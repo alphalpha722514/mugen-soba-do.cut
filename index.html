@@ -314,6 +314,9 @@ body{
   padding:8px;resize:vertical;
 }
 .backup-actions{display:flex;gap:8px;}
+.vis-row{display:flex;flex-direction:column;gap:6px;}
+.vis-opts{display:flex;flex-wrap:wrap;gap:6px;}
+.vis-opt[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-ink);border-color:var(--btn-edge);}
 .save-msg{margin:0;min-height:1.2em;font-size:.74rem;color:var(--accent2-ink);}
 .btn-small{
   font:inherit;font-weight:700;font-size:.78rem;
@@ -965,6 +968,15 @@ body{
     <details id="settings" class="settings">
       <summary>記録と設定</summary>
       <div class="settings-body">
+        <div class="vis-row" role="group" aria-labelledby="vis-title">
+          <span id="vis-title" class="backup-title">描画の細かさ</span>
+          <div class="vis-opts">
+            <button class="btn-small vis-opt" type="button" data-detail="high" aria-pressed="false">高</button>
+            <button class="btn-small vis-opt" type="button" data-detail="standard" aria-pressed="true">標準</button>
+            <button class="btn-small vis-opt" type="button" data-detail="low" aria-pressed="false">軽量</button>
+          </div>
+          <p class="save-note">器のそばの見た目です（得点や判定は変わりません）。軽量にすると、そばの粒や香りの湯気を省いて描画を軽くします。</p>
+        </div>
         <p class="save-note">記録はこの端末のブラウザ内にのみ保存されます。端末やブラウザを変えると引き継がれません。</p>
         <div class="clear-row">
           <button id="btn-clear" class="btn-small btn-danger" type="button">記録を消す</button>
@@ -1171,9 +1183,9 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内にのみ保存されます。端末やブラウザを変えると引き継がれません。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、段位、満足度の最高値、最大コンボ、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、図鑑（集めたアイテム・装備・ガチャの天井の回数・称号）、前回のそば粉、効果音のオン・オフ。</li>
+        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、段位、満足度の最高値、最大コンボ、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、図鑑（集めたアイテム・装備・ガチャの天井の回数・称号）、前回のそば粉、効果音のオン・オフ、描画の細かさ。</li>
         <li><b>引っ越し</b>ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
-        <li><b>リセット</b>「記録を消す」で自己ベストや段位などが初期状態に戻ります（効果音の設定・そば猪口コイン・図鑑と装備はそのまま）。</li>
+        <li><b>リセット</b>「記録を消す」で自己ベストや段位などが初期状態に戻ります（効果音と描画の設定・そば猪口コイン・図鑑と装備はそのまま）。</li>
         <li><b>そば猪口コイン</b>1回遊ぶごとに、得点÷20×お客さんの係数（観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2）。さらに自己ベスト更新で+150、最大コンボ10以上で+50（20以上なら+150）、本日のチャレンジ達成で+400（1日1回）。端数は切り捨て、1日に貯まるのは2,000まで（端末の日付で判定）。獲得した枚数と内訳はリザルトに出ます。</li>
         <li><b>ガチャと図鑑</b>ホームの「ガチャを引く」で、コインを使って越前・福井にちなんだアイテムを引けます（1回500・10連4,500）。確率・天井・被りの扱いはガチャ画面にいつも表示しています。集めたアイテムは「図鑑」で見られ、「装備する」で器・麺・包丁・背景・演出の色・効果音・称号を着せ替えられます（見た目と音だけで、得点や判定は変わりません）。</li>
       </ul>
@@ -1640,6 +1652,9 @@ var coinStatus = document.getElementById('coin-status');
 var STORE_KEY = 'echizenSoba.v1';
 var SCHEMA_VERSION = 10;   // 6 → 10: adds gacha (そば猪口コイン); older saves are carried over by coerceStore
 var LEGACY_KEYS = ['soba-dojo-bests','bestScores','soba-best','sobaBests'];
+// settings.visual.detail: how finely the bowl is drawn. Looks only; the schema stays 10 and saves without it get 'standard'.
+var VISUAL_DETAILS = ['high','standard','low'];
+var DEFAULT_VISUAL_DETAIL = 'standard';
 
 var RANK_LEVELS = [
   {min:0,     name:'見習い'},
@@ -1976,10 +1991,19 @@ function sanitizeGacha(raw){
   }
   return out;
 }
-// settings: not used by this version, but kept exactly as saved if a save carries it
+// settings: kept exactly as saved if a save carries it (settings.sound, settings.visual, and anything else)
 function sanitizeSettings(raw){
   if(!isPlainObj(raw)) return null;
   try{ return JSON.parse(JSON.stringify(raw)); }catch(e){ return null; }
+}
+function isVisualDetail(v){ return typeof v==='string' && VISUAL_DETAILS.indexOf(v)>=0; }
+function hasValidVisual(st){ return isPlainObj(st) && isPlainObj(st.visual) && isVisualDetail(st.visual.detail); }
+// Fills in settings.visual when a save has none (or an unknown detail). Every other setting is left as it is.
+function withVisualDefaults(st){
+  var out = isPlainObj(st) ? st : {};
+  if(!isPlainObj(out.visual)) out.visual = {detail:DEFAULT_VISUAL_DETAIL};
+  else if(!isVisualDetail(out.visual.detail)) out.visual.detail = DEFAULT_VISUAL_DETAIL;
+  return out;
 }
 
 function readRawLS(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
@@ -2049,7 +2073,7 @@ function ensureDailyFresh(store){
 }
 
 function defaultStore(){
-  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, rank:{bestTotal:0}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha() };
+  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, rank:{bestTotal:0}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha(), settings:{visual:{detail:DEFAULT_VISUAL_DETAIL}} };
 }
 
 function sanitizeFlatBests(raw){
@@ -2143,8 +2167,7 @@ function coerceStore(obj){
     lastPlayedSeasonal:sanitizeLastSeasonal(obj.lastPlayedSeasonal),
     gacha:sanitizeGacha(obj.gacha)
   };
-  var settings = sanitizeSettings(obj.settings);
-  if(settings) out.settings = settings;
+  out.settings = withVisualDefaults(sanitizeSettings(obj.settings));   // settings.visual gets its default when missing
   return out;
 }
 
@@ -2170,23 +2193,32 @@ function attemptMigration(){
   if(!any) return null;
   var bests = {};
   if(Object.keys(merged).length){ bests[DEFAULT_STYLE] = merged; }
-  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:bests, rank:{bestTotal:sumBests(bests)}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha() };
+  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:bests, rank:{bestTotal:sumBests(bests)}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha(), settings:{visual:{detail:DEFAULT_VISUAL_DETAIL}} };
 }
 
 function loadStore(){
   var raw = readRawLS(STORE_KEY);
   var store;
   var upgraded = false;
+  var visualAdded = false;
   if(raw===null){
     store = attemptMigration() || defaultStore();
   } else {
     store = safeParseStore(raw);
     upgraded = isOlderSchema(raw);
     if(upgraded) backupBeforeUpgrade(raw);
+    visualAdded = lacksVisual(raw);
   }
   var dailyChanged = ensureDailyFresh(store);
-  if(raw===null || upgraded || dailyChanged){ saveStoreObj(store); }
+  if(raw===null || upgraded || dailyChanged || visualAdded){ saveStoreObj(store); }
   return store;
+}
+// A readable save without settings.visual is written back once with the default filled in (nothing else changes).
+function lacksVisual(raw){
+  try{
+    var o = JSON.parse(raw);
+    return isPlainObj(o) && !hasValidVisual(o.settings);
+  }catch(e){ return false; }
 }
 // A readable save from an older schema is written back once in the current shape (its bests carried over as they are).
 function isOlderSchema(raw){
@@ -2234,10 +2266,12 @@ function importStoreString(text){
   }
   var coerced = coerceStore(obj);
   // a backup made before coins existed must not wipe the coins (or settings) saved now
-  if(!isPlainObj(obj.gacha) || !isPlainObj(obj.settings)){
+  if(!isPlainObj(obj.gacha) || !isPlainObj(obj.settings) || !hasValidVisual(obj.settings)){
     var current = loadStore();
     if(!isPlainObj(obj.gacha)) coerced.gacha = current.gacha;
     if(!isPlainObj(obj.settings) && current.settings) coerced.settings = current.settings;
+    // a backup made before the drawing setting existed keeps this device's choice
+    else if(!hasValidVisual(obj.settings) && hasValidVisual(current.settings)) coerced.settings.visual.detail = current.settings.visual.detail;
   }
   ensureDailyFresh(coerced);
   saveStoreObj(coerced);
@@ -2841,7 +2875,7 @@ btnExport.addEventListener('click', function(){
 btnImport.addEventListener('click', function(){
   var result = importStoreString(saveIo.value);
   showSaveMsg(result.message);
-  if(result.ok){ renderHome(); refreshSoundPref(); }
+  if(result.ok){ renderHome(); refreshSoundPref(); refreshVisualPref(); }
 });
 
 // ---------- Result card image (結果を画像で保存) ----------
@@ -3491,6 +3525,48 @@ btnSoundToggle.addEventListener('click', function(){
   btnSoundToggle.textContent = audioEnabled ? '🔊' : '🔇';
   saveSoundPref(audioEnabled);
 });
+
+// 描画の細かさ (settings.visual.detail): read from the save here and kept in memory, so drawing never reads the save.
+function loadVisualDetail(){
+  try{
+    var st = loadStore().settings;
+    if(hasValidVisual(st)) return st.visual.detail;
+  }catch(e){}
+  return DEFAULT_VISUAL_DETAIL;
+}
+function saveVisualDetail(detail){
+  if(!isVisualDetail(detail)) return false;
+  try{
+    var store = loadStore();
+    var st = isPlainObj(store.settings) ? store.settings : {};
+    var vis = isPlainObj(st.visual) ? st.visual : {};
+    vis.detail = detail;
+    st.visual = vis;
+    store.settings = st;
+    return saveStoreObj(store);
+  }catch(e){ return false; }
+}
+var visualDetail = loadVisualDetail();
+var visOptEls = document.querySelectorAll('.vis-opt');
+function syncVisualButtons(){
+  for(var i=0;i<visOptEls.length;i++){
+    visOptEls[i].setAttribute('aria-pressed', visOptEls[i].getAttribute('data-detail')===visualDetail ? 'true' : 'false');
+  }
+}
+// after a backup was read in (it may carry settings.visual)
+function refreshVisualPref(){
+  try{ visualDetail = loadVisualDetail(); syncVisualButtons(); }catch(e){}
+}
+for(var vo=0; vo<visOptEls.length; vo++){
+  visOptEls[vo].addEventListener('click', function(){
+    var d = this.getAttribute('data-detail');
+    if(!isVisualDetail(d)) return;
+    visualDetail = d;
+    saveVisualDetail(d);
+    syncVisualButtons();
+  });
+}
+syncVisualButtons();
 
 function playJustSound(){
   if(!audioEnabled) return;
@@ -5284,21 +5360,6 @@ var BOWL_DECOS = {
   }
 };
 
-// --- ③ 麺: small dark grains along a strand (十割・田舎・挽きぐるみ); the strand's width is left as it was cut ---
-function drawStrandSpecks(xx, yy, curveH, p, nsk){
-  var rnd = cardRng(Math.floor((p.seed!==undefined ? p.seed : 0.5) * 1000003) + 17);
-  var n = 4 + Math.round(p.thickness*0.5), r = Math.max(0.6, p.thickness*0.09);
-  ctx.fillStyle = nsk.speck;
-  for(var k=0;k<n;k++){
-    var t = 0.08 + rnd()*0.84, off = (rnd() - 0.5)*p.thickness*0.6, mt = 1 - t;
-    var px = mt*mt*(xx-26) + 2*mt*t*xx + t*t*(xx+26);
-    var py = mt*mt*(yy+6) + 2*mt*t*(yy+curveH) + t*t*(yy+6) + off;
-    ctx.beginPath();
-    ctx.arc(px, py, r, 0, Math.PI*2);
-    ctx.fill();
-  }
-}
-
 // --- 道具: the knife's blade pattern and handle bands (in the knife's own coordinates: blade x 0..38, y -42..2) ---
 var tsuchimeDents = null;
 function drawBladeDeco(tk){
@@ -6361,6 +6422,476 @@ function drawSpiceMeter(){
   }
 }
 
+// ---------- 越前おろしそば: the noodles, tsuyu and toppings in the bowl (drawing only) ----------
+// Nothing here changes a score, a judgement, the aroma or a customer's satisfaction; it only reads them.
+// A noodle's width still comes from its cut (state.batch[i].thickness, MIN_THICK..MAX_THICK). One cut through the
+// folded dough gives a small bundle of strands, each as wide as that cut, so a clean cut still shows as fine soba.
+// The noodles themselves stay in the brown of 越前そば, #6b5a3e–#8a7550 (dry and in tsuyu); edges and shade go darker.
+var FLOUR_LOOKS = {
+  // 二八: neat and even, the lightest brown, few grains and a clear shine
+  '二八':      {id:'二八', fills:['#8a7550','#857150','#7f6c4b'], soak:['#83704c','#7e6b49','#786646'],
+               outline:'#524430', outlineSoak:'#3f3223', speck:'#2e2317', speckDensity:0.35, speckAlpha:0.22, husk:0, jitter:0.04, shine:0.26},
+  // 十割: a little darker, with the grains standing out
+  '十割':      {id:'十割', fills:['#7d6949','#786546','#736143'], soak:['#776446','#726043','#6d5c40'],
+               outline:'#4a3e2b', outlineSoak:'#3b2f20', speck:'#2a1f14', speckDensity:0.8, speckAlpha:0.32, husk:0.08, jitter:0.1, shine:0.18},
+  // 挽きぐるみ: the deepest colour and the most grains (the husk is ground in with it)
+  '挽きぐるみ': {id:'挽きぐるみ', fills:['#6f5d40','#6c5b3f','#6b5a3e'], soak:['#6d5b3f','#6b5a3e','#6b5a3e'],
+               outline:'#403625', outlineSoak:'#342a1d', speck:'#21170e', speckDensity:1.35, speckAlpha:0.4, husk:0.22, jitter:0.16, shine:0.12}
+};
+// settings.visual.detail → how much is drawn. 'low' leaves out the grains, the aroma wisps and most small touches.
+var DETAIL_CONF = {
+  high:     {strands:4, pts:22, speck:1.3, husk:true,  steam:5, katsuo:10, negi:18, oroshi:13, oroshiDots:18, fibers:true,  poolShine:true,  glints:true},
+  standard: {strands:4, pts:16, speck:1,   husk:true,  steam:3, katsuo:7,  negi:12, oroshi:10, oroshiDots:9,  fibers:false, poolShine:true,  glints:false},
+  low:      {strands:2, pts:10, speck:0,   husk:false, steam:0, katsuo:4,  negi:7,  oroshi:6,  oroshiDots:0,  fibers:false, poolShine:false, glints:false}
+};
+function detailConf(){ return DETAIL_CONF[visualDetail] || DETAIL_CONF[DEFAULT_VISUAL_DETAIL]; }
+
+// the bowl's extras never stop the game: if one ever fails, that frame just goes without it
+function safeDraw(fn){
+  ctx.save();
+  try{ fn(); }catch(e){}
+  ctx.restore();
+}
+// 香り: how strongly the bowl shows it, 0..1 (only a high gauge shows; the gauge itself is only read)
+function aromaStrength(){
+  if(!state.styleConf || !state.styleConf.hasAroma) return 0;
+  return Math.max(0, Math.min(1, (state.aromaBonus/AROMA_MAX - 0.35)/0.65));
+}
+// the pieces of this bowl, as a short key (a new bowl, or a change of look, lays everything out again)
+function batchKey(pieces){
+  var s = pieces.length + ':';
+  for(var i=0;i<pieces.length;i++) s += (pieces[i].seed!==undefined ? pieces[i].seed : i) + '/' + pieces[i].thickness + ',';
+  return s;
+}
+
+// The colours and texture for this bowl: an equipped 麺 keeps its own colours (and has grains only if it had them),
+// 新そばモード keeps its green, and otherwise the flour chosen on the home screen decides.
+function noodleLook(nsk){
+  var f = FLOUR_LOOKS[state.style] || FLOUR_LOOKS[DEFAULT_STYLE];
+  if(nsk) return {id:'skin:' + nsk.id, fills:nsk.fills, soak:nsk.soak, outline:nsk.outline, outlineSoak:nsk.outlineSoak,
+                  speck:nsk.speck || null, speckDensity:0.9, speckAlpha:0.6, husk:0, jitter:0.08,
+                  shine:(typeof nsk.shine==='number' ? nsk.shine : 0.16)};
+  if(state.mode==='shinsoba') return {id:'shin:' + f.id, fills:STRAND_FILLS_SHIN, soak:f.soak, outline:f.outline, outlineSoak:f.outlineSoak,
+                  speck:f.speck, speckDensity:f.speckDensity, speckAlpha:f.speckAlpha, husk:f.husk, jitter:f.jitter, shine:f.shine};
+  return f;
+}
+
+// The heap: a low mound in the middle of the bowl. Each cut's bundle runs across the mound in its own direction
+// with a gentle wave and goes over its edge. It is worked out once per bowl and kept, so a frame only draws.
+// Points are relative to (bowlCX, bowlCY); u, v are across / front-to-back on the mound (its foot is radius 1).
+var HEAP_RX = 80, HEAP_RY = 20, HEAP_H = 30, HEAP_BASE = 32;
+function moundPoint(u, v, sc){
+  sc = sc || 1;
+  return {x:u*HEAP_RX*sc, y:HEAP_BASE + (v*HEAP_RY - HEAP_H*Math.pow(Math.max(0, 1 - u*u - v*v), 0.75))*sc};
+}
+// fewer cuts make a smaller mound (a full bowl is PATTERN_LENGTH cuts); the strands keep the width of their cut
+function heapScale(n){ return 0.6 + 0.4*Math.min(1, n/PATTERN_LENGTH); }
+// the mound's outline: its top edge seen from the front, then the front of its foot
+var moundTop = null;
+function traceMound(cx, oy, sc){
+  if(!moundTop){
+    moundTop = [];
+    for(var i=0;i<=28;i++){
+      var u = -1 + i/14, lim = Math.sqrt(Math.max(0, 1 - u*u)), best = HEAP_BASE;
+      for(var j=0;j<=16;j++) best = Math.min(best, moundPoint(u, -lim*j/16).y);
+      moundTop.push({x:u*HEAP_RX, y:best});
+    }
+  }
+  ctx.beginPath();
+  ctx.moveTo(cx + moundTop[0].x*sc, oy + HEAP_BASE + (moundTop[0].y - HEAP_BASE)*sc);
+  for(var k=1;k<moundTop.length;k++) ctx.lineTo(cx + moundTop[k].x*sc, oy + HEAP_BASE + (moundTop[k].y - HEAP_BASE)*sc);
+  ctx.ellipse(cx, oy + HEAP_BASE, HEAP_RX*sc, HEAP_RY*sc, 0, 0, Math.PI);
+  ctx.closePath();
+}
+var heapCache = {key:'', bundles:null};
+function heapLayout(pieces, conf, look){
+  var key = visualDetail + '|' + look.id + '|' + batchKey(pieces);
+  if(heapCache.key===key && heapCache.bundles) return heapCache.bundles;
+  var bundles = [], sc = heapScale(pieces.length);
+  for(var i=0;i<pieces.length;i++) bundles.push(buildBundle(pieces[i], i, conf, look, sc));
+  bundles.sort(function(a, b){ return a.depth - b.depth; });   // back to front
+  heapCache = {key:key, bundles:bundles};
+  return bundles;
+}
+function buildBundle(p, i, conf, look, sc){
+  var seed = p.seed!==undefined ? p.seed : (i*0.37)%1;
+  var seedInt = Math.floor(seed*1000003) + 7919*(i+1);
+  var rnd = cardRng(seedInt), grain = cardRng(seedInt + 104729);
+  var sw = Math.max(1.8, p.thickness*0.36);      // every strand is as wide as the cut: a clean cut gives thin soba
+  // where the bundle lies: a line across the mound (a depth from back to front, a direction), running over its edge
+  var cv = -0.6 + 1.25*((i*0.618034 + seed*0.41) % 1), cu = (rnd() - 0.5)*0.5;
+  var phi = (rnd() - 0.5)*(cv>0.3 ? 0.9 : rnd()<0.7 ? 1.1 : 2.2), du = Math.cos(phi), dv = Math.sin(phi);
+  var cd = cu*du + cv*dv, sq = Math.sqrt(Math.max(0, cd*cd - (cu*cu + cv*cv) + 1));
+  var t0 = -cd - sq, t1 = -cd + sq;
+  var wa = 0.04 + rnd()*0.04, wf = 1.5 + rnd()*2, wp = rnd()*6.2832;
+  function at(f){
+    var t = t0 + (t1 - t0)*f, wv = wa*Math.sin(wf*t + wp);
+    var pt = moundPoint(cu + t*du - wv*dv, cv + t*dv + wv*du, sc);
+    pt.d = cv + t*dv;
+    return pt;
+  }
+  var strands = [], depth = 0, k = conf.strands, m = conf.pts;
+  for(var j=0;j<k;j++){
+    var w = Math.max(1.6, sw*(1 + (rnd() - 0.5)*2*look.jitter));
+    var off = (j - (k-1)/2)*sw*1.1;
+    var driftA = sw*(0.3 + look.jitter*2), driftF = 1 + rnd()*2, driftP = rnd()*6.2832;
+    var xs = [], ys = [], len = 0;
+    for(var q=0;q<m;q++){
+      var f = q/(m - 1);
+      var a = at(f), b = at(f - 0.01), c = at(f + 0.01);
+      var tx = c.x - b.x, ty = c.y - b.y, tl = Math.sqrt(tx*tx + ty*ty) || 1;
+      var o = off + Math.sin(f*Math.PI*driftF + driftP)*driftA;
+      xs.push(a.x - ty/tl*o);
+      ys.push(a.y + tx/tl*o);
+      if(q>0){ var dx = xs[q] - xs[q-1], dy = ys[q] - ys[q-1]; len += Math.sqrt(dx*dx + dy*dy); }
+      if(j===0) depth += a.d;
+    }
+    strands.push({xs:xs, ys:ys, w:w, c:(i + j) % 3, specks:(look.speck && conf.speck>0) ? strandSpecks(xs, ys, len, w, grain, conf, look) : null});
+  }
+  return {strands:strands, depth:depth/m};
+}
+// そば粉の粒: faint small dark dots along a strand, and for 十割・挽きぐるみ a few larger flecks of husk
+function strandSpecks(xs, ys, len, w, rnd, conf, look){
+  var count = Math.round(look.speckDensity*conf.speck*(len/10)*(0.5 + w/5));
+  if(count<=0) return null;
+  var out = [], m = xs.length;
+  for(var s=0;s<count;s++){
+    var t = rnd()*(m - 1), q = Math.min(m - 2, Math.floor(t)), fr = t - q;
+    var tx = xs[q+1] - xs[q], ty = ys[q+1] - ys[q], tl = Math.sqrt(tx*tx + ty*ty) || 1;
+    var o = (rnd() - 0.5)*Math.max(0, w - 1.2)*0.85;
+    var husk = conf.husk && rnd()<look.husk;
+    var sz = husk ? 1.5 + rnd()*0.8 : 0.8 + rnd()*0.6;
+    out.push({x:xs[q] + tx*fr - ty/tl*o, y:ys[q] + ty*fr + tx/tl*o, s:sz, a:Math.min(0.8, look.speckAlpha*(husk ? 1.6 : 0.7 + rnd()*0.6)),
+              h:husk ? Math.atan2(ty, tx) + (rnd() - 0.5)*0.8 : null});
+  }
+  return out;
+}
+function traceStrand(xs, ys, i0, i1, ox, oy){
+  ctx.beginPath();
+  ctx.moveTo(ox + xs[i0], oy + ys[i0]);
+  for(var q=i0+1; q<i1; q++){
+    ctx.quadraticCurveTo(ox + xs[q], oy + ys[q], ox + (xs[q] + xs[q+1])/2, oy + (ys[q] + ys[q+1])/2);
+  }
+  ctx.lineTo(ox + xs[i1], oy + ys[i1]);
+}
+// the heap's height above where it rests: it rises from the tray during the lift and settles into the bowl
+function heapRise(cy, liftT){
+  if(liftT===null) return 0;
+  var pr = Math.max(0, Math.min(1, liftT/700));
+  return (trayY() - (cy + HEAP_BASE))*(1 - pr)*(1 - pr);
+}
+// liftT: ms into the lift (null once the noodles are in the bowl); shine: the sheen's strength (a high aroma adds to it)
+function drawNoodleHeap(bundles, cx, cy, look, soaked, liftT, shine, sc){
+  var fills = soaked ? look.soak : look.fills;
+  var outline = soaked ? look.outlineSoak : look.outline;
+  var oy = cy + heapRise(cy, liftT);
+  var sheen = 'rgba(255,245,225,' + shine.toFixed(3) + ')';
+  // a soft shade in the bowl under the mound, once it has settled
+  var settle = liftT===null ? 1 : Math.max(0, Math.min(1, (liftT - 450)/250));
+  if(settle>0){
+    ctx.save();
+    ctx.translate(cx, cy + HEAP_BASE + 3);
+    ctx.scale(1, 0.3);
+    var bed = ctx.createRadialGradient(0, 0, 10, 0, 0, HEAP_RX*sc + 10);
+    bed.addColorStop(0, 'rgba(38,24,12,' + (0.5*settle).toFixed(3) + ')');
+    bed.addColorStop(1, 'rgba(38,24,12,0)');
+    ctx.fillStyle = bed;
+    ctx.beginPath();
+    ctx.arc(0, 0, HEAP_RX*sc + 10, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+  // the mound itself (the noodles under the ones on top), then the strands on it
+  traceMound(cx, oy, sc);
+  var body = ctx.createLinearGradient(0, oy + HEAP_BASE - 36*sc, 0, oy + HEAP_BASE + HEAP_RY*sc);
+  body.addColorStop(0, fills[0]);
+  body.addColorStop(0.6, fills[2]);
+  body.addColorStop(1, outline);
+  ctx.fillStyle = body;
+  ctx.fill();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  for(var b=0;b<bundles.length;b++){
+    var B = bundles[b];
+    for(var j=0;j<B.strands.length;j++){
+      var S = B.strands[j], last = S.xs.length - 1;
+      traceStrand(S.xs, S.ys, 0, last, cx, oy);
+      ctx.strokeStyle = outline;
+      ctx.lineWidth = S.w + Math.max(0.9, S.w*0.3);
+      ctx.stroke();
+      ctx.strokeStyle = fills[S.c % fills.length];
+      ctx.lineWidth = S.w;
+      ctx.stroke();
+      if(S.specks){
+        ctx.fillStyle = look.speck;
+        for(var s=0;s<S.specks.length;s++){
+          var sp = S.specks[s];
+          ctx.globalAlpha = sp.a;
+          if(sp.h===null) ctx.fillRect(cx + sp.x - sp.s/2, oy + sp.y - sp.s/2, sp.s, sp.s);
+          else{ ctx.beginPath(); ctx.ellipse(cx + sp.x, oy + sp.y, sp.s*0.7, sp.s*0.35, sp.h, 0, Math.PI*2); ctx.fill(); }   // a fleck of husk
+        }
+        ctx.globalAlpha = 1;
+      }
+      if(S.w>=2.2 && shine>0){
+        var i0 = Math.floor(last*0.25), i1 = Math.max(i0 + 1, Math.floor(last*0.7));
+        traceStrand(S.xs, S.ys, i0, i1, cx, oy - S.w*0.2);
+        ctx.strokeStyle = sheen;
+        ctx.lineWidth = Math.max(0.6, S.w*0.3);
+        ctx.stroke();
+      }
+    }
+  }
+}
+// 光沢: with a high aroma, a few points of light twinkle on top of the heap ('high' only)
+function drawHeapGlints(bundles, cx, cy, k){
+  var tops = [];
+  for(var b=0;b<bundles.length;b++){
+    var S = bundles[b].strands[0], mid = Math.floor(S.xs.length/2);
+    tops.push({x:cx + S.xs[mid], y:cy + S.ys[mid] - S.w*0.3});
+  }
+  tops.sort(function(a, b){ return a.y - b.y; });
+  var t = lookTime(performance.now());
+  ctx.lineCap = 'round';
+  for(var i=0;i<Math.min(4, tops.length);i++){
+    var tw = 0.5 + 0.5*Math.sin(t*3 + i*1.7), r = 1.2 + 1.2*tw, x = tops[i].x, y = tops[i].y;
+    ctx.strokeStyle = 'rgba(255,250,235,' + (0.55*k).toFixed(3) + ')';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.moveTo(x - r, y); ctx.lineTo(x + r, y);
+    ctx.moveTo(x, y - r*0.7); ctx.lineTo(x, y + r*0.7);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,' + ((0.6 + 0.3*tw)*k).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(x, y, 0.8, 0, Math.PI*2); ctx.fill();
+  }
+}
+// the plain bowl's front lip catching the light (an equipped 器 draws its own rim)
+function drawBowlLip(cx, cy){
+  ctx.strokeStyle = 'rgba(255,236,205,0.4)';
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy+32, 100, 26, 0, 0.06*Math.PI, 0.94*Math.PI);
+  ctx.stroke();
+}
+// つゆ: spreads under the noodles as it is poured (g: 0..1)
+function drawTsuyuPool(cx, cy, g, conf){
+  if(g<=0) return;
+  var rx = 96*(0.55 + 0.45*g), ry = 23*(0.55 + 0.45*g);
+  ctx.fillStyle = 'rgba(92,54,22,' + (0.5*g).toFixed(3) + ')';
+  ctx.beginPath();
+  ctx.ellipse(cx, cy+33, rx, ry, 0, 0, Math.PI*2);
+  ctx.fill();
+  if(conf.poolShine){
+    ctx.strokeStyle = 'rgba(255,236,200,' + (0.4*g).toFixed(3) + ')';
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy+33, rx*0.9, ry*0.78, 0, 1.1*Math.PI, 1.55*Math.PI);
+    ctx.stroke();
+  }
+}
+
+// 薬味: 大根おろし (white and fluffy, with a pale shadow), 花かつお (pale pink-beige flakes), 刻みねぎ (green rings).
+// Laid out once per bowl on top of the mound; they drop in while the tsuyu is poured and stay until the customer eats.
+var TOPPING_AT = {oroshi:240, katsuo:420, negi:560};
+var OROSHI_X = -6, OROSHI_Y = 9;                    // the foot of the grated-daikon mound on a full bowl, relative to the bowl
+var KATSUO_COLS = [['#efd1bb','#c4906f'], ['#e5bea1','#b58062'], ['#f5e2d0','#cfa183'], ['#dcae90','#a87658']];   // [face, edge]
+var NEGI_COLS = [['#4f9a31','#cfe8a9'], ['#72b44a','#e0f0c6'], ['#a8d27b','#f3f8e6']];   // [ring, centre]: green, light green, white part
+var toppingCache = {key:'', set:null};
+function toppingLayout(pieces, conf){
+  var key = visualDetail + '|' + batchKey(pieces);
+  if(toppingCache.key===key && toppingCache.set) return toppingCache.set;
+  var s = 0;
+  for(var i=0;i<pieces.length;i++) s += (pieces[i].seed!==undefined ? pieces[i].seed : 0.5)*(i + 1);
+  var rnd = cardRng(Math.floor((s % 1)*1000003) + 101);
+  var sc = heapScale(pieces.length);
+  var set = {ox:OROSHI_X*sc, oy:HEAP_BASE + (OROSHI_Y - HEAP_BASE)*sc, oroshi:[], dots:[], fibers:[], katsuo:[], negi:[]};
+  for(var o=0;o<conf.oroshi;o++){                  // clumps: wide at the foot, narrowing to the top
+    var lv = o/Math.max(1, conf.oroshi - 1);
+    set.oroshi.push({x:(rnd()*2 - 1)*23*(1 - lv*0.6), y:6 - lv*18 + (rnd() - 0.5)*3, r:7 + rnd()*3.5 - lv*2});
+  }
+  for(var d=0;d<conf.oroshiDots;d++){
+    var dl = rnd();
+    set.dots.push({x:(rnd()*2 - 1)*20*(1 - dl*0.6), y:5 - dl*17, a:0.3 + rnd()*0.35});
+  }
+  if(conf.fibers){
+    for(var fb=0;fb<9;fb++){
+      var fl = rnd();
+      set.fibers.push({x:(rnd()*2 - 1)*17*(1 - fl*0.6), y:4 - fl*16, a:(rnd() - 0.5)*1.4, l:3 + rnd()*3});
+    }
+  }
+  for(var kt=0;kt<conf.katsuo;kt++){
+    var kx, ky;
+    if(kt%2===0){ kx = set.ox + (rnd()*2 - 1)*17; ky = set.oy - 15 + rnd()*14; }   // on the oroshi
+    else{ var ka = rnd()*6.2832, kr = 0.35 + 0.5*Math.sqrt(rnd()), kp = moundPoint(Math.cos(ka)*kr, Math.sin(ka)*kr, sc); kx = kp.x; ky = kp.y; }
+    var jag = [];
+    for(var jg=0;jg<7;jg++) jag.push(0.62 + rnd()*0.46);
+    set.katsuo.push({x:kx, y:ky, l:11 + rnd()*5, w:6 + rnd()*3, a:(rnd() - 0.5)*1.4, curl:rnd()*6.2832, jag:jag,
+                     roll:Math.floor(rnd()*7), c:Math.floor(rnd()*KATSUO_COLS.length), at:TOPPING_AT.katsuo + kt*16});
+  }
+  for(var ng=0;ng<conf.negi;ng++){
+    var na = rnd()*6.2832, nr = 0.15 + 0.7*Math.sqrt(rnd()), np = moundPoint(Math.cos(na)*nr, Math.sin(na)*nr, sc);
+    var nk = rnd();
+    set.negi.push({x:np.x, y:np.y - 1, r:2.1 + rnd()*1, a:rnd()*3.1416, kind:nk<0.45 ? 0 : nk<0.8 ? 1 : 2,
+                   at:TOPPING_AT.negi + ng*14});
+  }
+  set.negi.sort(function(a, b){ return a.y - b.y; });
+  toppingCache = {key:key, set:set};
+  return set;
+}
+// how far one topping has dropped in: null before it appears (no fall with prefers-reduced-motion)
+function toppingDrop(clock, at){
+  var t = (clock - at)/200;
+  if(t<=0) return null;
+  if(t>=1) return {a:1, dy:0};
+  var e = 1 - (1 - t)*(1 - t);
+  var still = reducedMotionMQ && reducedMotionMQ.matches;
+  return {a:Math.min(1, t*1.8), dy:still ? 0 : -12*(1 - e)};
+}
+// one shaving of 花かつお: a thin, papery flake with a wavy outline, one rolled edge, fine streaks and a soft light
+function drawKatsuoFlake(k, x, y){
+  var col = KATSUO_COLS[k.c], L = k.l/2, Wd = k.w/2, n = k.jag.length, pts = [], i;
+  for(i=0;i<n;i++){
+    var an = i*2*Math.PI/n;
+    pts.push({x:Math.cos(an)*L*k.jag[i], y:Math.sin(an)*Wd*k.jag[i] + Math.sin(an*2 + k.curl)*Wd*0.35});
+  }
+  var ga = ctx.globalAlpha;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(k.a);
+  ctx.beginPath();
+  ctx.moveTo((pts[n-1].x + pts[0].x)/2, (pts[n-1].y + pts[0].y)/2);
+  for(i=0;i<n;i++){
+    var nx = pts[(i + 1)%n];
+    ctx.quadraticCurveTo(pts[i].x, pts[i].y, (pts[i].x + nx.x)/2, (pts[i].y + nx.y)/2);
+  }
+  ctx.closePath();
+  ctx.globalAlpha = ga*0.92;
+  ctx.fillStyle = col[0];
+  ctx.fill();
+  ctx.globalAlpha = ga;
+  ctx.strokeStyle = col[1];
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+  var r0 = pts[k.roll%n], r1 = pts[(k.roll + 1)%n], r2 = pts[(k.roll + 2)%n];
+  ctx.globalAlpha = ga*0.75;
+  ctx.lineWidth = 1.1;
+  ctx.beginPath();
+  ctx.moveTo((r0.x + r1.x)/2, (r0.y + r1.y)/2);
+  ctx.quadraticCurveTo(r1.x, r1.y, (r1.x + r2.x)/2, (r1.y + r2.y)/2);
+  ctx.stroke();
+  ctx.globalAlpha = ga*0.4;
+  ctx.lineWidth = 0.4;
+  ctx.beginPath();
+  ctx.moveTo(-L*0.6, -Wd*0.15); ctx.quadraticCurveTo(0, -Wd*0.1 + Math.sin(k.curl)*Wd*0.3, L*0.6, -Wd*0.25);
+  ctx.moveTo(-L*0.5, Wd*0.3); ctx.quadraticCurveTo(0, Wd*0.35 + Math.cos(k.curl)*Wd*0.3, L*0.5, Wd*0.2);
+  ctx.stroke();
+  ctx.globalAlpha = ga*0.45;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.ellipse(-L*0.15, -Wd*0.2, L*0.35, Wd*0.22, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+function drawToppings(set, cx, cy, clock){
+  var i, dr;
+  // 大根おろし: its shadow on the noodles, a pale blue-grey shade under each clump, then the white, fluffy tops.
+  // It drops in solid (a see-through clump would show its own shading), only its shadow fades in.
+  var od = toppingDrop(clock, TOPPING_AT.oroshi);
+  if(od){
+    var ox = cx + set.ox, oy = cy + set.oy + od.dy;
+    ctx.globalAlpha = od.a;
+    ctx.fillStyle = 'rgba(36,24,12,0.28)';
+    ctx.beginPath();
+    ctx.ellipse(cx + set.ox + 3, cy + set.oy + 12, 31, 7, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#cdd5d9';
+    for(i=0;i<set.oroshi.length;i++){
+      var bl = set.oroshi[i];
+      ctx.beginPath(); ctx.arc(ox + bl.x + 0.8, oy + bl.y + 1.4, bl.r, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.fillStyle = '#fcfbf6';
+    for(i=0;i<set.oroshi.length;i++){
+      var bt = set.oroshi[i];
+      ctx.beginPath(); ctx.arc(ox + bt.x - 0.3, oy + bt.y - 0.6, bt.r*0.84, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.fillStyle = '#aab6b8';                      // the grated grain
+    for(i=0;i<set.dots.length;i++){
+      var gd = set.dots[i];
+      ctx.globalAlpha = gd.a;
+      ctx.fillRect(ox + gd.x, oy + gd.y, 0.9, 0.9);
+    }
+    ctx.globalAlpha = 1;
+    if(set.fibers.length){
+      ctx.strokeStyle = 'rgba(168,182,184,0.75)';
+      ctx.lineWidth = 0.5;
+      for(i=0;i<set.fibers.length;i++){
+        var fi = set.fibers[i], fx = Math.cos(fi.a)*fi.l/2, fy = Math.sin(fi.a)*fi.l/2;
+        ctx.beginPath();
+        ctx.moveTo(ox + fi.x - fx, oy + fi.y - fy);
+        ctx.quadraticCurveTo(ox + fi.x + fy*0.6, oy + fi.y - 1.2, ox + fi.x + fx, oy + fi.y + fy);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  // 花かつお
+  for(i=0;i<set.katsuo.length;i++){
+    var kf = set.katsuo[i];
+    dr = toppingDrop(clock, kf.at);
+    if(!dr) continue;
+    ctx.globalAlpha = dr.a;
+    drawKatsuoFlake(kf, cx + kf.x, cy + kf.y + dr.dy);
+  }
+  ctx.globalAlpha = 1;
+  // 刻みねぎ: small green rings with a pale centre
+  for(i=0;i<set.negi.length;i++){
+    var ng = set.negi[i], nc = NEGI_COLS[ng.kind];
+    dr = toppingDrop(clock, ng.at);
+    if(!dr) continue;
+    ctx.globalAlpha = dr.a;
+    ctx.fillStyle = nc[0];
+    ctx.beginPath(); ctx.ellipse(cx + ng.x, cy + ng.y + dr.dy, ng.r, ng.r*0.7, ng.a, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = nc[1];
+    ctx.beginPath(); ctx.ellipse(cx + ng.x, cy + ng.y + dr.dy, ng.r*0.5, ng.r*0.34, ng.a, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function canvasIsDark(){
+  var m = /^#([0-9a-f]{6})$/i.exec(COLORS.card || '');
+  if(!m) return false;
+  var v = parseInt(m[1], 16);
+  return (0.299*((v >> 16) & 255) + 0.587*((v >> 8) & 255) + 0.114*(v & 255)) < 110;
+}
+// 香りの湯気: soft wisps rising from the bowl while the aroma gauge is high (none on 'low')
+function drawAromaSteam(cx, cy, k, n){
+  if(k<=0 || !n) return;
+  var t = lookTime(performance.now());
+  var dark = canvasIsDark();
+  var layers = dark ? [['255,250,240', 0.05, 11], ['255,250,240', 0.08, 6], ['255,255,255', 0.4, 2.6]]
+                   : [['120,106,90', 0.07, 11], ['150,138,122', 0.1, 6], ['255,255,255', 0.75, 2.6]];
+  ctx.lineCap = 'round';
+  for(var i=0;i<n;i++){
+    var bx = cx - 6 + (i - (n - 1)/2)*15 + Math.sin(i*2.3)*3;
+    var y0 = cy + 4 - (i%2)*3, y1 = cy - 34 - (i%3)*8 + Math.sin(t*0.8 + i)*4;
+    var ph = t*1.25 + i*1.9, sway = 5 + (i%2)*3, h = y0 - y1;
+    for(var L=0; L<layers.length; L++){
+      var col = layers[L][0], A = layers[L][1]*k;
+      var g = ctx.createLinearGradient(0, y0, 0, y1);
+      g.addColorStop(0, 'rgba(' + col + ',0)');
+      g.addColorStop(0.25, 'rgba(' + col + ',' + A.toFixed(3) + ')');
+      g.addColorStop(0.7, 'rgba(' + col + ',' + (A*0.55).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(' + col + ',0)');
+      ctx.strokeStyle = g;
+      ctx.lineWidth = layers[L][2];
+      ctx.beginPath();
+      ctx.moveTo(bx, y0);
+      ctx.bezierCurveTo(bx + Math.sin(ph)*sway, y0 - h*0.35, bx - Math.sin(ph + 1.3)*sway, y0 - h*0.7, bx + Math.sin(ph + 2.4)*sway*0.6, y1);
+      ctx.stroke();
+    }
+  }
+}
+
 function drawServing(){
   var s = state.serving;
   if(s.stage==='spice'){
@@ -6368,55 +6899,42 @@ function drawServing(){
     return;
   }
   var cx = bowlCX(), cy = bowlCY();
+  var conf = detailConf();
+  var poured = (s.stage==='pour' || s.stage==='soak' || s.stage==='caption');
+  var clock = s.stage==='pour' ? s.t : (poured ? 100000 : -1);   // ms since the tsuyu began to pour
+  var aromaK = aromaStrength();
 
   drawServingBowl(cx, cy);   // ③ 器 (着せ替え: the original bowl when none is equipped)
+  if(!skinPart('bowl')) safeDraw(function(){ drawBowlLip(cx, cy); });
+  if(poured) safeDraw(function(){ drawTsuyuPool(cx, cy, Math.max(0, Math.min(1, (clock - 120)/600)), conf); });
 
   var pieces = state.batch;
-  var liftProg = s.stage==='lift' ? Math.min(s.t/700,1) : 1;
   var soaked = (s.stage==='soak' || s.stage==='caption');
   var nsk = state.mode==='shinsoba' ? null : skinPart('noodle');   // ③ 麺 (着せ替え; 新そばモード keeps its own colours)
 
-  ctx.save();
-  ctx.beginPath();
-  ctx.ellipse(cx, cy+30, 96, 24, 0, 0, Math.PI*2);
-  ctx.clip();
-
-  for(var i=0;i<pieces.length;i++){
-    var p = pieces[i];
-    var seed = p.seed!==undefined ? p.seed : (i*0.37)%1;
-    var startY = trayY();
-    var endY = cy+18 + (seed-0.5)*26 - (i%3)*3;
-    var yy = startY + (endY-startY)*liftProg;
-    var xx = cx + (i-(pieces.length-1)/2)*11 + (seed-0.5)*8;
-    var curveH = -8 - seed*14;
-
-    ctx.strokeStyle = soaked ? (nsk ? nsk.outlineSoak : STRAND_OUTLINE_SOAK) : (nsk ? nsk.outline : STRAND_OUTLINE);
-    ctx.lineWidth = p.thickness+3;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(xx-26, yy+6);
-    ctx.quadraticCurveTo(xx, yy+curveH, xx+26, yy+6);
-    ctx.stroke();
-
-    var palette = soaked ? (nsk ? nsk.soak : STRAND_FILLS_SOAK) : (state.mode==='shinsoba' ? STRAND_FILLS_SHIN : (nsk ? nsk.fills : STRAND_FILLS));
-    ctx.strokeStyle = palette[i%palette.length];
-    ctx.lineWidth = p.thickness;
-    ctx.beginPath();
-    ctx.moveTo(xx-26, yy+6);
-    ctx.quadraticCurveTo(xx, yy+curveH, xx+26, yy+6);
-    ctx.stroke();
-    if(nsk && nsk.speck) guardedSkinDraw('noodle', function(){ drawStrandSpecks(xx, yy, curveH, p, nsk); });
-
-    if(p.thickness>7){
-      ctx.strokeStyle = nsk ? ('rgba(255,255,255,' + nsk.shine + ')') : 'rgba(255,255,255,0.16)';
-      ctx.lineWidth = Math.max(1,p.thickness*0.2);
+  if(pieces.length){
+    var look = noodleLook(nsk);
+    var liftT = s.stage==='lift' ? s.t : null;
+    var shine = Math.min(0.6, look.shine + (soaked ? 0.1 : 0) + aromaK*0.22);
+    var heap = function(){
+      var bundles = heapLayout(pieces, conf, look);
       ctx.beginPath();
-      ctx.moveTo(xx-16, yy+2+curveH*0.5);
-      ctx.quadraticCurveTo(xx, yy+curveH*0.85, xx+16, yy+2+curveH*0.5);
-      ctx.stroke();
+      ctx.ellipse(cx, cy+32, 100, 26, 0, 0, Math.PI*2);          // the bowl's opening...
+      ctx.moveTo(cx-94, cy+32);
+      ctx.ellipse(cx, cy+32, 94, 50, 0, Math.PI, Math.PI*2);     // ...and the mound rising over it
+      ctx.closePath();
+      ctx.clip();
+      drawNoodleHeap(bundles, cx, cy, look, soaked, liftT, shine, heapScale(pieces.length));
+      if(conf.glints && liftT===null && aromaK>0.25) drawHeapGlints(bundles, cx, cy, aromaK);
+    };
+    if(nsk) guardedSkinDraw('noodle', heap);
+    else safeDraw(heap);
+    if(poured){
+      var set = toppingLayout(pieces, conf);
+      safeDraw(function(){ drawToppings(set, cx, cy, clock); });
+      if(aromaK>0 && conf.steam) safeDraw(function(){ drawAromaSteam(cx, cy, aromaK*Math.min(1, clock/300), conf.steam); });
     }
   }
-  ctx.restore();
 
   if(s.stage==='pour' || s.stage==='soak' || s.stage==='caption'){
     var tilt = s.stage==='pour' ? Math.min(s.t/300,1) : 1;
