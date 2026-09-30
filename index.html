@@ -316,7 +316,9 @@ body{
 .backup-actions{display:flex;gap:8px;}
 .vis-row{display:flex;flex-direction:column;gap:6px;}
 .vis-opts{display:flex;flex-wrap:wrap;gap:6px;}
-.vis-opt[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-ink);border-color:var(--btn-edge);}
+.vis-opt[aria-pressed="true"],.fx-opt[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-ink);border-color:var(--btn-edge);}
+.fx-check{display:flex;align-items:center;gap:8px;font-size:.74rem;font-weight:700;color:var(--ink);cursor:pointer;}
+.fx-check input{width:18px;height:18px;margin:0;accent-color:var(--btn-bg);}
 .save-msg{margin:0;min-height:1.2em;font-size:.74rem;color:var(--accent2-ink);}
 .btn-small{
   font:inherit;font-weight:700;font-size:.78rem;
@@ -555,6 +557,48 @@ body{
   transition:opacity .25s;
 }
 .serving-caption.show{opacity:1;}
+/* ③ the customer's words (a bubble whose text types itself out) and the bowl's satisfaction as it goes in */
+.serve-bubble{
+  position:absolute;left:34%;right:4%;top:63%;
+  padding:7px 12px 9px;border-radius:14px;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:0 4px 10px var(--shadow);
+  font-weight:700;font-size:.9rem;line-height:1.45;text-align:left;
+  opacity:0;transform:translateY(6px) scale(.96);transform-origin:0 50%;transition:opacity .15s,transform .15s;
+  pointer-events:none;
+}
+.serve-bubble.show{opacity:1;transform:none;}
+.serve-bubble::before{
+  content:"";position:absolute;left:-7px;top:34px;width:12px;height:12px;
+  background:var(--card);border-left:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg);
+}
+.serve-bubble[data-tier="just"]{border-color:#d9a21b;box-shadow:0 0 0 2px rgba(217,162,27,.3),0 4px 10px var(--shadow);}
+.serve-bubble[data-tier="just"]::before{border-color:#d9a21b;}
+.sb-who{display:block;font-size:.7rem;color:var(--ink-soft);margin-bottom:1px;}
+.sb-stars{margin-left:5px;color:#d9a21b;opacity:0;transition:opacity .2s;}
+.sb-stars.show{opacity:1;}
+.satis-pop{
+  position:absolute;left:4%;top:56%;
+  padding:5px 11px;border-radius:999px;white-space:nowrap;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:0 3px 8px var(--shadow);
+  font-weight:700;font-size:.8rem;line-height:1.2;opacity:0;pointer-events:none;
+}
+.satis-pop b{font-size:1.2rem;font-weight:900;margin-left:2px;}
+.satis-pop.show{animation:satisPop 1.3s ease-out forwards;}
+.satis-pop[data-tier="just"]{color:#7a4f00;background:#fff3d2;border-color:#d9a21b;}
+.satis-pop[data-tier="good"]{color:var(--ok);}
+.satis-pop[data-tier="miss"]{color:#5a6b8c;}
+@keyframes satisPop{
+  0%{opacity:0;transform:translateY(8px) scale(.7);}
+  15%{opacity:1;transform:translateY(0) scale(1.08);}
+  28%{transform:scale(1);}
+  75%{opacity:1;transform:translateY(-6px);}
+  100%{opacity:0;transform:translateY(-14px);}
+}
+@media (prefers-reduced-motion:reduce){
+  .serve-bubble{transition:opacity .15s;transform:none;}
+  .satis-pop.show{animation:satisFade 1.3s linear forwards;}
+}
+@keyframes satisFade{0%{opacity:0;}10%{opacity:1;}80%{opacity:1;}100%{opacity:0;}}
 
 .tap-hint{margin-top:10px;color:var(--ink-soft);font-size:.85rem;}
 
@@ -977,6 +1021,16 @@ body{
           </div>
           <p class="save-note">器のそばの見た目です（得点や判定は変わりません）。軽量にすると、そばの粒や香りの湯気を省いて描画を軽くします。</p>
         </div>
+        <div class="vis-row" role="group" aria-labelledby="fx-title">
+          <span id="fx-title" class="backup-title">お客さんの反応の演出</span>
+          <div class="vis-opts">
+            <button class="btn-small fx-opt" type="button" data-level="high" aria-pressed="false">強め</button>
+            <button class="btn-small fx-opt" type="button" data-level="standard" aria-pressed="true">標準</button>
+            <button class="btn-small fx-opt" type="button" data-level="low" aria-pressed="false">控えめ</button>
+          </div>
+          <label class="fx-check"><input id="fx-particles" type="checkbox" checked> 紙吹雪やキラキラを出す</label>
+          <p class="save-note">1杯出したあとの演出の強さです（得点や満足度は変わりません）。演出は画面をタップすると飛ばせます。</p>
+        </div>
         <p class="save-note">記録はこの端末のブラウザ内にのみ保存されます。端末やブラウザを変えると引き継がれません。</p>
         <div class="clear-row">
           <button id="btn-clear" class="btn-small btn-danger" type="button">記録を消す</button>
@@ -1033,7 +1087,7 @@ body{
         <li class="flow-card">
           <svg class="flow-ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12h18a9 8 0 0 1-18 0z"/><path d="M9 21h6"/><path d="M13 3l-3 8M18 4l-4 7"/></svg>
           <span class="flow-verb">出す</span>
-          <span class="flow-text">盛り付けと出汁かけは自動。お客さんが感想をくれる。</span>
+          <span class="flow-text">盛り付け→出汁かけ→お客さんの反応。タップで飛ばせる。</span>
         </li>
       </ol>
       <p class="gnote">選んだお客さんが5人続けて来店し、5杯出したら修行終了です。1杯ごとにテンポが少し速くなります。</p>
@@ -1117,6 +1171,7 @@ body{
         <li><b>判定の幅</b>観光客・地元の常連はPERFECT ±90ms／切れる範囲 ±380ms、そば通・辛味大根マニアは ±45ms／±220ms。十割ではさらに3/4になります。</li>
         <li><b>駒板</b>大きいと、流れてくる印が包丁の手前で板に隠れます。</li>
         <li><b>満足度</b>切った麺の判定が良いほど上がり、ズレるほど下がります。厳しいお客さんほど下がり幅が大きい。</li>
+        <li><b>反応</b>出汁をかけたあと、お客さんが1杯の満足度に合わせて反応します（55未満でがっくり、55以上でうなずき、70以上で笑顔、90以上で大喜び）。演出は画面をタップすると飛ばせて、飛ばしても満足度はそのとき加わり「満足度 ○」と出ます。</li>
       </ul>
       <div class="spice-note">
         <p class="spice-title">辛味大根メーター（辛味大根マニアのときだけ）</p>
@@ -1183,9 +1238,9 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内にのみ保存されます。端末やブラウザを変えると引き継がれません。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、段位、満足度の最高値、最大コンボ、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、図鑑（集めたアイテム・装備・ガチャの天井の回数・称号）、前回のそば粉、効果音のオン・オフ、描画の細かさ。</li>
+        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、段位、満足度の最高値、最大コンボ、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、図鑑（集めたアイテム・装備・ガチャの天井の回数・称号）、前回のそば粉、効果音のオン・オフ、描画の細かさ、お客さんの反応の演出。</li>
         <li><b>引っ越し</b>ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
-        <li><b>リセット</b>「記録を消す」で自己ベストや段位などが初期状態に戻ります（効果音と描画の設定・そば猪口コイン・図鑑と装備はそのまま）。</li>
+        <li><b>リセット</b>「記録を消す」で自己ベストや段位などが初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・図鑑と装備はそのまま）。</li>
         <li><b>そば猪口コイン</b>1回遊ぶごとに、得点÷20×お客さんの係数（観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2）。さらに自己ベスト更新で+150、最大コンボ10以上で+50（20以上なら+150）、本日のチャレンジ達成で+400（1日1回）。端数は切り捨て、1日に貯まるのは2,000まで（端末の日付で判定）。獲得した枚数と内訳はリザルトに出ます。</li>
         <li><b>ガチャと図鑑</b>ホームの「ガチャを引く」で、コインを使って越前・福井にちなんだアイテムを引けます（1回500・10連4,500）。確率・天井・被りの扱いはガチャ画面にいつも表示しています。集めたアイテムは「図鑑」で見られ、「装備する」で器・麺・包丁・背景・演出の色・効果音・称号を着せ替えられます（見た目と音だけで、得点や判定は変わりません）。</li>
       </ul>
@@ -1282,6 +1337,9 @@ body{
       <div id="popup" class="popup"></div>
       <div id="aroma-popup" class="aroma-popup"></div>
       <div id="serving-caption" class="serving-caption"></div>
+      <div id="serve-bubble" class="serve-bubble" aria-hidden="true"><span id="sb-who" class="sb-who"></span><span id="sb-text" class="sb-text"></span><span id="sb-stars" class="sb-stars"></span></div>
+      <div id="satis-pop" class="satis-pop" aria-hidden="true"></div>
+      <p id="serve-sr" class="vh" role="status"></p>
       <button id="btn-sound-toggle" class="sound-toggle">🔊</button>
     </div>
     <p class="tap-hint">タップ / スペースキーでカット!</p>
@@ -1568,6 +1626,12 @@ var elCombo = document.getElementById('hud-combo');
 var elCustomers = document.getElementById('hud-customers');
 var elPopup = document.getElementById('popup');
 var elCaption = document.getElementById('serving-caption');
+var elServeBubble = document.getElementById('serve-bubble');
+var elSbWho = document.getElementById('sb-who');
+var elSbText = document.getElementById('sb-text');
+var elSbStars = document.getElementById('sb-stars');
+var elSatisPop = document.getElementById('satis-pop');
+var elServeSr = document.getElementById('serve-sr');
 var aromaGaugeWrap = document.getElementById('aroma-gauge-wrap');
 var aromaValueEl = document.getElementById('aroma-value');
 var aromaGaugeFill = document.getElementById('aroma-gauge-fill');
@@ -1655,6 +1719,9 @@ var LEGACY_KEYS = ['soba-dojo-bests','bestScores','soba-best','sobaBests'];
 // settings.visual.detail: how finely the bowl is drawn. Looks only; the schema stays 10 and saves without it get 'standard'.
 var VISUAL_DETAILS = ['high','standard','low'];
 var DEFAULT_VISUAL_DETAIL = 'standard';
+// settings.effects: how lively the customer's reaction is after a bowl is served. Looks only; saves without it get the default.
+var EFFECT_LEVELS = ['high','standard','low'];
+var DEFAULT_EFFECT_LEVEL = 'standard';
 
 var RANK_LEVELS = [
   {min:0,     name:'見習い'},
@@ -2005,6 +2072,19 @@ function withVisualDefaults(st){
   else if(!isVisualDetail(out.visual.detail)) out.visual.detail = DEFAULT_VISUAL_DETAIL;
   return out;
 }
+function isEffectLevel(v){ return typeof v==='string' && EFFECT_LEVELS.indexOf(v)>=0; }
+function hasValidEffects(st){ return isPlainObj(st) && isPlainObj(st.effects) && isEffectLevel(st.effects.level) && typeof st.effects.particlesOn==='boolean'; }
+// Fills in settings.effects ({level, particlesOn}) when a save has none, or fixes just the field that is unknown.
+function withEffectsDefaults(st){
+  var out = isPlainObj(st) ? st : {};
+  if(!isPlainObj(out.effects)) out.effects = {level:DEFAULT_EFFECT_LEVEL, particlesOn:true};
+  else{
+    if(!isEffectLevel(out.effects.level)) out.effects.level = DEFAULT_EFFECT_LEVEL;
+    if(typeof out.effects.particlesOn!=='boolean') out.effects.particlesOn = true;
+  }
+  return out;
+}
+function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}}; }
 
 function readRawLS(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
 function writeRawLS(key,value){ try{ localStorage.setItem(key,value); return true; }catch(e){ return false; } }
@@ -2073,7 +2153,7 @@ function ensureDailyFresh(store){
 }
 
 function defaultStore(){
-  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, rank:{bestTotal:0}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha(), settings:{visual:{detail:DEFAULT_VISUAL_DETAIL}} };
+  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, rank:{bestTotal:0}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha(), settings:defaultSettings() };
 }
 
 function sanitizeFlatBests(raw){
@@ -2167,7 +2247,7 @@ function coerceStore(obj){
     lastPlayedSeasonal:sanitizeLastSeasonal(obj.lastPlayedSeasonal),
     gacha:sanitizeGacha(obj.gacha)
   };
-  out.settings = withVisualDefaults(sanitizeSettings(obj.settings));   // settings.visual gets its default when missing
+  out.settings = withEffectsDefaults(withVisualDefaults(sanitizeSettings(obj.settings)));   // visual / effects get their defaults when missing
   return out;
 }
 
@@ -2193,31 +2273,32 @@ function attemptMigration(){
   if(!any) return null;
   var bests = {};
   if(Object.keys(merged).length){ bests[DEFAULT_STYLE] = merged; }
-  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:bests, rank:{bestTotal:sumBests(bests)}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha(), settings:{visual:{detail:DEFAULT_VISUAL_DETAIL}} };
+  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:bests, rank:{bestTotal:sumBests(bests)}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha(), settings:defaultSettings() };
 }
 
 function loadStore(){
   var raw = readRawLS(STORE_KEY);
   var store;
   var upgraded = false;
-  var visualAdded = false;
+  var settingsFilled = false;
   if(raw===null){
     store = attemptMigration() || defaultStore();
   } else {
     store = safeParseStore(raw);
     upgraded = isOlderSchema(raw);
     if(upgraded) backupBeforeUpgrade(raw);
-    visualAdded = lacksVisual(raw);
+    settingsFilled = lacksSettingDefaults(raw);
   }
   var dailyChanged = ensureDailyFresh(store);
-  if(raw===null || upgraded || dailyChanged || visualAdded){ saveStoreObj(store); }
+  if(raw===null || upgraded || dailyChanged || settingsFilled){ saveStoreObj(store); }
   return store;
 }
-// A readable save without settings.visual is written back once with the default filled in (nothing else changes).
-function lacksVisual(raw){
+// A readable save without settings.visual or settings.effects is written back once with the defaults filled in
+// (nothing else changes).
+function lacksSettingDefaults(raw){
   try{
     var o = JSON.parse(raw);
-    return isPlainObj(o) && !hasValidVisual(o.settings);
+    return isPlainObj(o) && (!hasValidVisual(o.settings) || !hasValidEffects(o.settings));
   }catch(e){ return false; }
 }
 // A readable save from an older schema is written back once in the current shape (its bests carried over as they are).
@@ -2266,12 +2347,19 @@ function importStoreString(text){
   }
   var coerced = coerceStore(obj);
   // a backup made before coins existed must not wipe the coins (or settings) saved now
-  if(!isPlainObj(obj.gacha) || !isPlainObj(obj.settings) || !hasValidVisual(obj.settings)){
+  if(!isPlainObj(obj.gacha) || !isPlainObj(obj.settings) || !hasValidVisual(obj.settings) || !hasValidEffects(obj.settings)){
     var current = loadStore();
     if(!isPlainObj(obj.gacha)) coerced.gacha = current.gacha;
     if(!isPlainObj(obj.settings) && current.settings) coerced.settings = current.settings;
-    // a backup made before the drawing setting existed keeps this device's choice
-    else if(!hasValidVisual(obj.settings) && hasValidVisual(current.settings)) coerced.settings.visual.detail = current.settings.visual.detail;
+    else{
+      // a backup made before a setting existed keeps this device's choice for it
+      if(!hasValidVisual(obj.settings) && hasValidVisual(current.settings)) coerced.settings.visual.detail = current.settings.visual.detail;
+      if(hasValidEffects(current.settings)){
+        var fxIn = (isPlainObj(obj.settings) && isPlainObj(obj.settings.effects)) ? obj.settings.effects : {};
+        if(!isEffectLevel(fxIn.level)) coerced.settings.effects.level = current.settings.effects.level;
+        if(typeof fxIn.particlesOn!=='boolean') coerced.settings.effects.particlesOn = current.settings.effects.particlesOn;
+      }
+    }
   }
   ensureDailyFresh(coerced);
   saveStoreObj(coerced);
@@ -2753,6 +2841,7 @@ function onCut(){
     lockSpice();
     return;
   }
+  if(state.phase==='serving'){ skipServing(); return; }   // a tap while serving skips the show
   if(state.phase!=='playing' || state.roundStage!=='play') return;
   var now = performance.now();
   var best=null,bestErr=Infinity;
@@ -2769,6 +2858,8 @@ function onCut(){
 }
 document.getElementById('screen-game').addEventListener('pointerdown', function(e){
   e.preventDefault();
+  // while a bowl is being served, the 🔊 button only switches the sound (it does not skip the show)
+  if(state.phase==='serving' && state.serving && state.serving.stage!=='spice' && e.target && e.target.closest && e.target.closest('.sound-toggle')) return;
   onCut();
 });
 window.addEventListener('keydown', function(e){
@@ -2875,7 +2966,7 @@ btnExport.addEventListener('click', function(){
 btnImport.addEventListener('click', function(){
   var result = importStoreString(saveIo.value);
   showSaveMsg(result.message);
-  if(result.ok){ renderHome(); refreshSoundPref(); refreshVisualPref(); }
+  if(result.ok){ renderHome(); refreshSoundPref(); refreshVisualPref(); refreshEffectsPref(); }
 });
 
 // ---------- Result card image (結果を画像で保存) ----------
@@ -3456,6 +3547,7 @@ function startGame(tierKey, modeId){
   var style = STYLES[pendingStyle] ? pendingStyle : DEFAULT_STYLE;
   var styleConf = modeStyleConf(STYLES[style], mode);
   state = freshState();
+  resetServeShow();
   state.skin = resolveSkin();   // 着せ替え: the equipped look and sound for this game (anything invalid = the original)
   skinFailed = {};
   state.mode = mode;
@@ -3524,6 +3616,7 @@ btnSoundToggle.addEventListener('click', function(){
   audioEnabled = !audioEnabled;
   btnSoundToggle.textContent = audioEnabled ? '🔊' : '🔇';
   saveSoundPref(audioEnabled);
+  if(!audioEnabled) stopPourSound();
 });
 
 // 描画の細かさ (settings.visual.detail): read from the save here and kept in memory, so drawing never reads the save.
@@ -3567,6 +3660,59 @@ for(var vo=0; vo<visOptEls.length; vo++){
   });
 }
 syncVisualButtons();
+
+// お客さんの反応の演出 (settings.effects): read from the save here and kept in memory, like the drawing setting.
+function loadEffectsPref(){
+  var out = {level:DEFAULT_EFFECT_LEVEL, particlesOn:true};
+  try{
+    var fx = loadStore().settings.effects;
+    if(isPlainObj(fx)){
+      if(isEffectLevel(fx.level)) out.level = fx.level;
+      if(typeof fx.particlesOn==='boolean') out.particlesOn = fx.particlesOn;
+    }
+  }catch(e){}
+  return out;
+}
+function saveEffectsPref(p){
+  try{
+    var store = loadStore();
+    var st = isPlainObj(store.settings) ? store.settings : {};
+    var fx = isPlainObj(st.effects) ? st.effects : {};
+    fx.level = isEffectLevel(p.level) ? p.level : DEFAULT_EFFECT_LEVEL;
+    fx.particlesOn = !!p.particlesOn;
+    st.effects = fx;
+    store.settings = st;
+    return saveStoreObj(store);
+  }catch(e){ return false; }
+}
+var effectsPref = loadEffectsPref();
+var fxOptEls = document.querySelectorAll('.fx-opt');
+var fxParticlesEl = document.getElementById('fx-particles');
+function syncEffectsControls(){
+  for(var i=0;i<fxOptEls.length;i++){
+    fxOptEls[i].setAttribute('aria-pressed', fxOptEls[i].getAttribute('data-level')===effectsPref.level ? 'true' : 'false');
+  }
+  if(fxParticlesEl) fxParticlesEl.checked = !!effectsPref.particlesOn;
+}
+// after a backup was read in (it may carry settings.effects)
+function refreshEffectsPref(){
+  try{ effectsPref = loadEffectsPref(); syncEffectsControls(); }catch(e){}
+}
+for(var fo=0; fo<fxOptEls.length; fo++){
+  fxOptEls[fo].addEventListener('click', function(){
+    var lv = this.getAttribute('data-level');
+    if(!isEffectLevel(lv)) return;
+    effectsPref.level = lv;
+    saveEffectsPref(effectsPref);
+    syncEffectsControls();
+  });
+}
+if(fxParticlesEl) fxParticlesEl.addEventListener('change', function(){
+  effectsPref.particlesOn = !!fxParticlesEl.checked;
+  saveEffectsPref(effectsPref);
+  syncEffectsControls();
+});
+syncEffectsControls();
 
 function playJustSound(){
   if(!audioEnabled) return;
@@ -3713,8 +3859,67 @@ function beginServing(){
       spiceLocked:false, spiceLockedAt:0, spiceResult:null
     };
   } else {
-    state.serving = {stage:'lift', t:0, result:null};
+    state.serving = {stage:'plate', t:0, result:null};
+    startPlating(state.serving);
   }
+}
+
+// ---------- 提供: ① 盛り付け → ② だしをかける → ③ お客さんの反応 ----------
+// ① plate: the noodles rise into the bowl and the toppings go on; ② pour: the dashi is poured (its sound follows the
+// stream); ③ react: 0.3 s after the pour the customer reacts and speaks. A tap skips the rest at any point.
+// The bowl's satisfaction is worked out when plating starts (the same formula as before) but is only added to the
+// game, and shown, when ③ ends or the show is skipped.
+var SERVE_PLATE_MS = 1000, SERVE_POUR_MS = 900, SERVE_REACT_MS = 1800, SERVE_SAY_AT = 300;
+var SERVE_SKIP_GRACE = 250;          // taps this soon after plating starts are the last cuts, not a skip
+function startPlating(s){
+  s.stage = 'plate'; s.t = 0; s.clock = 0;
+  s.pourCued = false; s.said = false; s.committed = false;
+  prepareServeResult(s);
+  serveFx = [];
+  hideServeBubble();
+  elSatisPop.classList.remove('show');
+  elCaption.classList.remove('show');
+  state.captionHideAt = null;
+}
+// satisfaction → the customer's reaction: miss (below 55), ok (55+), good (70+), just (90+, the best)
+function reactionTier(sat){ return sat>=90 ? 'just' : sat>=70 ? 'good' : sat>=55 ? 'ok' : 'miss'; }
+function prepareServeResult(s){
+  var avg = 0;
+  for(var i=0;i<state.batch.length;i++) avg += state.batch[i].points;
+  avg = state.batch.length ? avg/state.batch.length : 0;
+  var satisfaction = 100 - (100-avg)*state.character.toppingStrictness;
+  if(state.character.hasSpiceMeter && s.spiceResult && !s.spiceResult.success){
+    satisfaction -= Math.min(40, s.spiceResult.diff*0.8);
+  }
+  satisfaction = Math.max(0, Math.min(100, Math.round(satisfaction)));
+  // the words follow the same satisfaction as the face, so a smile never comes with a complaint
+  var tier = satisfaction>=85 ? 'high' : satisfaction>=55 ? 'mid' : 'low';
+  var stars = tier==='high' ? '★★★' : tier==='mid' ? '★★' : '★';
+  s.result = {face:state.character.icon, text:pickComment(tier), stars:stars, satisfaction:satisfaction, reaction:reactionTier(satisfaction)};
+}
+// the bowl's satisfaction goes into the game exactly once, and is shown as it does
+function commitSatisfaction(s){
+  if(!s || s.committed || !s.result) return;
+  s.committed = true;
+  state.satisfactionSum += s.result.satisfaction;
+  state.satisfactionRounds++;
+  showSatisfactionPop(s.result.satisfaction, s.result.reaction);
+}
+// ③ has ended, or a tap skipped the show: add the satisfaction, clear the show, and bring on the next bowl
+function finishServing(){
+  var s = state.serving;
+  if(state.phase!=='serving' || !s || s.stage==='spice') return;
+  stopPourSound();
+  commitSatisfaction(s);
+  hideServeBubble();
+  serveFx = [];
+  advanceRoundAfterServing();
+}
+function skipServing(){
+  var s = state.serving;
+  if(state.phase!=='serving' || !s || s.stage==='spice' || s.clock<SERVE_SKIP_GRACE) return false;
+  finishServing();
+  return true;
 }
 
 function lockSpice(){
@@ -6183,38 +6388,33 @@ function updateServing(dt){
     if(!s.spiceLocked){
       if(s.t>=SPICE_TIMEOUT){ lockSpice(); }
     } else if(s.t-s.spiceLockedAt>=SPICE_RESULT_PAUSE){
-      s.stage='lift'; s.t=0;
+      startPlating(s);
     }
     return;
   }
-  var stages = {lift:700, pour:900, soak:500, caption:1300};
-  if(s.stage==='lift' && s.t>=stages.lift){
-    s.stage='pour'; s.t=0;
-  } else if(s.stage==='pour' && s.t>=stages.pour){
-    s.stage='soak'; s.t=0;
-    var avg=0;
-    for(var i=0;i<state.batch.length;i++) avg+=state.batch[i].points;
-    avg = state.batch.length ? avg/state.batch.length : 0;
-    var tier = avg>=85 ? 'high' : avg>=55 ? 'mid' : 'low';
-    var stars = tier==='high' ? '★★★' : tier==='mid' ? '★★' : '★';
-    s.result = {face:state.character.icon, text:pickComment(tier), stars:stars};
-
-    var satisfaction = 100 - (100-avg)*state.character.toppingStrictness;
-    if(state.character.hasSpiceMeter && s.spiceResult && !s.spiceResult.success){
-      satisfaction -= Math.min(40, s.spiceResult.diff*0.8);
+  s.clock += dt;
+  if(s.stage==='plate'){
+    if(s.t>=SERVE_PLATE_MS){ s.stage = 'pour'; s.t -= SERVE_PLATE_MS; }
+  } else if(s.stage==='pour'){
+    if(!s.pourCued && s.t>=POUR_STREAM_FROM){     // ② the sound starts with the stream and ends with it
+      s.pourCued = true;
+      playPourSound(POUR_STREAM_TO - s.t);
     }
-    satisfaction = Math.max(0, Math.min(100, Math.round(satisfaction)));
-    state.satisfactionSum += satisfaction;
-    state.satisfactionRounds++;
-  } else if(s.stage==='soak' && s.t>=stages.soak){
-    s.stage='caption'; s.t=0;
-    equipSfx('serve');   // 着せ替え: e.g. the slurp as the customer eats
-    elCaption.textContent = s.result.face+' '+s.result.text+' '+s.result.stars;
-    elCaption.classList.add('show');
-  } else if(s.stage==='caption' && s.t>=stages.caption){
-    elCaption.classList.remove('show');
-    advanceRoundAfterServing();
+    if(s.t>=SERVE_POUR_MS){
+      s.stage = 'react'; s.t -= SERVE_POUR_MS;
+      equipSfx('serve');   // 着せ替え: e.g. the slurp as the customer eats
+    }
+  } else if(s.stage==='react'){
+    if(!s.said && s.t>=SERVE_SAY_AT){             // ③ 0.3 s after the pour: the reaction, the words, the sound
+      s.said = true;
+      startReactionFx(s);
+      showServeBubble(s);
+      playReactionSound(s.result.reaction);
+    }
+    if(s.said) typeServeBubble(s);
+    if(s.t>=SERVE_REACT_MS){ finishServing(); return; }
   }
+  if(serveFx.length) updateServeFx(dt);
 }
 
 // ---------- Render ----------
@@ -6580,10 +6780,11 @@ function heapRise(cy, liftT){
   var pr = Math.max(0, Math.min(1, liftT/700));
   return (trayY() - (cy + HEAP_BASE))*(1 - pr)*(1 - pr);
 }
-// liftT: ms into the lift (null once the noodles are in the bowl); shine: the sheen's strength (a high aroma adds to it)
-function drawNoodleHeap(bundles, cx, cy, look, soaked, liftT, shine, sc){
-  var fills = soaked ? look.soak : look.fills;
-  var outline = soaked ? look.outlineSoak : look.outline;
+// liftT: ms into the lift (null once the noodles are in the bowl); soak: 0 dry … 1 in the dashi;
+// shine: the sheen's strength (a high aroma adds to it)
+function drawNoodleHeap(bundles, cx, cy, look, soak, liftT, shine, sc){
+  var fills = soak<=0 ? look.fills : soak>=1 ? look.soak : look.fills.map(function(c, i){ return mixHex(c, look.soak[i % look.soak.length], soak); });
+  var outline = soak<=0 ? look.outline : soak>=1 ? look.outlineSoak : mixHex(look.outline, look.outlineSoak, soak);
   var oy = cy + heapRise(cy, liftT);
   var sheen = 'rgba(255,245,225,' + shine.toFixed(3) + ')';
   // a soft shade in the bowl under the mound, once it has settled
@@ -6690,8 +6891,8 @@ function drawTsuyuPool(cx, cy, g, conf){
 }
 
 // 薬味: 大根おろし (white and fluffy, with a pale shadow), 花かつお (pale pink-beige flakes), 刻みねぎ (green rings).
-// Laid out once per bowl on top of the mound; they drop in while the tsuyu is poured and stay until the customer eats.
-var TOPPING_AT = {oroshi:240, katsuo:420, negi:560};
+// Laid out once per bowl on top of the mound; they drop in as the bowl is plated and stay until the customer eats.
+var TOPPING_AT = {oroshi:560, katsuo:680, negi:760};   // ms after plating starts (① 盛り付け)
 var OROSHI_X = -6, OROSHI_Y = 9;                    // the foot of the grated-daikon mound on a full bowl, relative to the bowl
 var KATSUO_COLS = [['#efd1bb','#c4906f'], ['#e5bea1','#b58062'], ['#f5e2d0','#cfa183'], ['#dcae90','#a87658']];   // [face, edge]
 var NEGI_COLS = [['#4f9a31','#cfe8a9'], ['#72b44a','#e0f0c6'], ['#a8d27b','#f3f8e6']];   // [ring, centre]: green, light green, white part
@@ -6725,13 +6926,13 @@ function toppingLayout(pieces, conf){
     var jag = [];
     for(var jg=0;jg<7;jg++) jag.push(0.62 + rnd()*0.46);
     set.katsuo.push({x:kx, y:ky, l:11 + rnd()*5, w:6 + rnd()*3, a:(rnd() - 0.5)*1.4, curl:rnd()*6.2832, jag:jag,
-                     roll:Math.floor(rnd()*7), c:Math.floor(rnd()*KATSUO_COLS.length), at:TOPPING_AT.katsuo + kt*16});
+                     roll:Math.floor(rnd()*7), c:Math.floor(rnd()*KATSUO_COLS.length), at:TOPPING_AT.katsuo + kt*14});
   }
   for(var ng=0;ng<conf.negi;ng++){
     var na = rnd()*6.2832, nr = 0.15 + 0.7*Math.sqrt(rnd()), np = moundPoint(Math.cos(na)*nr, Math.sin(na)*nr, sc);
     var nk = rnd();
     set.negi.push({x:np.x, y:np.y - 1, r:2.1 + rnd()*1, a:rnd()*3.1416, kind:nk<0.45 ? 0 : nk<0.8 ? 1 : 2,
-                   at:TOPPING_AT.negi + ng*14});
+                   at:TOPPING_AT.negi + ng*10});
   }
   set.negi.sort(function(a, b){ return a.y - b.y; });
   toppingCache = {key:key, set:set};
@@ -6892,6 +7093,749 @@ function drawAromaSteam(cx, cy, k, n){
   }
 }
 
+// ---------- ② だし: the stream and its sound, kept in step ----------
+// The stream runs from POUR_STREAM_FROM to POUR_STREAM_TO (ms into ②), swelling in and fading out; pourLevel() is that
+// curve, and the pouring sound is started when the stream starts, lasts until it ends and follows the same swell.
+var POUR_STREAM_FROM = 150, POUR_STREAM_TO = 780, POUR_FADE_IN = 100, POUR_FADE_OUT = 80;
+function pourLevel(t){
+  if(t<POUR_STREAM_FROM || t>=POUR_STREAM_TO) return 0;
+  return Math.max(0, Math.min(1, (t - POUR_STREAM_FROM)/POUR_FADE_IN, (POUR_STREAM_TO - t)/POUR_FADE_OUT));
+}
+// the pouring sound: noise through a band-pass filter (whose note rises a little as the bowl fills), a softer low
+// splash under it, and a quick flutter for the trickle. Silent while 🔇; a skip or 🔇 stops it at once.
+var pourVoice = null;
+function playPourSound(ms){
+  if(!audioEnabled || !(ms>40)) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended'){ ac.resume(); }
+    stopPourSound();
+    var t0 = ac.currentTime, dur = ms/1000;
+    var up = Math.min(POUR_FADE_IN/1000, dur*0.3), down = Math.min(POUR_FADE_OUT/1000, dur*0.3);
+    var src = ac.createBufferSource();
+    src.buffer = sfxNoiseBuffer(ac);
+    var band = ac.createBiquadFilter();
+    band.type = 'bandpass';
+    band.Q.setValueAtTime(1.3, t0);
+    band.frequency.setValueAtTime(760, t0);
+    band.frequency.exponentialRampToValueAtTime(1350, t0 + dur);
+    var low = ac.createBiquadFilter();
+    low.type = 'bandpass';
+    low.Q.setValueAtTime(0.8, t0);
+    low.frequency.setValueAtTime(320, t0);
+    var lowGain = ac.createGain();
+    lowGain.gain.setValueAtTime(0.55, t0);
+    var trem = ac.createGain();
+    trem.gain.setValueAtTime(0.82, t0);
+    var lfo = ac.createOscillator(), depth = ac.createGain();
+    lfo.frequency.setValueAtTime(13, t0);
+    depth.gain.setValueAtTime(0.18, t0);
+    lfo.connect(depth);
+    depth.connect(trem.gain);
+    var env = ac.createGain();
+    env.gain.setValueAtTime(0.0001, t0);
+    env.gain.exponentialRampToValueAtTime(0.2, t0 + up);
+    env.gain.setValueAtTime(0.2, Math.max(t0 + up, t0 + dur - down));
+    env.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(band); band.connect(trem);
+    src.connect(low); low.connect(lowGain); lowGain.connect(trem);
+    trem.connect(env);
+    env.connect(ac.destination);
+    src.start(t0);
+    src.stop(t0 + dur + 0.02);
+    lfo.start(t0);
+    lfo.stop(t0 + dur + 0.02);
+    pourVoice = {src:src, lfo:lfo, env:env, until:t0 + dur};
+  }catch(e){}
+}
+function stopPourSound(){
+  var v = pourVoice;
+  pourVoice = null;
+  if(!v) return;
+  try{
+    var ac = getAudioCtx(), now = ac.currentTime;
+    if(now>=v.until) return;
+    v.env.gain.cancelScheduledValues(now);
+    v.env.gain.setValueAtTime(Math.max(0.0001, v.env.gain.value), now);
+    v.env.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+    v.src.stop(now + 0.05);
+    v.lfo.stop(now + 0.05);
+  }catch(e){}
+}
+// the ladle tips, pours and rights itself, then fades away while the customer reacts
+function drawDashiPour(cx, cy, s){
+  if(s.stage!=='pour' && s.stage!=='react') return;
+  var t = s.t, tilt, alpha = 1;
+  if(s.stage==='pour') tilt = t<250 ? t/250 : t<POUR_STREAM_TO ? 1 : 1 - 0.45*Math.min(1, (t - POUR_STREAM_TO)/120);
+  else{ tilt = 0.55; alpha = Math.max(0, 1 - t/SERVE_SAY_AT); }
+  if(alpha<=0) return;
+  ctx.globalAlpha = alpha;
+  ctx.save();
+  ctx.translate(cx+72, cy-66);
+  ctx.rotate(-0.85*tilt);
+  ctx.fillStyle = '#37474f';
+  ctx.beginPath();
+  ctx.ellipse(0,0,24,17,0,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillRect(-4,-28,8,18);
+  ctx.restore();
+  ctx.globalAlpha = 1;
+  if(s.stage==='pour'){
+    var a = pourLevel(t);
+    if(a>0) drawDashiStream(cx, cy, t, a);
+  }
+}
+// the stream of dashi: it leaves the ladle's lip going sideways and falls in an arc, wide at the top and thinning as it
+// falls; a light edge, drops riding down it, and rings where it lands. a = how strongly it is running (pourLevel).
+function drawDashiStream(cx, cy, t, a){
+  var x0 = cx+56, y0 = cy-56, qx = cx+20, qy = cy-54, x2 = cx+8 + Math.sin(t*0.02)*1.2, y2 = cy+8;
+  var n = 14, left = [], right = [], i, u, m, px, py, tx, ty, tl, w;
+  for(i=0;i<=n;i++){
+    u = i/n; m = 1 - u;
+    px = m*m*x0 + 2*m*u*qx + u*u*x2;
+    py = m*m*y0 + 2*m*u*qy + u*u*y2;
+    tx = 2*m*(qx - x0) + 2*u*(x2 - qx);
+    ty = 2*m*(qy - y0) + 2*u*(y2 - qy);
+    tl = Math.sqrt(tx*tx + ty*ty) || 1;
+    w = a*(3.2 - 1.6*u + 0.35*Math.sin(t*0.03 + u*9));
+    left.push([px - ty/tl*w, py + tx/tl*w]);
+    right.push([px + ty/tl*w, py - tx/tl*w]);
+  }
+  ctx.beginPath();
+  ctx.moveTo(left[0][0], left[0][1]);
+  for(i=1;i<=n;i++) ctx.lineTo(left[i][0], left[i][1]);
+  for(i=n;i>=0;i--) ctx.lineTo(right[i][0], right[i][1]);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(146,86,34,' + (0.85*a).toFixed(3) + ')';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,226,182,' + (0.6*a).toFixed(3) + ')';
+  ctx.lineWidth = 1;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo((left[1][0] + x0)/2, (left[1][1] + y0)/2);
+  for(i=2;i<n;i++) ctx.lineTo(left[i][0]*0.6 + right[i][0]*0.4, left[i][1]*0.6 + right[i][1]*0.4);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255,232,196,' + (0.85*a).toFixed(3) + ')';
+  for(i=0;i<4;i++){
+    u = (t*0.0021 + i*0.25) % 1; m = 1 - u;
+    ctx.beginPath();
+    ctx.arc(m*m*x0 + 2*m*u*qx + u*u*x2, m*m*y0 + 2*m*u*qy + u*u*y2, 1.1, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.lineWidth = 1;
+  for(var k=0;k<2;k++){
+    var ph = (t*0.0035 + k*0.5) % 1, rr = 3 + 12*ph;
+    ctx.strokeStyle = 'rgba(255,236,205,' + ((1 - ph)*0.6*a).toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.ellipse(x2, y2 + 3, rr, rr*0.32, 0, 0, Math.PI*2);
+    ctx.stroke();
+  }
+}
+// two '#rrggbb' colours mixed (t = 0 → a, 1 → b): the noodles darken as the dashi soaks in
+function mixHex(a, b, t){
+  var ma = /^#([0-9a-f]{6})$/i.exec(a), mb = /^#([0-9a-f]{6})$/i.exec(b);
+  if(!ma || !mb) return t<0.5 ? a : b;
+  var x = parseInt(ma[1], 16), y = parseInt(mb[1], 16), out = '#';
+  for(var sh=16; sh>=0; sh-=8){
+    var c = Math.round(((x >> sh) & 255)*(1 - t) + ((y >> sh) & 255)*t).toString(16);
+    out += c.length<2 ? '0' + c : c;
+  }
+  return out;
+}
+
+// ---------- ③ お客さん: drawn at the lower left while the bowl is served, then reacting to it ----------
+// One look per customer (by the customer key); faces: wait, taste (eyes shut, slurping), miss, ok, good, just.
+var CUSTOMER_LOOKS = {
+  beginner:  {skin:'#f6d5b5', hair:'#5b3a24', brow:'#5b3a24', top:'#7fb2d6', trim:'#4d7fa6', hat:'cap',       hatColor:'#d24b3e', acc:'camera'},
+  lover:     {skin:'#f0cba6', hair:'#ebe7df', brow:'#d9d4ca', top:'#9a7351', trim:'#6e5038', hat:'gray',      hatColor:null,      acc:'cardigan'},
+  regular:   {skin:'#f2d0ad', hair:'#2b2522', brow:'#2b2522', top:'#34455f', trim:'#f1ece0', hat:'neat',      hatColor:null,      acc:'monocle'},
+  enthusiast:{skin:'#f3cdaa', hair:'#3a2a22', brow:'#3a2a22', top:'#e08a2e', trim:'#b0561a', hat:'hachimaki', hatColor:'#d0342c', acc:'happi'},
+  farmer:    {skin:'#e4b58b', hair:'#4a3526', brow:'#4a3526', top:'#6f8f4f', trim:'#4d6636', hat:'straw',     hatColor:'#e7c76e', acc:'towel'}
+};
+function customerGeom(){ return {x:W*0.19, y:H*0.775, r:Math.max(20, Math.min(32, W*0.082))}; }
+// settings.effects plus prefers-reduced-motion → how much moves and sparkles
+function fxConf(){
+  var lv = effectsPref.level, still = !!(reducedMotionMQ && reducedMotionMQ.matches);
+  return {
+    parts:effectsPref.particlesOn ? (lv==='high' ? 1.5 : lv==='low' ? 0.4 : 1) : 0,
+    motion:still ? 0 : (lv==='high' ? 1.2 : lv==='low' ? 0.5 : 1),
+    rays:lv!=='low', flash:lv==='high' && !still, pulse:lv==='high' && !still, still:still
+  };
+}
+// where the customer's head is and how their face looks at this moment (rt: ms since the reaction began)
+function customerPose(s, tier, rt, fc){
+  var m = fc.motion, p = {dy:0, bodyDy:0, tilt:0, face:'wait', blink:false, arms:0, sweat:false, gloom:0};
+  if(s.stage!=='react'){
+    p.dy = Math.sin(s.clock*0.005)*0.8*m;
+    p.blink = (s.clock % 2300)<110;
+    return p;
+  }
+  if(rt<0){ p.face = 'taste'; p.dy = 1.5*m; return p; }
+  var k = s.result.satisfaction;
+  if(tier==='miss'){                 // ガクッ: the head drops, bounces a little, then keeps sinking
+    var depth = (10 + 6*Math.min(1, (55 - k)/55))*m;
+    if(rt<100) p.dy = depth*(rt/100)*(rt/100);
+    else if(rt<220) p.dy = depth - depth*0.25*Math.sin(Math.PI*(rt - 100)/120);
+    else p.dy = depth + 3*m*Math.min(1, (rt - 220)/1100);
+    p.bodyDy = p.dy*0.45;
+    p.tilt = -0.1*Math.min(1, rt/100)*(m>0 ? 1 : 0);
+    p.face = 'miss'; p.sweat = true; p.gloom = Math.min(1, rt/150);
+  } else if(tier==='ok'){            // two nods
+    var ph = rt/340;
+    p.dy = ph<2 ? 4*m*Math.sin(Math.PI*(ph % 1)) : 0;
+    p.face = 'ok';
+    p.blink = ph<2 && (ph % 1)>0.35 && (ph % 1)<0.65;
+  } else if(tier==='good'){          // a smile and a little hop
+    var hop = (4 + 3*Math.max(0, (k - 70)/20))*m;
+    p.dy = rt<300 ? -hop*Math.sin(Math.PI*rt/300) : 0;
+    p.face = 'good';
+  } else {                           // just: arms up, two jumps
+    var jump = (10 + 6*Math.max(0, (k - 90)/10))*m, q = rt/340;
+    p.dy = q<2 ? -jump*Math.sin(Math.PI*(q % 1)) : 0;
+    p.bodyDy = p.dy*0.6;
+    p.arms = rt<1300 ? Math.min(1, rt/90) : Math.max(0, 1 - (rt - 1300)/200);
+    p.face = 'just';
+  }
+  return p;
+}
+function drawCustomer(g, p){
+  var look = CUSTOMER_LOOKS[state.tier] || CUSTOMER_LOOKS.lover, r = g.r;
+  var top = g.y + r*0.9 + p.bodyDy;
+  drawCustomerBody(look, g.x, top, r);
+  if(p.arms>0) drawCustomerArms(look, g.x, top, g.y + p.dy, r, p.arms);
+  ctx.save();
+  ctx.translate(g.x, g.y + p.dy);
+  ctx.rotate(p.tilt);
+  drawCustomerHead(look, r, p);
+  ctx.restore();
+}
+function drawCustomerBody(look, x, top, r){
+  ctx.fillStyle = look.top;
+  ctx.beginPath();
+  ctx.moveTo(x - r*1.45, H + 2);
+  ctx.bezierCurveTo(x - r*1.45, top + r*0.3, x - r*1.05, top, x - r*0.45, top);
+  ctx.lineTo(x + r*0.45, top);
+  ctx.bezierCurveTo(x + r*1.05, top, x + r*1.45, top + r*0.3, x + r*1.45, H + 2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = look.skin;                       // the neck
+  ctx.fillRect(x - r*0.22, top - r*0.3, r*0.44, r*0.4);
+  ctx.strokeStyle = look.trim;
+  ctx.lineWidth = Math.max(1.5, r*0.1);
+  ctx.lineCap = 'round';
+  if(look.acc==='monocle' || look.acc==='happi' || look.acc==='cardigan'){   // a crossed collar (kimono, happi) or a V-neck
+    ctx.beginPath();
+    ctx.moveTo(x - r*0.42, top);
+    ctx.lineTo(x + r*0.12, top + r*0.75);
+    ctx.moveTo(x + r*0.42, top);
+    ctx.lineTo(x - r*0.02, top + r*0.55);
+    ctx.stroke();
+    if(look.acc==='happi'){
+      ctx.fillStyle = '#ffffff';
+      ctx.font = cardFont('700', Math.max(8, Math.round(r*0.36)), CARD_SANS);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('辛', x - r*0.62, top + r*0.62);
+    }
+    if(look.acc==='cardigan'){
+      ctx.fillStyle = look.trim;
+      for(var bt=0; bt<2; bt++){ ctx.beginPath(); ctx.arc(x + r*0.2, top + r*0.95 + bt*r*0.42, r*0.07, 0, Math.PI*2); ctx.fill(); }
+    }
+  } else {
+    ctx.beginPath();
+    ctx.arc(x, top - r*0.05, r*0.46, 0.15*Math.PI, 0.85*Math.PI);
+    ctx.stroke();
+  }
+  if(look.acc==='camera'){                         // a camera on its strap
+    ctx.strokeStyle = '#3b3b3b';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(x - r*0.45, top + r*0.05);
+    ctx.lineTo(x - r*0.1, top + r*0.72);
+    ctx.moveTo(x + r*0.45, top + r*0.05);
+    ctx.lineTo(x + r*0.3, top + r*0.72);
+    ctx.stroke();
+    ctx.fillStyle = '#2f3336';
+    ctx.fillRect(x - r*0.42, top + r*0.72, r*0.9, r*0.58);
+    ctx.fillStyle = '#9aa6ad';
+    ctx.beginPath(); ctx.arc(x + r*0.03, top + r*1.01, r*0.19, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#1d2124';
+    ctx.beginPath(); ctx.arc(x + r*0.03, top + r*1.01, r*0.1, 0, Math.PI*2); ctx.fill();
+  }
+  if(look.acc==='towel'){                          // a towel round the neck, one end hanging
+    ctx.strokeStyle = '#f5f2ea';
+    ctx.lineWidth = r*0.26;
+    ctx.beginPath();
+    ctx.moveTo(x - r*0.62, top + r*0.08);
+    ctx.quadraticCurveTo(x, top + r*0.42, x + r*0.62, top + r*0.08);
+    ctx.stroke();
+    ctx.fillStyle = '#f5f2ea';
+    ctx.fillRect(x + r*0.36, top + r*0.1, r*0.26, r*0.7);
+  }
+}
+function drawCustomerArms(look, x, top, headY, r, k){
+  for(var sd=-1; sd<=1; sd+=2){
+    var sx = x + sd*r*0.95, sy = top + r*0.25;
+    var hx = x + sd*r*(0.95 + 0.45*k), hy = sy + (headY - r*0.45 - sy)*k;
+    ctx.strokeStyle = look.top;
+    ctx.lineWidth = r*0.42;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(hx, hy);
+    ctx.stroke();
+    ctx.fillStyle = look.skin;
+    ctx.beginPath();
+    ctx.arc(hx, hy - r*0.12, r*0.22, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+function drawCustomerHead(look, r, p){
+  ctx.fillStyle = look.skin;
+  ctx.beginPath(); ctx.arc(-r*0.95, r*0.08, r*0.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(r*0.95, r*0.08, r*0.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(110,70,40,0.35)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  if(p.gloom>0){                                   // ガクッ: a blue shade over the brow, with the gloom lines
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI*2);
+    ctx.clip();
+    var gl = ctx.createLinearGradient(0, -r, 0, r*0.1);
+    gl.addColorStop(0, 'rgba(70,90,150,' + (0.55*p.gloom).toFixed(3) + ')');
+    gl.addColorStop(1, 'rgba(70,90,150,0)');
+    ctx.fillStyle = gl;
+    ctx.fillRect(-r, -r, r*2, r*1.1);
+    ctx.strokeStyle = 'rgba(45,60,115,' + (0.7*p.gloom).toFixed(3) + ')';
+    ctx.lineWidth = 1;
+    for(var gi=0; gi<4; gi++){
+      ctx.beginPath();
+      ctx.moveTo(-r*0.45 + gi*r*0.28, -r*0.88);
+      ctx.lineTo(-r*0.45 + gi*r*0.28, -r*0.42);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  drawCustomerHair(look, r);
+  drawCustomerFace(look, r, p);
+  if(look.hat==='straw') drawStrawHat(look, r);
+  if(look.acc==='monocle'){                        // そば通's monocle and its chain
+    ctx.strokeStyle = '#c9a227';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(r*0.4, -r*0.02, r*0.22, 0, Math.PI*2); ctx.stroke();
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(r*0.52, r*0.16);
+    ctx.quadraticCurveTo(r*0.85, r*0.7, r*0.5, r*1.2);
+    ctx.stroke();
+  }
+  if(p.sweat){
+    ctx.fillStyle = '#8ec5ea';
+    ctx.beginPath();
+    ctx.moveTo(r*0.98, -r*0.62);
+    ctx.quadraticCurveTo(r*1.2, -r*0.28, r*0.98, -r*0.2);
+    ctx.quadraticCurveTo(r*0.76, -r*0.28, r*0.98, -r*0.62);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.beginPath(); ctx.arc(r*0.93, -r*0.33, r*0.05, 0, Math.PI*2); ctx.fill();
+  }
+}
+function drawCustomerHair(look, r){
+  ctx.fillStyle = look.hair;
+  if(look.hat==='cap'){                            // 観光客: a red cap, its peak toward the bowl
+    ctx.beginPath(); ctx.ellipse(-r*0.8, -r*0.18, r*0.26, r*0.4, 0.2, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = look.hatColor;
+    ctx.beginPath();
+    ctx.moveTo(-r*1.02, -r*0.2);
+    ctx.bezierCurveTo(-r*1.0, -r*1.32, r*1.0, -r*1.32, r*1.02, -r*0.2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath(); ctx.ellipse(r*0.78, -r*0.22, r*0.7, r*0.16, 0.06, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, -r*1.02); ctx.quadraticCurveTo(r*0.2, -r*0.6, r*0.1, -r*0.24); ctx.stroke();
+    ctx.fillStyle = '#a8352b';
+    ctx.beginPath(); ctx.arc(0, -r*1.04, r*0.1, 0, Math.PI*2); ctx.fill();
+  } else if(look.hat==='gray'){                    // 地元の常連: white hair at the sides, thin on top, a white moustache
+    ctx.beginPath(); ctx.ellipse(-r*0.84, -r*0.28, r*0.3, r*0.42, 0.25, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(r*0.84, -r*0.28, r*0.3, r*0.42, -0.25, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = look.hair;
+    ctx.lineWidth = r*0.16;
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(0, r*0.05, r*0.9, 1.2*Math.PI, 1.55*Math.PI); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(r*-0.06, r*0.3, r*0.17, r*0.08, 0.25, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(r*0.18, r*0.3, r*0.17, r*0.08, -0.25, 0, Math.PI*2); ctx.fill();
+  } else if(look.hat==='neat'){                    // そば通: neat black hair with a side parting
+    ctx.beginPath();
+    ctx.moveTo(-r*1.0, r*0.05);
+    ctx.bezierCurveTo(-r*1.12, -r*1.22, r*1.12, -r*1.25, r*1.0, -r*0.05);
+    ctx.bezierCurveTo(r*0.72, -r*0.55, -r*0.05, -r*0.78, -r*0.5, -r*0.5);
+    ctx.bezierCurveTo(-r*0.78, -r*0.32, -r*0.85, -r*0.08, -r*1.0, r*0.05);
+    ctx.fill();
+  } else if(look.hat==='hachimaki'){               // 辛味大根マニア: spiky hair and a red headband with a chilli pin
+    ctx.beginPath();
+    ctx.moveTo(-r*1.0, -r*0.18);
+    for(var sp=0; sp<=8; sp++){
+      var an = Math.PI*(1.05 + 0.9*sp/8), rad = sp % 2 ? r*1.3 : r*1.02;
+      ctx.lineTo(Math.cos(an)*rad, Math.sin(an)*rad);
+    }
+    ctx.lineTo(r*1.0, -r*0.18);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = look.hatColor;
+    ctx.beginPath();
+    ctx.moveTo(-r*1.0, -r*0.36);
+    ctx.quadraticCurveTo(0, -r*0.66, r*1.0, -r*0.36);
+    ctx.lineTo(r*0.99, -r*0.12);
+    ctx.quadraticCurveTo(0, -r*0.42, -r*0.99, -r*0.12);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();                               // the knot's tails on the left
+    ctx.moveTo(-r*0.95, -r*0.26);
+    ctx.lineTo(-r*1.45, -r*0.52);
+    ctx.lineTo(-r*1.35, -r*0.2);
+    ctx.closePath();
+    ctx.moveTo(-r*0.95, -r*0.2);
+    ctx.lineTo(-r*1.4, -r*0.02);
+    ctx.lineTo(-r*1.2, r*0.12);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#b71c1c';
+    ctx.beginPath(); ctx.ellipse(r*0.28, -r*0.38, r*0.2, r*0.08, -0.5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#3f8f3a';
+    ctx.fillRect(r*0.42, -r*0.52, r*0.1, r*0.1);
+  } else if(look.hat==='straw'){                   // そば畑の農家: dark hair under the straw hat (drawn after the face)
+    ctx.beginPath(); ctx.ellipse(-r*0.86, -r*0.2, r*0.2, r*0.34, 0.2, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(r*0.86, -r*0.2, r*0.2, r*0.34, -0.2, 0, Math.PI*2); ctx.fill();
+  }
+}
+function drawStrawHat(look, r){
+  ctx.fillStyle = look.hatColor;
+  ctx.beginPath(); ctx.ellipse(0, -r*0.74, r*0.74, r*0.52, 0, Math.PI, 0); ctx.fill();
+  ctx.fillStyle = '#8a4f2a';
+  ctx.fillRect(-r*0.74, -r*0.8, r*1.48, r*0.17);
+  ctx.fillStyle = look.hatColor;
+  ctx.beginPath(); ctx.ellipse(0, -r*0.64, r*1.5, r*0.3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = 'rgba(150,110,40,0.45)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.ellipse(0, -r*0.64, r*1.2, r*0.2, 0, 0.1*Math.PI, 0.9*Math.PI); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(0, -r*0.64, r*1.5, r*0.3, 0, 0, Math.PI*2); ctx.stroke();
+}
+function drawCustomerFace(look, r, p){
+  var ink = '#3b2a20', lw = Math.max(1.3, r*0.08), ex = r*0.34, ox = r*0.06, ey = -r*0.02, my = r*0.44;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = look.brow;                     // eyebrows
+  ctx.lineWidth = lw*0.9;
+  for(var sd=-1; sd<=1; sd+=2){
+    var bx = ox + sd*ex;
+    ctx.beginPath();
+    if(p.face==='miss'){ ctx.moveTo(bx - sd*r*0.15, -r*0.3); ctx.lineTo(bx + sd*r*0.1, -r*0.4); }           // sad: inner ends up
+    else if(p.face==='good' || p.face==='just'){ ctx.arc(bx, -r*0.25, r*0.15, 1.2*Math.PI, 1.8*Math.PI); }   // raised
+    else{ ctx.moveTo(bx - r*0.13, -r*0.34); ctx.lineTo(bx + r*0.13, -r*0.34); }
+    ctx.stroke();
+  }
+  ctx.strokeStyle = ink;
+  ctx.fillStyle = ink;
+  ctx.lineWidth = lw;
+  for(var e=-1; e<=1; e+=2){                       // eyes
+    var x = ox + e*ex;
+    ctx.beginPath();
+    if(p.face==='good' || p.face==='just'){
+      ctx.lineWidth = p.face==='just' ? lw*1.35 : lw;
+      ctx.arc(x, ey + r*0.08, r*0.13, 1.15*Math.PI, 1.85*Math.PI);
+      ctx.stroke();
+    } else if(p.face==='taste'){
+      ctx.arc(x, ey - r*0.06, r*0.12, 0.15*Math.PI, 0.85*Math.PI);
+      ctx.stroke();
+    } else if(p.face==='miss'){
+      ctx.moveTo(x - r*0.11, ey + r*0.03);
+      ctx.lineTo(x + r*0.11, ey + r*0.03);
+      ctx.stroke();
+    } else if(p.blink){
+      ctx.moveTo(x - r*0.1, ey);
+      ctx.lineTo(x + r*0.1, ey);
+      ctx.stroke();
+    } else {
+      ctx.ellipse(x + r*0.02, ey, r*0.085, r*(p.face==='ok' ? 0.1 : 0.12), 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(x + r*0.05, ey - r*0.04, r*0.03, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = ink;
+    }
+  }
+  if(p.face==='good' || p.face==='just'){          // blush
+    ctx.fillStyle = 'rgba(240,120,120,' + (p.face==='just' ? 0.5 : 0.35) + ')';
+    ctx.beginPath(); ctx.ellipse(ox - r*0.55, r*0.2, r*0.15, r*0.08, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(ox + r*0.55, r*0.2, r*0.15, r*0.08, 0, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.lineWidth = lw;                              // the mouth
+  ctx.strokeStyle = ink;
+  if(p.face==='good' || p.face==='just'){
+    var mw = p.face==='just' ? r*0.3 : r*0.21, mh = p.face==='just' ? r*0.3 : r*0.19;
+    ctx.fillStyle = '#8a2f28';
+    ctx.beginPath();
+    ctx.moveTo(ox - mw, my - r*0.06);
+    ctx.quadraticCurveTo(ox, my - r*0.06 + mh*2, ox + mw, my - r*0.06);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#e98b8b';
+    ctx.beginPath(); ctx.ellipse(ox, my - r*0.06 + mh*0.72, mw*0.45, mh*0.3, 0, 0, Math.PI*2); ctx.fill();
+  } else if(p.face==='taste'){
+    ctx.fillStyle = '#8a2f28';
+    ctx.beginPath(); ctx.ellipse(ox, my, r*0.08, r*0.09, 0, 0, Math.PI*2); ctx.fill();
+  } else if(p.face==='miss'){
+    ctx.beginPath();
+    ctx.moveTo(ox - r*0.2, my + r*0.02);
+    ctx.quadraticCurveTo(ox - r*0.1, my - r*0.08, ox, my + r*0.02);
+    ctx.quadraticCurveTo(ox + r*0.1, my + r*0.1, ox + r*0.2, my);
+    ctx.stroke();
+  } else if(p.face==='ok'){
+    ctx.beginPath(); ctx.moveTo(ox - r*0.13, my); ctx.quadraticCurveTo(ox, my + r*0.05, ox + r*0.13, my); ctx.stroke();
+  } else {
+    ctx.beginPath(); ctx.arc(ox, my - r*0.12, r*0.16, 0.2*Math.PI, 0.8*Math.PI); ctx.stroke();
+  }
+}
+// a top result: soft rays behind the customer
+function drawJustRays(g, rt, fc){
+  var a = Math.min(1, rt/200)*(rt>1250 ? Math.max(0, 1 - (rt - 1250)/300) : 1);
+  if(a<=0) return;
+  var R = g.r*3.4, rot = fc.still ? 0 : rt/1000*0.6;
+  ctx.save();
+  ctx.translate(g.x, g.y - g.r*0.1);
+  ctx.rotate(rot);
+  var gr = ctx.createRadialGradient(0, 0, g.r*0.4, 0, 0, R);
+  gr.addColorStop(0, 'rgba(255,205,90,' + (0.42*a).toFixed(3) + ')');
+  gr.addColorStop(1, 'rgba(255,205,90,0)');
+  ctx.fillStyle = gr;
+  for(var i=0;i<12;i++){
+    var a0 = i*Math.PI/6;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, R, a0, a0 + Math.PI/13);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+// 称賛マーク: a red 「絶品」 seal pressed onto the scene (with a ring that spreads from it on 強め)
+function drawPraiseStamp(rt, fc){
+  var x = W*0.19, y = H*0.19, R = Math.max(20, Math.min(30, W*0.08));
+  var p = fc.still ? 1 : Math.min(1, rt/170), sc = 1.9 - 0.9*(1 - (1 - p)*(1 - p));
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-0.2);
+  ctx.scale(sc, sc);
+  ctx.globalAlpha = fc.still ? Math.min(1, rt/120) : Math.min(1, rt/60);
+  ctx.fillStyle = '#c8322a';
+  ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#fbeee0';
+  ctx.lineWidth = Math.max(1.2, R*0.06);
+  ctx.beginPath(); ctx.arc(0, 0, R*0.82, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle = '#fbeee0';
+  ctx.font = cardFont('700', Math.round(R*0.62), CARD_SERIF);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('絶品', 0, R*0.04);
+  ctx.restore();
+  if(fc.pulse && rt>170 && rt<700){
+    var q = (rt - 170)/530;
+    ctx.strokeStyle = 'rgba(200,50,42,' + (0.5*(1 - q)).toFixed(3) + ')';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, y, R*(1 + 0.8*q), 0, Math.PI*2); ctx.stroke();
+  }
+}
+// miss: a comic 「ガクッ」 beside the head
+function drawGakuText(g, rt, fc){
+  var a = rt<1200 ? Math.min(1, rt/80) : Math.max(0, 1 - (rt - 1200)/300);
+  if(a<=0) return;
+  var drop = fc.still ? 0 : -6*Math.max(0, 1 - rt/140);
+  ctx.save();
+  ctx.globalAlpha = a;
+  ctx.translate(g.x - g.r*1.55, g.y - g.r*1.55 + drop);
+  ctx.rotate(-0.1);
+  ctx.font = cardFont('900', Math.round(g.r*0.62), CARD_SANS);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = COLORS.card;
+  ctx.strokeText('ガクッ', 0, 0);
+  ctx.fillStyle = '#4f5f86';
+  ctx.fillText('ガクッ', 0, 0);
+  ctx.restore();
+}
+
+// particles for the reaction: little sparkles (good, just) and confetti (just); none when switched off
+var serveFx = [];
+var CONFETTI_COLS = ['#e05a47','#f2b134','#5aa05a','#4a90c2','#e889a8','#f08a3c'];
+function startReactionFx(s){
+  serveFx = [];
+  var fc = fxConf(), tier = s.result.reaction, k = s.result.satisfaction;
+  if(!fc.parts || (tier!=='good' && tier!=='just')) return;
+  var g = customerGeom(), cx = bowlCX(), cy = bowlCY(), i, a, rr;
+  var sparks = tier==='good' ? Math.round((3 + 4*Math.max(0, (k - 70)/20))*fc.parts) : Math.round(6*fc.parts);
+  for(i=0;i<sparks;i++){
+    a = Math.random()*Math.PI*2; rr = g.r*(1.3 + Math.random()*0.8);
+    serveFx.push({kind:'spark', x:g.x + Math.cos(a)*rr, y:g.y - g.r*0.35 + Math.sin(a)*rr*0.8, vx:0, vy:fc.still ? 0 : -10,
+                  g:0, rot:0, vr:0, size:3 + Math.random()*3, col:'#f5b82e', age:-i*70, life:700 + Math.random()*300});
+  }
+  if(tier!=='just') return;
+  var n = Math.round((16 + 24*Math.max(0, (k - 90)/10))*fc.parts);
+  for(i=0;i<n;i++){
+    var p = {kind:'confetti', x:cx + (Math.random() - 0.5)*40, y:cy + 4, vx:(Math.random() - 0.5)*320, vy:-(260 + Math.random()*230),
+             g:640, rot:Math.random()*6, vr:(Math.random() - 0.5)*14, size:2.5 + Math.random()*2.5,
+             col:CONFETTI_COLS[i % CONFETTI_COLS.length], age:-Math.random()*120, life:1100 + Math.random()*450};
+    if(fc.still){ p.x = cx + (Math.random() - 0.5)*200; p.y = cy - 70 + Math.random()*90; p.vx = p.vy = p.g = p.vr = 0; }
+    serveFx.push(p);
+  }
+  var st = Math.round(4*fc.parts);
+  for(i=0;i<st;i++){                               // a few glints round the seal
+    a = Math.random()*Math.PI*2; rr = 26 + Math.random()*14;
+    serveFx.push({kind:'spark', x:W*0.19 + Math.cos(a)*rr, y:H*0.19 + Math.sin(a)*rr, vx:0, vy:0, g:0, rot:0, vr:0,
+                  size:3 + Math.random()*2.5, col:'#ffd54a', age:-120 - i*60, life:650});
+  }
+}
+function updateServeFx(dt){
+  var sec = dt/1000;
+  for(var i=0;i<serveFx.length;i++){
+    var p = serveFx[i];
+    p.age += dt;
+    if(p.age<0) continue;
+    p.x += p.vx*sec;
+    p.y += p.vy*sec;
+    p.vy += p.g*sec;
+    p.vx *= (1 - 0.8*sec);
+    p.rot += p.vr*sec;
+  }
+  serveFx = serveFx.filter(function(p){ return p.age<p.life; });
+}
+function drawServeFx(still){
+  for(var i=0;i<serveFx.length;i++){
+    var p = serveFx[i];
+    if(p.age<0) continue;
+    var life = p.age/p.life, a = Math.min(1, p.age/80)*(life>0.7 ? Math.max(0, (1 - life)/0.3) : 1);
+    if(a<=0) continue;
+    ctx.globalAlpha = a;
+    if(p.kind==='confetti'){
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.scale(1, 0.25 + 0.75*Math.abs(Math.cos(p.rot*1.7)));
+      ctx.fillStyle = p.col;
+      ctx.fillRect(-p.size, -p.size*0.55, p.size*2, p.size*1.1);
+      ctx.restore();
+    } else {
+      var s = p.size*(still ? 0.85 : 0.7 + 0.3*Math.sin(p.age*0.02));
+      ctx.fillStyle = p.col;
+      ctx.beginPath();
+      for(var k=0;k<8;k++){
+        var an = k*Math.PI/4, rr = k % 2 ? s*0.32 : s;
+        ctx.lineTo(p.x + Math.cos(an)*rr, p.y + Math.sin(an)*rr);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(p.x, p.y, s*0.22, 0, Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+// the customer, and everything around their reaction
+function drawCustomerScene(s){
+  var g = customerGeom(), fc = fxConf(), tier = s.result ? s.result.reaction : 'ok';
+  var rt = s.stage==='react' ? s.t - SERVE_SAY_AT : -1, said = s.stage==='react' && s.said && rt>=0;
+  if(said && tier==='just' && fc.rays) drawJustRays(g, rt, fc);
+  ctx.globalAlpha = Math.min(1, s.clock/220);      // steps in as the bowl is plated
+  drawCustomer(g, customerPose(s, tier, said ? rt : -1, fc));
+  ctx.globalAlpha = 1;
+  if(!said) return;
+  if(tier==='miss') drawGakuText(g, rt, fc);
+  if(tier==='just') drawPraiseStamp(rt, fc);
+  drawServeFx(fc.still);
+  if(tier==='just' && fc.flash && rt<180){
+    ctx.fillStyle = 'rgba(255,248,225,' + (0.35*(1 - rt/180)).toFixed(3) + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+}
+
+// ③ the words: a speech bubble whose text types itself out; the ★ appear when it is done
+function showServeBubble(s){
+  var r = s.result, ch = state.character;
+  s.sayLen = r.text.length;
+  s.charMs = Math.max(26, Math.min(55, Math.floor(700/Math.max(1, s.sayLen))));
+  s.typed = -1;
+  elSbWho.textContent = ch.icon + ' ' + ch.name;
+  elSbText.textContent = '';
+  elSbStars.textContent = r.stars;
+  elSbStars.classList.remove('show');
+  elServeBubble.setAttribute('data-tier', r.reaction);
+  elServeBubble.classList.add('show');
+  elServeSr.textContent = ch.name + '「' + r.text + '」' + r.stars;
+}
+function typeServeBubble(s){
+  var n = Math.min(s.sayLen, Math.floor((s.t - SERVE_SAY_AT)/s.charMs) + 1);
+  if(n===s.typed) return;
+  s.typed = n;
+  elSbText.textContent = s.result.text.slice(0, n);
+  if(n>=s.sayLen) elSbStars.classList.add('show');
+}
+function hideServeBubble(){
+  elServeBubble.classList.remove('show');
+  elSbStars.classList.remove('show');
+}
+// 「満足度 ○」 when the bowl's satisfaction goes in
+function showSatisfactionPop(value, tier){
+  elSatisPop.textContent = '';
+  elSatisPop.appendChild(document.createTextNode('満足度 '));
+  var b = document.createElement('b');
+  b.textContent = String(value);
+  elSatisPop.appendChild(b);
+  elSatisPop.setAttribute('data-tier', tier);
+  elSatisPop.classList.remove('show');
+  void elSatisPop.offsetWidth;
+  elSatisPop.classList.add('show');
+  elServeSr.textContent = '満足度 ' + value;
+}
+function resetServeShow(){
+  stopPourSound();
+  hideServeBubble();
+  elSatisPop.classList.remove('show');
+  elServeSr.textContent = '';
+  serveFx = [];
+}
+// ③ sounds: a comic droop (miss), two soft nods (ok), a little chime (good), cheering and a fanfare (just)
+function playReactionSound(tier){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended'){ ac.resume(); }
+    if(tier==='miss'){
+      gachaTone(ac, 392, 0, 0.24, 'triangle', 0.08, 311);
+      gachaTone(ac, 311, 0.26, 0.5, 'triangle', 0.08, 185);
+    } else if(tier==='ok'){
+      gachaTone(ac, 523, 0, 0.09, 'sine', 0.06);
+      gachaTone(ac, 523, 0.34, 0.09, 'sine', 0.05);
+    } else if(tier==='good'){
+      gachaTone(ac, 1319, 0, 0.18, 'sine', 0.05);
+      gachaTone(ac, 1760, 0.08, 0.22, 'sine', 0.045);
+      gachaTone(ac, 2637, 0.16, 0.26, 'sine', 0.03);
+    } else if(tier==='just'){
+      // 歓声風: a crowd-like swell of band-passed noise, a patter of claps, and a bright rising fanfare
+      sfxNoiseVoice(ac, {filter:'bandpass', f:650, f2:950, q:0.9, dur:1.0, vol:0.12, trem:5}, 0);
+      sfxNoiseVoice(ac, {filter:'bandpass', f:1500, f2:1900, q:1.4, dur:0.85, vol:0.05, trem:6}, 0.05);
+      for(var i=0;i<7;i++) sfxNoiseVoice(ac, {filter:'highpass', f:1800, dur:0.035, vol:0.07}, 0.12 + i*0.09 + (i % 2)*0.02);
+      var notes = [1047, 1319, 1568, 2093];
+      for(var k=0;k<notes.length;k++) gachaTone(ac, notes[k], k*0.07, 0.28, 'triangle', 0.05);
+    }
+  }catch(e){}
+}
+
 function drawServing(){
   var s = state.serving;
   if(s.stage==='spice'){
@@ -6900,22 +7844,23 @@ function drawServing(){
   }
   var cx = bowlCX(), cy = bowlCY();
   var conf = detailConf();
-  var poured = (s.stage==='pour' || s.stage==='soak' || s.stage==='caption');
-  var clock = s.stage==='pour' ? s.t : (poured ? 100000 : -1);   // ms since the tsuyu began to pour
+  var poured = (s.stage==='pour' || s.stage==='react');
+  var clock = s.clock;                               // ms since plating began: the toppings go on while plating
   var aromaK = aromaStrength();
 
   drawServingBowl(cx, cy);   // ③ 器 (着せ替え: the original bowl when none is equipped)
   if(!skinPart('bowl')) safeDraw(function(){ drawBowlLip(cx, cy); });
-  if(poured) safeDraw(function(){ drawTsuyuPool(cx, cy, Math.max(0, Math.min(1, (clock - 120)/600)), conf); });
+  if(poured) safeDraw(function(){ drawTsuyuPool(cx, cy, s.stage==='pour' ? Math.max(0, Math.min(1, (s.t - 200)/650)) : 1, conf); });
 
   var pieces = state.batch;
-  var soaked = (s.stage==='soak' || s.stage==='caption');
+  // the noodles take on the dashi while it is poured
+  var soak = s.stage==='react' ? 1 : s.stage==='pour' ? Math.max(0, Math.min(1, (s.t - 450)/400)) : 0;
   var nsk = state.mode==='shinsoba' ? null : skinPart('noodle');   // ③ 麺 (着せ替え; 新そばモード keeps its own colours)
 
   if(pieces.length){
     var look = noodleLook(nsk);
-    var liftT = s.stage==='lift' ? s.t : null;
-    var shine = Math.min(0.6, look.shine + (soaked ? 0.1 : 0) + aromaK*0.22);
+    var liftT = s.stage==='plate' ? s.t : null;
+    var shine = Math.min(0.6, look.shine + 0.1*soak + aromaK*0.22);
     var heap = function(){
       var bundles = heapLayout(pieces, conf, look);
       ctx.beginPath();
@@ -6924,42 +7869,18 @@ function drawServing(){
       ctx.ellipse(cx, cy+32, 94, 50, 0, Math.PI, Math.PI*2);     // ...and the mound rising over it
       ctx.closePath();
       ctx.clip();
-      drawNoodleHeap(bundles, cx, cy, look, soaked, liftT, shine, heapScale(pieces.length));
+      drawNoodleHeap(bundles, cx, cy, look, soak, liftT, shine, heapScale(pieces.length));
       if(conf.glints && liftT===null && aromaK>0.25) drawHeapGlints(bundles, cx, cy, aromaK);
     };
     if(nsk) guardedSkinDraw('noodle', heap);
     else safeDraw(heap);
-    if(poured){
-      var set = toppingLayout(pieces, conf);
-      safeDraw(function(){ drawToppings(set, cx, cy, clock); });
-      if(aromaK>0 && conf.steam) safeDraw(function(){ drawAromaSteam(cx, cy, aromaK*Math.min(1, clock/300), conf.steam); });
-    }
+    var set = toppingLayout(pieces, conf);
+    safeDraw(function(){ drawToppings(set, cx, cy, clock); });
+    if(poured && aromaK>0 && conf.steam) safeDraw(function(){ drawAromaSteam(cx, cy, aromaK*Math.min(1, (s.stage==='pour' ? s.t : 300)/300), conf.steam); });
   }
 
-  if(s.stage==='pour' || s.stage==='soak' || s.stage==='caption'){
-    var tilt = s.stage==='pour' ? Math.min(s.t/300,1) : 1;
-    ctx.save();
-    ctx.translate(cx+72, cy-66);
-    ctx.rotate(-0.85*tilt);
-    ctx.fillStyle = '#37474f';
-    ctx.beginPath();
-    ctx.ellipse(0,0,24,17,0,0,Math.PI*2);
-    ctx.fill();
-    ctx.fillRect(-4,-28,8,18);
-    ctx.restore();
-
-    if(s.stage==='pour'){
-      var prog = Math.min(s.t/900,1);
-      ctx.strokeStyle = COLORS.accent2;
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.moveTo(cx+58, cy-58);
-      ctx.quadraticCurveTo(cx+38, cy-26, cx+8, cy+8-8*Math.sin(prog*Math.PI));
-      ctx.globalAlpha = 0.5+prog*0.4;
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
-  }
+  safeDraw(function(){ drawDashiPour(cx, cy, s); });      // ② the ladle and the stream of dashi
+  safeDraw(function(){ drawCustomerScene(s); });          // ③ the customer and their reaction
 }
 
 // ---------- Loop ----------
