@@ -681,11 +681,13 @@ body{
 
 /* home: coins + entrances */
 .collect-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:8px var(--pad-x);}
-.collect-main{flex:1 1 auto;min-width:0;}
+.collect-main{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;flex-wrap:wrap;gap:0 10px;}
 .collect-label{margin:0;font-size:.66rem;font-weight:700;letter-spacing:.1em;color:var(--ink-soft);}
 .collect-coins{margin:0;font-size:1.12rem;font-weight:900;line-height:1.3;font-variant-numeric:tabular-nums;}
-.collect-actions{display:flex;gap:6px;}
-.collect-btn{padding:7px 11px;}
+.collect-actions{flex:1 1 100%;display:flex;gap:6px;}
+.collect-btn{flex:1 1 auto;padding:6px 5px;white-space:nowrap;}
+.collect-fuda{display:inline-block;margin-left:12px;font-size:.74rem;font-weight:700;color:var(--ink-soft);}
+.collect-fuda #home-tickets{color:var(--ink);font-weight:900;}
 .collect-title{flex-basis:100%;margin:0;font-size:.7rem;font-weight:900;color:var(--ok);}
 
 /* picture box shared by results, 図鑑 and the detail view */
@@ -707,8 +709,7 @@ body{
 .gw-row{margin:0;display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
 .gw-label{font-size:.72rem;font-weight:700;color:var(--ink-soft);}
 .gw-coins{font-size:1.3rem;font-weight:900;font-variant-numeric:tabular-nums;}
-.gw-pity,.gw-total{margin:0;font-size:.72rem;line-height:1.55;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
-.gw-pity b{color:var(--ink);font-weight:900;}
+.gw-total{margin:0;font-size:.72rem;line-height:1.55;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
 .gacha-stage-wrap{position:relative;overflow:hidden;border-radius:var(--radius);border:1px solid var(--line);background:var(--card);box-shadow:var(--card-shadow);}
 .gacha-stage{display:block;width:100%;height:190px;}
 .gacha-stage-wrap.is-playing .gacha-stage{cursor:pointer;}
@@ -839,6 +840,63 @@ body{
 .result-stats .equip-title-chip{font-size:.7rem;font-weight:900;line-height:1.6;padding:0 8px;border-radius:999px;border:1px solid var(--ok);color:var(--ok);background:var(--ok-soft);}
 .result-equip{margin:-16px 0 22px;max-width:320px;font-size:.76rem;line-height:1.55;color:var(--ink-soft);text-align:center;word-break:auto-phrase;}
 #screen-result.has-fx .result-stats{border-top:4px solid var(--fx-accent,var(--line));}
+/* ---------- そば札・交換所・着せ替え ---------- */
+.fuda-ic{
+  display:inline-grid;place-items:center;min-width:1.4em;height:1.4em;margin-right:4px;padding:0 2px;vertical-align:-.15em;
+  font-size:.62rem;font-weight:900;line-height:1;color:#5a3616;background:#e2c393;
+  border:1px solid rgba(90,54,22,0.45);border-radius:3px 3px 6px 6px;box-shadow:inset 0 -1px 0 rgba(90,54,22,0.18);
+}
+.gw-fuda{font-size:1.05rem;font-weight:900;font-variant-numeric:tabular-nums;}
+.sub-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.exchange .guide-title,.kisekae .guide-title{font-size:1.22rem;}
+.ex-table{min-width:280px;}
+.ex-table col.c-rar{width:70px;}
+.ex-table tbody th{text-align:center;padding-left:5px;}
+.ex-summary{margin:0;font-size:.76rem;line-height:1.55;color:var(--ink-soft);}
+.ex-summary b{color:var(--ink);font-weight:900;}
+.ex-card{cursor:default;}
+.ex-btn{
+  font:inherit;font-size:.68rem;font-weight:900;line-height:1.3;padding:6px 4px;border-radius:9px;font-variant-numeric:tabular-nums;
+  border:1px solid var(--btn-bg);background:var(--btn-bg);color:var(--btn-ink);cursor:pointer;touch-action:manipulation;
+}
+.ex-btn:disabled{background:var(--muted-fill);color:var(--ink-soft);border:1px dashed var(--line);cursor:not-allowed;}
+.xm-head{margin:0;font-size:.84rem;font-weight:900;color:var(--ok);}
+.xm-head:empty{display:none;}
+.xm-text{text-align:center;}
+.xm-text b{font-weight:900;}
+.kk-preview{padding:8px;display:flex;flex-direction:column;gap:6px;}
+.kk-canvas{display:block;width:100%;height:170px;border-radius:calc(var(--radius) - 4px);background:var(--card);}
+.kk-under{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;}
+.kk-chip{margin:0;font-size:.72rem;font-weight:900;line-height:1.6;padding:0 9px;border-radius:999px;border:1px solid var(--ok);color:var(--ok);background:var(--ok-soft);}
+.kk-try{margin-left:auto;}
+.kk-tabs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;}
+.kk-tab{
+  font:inherit;min-width:0;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 1px 5px;
+  border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;touch-action:manipulation;
+}
+.kk-tab-l{font-size:.74rem;font-weight:900;line-height:1.3;white-space:nowrap;}
+.kk-tab-s{font-size:.54rem;line-height:1.3;color:var(--ink-soft);white-space:nowrap;}
+.kk-tab.is-on .kk-tab-s{color:var(--ok);font-weight:900;}
+.kk-tab[aria-selected="true"]{background:var(--btn-bg);color:var(--btn-ink);border-color:var(--btn-edge);}
+.kk-tab[aria-selected="true"] .kk-tab-s{color:var(--btn-ink);}
+.kk-panel{padding:var(--pad-y) var(--pad-x);display:flex;flex-direction:column;gap:7px;}
+.kk-note{margin:0;font-size:.72rem;line-height:1.55;color:var(--ink-soft);}
+.kk-list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:6px;}
+.kk-item{
+  font:inherit;width:100%;height:100%;min-width:0;display:flex;align-items:center;gap:8px;padding:6px 8px;text-align:left;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:3px solid var(--rc,var(--line));border-radius:10px;
+  cursor:pointer;touch-action:manipulation;
+}
+.kk-item .art{width:36px;border-radius:8px;}
+.kk-item .art-ic{font-size:1.15rem;}
+.kk-none-art{display:grid;place-items:center;flex:0 0 auto;width:36px;aspect-ratio:1/1;border-radius:8px;border:1px dashed var(--line);color:var(--ink-soft);font-size:.9rem;font-weight:900;}
+.kk-item-t{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.kk-item-n{font-size:.72rem;font-weight:900;line-height:1.35;word-break:auto-phrase;}
+.kk-item-s{font-size:.6rem;line-height:1.3;color:var(--ink-soft);}
+.kk-item[aria-pressed="true"]{border-color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok);background:var(--ok-soft);}
+.kk-item[aria-pressed="true"] .kk-item-s{color:var(--ok);font-weight:900;}
+@media (hover:hover){ .kk-item:hover,.kk-tab:hover{border-color:var(--accent-ink);} }
+.kk-tab:focus-visible,.kk-item:focus-visible,.ex-btn:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px;}
 @media (max-width:360px){ .game-title{font-size:1.4rem;} .rank-badge{padding:5px 8px 5px 10px;} }
 </style>
 </head>
@@ -995,11 +1053,13 @@ body{
     <section class="collect-row card" aria-labelledby="collect-label">
       <div class="collect-main">
         <h2 id="collect-label" class="collect-label">そば猪口コイン</h2>
-        <p class="collect-coins"><span id="home-coins">0</span>🪙</p>
+        <p class="collect-coins"><span id="home-coins">0</span>🪙<span class="collect-fuda"><span class="fuda-ic" aria-hidden="true">札</span>そば札 <span id="home-tickets">0</span>枚</span></p>
       </div>
       <div class="collect-actions">
         <button id="btn-gacha" class="btn-small collect-btn" type="button">ガチャを引く</button>
         <button id="btn-zukan" class="btn-small collect-btn" type="button">図鑑 <span id="home-zukan">0/42</span></button>
+        <button id="btn-exchange" class="btn-small collect-btn" type="button">交換所</button>
+        <button id="btn-kisekae" class="btn-small collect-btn" type="button">着せ替え</button>
       </div>
       <p id="home-title-chip" class="collect-title" hidden></p>
     </section>
@@ -1035,7 +1095,7 @@ body{
         <div class="clear-row">
           <button id="btn-clear" class="btn-small btn-danger" type="button">記録を消す</button>
           <div id="clear-confirm" class="clear-confirm" hidden>
-            <p class="clear-q">自己ベスト・限定ベスト・段位・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・図鑑・装備は残ります）。</p>
+            <p class="clear-q">自己ベスト・限定ベスト・段位・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備は残ります）。</p>
             <div class="clear-actions">
               <button id="btn-clear-yes" class="btn-small btn-danger-solid" type="button">消す</button>
               <button id="btn-clear-no" class="btn-small" type="button">やめる</button>
@@ -1238,11 +1298,11 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内にのみ保存されます。端末やブラウザを変えると引き継がれません。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、段位、満足度の最高値、最大コンボ、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、図鑑（集めたアイテム・装備・ガチャの天井の回数・称号）、前回のそば粉、効果音のオン・オフ、描画の細かさ、お客さんの反応の演出。</li>
+        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、段位、満足度の最高値、最大コンボ、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、描画の細かさ、お客さんの反応の演出。</li>
         <li><b>引っ越し</b>ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
-        <li><b>リセット</b>「記録を消す」で自己ベストや段位などが初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・図鑑と装備はそのまま）。</li>
-        <li><b>そば猪口コイン</b>1回遊ぶごとに、得点÷20×お客さんの係数（観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2）。さらに自己ベスト更新で+150、最大コンボ10以上で+50（20以上なら+150）、本日のチャレンジ達成で+400（1日1回）。端数は切り捨て、1日に貯まるのは2,000まで（端末の日付で判定）。獲得した枚数と内訳はリザルトに出ます。</li>
-        <li><b>ガチャと図鑑</b>ホームの「ガチャを引く」で、コインを使って越前・福井にちなんだアイテムを引けます（1回500・10連4,500）。確率・天井・被りの扱いはガチャ画面にいつも表示しています。集めたアイテムは「図鑑」で見られ、「装備する」で器・麺・包丁・背景・演出の色・効果音・称号を着せ替えられます（見た目と音だけで、得点や判定は変わりません）。</li>
+        <li><b>リセット</b>「記録を消す」で自己ベストや段位などが初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備はそのまま）。</li>
+        <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。</li>
+        <li><b>ガチャと図鑑</b>ホームの「ガチャを引く」で、コインを使って越前・福井にちなんだアイテムを引けます（1回500・10連4,500）。確率はガチャ画面にいつも表示しています（天井はありません）。被ったアイテムは「そば札」に変わり、「交換所」でまだ持っていないアイテムと交換できます。集めたアイテムは「図鑑」で見られ、「着せ替え」で器・麺・包丁・背景・演出の色・効果音・称号を着せ替えられます（見た目と音だけで、得点や判定は変わりません）。</li>
       </ul>
     </section>
 
@@ -1259,7 +1319,7 @@ body{
     </div>
     <div class="gacha-wallet card">
       <p class="gw-row"><span class="gw-label">そば猪口コイン</span><span id="gacha-balance" class="gw-coins">0🪙</span></p>
-      <p id="gacha-pity" class="gw-pity"></p>
+      <p class="gw-row"><span class="gw-label"><span class="fuda-ic" aria-hidden="true">札</span>そば札（被りで貯まる）</span><span id="gacha-tickets" class="gw-fuda">0枚</span></p>
       <p id="gacha-total" class="gw-total"></p>
     </div>
     <div id="gacha-stage-wrap" class="gacha-stage-wrap">
@@ -1268,7 +1328,7 @@ body{
     </div>
     <div id="gacha-pulls" class="gacha-pulls">
       <button id="btn-pull-1" class="btn-pull" type="button"><span class="bp-main">1回引く</span><span class="bp-cost">500🪙</span><span class="bp-need"></span></button>
-      <button id="btn-pull-10" class="btn-pull" type="button"><span class="bp-main">10連で引く</span><span class="bp-cost">4,500🪙</span><span class="bp-note">特上以上1枠確定</span><span class="bp-need"></span></button>
+      <button id="btn-pull-10" class="btn-pull" type="button"><span class="bp-main">10連で引く</span><span class="bp-cost">4,500🪙</span><span class="bp-note">上以上1枠確定</span><span class="bp-need"></span></button>
     </div>
     <p id="gacha-rate-line" class="rate-line"></p>
     <p id="gacha-msg" class="gacha-msg" role="status" aria-live="polite"></p>
@@ -1294,7 +1354,10 @@ body{
       </div>
       <ul id="gacha-rules" class="gpoints"></ul>
     </section>
-    <button id="btn-gacha-zukan" class="btn-small guide-back" type="button">図鑑を見る</button>
+    <div class="sub-links">
+      <button id="btn-gacha-zukan" class="btn-small" type="button">図鑑を見る</button>
+      <button id="btn-gacha-exchange" class="btn-small" type="button">交換所へ</button>
+    </div>
   </section>
 
   <section id="screen-zukan" class="screen guide zukan" aria-labelledby="zukan-title">
@@ -1317,7 +1380,68 @@ body{
       <p id="equip-msg" class="equip-msg" role="status" aria-live="polite"></p>
     </section>
     <div id="zukan-groups" class="zukan-groups"></div>
-    <button id="btn-zukan-gacha" class="btn-small guide-back" type="button">ガチャへ</button>
+    <div class="sub-links">
+      <button id="btn-zukan-gacha" class="btn-small" type="button">ガチャへ</button>
+      <button id="btn-zukan-exchange" class="btn-small" type="button">交換所へ</button>
+      <button id="btn-zukan-kisekae" class="btn-small" type="button">着せ替えへ</button>
+    </div>
+  </section>
+
+  <section id="screen-exchange" class="screen guide exchange" aria-labelledby="exchange-title">
+    <div class="guide-bar">
+      <h2 id="exchange-title" class="guide-title" tabindex="-1">交換所</h2>
+      <button id="btn-exchange-back" class="btn-small" type="button">戻る</button>
+    </div>
+    <div class="gacha-wallet card">
+      <p class="gw-row"><span class="gw-label"><span class="fuda-ic" aria-hidden="true">札</span>そば札</span><span id="exchange-tickets" class="gw-coins">0枚</span></p>
+      <p id="exchange-lead" class="gw-total"></p>
+    </div>
+    <div class="table-scroll">
+      <table class="gtable ex-table">
+        <caption class="vh">レア度ごとのそば札</caption>
+        <colgroup><col class="c-rar"><col><col></colgroup>
+        <thead>
+          <tr><th scope="col">レア度</th><th scope="col">被りでもらえる</th><th scope="col">交換に必要</th></tr>
+        </thead>
+        <tbody id="exchange-cost-body"></tbody>
+      </table>
+    </div>
+    <p id="exchange-msg" class="equip-msg" role="status" aria-live="polite"></p>
+    <p id="exchange-summary" class="ex-summary"></p>
+    <div id="exchange-groups" class="zukan-groups"></div>
+    <div class="sub-links">
+      <button id="btn-exchange-kisekae" class="btn-small" type="button">着せ替えへ</button>
+    </div>
+  </section>
+
+  <section id="screen-kisekae" class="screen guide kisekae" aria-labelledby="kisekae-title">
+    <div class="guide-bar">
+      <h2 id="kisekae-title" class="guide-title" tabindex="-1">着せ替え</h2>
+      <div class="bar-actions">
+        <button id="kisekae-sound" class="btn-small bar-icon" type="button" aria-pressed="true" aria-label="効果音" title="効果音のオン・オフ">🔊</button>
+        <button id="btn-kisekae-back" class="btn-small" type="button">戻る</button>
+      </div>
+    </div>
+    <div class="kk-preview card">
+      <canvas id="kisekae-canvas" class="kk-canvas" aria-hidden="true"></canvas>
+      <div class="kk-under">
+        <p id="kisekae-title-chip" class="kk-chip" hidden></p>
+        <button id="kisekae-try" class="btn-small kk-try" type="button">音を試す</button>
+      </div>
+      <p id="kisekae-sum" class="vh"></p>
+    </div>
+    <p class="equip-hint">見本は、いま装備しているもので描いています。変わるのは見た目と音だけで、得点や判定は変わりません。</p>
+    <div id="kisekae-tabs" class="kk-tabs" role="tablist" aria-label="装備する部位"></div>
+    <section id="kisekae-panel" class="kk-panel card" role="tabpanel" aria-labelledby="kisekae-panel-h">
+      <h3 id="kisekae-panel-h" class="gr-h" tabindex="-1"></h3>
+      <p id="kisekae-note" class="kk-note"></p>
+      <ul id="kisekae-list" class="kk-list"></ul>
+      <p id="kisekae-empty" class="kk-note" hidden></p>
+    </section>
+    <p id="kisekae-msg" class="equip-msg" role="status" aria-live="polite"></p>
+    <div class="sub-links">
+      <button id="btn-kisekae-exchange" class="btn-small" type="button">交換所へ</button>
+    </div>
   </section>
 
   <section id="screen-game" class="screen">
@@ -1394,6 +1518,23 @@ body{
       <p id="zm-odds" class="zm-odds"></p>
       <p id="zm-equip-note" class="zm-equip-note" hidden></p>
       <div class="zm-actions"><button id="zm-equip" class="btn-small zm-equip" type="button" hidden>装備する</button><button id="zm-close" class="btn-small" type="button">閉じる</button></div>
+    </div>
+  </div>
+
+  <div id="xmodal" class="zmodal" hidden>
+    <div class="zmodal-backdrop" data-xclose="1"></div>
+    <div id="xm-card" class="zmodal-card" role="dialog" aria-modal="true" aria-labelledby="xm-name" aria-describedby="xm-text">
+      <p id="xm-head" class="xm-head"></p>
+      <div id="xm-art" class="zm-art"></div>
+      <p class="zm-meta"><span id="xm-rar" class="rar"></span><span id="xm-cat" class="tag"></span></p>
+      <h3 id="xm-name" class="zm-name"></h3>
+      <p id="xm-text" class="zm-desc xm-text"></p>
+      <p id="xm-note" class="zm-equip-note" hidden></p>
+      <div class="zm-actions">
+        <button id="xm-ok" class="btn-small zm-equip" type="button">交換する</button>
+        <button id="xm-equip" class="btn-small zm-equip" type="button" hidden>装備する</button>
+        <button id="xm-cancel" class="btn-small" type="button">やめる</button>
+      </div>
     </div>
   </div>
 
@@ -1617,7 +1758,9 @@ var screens = {
   game: document.getElementById('screen-game'),
   result: document.getElementById('screen-result'),
   gacha: document.getElementById('screen-gacha'),
-  zukan: document.getElementById('screen-zukan')
+  zukan: document.getElementById('screen-zukan'),
+  exchange: document.getElementById('screen-exchange'),
+  kisekae: document.getElementById('screen-kisekae')
 };
 var canvas = document.getElementById('game-canvas');
 var ctx = canvas.getContext('2d');
@@ -1737,45 +1880,46 @@ var DAILY_TIERS = ['beginner','lover','regular','enthusiast'];
 var DAILY_THRESHOLDS = [400,600,800,1000,1200];
 
 // ---------- そば猪口コイン: saved in store.gacha (earned here; spent by the そば猪口ガチャ further below) ----------
+// One finished game pays 120〜220 (about three games for one pull), with no daily limit:
+//   修行 120 + 得点ぶん 0〜50 (得点 × お客さんの係数 ÷ 100) + 満足度ぶん 0〜50 (5杯の平均満足度 ÷ 2).
+// 本日のチャレンジ達成 adds 500, once a day. Fractions are dropped.
 var COIN_MAX = 99999999;
-var COIN_DAILY_CAP = 2000;
-var COIN_PER_POINTS = 20;
-var COIN_BEST_BONUS = 150;
-var COIN_COMBO_BONUS = [{min:20, coins:150}, {min:10, coins:50}];   // only the highest step that was reached
-var COIN_CHALLENGE_BONUS = 400;
+var COIN_PLAY_BASE = 120;
+var COIN_SCORE_MAX = 50;
+var COIN_SCORE_STEP = 100;
+var COIN_SAT_MAX = 50;
+var COIN_SAT_DIV = 2;
+var COIN_CHALLENGE_BONUS = 500;
 // customer factor ×10, so the maths stays in whole numbers:
 // 観光客 1.0 / 地元の常連 1.2 / そば通 1.5 / 辛味大根マニア 2.0 / そば畑の農家 (limited guest) 1.2
 var COIN_RATE10 = {beginner:10, lover:12, regular:15, enthusiast:20, farmer:12};
+// そば札 (tickets): what a duplicate from the gacha turns into; spent at the 交換所
+var TICKET_MAX = 9999999;
 var GACHA_SLOTS = ['bowl','noodle','tool','bg','effect','sound','title'];
 
 // ---------- そば猪口ガチャ: the 42-item catalog and the draw rules ----------
 // Each item is {id, name, rarity, category, applyTo, desc}.
 //   rarity:  'nami' 並 / 'jo' 上 / 'tokujo' 特上 / 'kiwami' 極み
-//   applyTo: the equip slot it is meant to dress later (one of GACHA_SLOTS), or null for 図鑑-only items.
-//            背景・のれん→bg, 器→bowl, 麺→noodle, 道具→tool, SE・まな板音→sound, 薬味・小物→effect, 称号→title.
-//            Nothing is equipped in this version: items only fill the 図鑑.
+//   applyTo: the equip slot it dresses (one of GACHA_SLOTS). Every prize is a look or a sound — nothing changes play.
+//            背景・のれん→bg, 器→bowl, 麺→noodle, 道具→tool, SE・まな板音→sound, 薬味・小物・おまけ→effect, 称号→title.
 //   id:      also the key of the item's picture in ART (top of the script).
+// There is no 天井 (pity) and no daily limit on coins. A duplicate becomes そば札 (dupTickets), and at the 交換所
+// そば札 buy any item not owned yet (exchange = the price in そば札).
 var GACHA_RARITY_ORDER = ['nami','jo','tokujo','kiwami'];
 var GACHA_RARITIES = {
-  nami:  {label:'並',   rate:6000, dupCoins:50,   count:14},
-  jo:    {label:'上',   rate:3000, dupCoins:200,  count:12},
-  tokujo:{label:'特上', rate:900,  dupCoins:800,  count:9},
-  kiwami:{label:'極み', rate:100,  dupCoins:3000, count:7}
+  nami:  {label:'並',   rate:6000, dupTickets:1,  exchange:10,  count:14},
+  jo:    {label:'上',   rate:2500, dupTickets:3,  exchange:30,  count:12},
+  tokujo:{label:'特上', rate:1200, dupTickets:10, exchange:80,  count:9},
+  kiwami:{label:'極み', rate:300,  dupTickets:25, exchange:200, count:7}
 };
 var GACHA_RATE_TOTAL = 10000;   // rates are in hundredths of a percent: 6000 = 60.00% (they must add up to 100%)
-var GACHA_TOP_INDEX = 2;        // GACHA_RARITY_ORDER index of 特上: 特上以上 = 特上 + 極み
+var GACHA_TEN_MIN_INDEX = 1;    // GACHA_RARITY_ORDER index of 上: the 10連's sure slot is 上以上 = 上 + 特上 + 極み
 var GACHA_TOTAL_ITEMS = 42;
 var GACHA_PULLS = {
-  single:{count:1,  cost:500,  guaranteeTop:false},
-  ten:   {count:10, cost:4500, guaranteeTop:true}    // 10連: the last slot is 特上以上 if none came before it
+  single:{count:1,  cost:500,  guaranteeMin:0},
+  ten:   {count:10, cost:4500, guaranteeMin:GACHA_TEN_MIN_INDEX}   // 10連: the last slot is 上以上 if none came before it
 };
-// 天井 (pity). Two separate counters in store.gacha.pity:
-//   sinceTop  = pulls in a row without 特上以上 → the 50th such pull is 特上以上 for sure
-//   sinceBest = pulls in a row without 極み    → the 100th such pull is 極み for sure
-// A counter goes back to 0 as soon as its rarity comes out (極み also counts as 特上以上).
-var GACHA_PITY_TOP = 50;
-var GACHA_PITY_BEST = 100;
-// 新そば is 秋限定: it only drops while 新そばモード's period is open (this device's local date).
+// 新そば is 秋限定: it only drops (and can only be exchanged) while 新そばモード's period is open (this device's local date).
 var GACHA_SEASON_ONLY = {shinsoba_noodle:'shinsoba'};
 // Filling the whole 図鑑 gives this title (only the title: no coins or other rewards).
 var GACHA_COMPLETE_TITLE = 'soba_hitosuji';
@@ -1805,11 +1949,11 @@ var GACHA_CATALOG = [
    desc:'そば切り包丁で、駒板に沿ってトン、トンと刻んでいく音。'},
   {id:'slurp_sound', name:'そば猪口をすする音', rarity:'nami', category:'SE', applyTo:'sound',
    desc:'そば猪口のつゆをすする音。最後はそば湯で割って飲むのも楽しみ。'},
-  {id:'habutae_mochi', name:'羽二重餅', rarity:'nami', category:'おまけ', applyTo:null,
+  {id:'habutae_mochi', name:'羽二重餅', rarity:'nami', category:'おまけ', applyTo:'effect',
    desc:'福井を代表する銘菓。絹織物の羽二重のように、なめらかでやわらかい餅菓子。'},
-  {id:'mizu_yokan', name:'水ようかん', rarity:'nami', category:'おまけ', applyTo:null,
+  {id:'mizu_yokan', name:'水ようかん', rarity:'nami', category:'おまけ', applyTo:'effect',
    desc:'福井では冬にこたつで食べるのが定番。平たい箱に流した、あっさり甘い水ようかん。'},
-  {id:'satsukigase', name:'五月ヶ瀬', rarity:'nami', category:'おまけ', applyTo:null,
+  {id:'satsukigase', name:'五月ヶ瀬', rarity:'nami', category:'おまけ', applyTo:'effect',
    desc:'福井で長く親しまれている、落花生がぎっしり入った煎餅。'},
   // ---- 上 (12) ----
   {id:'echizen_lacquer_bowl', name:'越前漆器の椀', rarity:'jo', category:'器', applyTo:'bowl',
@@ -1915,7 +2059,7 @@ var EQUIP_SLOT_NOTES = {
   noodle:'麺と生地の色・質感が変わります（新そばモードでは新そばの色のまま）。',
   tool:'包丁の見た目と、JUST!のときの刃の音が変わります。',
   bg:'プレイ画面の背景が変わります（ARTに画像があればその画像）。',
-  effect:'切ったときの輪と紙吹雪の色が変わります。',
+  effect:'切ったときの輪と紙吹雪、お客さんが喜んだときのキラキラと紙吹雪の色が変わります。',
   sound:'効果音が加わります。',
   title:'リザルトの段位の横に表示されます。'
 };
@@ -1968,11 +2112,15 @@ var SKIN_BGS = {
   yokokan_garden:{scene:'garden'}, echizen_cape:{scene:'cape'}, ichijodani_ruins:{scene:'ruins'}, eiheiji_temple:{scene:'temple'},
   dinosaur_museum:{scene:'museum'}, eastern_cliff:{scene:'cliff'}, master_tansu:{scene:'tansu', fine:true}
 };
-// 演出: the colours of the ring and the confetti when a cut lands (ring / JUST! ring / confetti)
+// 演出: the colours of the ring and the confetti when a cut lands (ring / JUST! ring / confetti), and of the
+// sparkles (just) and confetti (bits) when a customer is pleased after a bowl is served
 var SKIN_EFFECTS = {
   washi_chopstick_sleeve:{ring:'#b3452e', just:'#e9d6a8', bits:['#f7f1e3','#e6d8b8','#b3452e']},
   extra_negi:            {ring:'#4f8f2f', just:'#a9d65f', bits:['#6fae3f','#a5d364','#e3f1c4']},
   extra_katsuobushi:     {ring:'#b86f58', just:'#f0b8a0', bits:['#e7b19c','#f5dccf','#c9866d']},
+  habutae_mochi:         {ring:'#efe7d4', just:'#ffffff', bits:['#fffdf7','#e9dcc0','#b89a64']},
+  mizu_yokan:            {ring:'#7a3328', just:'#c0685a', bits:['#6e2d24','#98493b','#cf8f7e']},
+  satsukigase:           {ring:'#b98646', just:'#f0cd86', bits:['#c99456','#e6c485','#8c5b2c']},
   crab_chopstick_rest:   {ring:'#d24a2a', just:'#ffd54a', bits:['#e0603a','#f39a6b','#ffd54a']},
   agate_chopstick_rest:  {ring:'#b83a33', just:'#f5a67b', bits:['#d4524c','#ef9b76','#f8d9c6']},
   wakasa_chopsticks:     {ring:'#9b291d', just:'#e8c46a', bits:['#b8872f','#6f8f5c','#9b291d','#e8c46a']}
@@ -2002,14 +2150,15 @@ var SKIN_SFX = {
   bladeRing: [{t:'tone', wave:'sine', f:1760, dur:0.55, vol:0.035}, {t:'tone', wave:'sine', f:2653, dur:0.4, vol:0.02}]
 };
 
+// store.gacha. A save without it (or without tickets / stats) gets these defaults; nothing else is touched.
 function defaultGacha(){
   return {
-    currency:0,
-    dailyEarned:{date:'', amount:0, challenge:false},
+    currency:0,     // そば猪口コイン
+    tickets:0,      // そば札 (from duplicates; spent at the 交換所)
     owned:[],
     equipped:{bowl:null, noodle:null, tool:null, bg:null, effect:null, sound:null, title:null},
-    pity:{sinceTop:0, sinceBest:0},
-    totalPulls:0,
+    stats:{totalPulls:0},
+    dailyEarned:{date:'', amount:0, challenge:false},   // today's coins (shown only) and whether today's challenge bonus was paid
     history:[],
     titles:[]      // titles earned in the 図鑑 (soba_hitosuji for a full set); older saves simply start with []
   };
@@ -2026,12 +2175,13 @@ function sanitizeGacha(raw){
   var g = isPlainObj(raw) ? raw : {};
   var de = isPlainObj(g.dailyEarned) ? g.dailyEarned : {};
   var eq = isPlainObj(g.equipped) ? g.equipped : {};
-  var pity = isPlainObj(g.pity) ? g.pity : {};
+  var st = isPlainObj(g.stats) ? g.stats : {};
   var out = defaultGacha();
   out.currency = clampInt(g.currency, 0, COIN_MAX);
+  out.tickets = clampInt(g.tickets, 0, TICKET_MAX);
   out.dailyEarned = {
     date:(typeof de.date==='string' && de.date.length<=32) ? de.date : '',
-    amount:clampInt(de.amount, 0, COIN_DAILY_CAP),
+    amount:clampInt(de.amount, 0, COIN_MAX),
     challenge:de.challenge===true   // today's challenge bonus already paid (it is paid once a day)
   };
   if(Array.isArray(g.owned)){
@@ -2044,8 +2194,8 @@ function sanitizeGacha(raw){
     var v = eq[GACHA_SLOTS[s]];
     out.equipped[GACHA_SLOTS[s]] = (typeof v==='string' && v.length>0 && v.length<=64) ? v : null;
   }
-  out.pity = {sinceTop:clampInt(pity.sinceTop, 0, 1000000), sinceBest:clampInt(pity.sinceBest, 0, 1000000)};
-  out.totalPulls = clampInt(g.totalPulls, 0, 100000000);
+  // older saves kept the count at gacha.totalPulls: it moves into stats (the pity counters of that version are dropped)
+  out.stats = {totalPulls:Math.max(clampInt(st.totalPulls, 0, 100000000), clampInt(g.totalPulls, 0, 100000000))};
   if(Array.isArray(g.history)){
     var h = g.history.slice(-100);
     for(var j=0;j<h.length;j++){ if(typeof h[j]==='string' || isPlainObj(h[j])) out.history.push(h[j]); }
@@ -2287,7 +2437,7 @@ function loadStore(){
     store = safeParseStore(raw);
     upgraded = isOlderSchema(raw);
     if(upgraded) backupBeforeUpgrade(raw);
-    settingsFilled = lacksSettingDefaults(raw);
+    settingsFilled = lacksSettingDefaults(raw) || lacksGachaDefaults(raw);
   }
   var dailyChanged = ensureDailyFresh(store);
   if(raw===null || upgraded || dailyChanged || settingsFilled){ saveStoreObj(store); }
@@ -2299,6 +2449,16 @@ function lacksSettingDefaults(raw){
   try{
     var o = JSON.parse(raw);
     return isPlainObj(o) && (!hasValidVisual(o.settings) || !hasValidEffects(o.settings));
+  }catch(e){ return false; }
+}
+// Likewise a save whose gacha has no tickets / stats yet (made before the 交換所): written back once with
+// tickets 0 and the pull count moved into stats. Coins, the 図鑑 and the equipment stay as they are.
+function lacksGachaDefaults(raw){
+  try{
+    var o = JSON.parse(raw);
+    if(!isPlainObj(o)) return false;
+    var g = o.gacha;
+    return !isPlainObj(g) || typeof g.tickets!=='number' || !isPlainObj(g.stats) || typeof g.stats.totalPulls!=='number';
   }catch(e){ return false; }
 }
 // A readable save from an older schema is written back once in the current shape (its bests carried over as they are).
@@ -2347,9 +2507,11 @@ function importStoreString(text){
   }
   var coerced = coerceStore(obj);
   // a backup made before coins existed must not wipe the coins (or settings) saved now
-  if(!isPlainObj(obj.gacha) || !isPlainObj(obj.settings) || !hasValidVisual(obj.settings) || !hasValidEffects(obj.settings)){
+  var noTickets = isPlainObj(obj.gacha) && typeof obj.gacha.tickets!=='number';
+  if(!isPlainObj(obj.gacha) || noTickets || !isPlainObj(obj.settings) || !hasValidVisual(obj.settings) || !hasValidEffects(obj.settings)){
     var current = loadStore();
     if(!isPlainObj(obj.gacha)) coerced.gacha = current.gacha;
+    else if(noTickets) coerced.gacha.tickets = current.gacha.tickets;   // likewise a backup made before そば札 keeps the そば札 saved now
     if(!isPlainObj(obj.settings) && current.settings) coerced.settings = current.settings;
     else{
       // a backup made before a setting existed keeps this device's choice for it
@@ -3987,7 +4149,7 @@ function endGame(){
   var rank = RANKS[0].name;
   for(var i=0;i<RANKS.length;i++){ if(state.score>=RANKS[i].min) rank = RANKS[i].name; }
   resultRank.textContent = '称号: ' + rank;
-  showCoinsForGame(isNewBest, dailyJustCleared);
+  showCoinsForGame(dailyJustCleared);
   showEquipOnResult();
   showScreen('result');
 }
@@ -4046,7 +4208,7 @@ function endSeasonalGame(){
   var rank = RANKS[0].name;
   for(var i=0;i<RANKS.length;i++){ if(state.score>=RANKS[i].min) rank = RANKS[i].name; }
   resultRank.textContent = '称号: ' + rank;
-  showCoinsForGame(isNewBest, false);   // limited modes earn coins too (no daily challenge there)
+  showCoinsForGame(false);   // limited modes earn coins too (no daily challenge there)
   showEquipOnResult();
   showScreen('result');
 }
@@ -4161,23 +4323,21 @@ function drawShinsobaLook(now){
 }
 
 // ---------- そば猪口コイン: what one finished game earns ----------
-function coinParts(score, tier, isNewBest, maxCombo, challengeCleared){
-  var base = Math.floor(Math.max(0, score) / COIN_PER_POINTS);
+// score: the game's points; satisfaction: the 5 bowls' average (0..100, as on the result screen).
+function coinParts(score, tier, satisfaction, challengeCleared){
   var rate10 = Object.prototype.hasOwnProperty.call(COIN_RATE10, tier) ? COIN_RATE10[tier] : 10;
-  var combo = 0, comboMin = 0;
-  for(var i=0;i<COIN_COMBO_BONUS.length;i++){
-    if(maxCombo>=COIN_COMBO_BONUS[i].min){ combo = COIN_COMBO_BONUS[i].coins; comboMin = COIN_COMBO_BONUS[i].min; break; }
-  }
+  var sc = Math.max(0, Math.floor(Number(score) || 0));
+  var sat = Math.max(0, Math.min(100, Math.round(Number(satisfaction) || 0)));
   return {
-    score:Math.max(0, score), rate10:rate10,
-    play:Math.floor(base * rate10 / 10),
-    best:(isNewBest && score>0) ? COIN_BEST_BONUS : 0,   // a 0-point game never pays the best bonus
-    combo:combo, comboMin:comboMin,
+    score:sc, rate10:rate10, sat:sat,
+    base:COIN_PLAY_BASE,
+    scorePart:Math.min(COIN_SCORE_MAX, Math.floor(sc * rate10 / (10 * COIN_SCORE_STEP))),
+    satPart:Math.min(COIN_SAT_MAX, Math.floor(sat / COIN_SAT_DIV)),
     challenge:challengeCleared ? COIN_CHALLENGE_BONUS : 0
   };
 }
-// Adds the coins to store.gacha, honouring the daily cap (by this device's local date) and the
-// once-a-day challenge bonus. Returns what happened, for the result screen.
+// Adds the coins to store.gacha (no daily limit) and pays today's challenge bonus only once a day
+// (by this device's local date). Returns what happened, for the result screen.
 function awardCoins(parts){
   var store = loadStore();
   var g = store.gacha;
@@ -4185,38 +4345,38 @@ function awardCoins(parts){
   if(g.dailyEarned.date!==today) g.dailyEarned = {date:today, amount:0, challenge:false};
   var challengeRepeat = false;
   if(parts.challenge && g.dailyEarned.challenge){ parts.challenge = 0; challengeRepeat = true; }
-  var total = parts.play + parts.best + parts.combo + parts.challenge;
-  var room = Math.max(0, COIN_DAILY_CAP - g.dailyEarned.amount);
-  var granted = Math.max(0, Math.min(total, room, COIN_MAX - g.currency));
+  var total = parts.base + parts.scorePart + parts.satPart + parts.challenge;
+  var granted = Math.max(0, Math.min(total, COIN_MAX - g.currency));   // only the wallet's own ceiling
   g.currency += granted;
-  g.dailyEarned.amount += granted;
+  g.dailyEarned.amount = Math.min(COIN_MAX, g.dailyEarned.amount + granted);
   if(parts.challenge) g.dailyEarned.challenge = true;
   saveStoreObj(store);
-  return {parts:parts, total:total, granted:granted, capped:granted<total, challengeRepeat:challengeRepeat, balance:g.currency, today:g.dailyEarned.amount};
+  return {parts:parts, total:total, granted:granted, full:granted<total, challengeRepeat:challengeRepeat, balance:g.currency, today:g.dailyEarned.amount};
 }
 function renderCoinResult(r){
   var p = r.parts;
   coinGain.textContent = '+' + fmtPoints(r.granted) + '🪙';
-  var items = ['プレイ ' + fmtPoints(p.play) + '（' + fmtPoints(p.score) + '点÷' + COIN_PER_POINTS + '×' + (p.rate10/10).toFixed(1) + '）'];
-  if(p.best) items.push('自己ベスト更新 ' + p.best);
-  if(p.combo) items.push('最大コンボ' + p.comboMin + '以上 ' + p.combo);
+  var items = [
+    '修行 ' + p.base,
+    '得点 ' + p.scorePart + '（' + fmtPoints(p.score) + '点×' + (p.rate10/10).toFixed(1) + '÷' + COIN_SCORE_STEP + (p.scorePart>=COIN_SCORE_MAX ? '・上限' + COIN_SCORE_MAX : '') + '）',
+    '満足度 ' + p.satPart + '（' + p.sat + '÷' + COIN_SAT_DIV + '）'
+  ];
   if(p.challenge) items.push('本日のチャレンジ達成 ' + p.challenge);
   coinBreakdown.textContent = '（' + items.join(' ＋ ') + '）';
   var notes = [];
   if(r.challengeRepeat) notes.push('本日のチャレンジ達成ボーナスは受け取り済みです。');
-  if(r.capped){
-    notes.push(r.granted>0
-      ? ('1日の上限' + fmtPoints(COIN_DAILY_CAP) + 'に届いたため、' + fmtPoints(r.total) + 'のうち' + fmtPoints(r.granted) + 'だけ加算しました。')
-      : ('1日の上限' + fmtPoints(COIN_DAILY_CAP) + 'に達しているため、今回は加算されません。'));
-  }
+  if(r.full) notes.push('持てるコインは' + fmtPoints(COIN_MAX) + 'までのため、' + fmtPoints(r.total) + 'のうち' + fmtPoints(r.granted) + 'だけ加算しました。');
   coinNote.textContent = notes.join(' ');
-  coinStatus.textContent = '所持 ' + fmtPoints(r.balance) + '🪙 ・ 本日の獲得 ' + fmtPoints(r.today) + ' / ' + fmtPoints(COIN_DAILY_CAP);
+  coinStatus.textContent = '所持 ' + fmtPoints(r.balance) + '🪙 ・ 本日の獲得 ' + fmtPoints(r.today);
   coinBox.hidden = false;
 }
+function gameSatisfactionAvg(){
+  return state.satisfactionRounds ? Math.round(state.satisfactionSum/state.satisfactionRounds) : 0;
+}
 // Never lets a coin problem get in the way of the result screen.
-function showCoinsForGame(isNewBest, challengeCleared){
+function showCoinsForGame(challengeCleared){
   try{
-    renderCoinResult(awardCoins(coinParts(state.score, state.tier, isNewBest, state.maxCombo, challengeCleared)));
+    renderCoinResult(awardCoins(coinParts(state.score, state.tier, gameSatisfactionAvg(), challengeCleared)));
   }catch(e){
     coinBox.hidden = true;
   }
@@ -4225,10 +4385,10 @@ function showCoinsForGame(isNewBest, challengeCleared){
 // ---------- そば猪口ガチャ・図鑑: pulling, the opening effect and the collection ----------
 // A pull always runs in this order: 残高チェック → 減算 → 抽選・確定 → セーブ (a single write).
 // The save is the commit: if it fails nothing has changed, so coins are never spent twice or lost
-// and the balance never goes below 0. Items only fill the 図鑑 for now (nothing is equipped yet).
+// and the balance never goes below 0. The 交換所 spends そば札 the same way (further below).
 var gachaTitleEl = document.getElementById('gacha-title');
 var gachaBalanceEl = document.getElementById('gacha-balance');
-var gachaPityEl = document.getElementById('gacha-pity');
+var gachaTicketsEl = document.getElementById('gacha-tickets');
 var gachaTotalEl = document.getElementById('gacha-total');
 var gachaStageWrap = document.getElementById('gacha-stage-wrap');
 var gachaStage = document.getElementById('gacha-stage');
@@ -4248,6 +4408,7 @@ var gachaRateBody = document.getElementById('gacha-rate-body');
 var gachaRateFoot = document.getElementById('gacha-rate-foot');
 var gachaRules = document.getElementById('gacha-rules');
 var gachaSoundBtn = document.getElementById('gacha-sound');
+var kisekaeSoundBtn = document.getElementById('kisekae-sound');
 var btnGachaBack = document.getElementById('btn-gacha-back');
 var btnGachaZukan = document.getElementById('btn-gacha-zukan');
 var btnGacha = document.getElementById('btn-gacha');
@@ -4296,8 +4457,8 @@ function gachaPool(rarity, today){
   }
   return pool;
 }
-// r: a random number in [0,1). minIdx 0 = the normal rates (並60・上30・特上9・極み1);
-// GACHA_TOP_INDEX = 特上以上 only, in the same proportion (特上90%・極み10%).
+// r: a random number in [0,1). minIdx 0 = the normal rates (並60・上25・特上12・極み3);
+// GACHA_TEN_MIN_INDEX = 上以上 only, in the same proportion (上62.5%・特上30%・極み7.5%).
 function gachaRollRarity(r, minIdx){
   var total = 0, i;
   if(!(typeof r==='number' && r>=0 && r<1)) r = 0;
@@ -4309,22 +4470,16 @@ function gachaRollRarity(r, minIdx){
   }
   return GACHA_RARITY_ORDER[GACHA_RARITY_ORDER.length-1];
 }
-// Draws spec.count items and moves the pity counters in place. For each slot, the strongest rule wins:
-// 極み天井 → 特上以上天井 → 10連の確定枠 (last slot, when no 特上以上 came before it) → normal rates.
-function gachaDrawBatch(spec, pity, today, rnd){
+// Draws spec.count items. Every slot uses the normal rates, except the 10連's last slot when nothing of
+// 上以上 came before it: that one is drawn from 上以上 only (10連の確定枠). There is no 天井.
+function gachaDrawBatch(spec, today, rnd){
   rnd = rnd || Math.random;
-  var out = [], gotTop = false;
+  var out = [], minIdx = spec.guaranteeMin || 0, gotMin = false;
   for(var i=0;i<spec.count;i++){
     var rarity, reason = '';
-    if(pity.sinceBest + 1 >= GACHA_PITY_BEST){ rarity = 'kiwami'; reason = 'pityBest'; }
-    else if(pity.sinceTop + 1 >= GACHA_PITY_TOP){ rarity = gachaRollRarity(rnd(), GACHA_TOP_INDEX); reason = 'pityTop'; }
-    else if(spec.guaranteeTop && i===spec.count-1 && !gotTop){ rarity = gachaRollRarity(rnd(), GACHA_TOP_INDEX); reason = 'ten'; }
+    if(minIdx>0 && i===spec.count-1 && !gotMin){ rarity = gachaRollRarity(rnd(), minIdx); reason = 'ten'; }
     else rarity = gachaRollRarity(rnd(), 0);
-    var top = GACHA_RARITY_ORDER.indexOf(rarity) >= GACHA_TOP_INDEX;
-    if(top) gotTop = true;
-    if(rarity==='kiwami'){ pity.sinceTop = 0; pity.sinceBest = 0; }   // 極み is also 特上以上
-    else if(top){ pity.sinceTop = 0; pity.sinceBest += 1; }
-    else { pity.sinceTop += 1; pity.sinceBest += 1; }
+    if(minIdx>0 && GACHA_RARITY_ORDER.indexOf(rarity)>=minIdx) gotMin = true;
     var pool = gachaPool(rarity, today);
     if(!pool.length) throw new Error('no item to draw for ' + rarity);
     var pick = Math.floor(rnd() * pool.length);
@@ -4355,44 +4510,50 @@ function runGachaTransaction(kind){
   if(!(g.currency >= spec.cost)) return {ok:false, reason:'short', need:spec.cost - g.currency, balance:g.currency};
   // 2) 減算
   g.currency -= spec.cost;
-  // 3) 抽選・確定（天井・10連の確定枠・被りのコイン変換・図鑑コンプの称号）
-  var results = gachaDrawBatch(spec, g.pity, localToday(), Math.random);
+  // 3) 抽選・確定（10連の確定枠・被りのそば札変換・図鑑コンプの称号）
+  var results = gachaDrawBatch(spec, localToday(), Math.random);
   var have = Object.create(null), i;
   for(i=0;i<g.owned.length;i++) have[g.owned[i]] = true;
-  var dupCoins = 0, newCount = 0, ids = [];
+  var dupTickets = 0, newCount = 0, ids = [];
   for(i=0;i<results.length;i++){
     var r = results[i];
     ids.push(r.id);
-    if(have[r.id]){ r.dup = true; r.coins = GACHA_RARITIES[r.rarity].dupCoins; dupCoins += r.coins; }
-    else { r.dup = false; r.coins = 0; have[r.id] = true; g.owned.push(r.id); newCount++; }
+    if(have[r.id]){ r.dup = true; r.tickets = GACHA_RARITIES[r.rarity].dupTickets; dupTickets += r.tickets; }
+    else { r.dup = false; r.tickets = 0; have[r.id] = true; g.owned.push(r.id); newCount++; }
   }
-  var paid = Math.max(0, Math.min(dupCoins, COIN_MAX - g.currency));   // not counted in the daily earning cap
-  g.currency += paid;
-  g.totalPulls = Math.min(100000000, g.totalPulls + spec.count);
+  var gotTickets = Math.max(0, Math.min(dupTickets, TICKET_MAX - g.tickets));
+  g.tickets += gotTickets;
+  g.stats.totalPulls = Math.min(100000000, g.stats.totalPulls + spec.count);
   var newTitle = gachaGrantCompletion(g);
-  g.history.push({date:todayStr(), kind:kind, cost:spec.cost, items:ids, dupCoins:paid});
+  g.history.push({date:todayStr(), kind:kind, cost:spec.cost, items:ids, dupTickets:gotTickets});
   if(g.history.length>100) g.history = g.history.slice(-100);
   // 4) セーブ — the only write. If it fails, the save still holds the state from before this pull.
   if(!saveStoreObj(store)) return {ok:false, reason:'save'};
   return {
     ok:true, kind:kind, cost:spec.cost, results:results, top:gachaTopRarity(results),
-    dupCoins:paid, newCount:newCount, balance:g.currency,
-    pity:{sinceTop:g.pity.sinceTop, sinceBest:g.pity.sinceBest}, newTitle:newTitle
+    dupTickets:gotTickets, newCount:newCount, balance:g.currency, tickets:g.tickets, newTitle:newTitle
   };
 }
-// Self-check of the tables: rates add up to 100%, 42 items in the right numbers, valid slots, something to draw.
-// If anything is off, the pull buttons stay disabled rather than drawing from a broken table.
+// Self-check of the tables: rates add up to 100%, 42 items in the right numbers, every item a skin with a look
+// for its slot, sensible そば札 numbers, something to draw. If anything is off, the pull and exchange buttons stay
+// disabled rather than working from a broken table.
 function checkGachaTables(){
   try{
     var sum = 0, i, seen = Object.create(null), counts = {};
-    for(i=0;i<GACHA_RARITY_ORDER.length;i++){ sum += GACHA_RARITIES[GACHA_RARITY_ORDER[i]].rate; counts[GACHA_RARITY_ORDER[i]] = 0; }
+    for(i=0;i<GACHA_RARITY_ORDER.length;i++){
+      var rr = GACHA_RARITIES[GACHA_RARITY_ORDER[i]];
+      sum += rr.rate;
+      counts[GACHA_RARITY_ORDER[i]] = 0;
+      if(!(rr.rate>0 && Math.floor(rr.rate)===rr.rate)) return false;
+      if(!(rr.dupTickets>0 && Math.floor(rr.dupTickets)===rr.dupTickets && rr.exchange>0 && Math.floor(rr.exchange)===rr.exchange)) return false;
+    }
     if(sum!==GACHA_RATE_TOTAL) return false;
     if(GACHA_CATALOG.length!==GACHA_TOTAL_ITEMS) return false;
     for(i=0;i<GACHA_CATALOG.length;i++){
       var it = GACHA_CATALOG[i];
       if(!it || typeof it.id!=='string' || seen[it.id] || !Object.prototype.hasOwnProperty.call(counts, it.rarity)) return false;
       if(typeof it.name!=='string' || typeof it.category!=='string' || typeof it.desc!=='string') return false;
-      if(it.applyTo!==null && GACHA_SLOTS.indexOf(it.applyTo)<0) return false;
+      if(GACHA_SLOTS.indexOf(it.applyTo)<0 || !Object.prototype.hasOwnProperty.call(SKIN_TABLES[it.applyTo], it.id)) return false;
       seen[it.id] = true;
       counts[it.rarity]++;
     }
@@ -4483,9 +4644,11 @@ function renderCollectRow(){
   var coinsEl = document.getElementById('home-coins');
   var zukanEl = document.getElementById('home-zukan');
   var titleEl = document.getElementById('home-title-chip');
+  var ticketsEl = document.getElementById('home-tickets');
   if(!coinsEl || !zukanEl) return;
   var g = loadStore().gacha;
   coinsEl.textContent = fmtPoints(g.currency);
+  if(ticketsEl) ticketsEl.textContent = fmtPoints(g.tickets);
   zukanEl.textContent = gachaOwnedCount(g) + '/' + GACHA_CATALOG.length;
   if(titleEl){
     var has = g.titles.indexOf(GACHA_COMPLETE_TITLE)>=0, worn = equippedTitleName(g);
@@ -4504,14 +4667,8 @@ function setPullBtn(btn, spec, balance){
 function renderGacha(){
   var g = loadStore().gacha;
   gachaBalanceEl.textContent = fmtPoints(g.currency) + '🪙';
-  var top = Math.max(1, GACHA_PITY_TOP - g.pity.sinceTop), best = Math.max(1, GACHA_PITY_BEST - g.pity.sinceBest);
-  gachaPityEl.textContent = '';
-  appendText(gachaPityEl, '天井まで　特上以上 あと');
-  appendBold(gachaPityEl, String(top));
-  appendText(gachaPityEl, '回 ／ 極み あと');
-  appendBold(gachaPityEl, String(best));
-  appendText(gachaPityEl, '回');
-  gachaTotalEl.textContent = 'これまでに引いた回数 ' + fmtPoints(g.totalPulls) + '回';
+  gachaTicketsEl.textContent = fmtPoints(g.tickets) + '枚';
+  gachaTotalEl.textContent = 'これまでに引いた回数 ' + fmtPoints(g.stats.totalPulls) + '回';
   setPullBtn(btnPull1, GACHA_PULLS.single, g.currency);
   setPullBtn(btnPull10, GACHA_PULLS.ten, g.currency);
   gachaPullsEl.classList.toggle('is-busy', gachaBusy);
@@ -4569,21 +4726,36 @@ function renderRateTable(){
   gachaRateFoot.appendChild(ft);
   gachaRateLine.textContent = '確率　' + line.join('・') + '（合計' + fmtRate(sum) + '）';
 }
-function renderGachaRules(){
-  var R = GACHA_RARITIES, P = GACHA_PULLS;
-  var topTotal = R.tokujo.rate + R.kiwami.rate;
-  var dups = [];
-  for(var d=0; d<GACHA_RARITY_ORDER.length; d++){
-    var rd = R[GACHA_RARITY_ORDER[d]];
-    dups.push(rd.label + '+' + fmtPoints(rd.dupCoins));
+// "並1枚・上3枚・特上10枚・極み25枚" from one of the per-rarity numbers
+function perRarityText(key, unit){
+  var parts = [];
+  for(var i=0;i<GACHA_RARITY_ORDER.length;i++){
+    var rr = GACHA_RARITIES[GACHA_RARITY_ORDER[i]];
+    parts.push(rr.label + fmtPoints(rr[key]) + unit);
   }
+  return parts.join('・');
+}
+// 上以上 in the 10連's sure slot: each rarity's share of 上 + 特上 + 極み
+function tenSlotText(){
+  var total = 0, i, parts = [];
+  for(i=GACHA_TEN_MIN_INDEX;i<GACHA_RARITY_ORDER.length;i++) total += GACHA_RARITIES[GACHA_RARITY_ORDER[i]].rate;
+  for(i=GACHA_TEN_MIN_INDEX;i<GACHA_RARITY_ORDER.length;i++){
+    var rr = GACHA_RARITIES[GACHA_RARITY_ORDER[i]];
+    parts.push(rr.label + fmtRate(Math.round(rr.rate / total * 10000)));
+  }
+  return parts.join('・');
+}
+function renderGachaRules(){
+  var P = GACHA_PULLS, minLabel = GACHA_RARITIES[GACHA_RARITY_ORDER[GACHA_TEN_MIN_INDEX]].label;
+  var save = P.single.cost * P.ten.count - P.ten.cost;
   var rules = [
-    ['引き方', '1回' + fmtPoints(P.single.cost) + '🪙、10連' + fmtPoints(P.ten.cost) + '🪙。10連は、最後の1枠までに特上以上が出なかったとき、その1枠が特上以上になります。'],
-    ['天井', '特上以上は' + GACHA_PITY_TOP + '回に1回、極みは' + GACHA_PITY_BEST + '回に1回、必ず出ます（' + (GACHA_PITY_TOP - 1) + '回・' + (GACHA_PITY_BEST - 1) + '回続けて出なかったら、次の1回で確定）。2つの回数は別々に数え、そのレア度が出たところで0に戻ります。'],
-    ['確定のとき', '10連の確定枠と特上以上の天井は、特上' + fmtRate(Math.round(R.tokujo.rate / topTotal * 10000)) + '・極み' + fmtRate(Math.round(R.kiwami.rate / topTotal * 10000)) + 'で決まります。'],
-    ['被り', '持っているアイテムがまた出たら、自動でコインに変わります（' + dups.join('・') + '）。1日の獲得上限（' + fmtPoints(COIN_DAILY_CAP) + '）とは別に入ります。'],
-    ['秋限定', '新そば（特上）は' + seasonSpan('shinsoba') + 'だけ出ます（この端末の日付で判定）。期間外は特上の' + gachaPool('tokujo', null).length + '種から出ます。'],
-    ['図鑑', GACHA_TOTAL_ITEMS + '点すべて集めると、称号「' + GACHA_TITLES[GACHA_COMPLETE_TITLE].name + '」がもらえます。']
+    ['引き方', '1回' + fmtPoints(P.single.cost) + '🪙、10連' + fmtPoints(P.ten.cost) + '🪙（1回ずつ10回引くより' + fmtPoints(save) + '🪙お得）。10連は、最後の1枠までに' + minLabel + '以上が出なかったとき、その1枠が' + minLabel + '以上になります。'],
+    ['確定のとき', '10連の確定枠は、' + tenSlotText() + 'で決まります。'],
+    ['被り', '持っているアイテムがまた出たら、そば札に変わります（' + perRarityText('dupTickets', '枚') + '）。'],
+    ['交換所', 'そば札を使って、まだ持っていないアイテムを選んで手に入れられます（' + perRarityText('exchange', '枚') + '）。'],
+    ['天井なし', '決まった回数で当たりが確定する「天井」はありません。1日にもらえるコインにも上限はありません。'],
+    ['秋限定', '新そば（特上）は' + seasonSpan('shinsoba') + 'だけ出ます（交換所でもこの期間だけ。この端末の日付で判定）。期間外は特上の' + gachaPool('tokujo', null).length + '種から出ます。'],
+    ['図鑑', GACHA_TOTAL_ITEMS + '点すべて集めると、称号「' + GACHA_TITLES[GACHA_COMPLETE_TITLE].name + '」がもらえます（ほかの特典はありません）。']
   ];
   gachaRules.textContent = '';
   for(var i=0;i<rules.length;i++){
@@ -4593,7 +4765,7 @@ function renderGachaRules(){
     gachaRules.appendChild(li);
   }
 }
-var GACHA_REASON_LABELS = {pityTop:'天井（特上以上）', pityBest:'天井（極み）', ten:'10連の確定枠'};
+var GACHA_REASON_LABELS = {ten:'10連の確定枠'};
 function renderGachaResults(res){
   var spoken = [], dupN = 0;
   gachaResultList.textContent = '';
@@ -4612,7 +4784,7 @@ function renderGachaResults(res){
     li.appendChild(nm);
     var sub = document.createElement('span');
     sub.className = 'gres-sub ' + (r.dup ? 'is-dup' : 'is-new');
-    sub.textContent = r.dup ? ('被り → +' + fmtPoints(r.coins) + '🪙') : 'NEW';
+    sub.textContent = r.dup ? ('被り → そば札+' + fmtPoints(r.tickets)) : 'NEW';
     li.appendChild(sub);
     if(r.reason && Object.prototype.hasOwnProperty.call(GACHA_REASON_LABELS, r.reason)){
       var why = document.createElement('span');
@@ -4625,7 +4797,7 @@ function renderGachaResults(res){
     spoken.push(GACHA_RARITIES[r.rarity].label + '「' + it.name + '」' + (r.dup ? '被り' : 'NEW'));
   }
   var sum = 'NEW ' + res.newCount + '点';
-  if(dupN) sum += '　被り ' + dupN + '点 → +' + fmtPoints(res.dupCoins) + '🪙';
+  if(dupN) sum += '　被り ' + dupN + '点 → そば札+' + fmtPoints(res.dupTickets) + '枚';
   sum += '　残り ' + fmtPoints(res.balance) + '🪙';
   gachaResultSum.textContent = sum;
   gachaResultTitle.hidden = !res.newTitle;
@@ -4655,8 +4827,9 @@ function onPull(kind){
   }
   gachaResultsEl.hidden = true;
   gachaLive.textContent = '';
-  // already spent and saved: the balance shows the cost now, the duplicate coins arrive with the results
-  gachaBalanceEl.textContent = fmtPoints(res.balance - res.dupCoins) + '🪙';
+  // already spent and saved: the balance shows the cost now, the そば札 from duplicates arrive with the results
+  gachaBalanceEl.textContent = fmtPoints(res.balance) + '🪙';
+  gachaTicketsEl.textContent = fmtPoints(res.tickets - res.dupTickets) + '枚';
   startOpening(res.top, function(){
     gachaBusy = false;
     gachaQuietUntil = gachaNow() + 400;
@@ -4702,13 +4875,16 @@ function playGachaReveal(rarity){
   if(!ac) return;
   try{
     if(ac.state==='suspended'){ ac.resume(); }
-    gachaTone(ac, 420, 0, 0.1, 'sine', 0.12, 980);          // the seal pops
+    // the lid pops: a hollow knock and a puff of air, then the chime of the rarity
+    gachaTone(ac, 190, 0, 0.09, 'sine', 0.11, 118);
+    sfxNoiseVoice(ac, {filter:'bandpass', f:2300, f2:900, q:1.3, dur:0.08, vol:0.09}, 0);
+    gachaTone(ac, 420, 0.02, 0.1, 'sine', 0.1, 980);
     var notes = Object.prototype.hasOwnProperty.call(GACHA_CHIMES, rarity) ? GACHA_CHIMES[rarity] : GACHA_CHIMES.nami;
     for(var i=0;i<notes.length;i++){
-      gachaTone(ac, notes[i], 0.08 + i*0.09, i===notes.length-1 ? 0.7 : 0.3, 'triangle', 0.08);
+      gachaTone(ac, notes[i], 0.1 + i*0.09, i===notes.length-1 ? 0.7 : 0.3, 'triangle', 0.08);
     }
     if(rarity==='kiwami'){
-      for(var k=0;k<6;k++) gachaTone(ac, k%2 ? 2637 : 2093, 0.55 + k*0.07, 0.25, 'sine', 0.03);
+      for(var k=0;k<6;k++) gachaTone(ac, k%2 ? 2637 : 2093, 0.57 + k*0.07, 0.25, 'sine', 0.03);
     }
   }catch(e){}
 }
@@ -4717,11 +4893,16 @@ function syncSoundButtons(){
   gachaSoundBtn.textContent = label;
   gachaSoundBtn.setAttribute('aria-pressed', audioEnabled ? 'true' : 'false');
   btnSoundToggle.textContent = label;
+  if(kisekaeSoundBtn){
+    kisekaeSoundBtn.textContent = label;
+    kisekaeSoundBtn.setAttribute('aria-pressed', audioEnabled ? 'true' : 'false');
+  }
 }
 
-// --- 開封演出: a そば猪口 sealed with washi paper shakes, the seal flies off and the contents burst out.
-// The burst reuses the game's own effects: the expanding rings of a cut (cutFx in drawLane) and the
-// dot-and-strip confetti around the 自己ベスト stamp (drawBestStamp) — more, faster and brighter for a higher rarity.
+// --- 開封演出: a capsule — its lower half a porcelain そば猪口 with the classic 十草 stripes, its upper half a lacquered
+// lid, the seam wrapped in washi and sealed 「封」 — wobbles, the lid pops off and the contents burst out. The burst
+// throws the same particles as a pleased customer after a bowl is served (fxStep / drawFxParts: twinkling sparkles
+// and flipping confetti), with the expanding rings of a cut — more, faster and brighter for a higher rarity.
 var OPEN_FX = {
   nami:  {shake:600,  count:14, rings:1, speed:0.9,  size:1.0,  flash:0,    rays:0,  glow:0.22, hint:false, extra:['soba','greenLight']},
   jo:    {shake:800,  count:26, rings:2, speed:1.05, size:1.1,  flash:0.12, rays:0,  glow:0.35, hint:false, extra:['greenLight','soba','gold']},
@@ -4755,106 +4936,175 @@ function rarityColor(rarity){
   return v || '#c29a3c';
 }
 function fxColor(name){ return name==='white' ? '#ffffff' : (CARD_COL[name] || '#c29a3c'); }
-function chokoGeom(){
+// the capsule: a ball of radius r; its seam is seen a little from above, as an ellipse (r × ry)
+function capsuleGeom(){
   var s = Math.max(0.8, Math.min(1.25, gStage.h/190));
-  return {cx:gStage.w/2, top:gStage.h*0.5, tw:42*s, bw:30*s, h:56*s, s:s};
+  return {cx:gStage.w/2, cy:gStage.h*0.55, r:46*s, ry:10*s, s:s};
 }
-function chokoPath(ctx, k){
-  var x = k.cx, t = k.top, b = k.top + k.h;
+// with the lid on: the lower half shows below the seam's front edge, the lid above it
+function capsuleLowerPath(ctx, k){
   ctx.beginPath();
-  ctx.moveTo(x - k.tw, t);
-  ctx.lineTo(x + k.tw, t);
-  ctx.quadraticCurveTo(x + k.tw - 1, t + k.h*0.62, x + k.bw, b);
-  ctx.lineTo(x - k.bw, b);
-  ctx.quadraticCurveTo(x - k.tw + 1, t + k.h*0.62, x - k.tw, t);
+  ctx.moveTo(k.cx - k.r, k.cy);
+  ctx.arc(k.cx, k.cy, k.r, Math.PI, 0, true);
+  ctx.ellipse(k.cx, k.cy, k.r, k.ry, 0, 0, Math.PI, false);
   ctx.closePath();
 }
-// a porcelain そば猪口 with the classic 十草 (thin cobalt stripes) pattern
-function drawChoko(ctx, k, opened){
-  var x = k.cx, t = k.top, b = k.top + k.h, s = k.s;
-  chokoPath(ctx, k);
+function capsuleLidPath(ctx, k){
+  ctx.beginPath();
+  ctx.moveTo(k.cx - k.r, k.cy);
+  ctx.arc(k.cx, k.cy, k.r, Math.PI, Math.PI*2, false);
+  ctx.ellipse(k.cx, k.cy, k.r, k.ry, 0, 0, Math.PI, false);
+  ctx.closePath();
+}
+// the lower half: white porcelain with 十草 (thin cobalt stripes) and two cobalt rings; opened, the inside shows
+function drawCapsuleLower(ctx, k, opened, glowCol, glowA){
+  var s = k.s, x = k.cx, y = k.cy, r = k.r, u, h;
+  capsuleLowerPath(ctx, k);
   ctx.fillStyle = '#f6f2e9';
   ctx.fill();
   ctx.save();
-  chokoPath(ctx, k);
+  capsuleLowerPath(ctx, k);
   ctx.clip();
   ctx.strokeStyle = 'rgba(40,74,128,0.85)';
   ctx.lineWidth = 1.5*s;
-  for(var sx = x - k.tw + 5*s; sx < x + k.tw - 3*s; sx += 7*s){
+  for(u=-0.88; u<0.9; u+=0.16){
+    var sy = y + k.ry*Math.sqrt(Math.max(0, 1 - u*u));
     ctx.beginPath();
-    ctx.moveTo(sx, t + 10*s);
-    ctx.lineTo(x + (sx - x)*(k.bw/k.tw), b - 8*s);
+    ctx.moveTo(x + u*r, sy + 6*s);
+    ctx.quadraticCurveTo(x + u*r*0.93, y + r*0.55, x + u*r*0.5, y + r*0.97);
     ctx.stroke();
   }
   ctx.lineWidth = 1.2*s;
-  ctx.beginPath(); ctx.moveTo(x - k.tw, t + 6*s); ctx.lineTo(x + k.tw, t + 6*s); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x - k.tw, b - 5*s); ctx.lineTo(x + k.tw, b - 5*s); ctx.stroke();
-  var sh = ctx.createLinearGradient(x - k.tw, 0, x + k.tw, 0);
-  sh.addColorStop(0, 'rgba(255,255,255,0.25)');
-  sh.addColorStop(0.6, 'rgba(0,0,0,0)');
-  sh.addColorStop(1, 'rgba(60,45,25,0.18)');
+  var rings = [0.2, 0.8];
+  for(var i=0;i<rings.length;i++){
+    h = rings[i]*r;
+    var rho = Math.sqrt(Math.max(0, r*r - h*h));
+    ctx.beginPath();
+    ctx.ellipse(x, y + h, rho, k.ry*rho/r, 0, 0, Math.PI, false);
+    ctx.stroke();
+  }
+  var sh = ctx.createRadialGradient(x - r*0.45, y - r*0.1, r*0.15, x, y, r*1.05);
+  sh.addColorStop(0, 'rgba(255,255,255,0.2)');
+  sh.addColorStop(0.65, 'rgba(0,0,0,0)');
+  sh.addColorStop(1, 'rgba(60,45,25,0.24)');
   ctx.fillStyle = sh;
-  ctx.fillRect(x - k.tw, t, k.tw*2, k.h);
+  ctx.fillRect(x - r, y - r, r*2, r*2);
   ctx.restore();
-  chokoPath(ctx, k);
+  capsuleLowerPath(ctx, k);
   ctx.strokeStyle = 'rgba(60,45,25,0.5)';
   ctx.lineWidth = 1.2;
   ctx.stroke();
+  if(!opened) return;
   ctx.beginPath();
-  ctx.ellipse(x, t, k.tw, 6*s, 0, 0, Math.PI*2);
-  ctx.fillStyle = opened ? '#3b2616' : '#ebe5d8';   // open: the dark つゆ inside
+  ctx.ellipse(x, y, r, k.ry, 0, 0, Math.PI*2);
+  ctx.fillStyle = '#3b2616';
   ctx.fill();
-  ctx.stroke();
-  if(opened){
+  if(glowA>0.01){                                     // lit from inside by what came out
+    ctx.save();
     ctx.beginPath();
-    ctx.ellipse(x - k.tw*0.3, t - s, k.tw*0.35, 1.6*s, 0, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.18)';
-    ctx.fill();
+    ctx.ellipse(x, y, r, k.ry, 0, 0, Math.PI*2);
+    ctx.clip();
+    var g = ctx.createRadialGradient(x, y, 1, x, y, r);
+    g.addColorStop(0, rgbaOf(glowCol, Math.min(0.95, glowA*1.2)));
+    g.addColorStop(1, rgbaOf(glowCol, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(x - r, y - k.ry, r*2, k.ry*2);
+    ctx.restore();
   }
-}
-// the washi paper seal tied with a red string; lift 0 = in place, 1 = flown off
-function drawSeal(ctx, k, lift){
-  var s = k.s, w = k.tw + 5*s;
-  ctx.save();
-  ctx.globalAlpha = Math.max(0, 1 - lift);
-  ctx.translate(k.cx + lift*38*s, k.top - lift*78*s);
-  ctx.rotate(-lift*0.8);
   ctx.beginPath();
-  ctx.moveTo(-w, 3*s);
-  ctx.quadraticCurveTo(-w + 4*s, -15*s, 0, -17*s);
-  ctx.quadraticCurveTo(w - 4*s, -15*s, w, 3*s);
-  ctx.lineTo(w - 3*s, 10*s);
-  ctx.quadraticCurveTo(0, 13*s, -w + 3*s, 10*s);
-  ctx.closePath();
-  ctx.fillStyle = '#efe4c8';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(120,98,60,0.5)';
+  ctx.ellipse(x, y, r, k.ry, 0, 0, Math.PI*2);
+  ctx.strokeStyle = '#e9e2d3';
+  ctx.lineWidth = 2*s;
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(60,45,25,0.45)';
   ctx.lineWidth = 1;
   ctx.stroke();
+}
+// the lid: glossy vermilion lacquer, with a gold line round its edge
+function drawCapsuleLid(ctx, k){
+  var s = k.s, x = k.cx, y = k.cy, r = k.r;
+  capsuleLidPath(ctx, k);
+  var g = ctx.createRadialGradient(x - r*0.35, y - r*0.5, r*0.08, x, y - r*0.1, r*1.1);
+  g.addColorStop(0, '#e2735a');
+  g.addColorStop(0.45, '#b23c27');
+  g.addColorStop(1, '#6b1b10');
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(60,20,10,0.55)';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  ctx.save();
+  capsuleLidPath(ctx, k);
+  ctx.clip();
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.beginPath();
+  ctx.ellipse(x - r*0.38, y - r*0.56, r*0.32, r*0.13, -0.55, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+  ctx.beginPath();
+  ctx.ellipse(x, y - 2*s, r - 0.8, k.ry, 0, 0.03*Math.PI, 0.97*Math.PI, false);
+  ctx.strokeStyle = '#d8b457';
+  ctx.lineWidth = 1.3*s;
+  ctx.stroke();
+}
+// the washi band round the seam, tied with a red string and sealed 「封」
+function drawCapsuleBand(ctx, k){
+  var s = k.s, x = k.cx, y = k.cy, r = k.r;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x, y, r + 0.5, 0, Math.PI*2);
+  ctx.clip();
+  ctx.beginPath();
+  ctx.ellipse(x, y + 1.5*s, r, k.ry + 1.5*s, 0, 0, Math.PI, false);
+  ctx.strokeStyle = '#efe4c8';
+  ctx.lineWidth = 9*s;
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(120,98,60,0.35)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.ellipse(x, y - 3*s, r, k.ry, 0, 0, Math.PI, false);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(x, y + 6*s, r, k.ry + 1*s, 0, 0, Math.PI, false);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(x, y + 1.5*s, r, k.ry + 1.5*s, 0, 0, Math.PI, false);
   ctx.strokeStyle = '#b3452e';
-  ctx.lineWidth = 2*s;
-  ctx.beginPath(); ctx.moveTo(-w + 2*s, 6*s); ctx.quadraticCurveTo(0, 9*s, w - 2*s, 6*s); ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(-5*s, 6*s, 5*s, 3*s, -0.4, 0, Math.PI*2); ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(5*s, 6*s, 5*s, 3*s, 0.4, 0, Math.PI*2); ctx.stroke();
+  ctx.lineWidth = 1.6*s;
+  ctx.stroke();
+  ctx.restore();
+  var sx = x, sy = y + k.ry + 1.5*s;
   ctx.fillStyle = '#a93a26';
-  ctx.fillRect(-7*s, -14*s, 14*s, 13*s);
+  ctx.fillRect(sx - 7*s, sy - 7*s, 14*s, 13*s);
   ctx.fillStyle = '#f6efdf';
   ctx.font = '700 ' + Math.round(10*s) + 'px ' + CARD_SERIF;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('封', 0, -7.5*s);
+  ctx.fillText('封', sx, sy - 0.5*s);
+}
+// the lid (with its band) flying off; lift 0 = just popped, 1 = gone
+function drawFlyingLid(ctx, k, lift){
+  if(lift>=1) return;
+  var px = k.cx, py = k.cy - k.r*0.4;
+  ctx.save();
+  ctx.globalAlpha = Math.max(0, 1 - lift);
+  ctx.translate(px + lift*44*k.s, py - lift*86*k.s);
+  ctx.rotate(-lift*0.95);
+  ctx.translate(-px, -py);
+  drawCapsuleLid(ctx, k);
+  drawCapsuleBand(ctx, k);
   ctx.restore();
 }
-// o: {sx, rot, glow, color, opened, seal}
+// o: {sx, rot, glow, color, opened, lift}
 function drawStageScene(o){
   var ctx = gStage.ctx, W = gStage.w, H = gStage.h;
   if(!ctx || W<=0 || H<=0) return;
-  var k = chokoGeom();
+  var k = capsuleGeom();
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle = COLORS.card || '#fbf7ec';
   ctx.fillRect(0,0,W,H);
   if(o.glow>0.001){
-    var g = ctx.createRadialGradient(k.cx, k.top, 2, k.cx, k.top, Math.max(W, H)*0.62);
+    var g = ctx.createRadialGradient(k.cx, k.cy, 2, k.cx, k.cy, Math.max(W, H)*0.62);
     g.addColorStop(0, rgbaOf(o.color, Math.min(0.75, 0.6*o.glow)));
     g.addColorStop(1, rgbaOf(o.color, 0));
     ctx.fillStyle = g;
@@ -4862,39 +5112,45 @@ function drawStageScene(o){
   }
   ctx.fillStyle = 'rgba(40,28,10,0.14)';
   ctx.beginPath();
-  ctx.ellipse(k.cx, k.top + k.h + 5*k.s, k.tw*1.05, 7*k.s, 0, 0, Math.PI*2);
+  ctx.ellipse(k.cx, k.cy + k.r + 4*k.s, k.r*0.9, 6*k.s, 0, 0, Math.PI*2);
   ctx.fill();
   ctx.save();
-  ctx.translate(k.cx + (o.sx||0), k.top + k.h);   // shake around the cup's foot
+  ctx.translate(k.cx + (o.sx||0), k.cy + k.r);   // it rocks on its foot
   ctx.rotate(o.rot||0);
-  ctx.translate(-k.cx, -(k.top + k.h));
-  drawChoko(ctx, k, o.opened);
-  if(o.seal<1) drawSeal(ctx, k, o.seal);
+  ctx.translate(-k.cx, -(k.cy + k.r));
+  drawCapsuleLower(ctx, k, o.opened, o.color, o.opened ? o.glow : 0);
+  if(!o.opened){ drawCapsuleLid(ctx, k); drawCapsuleBand(ctx, k); }
   ctx.restore();
+  if(o.opened) drawFlyingLid(ctx, k, o.lift===undefined ? 1 : o.lift);
 }
+// the burst: flipping confetti thrown up out of the capsule and sparkles twinkling round it — the particles of a
+// pleased customer's reaction (same kinds, same motion), in the rarity's colours
 function spawnBurst(a){
-  var k = chokoGeom(), fx = a.fx;
+  var k = capsuleGeom(), fx = a.fx, n = fx.count, nSpark = Math.round(n*0.35), i;
   a.parts = [];
-  for(var i=0;i<fx.count;i++){
-    var ang = -Math.PI/2 + (Math.random() - 0.5)*Math.PI*0.9;
-    var sp = (0.12 + Math.random()*0.2) * fx.speed;       // px per ms
-    var life = 900 + Math.random()*700;
-    a.parts.push({
-      x:k.cx + (Math.random() - 0.5)*k.tw*1.2, y:k.top,
-      vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp, rot:Math.random()*6.283, vr:(Math.random() - 0.5)*0.02,
-      life:life, max:life, strip:(i%2===1), color:a.colors[i%a.colors.length], size:fx.size
-    });
+  for(i=0;i<n - nSpark;i++){
+    var ang = -Math.PI/2 + (Math.random() - 0.5)*Math.PI*0.95;
+    var sp = (100 + Math.random()*170)*fx.speed;
+    a.parts.push({kind:'confetti', x:k.cx + (Math.random() - 0.5)*k.r*0.9, y:k.cy, vx:Math.cos(ang)*sp*1.25, vy:Math.sin(ang)*sp,
+                  g:520, rot:Math.random()*6.283, vr:(Math.random() - 0.5)*14, size:(2.4 + Math.random()*2.3)*fx.size,
+                  col:a.colors[i % a.colors.length], age:-Math.random()*90, life:1100 + Math.random()*600});
+  }
+  for(i=0;i<nSpark;i++){
+    var an = Math.random()*Math.PI*2, rr = k.r*(0.55 + Math.random()*1.05);
+    a.parts.push({kind:'spark', x:k.cx + Math.cos(an)*rr*1.25, y:k.cy - k.r*0.25 + Math.sin(an)*rr*0.75, vx:0, vy:-(8 + Math.random()*18),
+                  g:0, rot:0, vr:0, size:(3 + Math.random()*3)*fx.size, col:i % 2 ? CARD_COL.gold : a.color,
+                  age:-i*30, life:650 + Math.random()*420});
   }
 }
 function drawBurst(a, since, dt){
-  var ctx = gStage.ctx, k = chokoGeom(), fx = a.fx, W = gStage.w, H = gStage.h, i;
+  var ctx = gStage.ctx, k = capsuleGeom(), fx = a.fx, W = gStage.w, H = gStage.h, i;
   if(!ctx || W<=0 || H<=0) return 0;
   if(fx.rays){                                          // light rays (特上・極み)
     var ra = 0.3*Math.max(0, 1 - since/1500);
     if(ra>0.01){
       var len = Math.max(W, H);
       ctx.save();
-      ctx.translate(k.cx, k.top);
+      ctx.translate(k.cx, k.cy);
       ctx.rotate(since*0.00035);
       ctx.fillStyle = rgbaOf(a.color, ra);
       for(i=0;i<fx.rays;i++){
@@ -4916,35 +5172,17 @@ function drawBurst(a, since, dt){
     ctx.strokeStyle = i%2 ? CARD_COL.gold : a.color;
     ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.arc(k.cx, k.top, 12 + rt*0.2*(1 + i*0.15), 0, Math.PI*2);
+    ctx.arc(k.cx, k.cy, 12 + rt*0.2*(1 + i*0.15), 0, Math.PI*2);
     ctx.stroke();
   }
   ctx.globalAlpha = 1;
-  var alive = 0;
-  for(i=0;i<a.parts.length;i++){                        // confetti: dots and strips
-    var p = a.parts[i];
-    if(p.life<=0) continue;
-    p.life -= dt;
-    p.vy += 0.0006*dt;
-    p.x += p.vx*dt;
-    p.y += p.vy*dt;
-    p.rot += p.vr*dt;
-    if(p.life<=0) continue;
-    alive++;
-    ctx.globalAlpha = Math.min(1, p.life/(p.max*0.4));
-    ctx.fillStyle = p.color;
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.rot);
-    drawConfettiPiece(ctx, p.strip, p.size);
-    ctx.restore();
-  }
-  ctx.globalAlpha = 1;
+  a.parts = fxStep(a.parts, dt);                        // sparkles and confetti (the serving reaction's particles)
+  drawFxParts(ctx, a.parts, false);
   if(fx.flash){
     var fa = fx.flash*(1 - since/280);
     if(fa>0){ ctx.fillStyle = 'rgba(255,255,255,' + fa.toFixed(3) + ')'; ctx.fillRect(0,0,W,H); }
   }
-  return alive;
+  return a.parts.length;
 }
 function stageFrame(ts){
   gStage.raf = 0;
@@ -4956,12 +5194,12 @@ function stageFrame(ts){
   if(!a.popped && t>=fx.shake) popOpening(a);
   if(!a.popped){
     var p = t/fx.shake;
-    var hint = (fx.hint && p>0.55) ? (p - 0.55)/0.45 : 0;   // 特上・極み: the cup starts to glow before it opens
-    drawStageScene({sx:Math.sin(t*0.075)*(1 + 3.2*p)*a.s, rot:Math.sin(t*0.052)*0.04*p,
-      glow:hint*fx.glow*(0.8 + 0.2*Math.sin(t*0.03)), color:a.color, opened:false, seal:0});
+    var hint = (fx.hint && p>0.55) ? (p - 0.55)/0.45 : 0;   // 特上・極み: a glow round the capsule before it opens
+    drawStageScene({sx:Math.sin(t*0.075)*(1 + 3.2*p)*a.s, rot:Math.sin(t*0.052)*0.05*p,
+      glow:hint*fx.glow*(0.8 + 0.2*Math.sin(t*0.03)), color:a.color, opened:false, lift:0});
   } else {
     var since = t - fx.shake;
-    drawStageScene({sx:0, rot:0, glow:fx.glow*(0.55 + 0.45*Math.max(0, 1 - since/900)), color:a.color, opened:true, seal:Math.min(1, since/420)});
+    drawStageScene({sx:0, rot:0, glow:fx.glow*(0.55 + 0.45*Math.max(0, 1 - since/900)), color:a.color, opened:true, lift:Math.min(1, since/420)});
     drawBurst(a, since, dt);
     if(!a.revealed && since>=240) revealOpening(a);
     if(since>1700){ endOpening(); return; }
@@ -4981,7 +5219,7 @@ function revealOpening(a){
 }
 function drawStageIdle(){
   var r = gStage.last, fx = r ? OPEN_FX[r] : null;
-  drawStageScene({sx:0, rot:0, glow:fx ? fx.glow*0.5 : 0, color:r ? rarityColor(r) : '#c29a3c', opened:!!r, seal:r ? 1 : 0});
+  drawStageScene({sx:0, rot:0, glow:fx ? fx.glow*0.5 : 0, color:r ? rarityColor(r) : '#c29a3c', opened:!!r, lift:1});
 }
 function endOpening(){
   var a = gStage.anim;
@@ -4995,11 +5233,11 @@ function endOpening(){
 function startOpening(rarity, onReveal){
   if(gStage.anim) endOpening();
   var fx = Object.prototype.hasOwnProperty.call(OPEN_FX, rarity) ? OPEN_FX[rarity] : OPEN_FX.nami;
-  var a = {rarity:rarity, fx:fx, t0:null, last:0, popped:false, revealed:false, onReveal:onReveal, parts:[], color:rarityColor(rarity), s:chokoGeom().s};
+  var a = {rarity:rarity, fx:fx, t0:null, last:0, popped:false, revealed:false, onReveal:onReveal, parts:[], color:rarityColor(rarity), s:capsuleGeom().s};
   a.colors = [a.color];
   for(var i=0;i<fx.extra.length;i++) a.colors.push(fxColor(fx.extra[i]));
   if(!gStage.ctx || gStage.w<=0 || prefersReducedMotion()){
-    // reduced motion (or no canvas): no shaking or particles — straight to the opened cup and the results
+    // reduced motion (or no canvas): no wobbling or particles — straight to the opened capsule and the results
     gStage.last = rarity;
     playGachaReveal(rarity);
     drawStageIdle();
@@ -5132,6 +5370,7 @@ function openZukanDetail(id, opener){
   zmDesc.classList.toggle('is-locked', !owned);
   var avail = gachaItemAvailable(it, today);
   var odds = 'ガチャの' + rr.label + '（' + fmtRate(rr.rate) + '）から出ます。1種あたり' + (avail ? fmtItemRate(rr.rate, gachaPool(it.rarity, today).length) : '0%（いまは期間外）') + '。';
+  if(!owned) odds += '交換所なら、そば札' + fmtPoints(rr.exchange) + '枚で手に入ります' + (avail ? '' : '（期間中だけ）') + '。';
   if(season) odds += '秋限定：' + seasonSpan(season) + 'だけ出ます。';
   zmOdds.textContent = odds;
   zmCurrentId = id;
@@ -6298,6 +6537,630 @@ zukanTitleEquip.addEventListener('click', function(){
   renderZukan();
   setEquipMsg(res, GACHA_TITLES[id].name, 'title', !on);
   focusEl(zukanTitleEquip);
+});
+
+// ---------- 交換所: そば札 → an item not owned yet ----------
+// Runs like a pull: 確認 → 残高チェック → 減算・付与 → セーブ (a single write). If the save fails nothing has changed
+// (the そば札 are not spent), and the balance never goes below 0. An item already owned, an unknown id and 新そば
+// outside its season cannot be exchanged. The item can be equipped right there.
+var exchangeTitleEl = document.getElementById('exchange-title');
+var exchangeTicketsEl = document.getElementById('exchange-tickets');
+var exchangeLeadEl = document.getElementById('exchange-lead');
+var exchangeCostBody = document.getElementById('exchange-cost-body');
+var exchangeMsg = document.getElementById('exchange-msg');
+var exchangeSummary = document.getElementById('exchange-summary');
+var exchangeGroups = document.getElementById('exchange-groups');
+var btnExchange = document.getElementById('btn-exchange');
+var btnExchangeBack = document.getElementById('btn-exchange-back');
+var btnExchangeKisekae = document.getElementById('btn-exchange-kisekae');
+var btnGachaExchange = document.getElementById('btn-gacha-exchange');
+var btnZukanExchange = document.getElementById('btn-zukan-exchange');
+var btnZukanKisekae = document.getElementById('btn-zukan-kisekae');
+var xModal = document.getElementById('xmodal');
+var xmCard = document.getElementById('xm-card');
+var xmHead = document.getElementById('xm-head');
+var xmArt = document.getElementById('xm-art');
+var xmRar = document.getElementById('xm-rar');
+var xmCat = document.getElementById('xm-cat');
+var xmName = document.getElementById('xm-name');
+var xmText = document.getElementById('xm-text');
+var xmNote = document.getElementById('xm-note');
+var xmOk = document.getElementById('xm-ok');
+var xmEquip = document.getElementById('xm-equip');
+var xmCancel = document.getElementById('xm-cancel');
+var xm = {id:null, phase:'', newTitle:null};
+
+function exchangeCost(it){ return GACHA_RARITIES[it.rarity].exchange; }
+// the item's kind and, when it says something more, where it is worn: 「器」, 「SE・音」, 「おまけ・演出」
+function itemKindText(it){
+  var slot = EQUIP_SLOT_LABELS[it.applyTo] || '';
+  return it.category + (slot && slot!==it.category ? '・' + slot : '');
+}
+function runExchangeTransaction(id){
+  if(!gachaTablesOk) return {ok:false, reason:'tables'};
+  var it = gachaItem(id);
+  if(!it) return {ok:false, reason:'unknown'};
+  var store = loadStore(), g = store.gacha;           // always the latest save (another tab may have changed it)
+  // 1) 確認: not owned yet, and in season
+  if(g.owned.indexOf(id)>=0) return {ok:false, reason:'owned'};
+  if(!gachaItemAvailable(it, localToday())) return {ok:false, reason:'season'};
+  // 2) 残高チェック
+  var cost = exchangeCost(it);
+  if(!(g.tickets >= cost)) return {ok:false, reason:'short', need:cost - g.tickets, tickets:g.tickets};
+  // 3) 減算・付与（図鑑コンプの称号も）
+  g.tickets -= cost;
+  g.owned.push(id);
+  var newTitle = gachaGrantCompletion(g);
+  g.history.push({date:todayStr(), kind:'exchange', tickets:cost, items:[id]});
+  if(g.history.length>100) g.history = g.history.slice(-100);
+  // 4) セーブ — the only write
+  if(!saveStoreObj(store)) return {ok:false, reason:'save'};
+  return {ok:true, id:id, cost:cost, tickets:g.tickets, newTitle:newTitle};
+}
+function exchangeFailText(res){
+  if(res.reason==='short') return 'そば札が足りません（あと' + fmtPoints(res.need) + '枚）。';
+  if(res.reason==='owned') return 'このアイテムはもう持っています。';
+  if(res.reason==='season') return '新そばは' + seasonSpan('shinsoba') + 'の間だけ交換できます。';
+  if(res.reason==='save') return '保存できなかったため、交換を取り消しました（そば札は減っていません）。';
+  if(res.reason==='tables') return 'ガチャの設定に誤りがあるため、いまは交換できません。';
+  return '交換できませんでした（そば札は減っていません）。';
+}
+function setExchangeMsg(text, isError){
+  exchangeMsg.textContent = text;
+  exchangeMsg.classList.toggle('is-error', !!isError);
+}
+function renderExchange(){
+  var g = loadStore().gacha, today = localToday(), have = Object.create(null), missing = 0, i, j;
+  for(i=0;i<g.owned.length;i++) have[g.owned[i]] = true;
+  exchangeTicketsEl.textContent = fmtPoints(g.tickets) + '枚';
+  exchangeLeadEl.textContent = 'ガチャで持っているアイテムが出ると、そば札に変わります。そば札で、まだ持っていないアイテムを選んで手に入れられます。';
+  exchangeCostBody.textContent = '';
+  for(i=0;i<GACHA_RARITY_ORDER.length;i++){
+    var rk = GACHA_RARITY_ORDER[i], rr = GACHA_RARITIES[rk];
+    var tr = document.createElement('tr');
+    var th = document.createElement('th');
+    th.scope = 'row';
+    th.appendChild(gachaRarityChip(rk));
+    tr.appendChild(th);
+    var cells = [fmtPoints(rr.dupTickets) + '枚', fmtPoints(rr.exchange) + '枚'];
+    for(j=0;j<cells.length;j++){
+      var td = document.createElement('td');
+      td.className = 'num';
+      td.textContent = cells[j];
+      tr.appendChild(td);
+    }
+    exchangeCostBody.appendChild(tr);
+  }
+  exchangeGroups.textContent = '';
+  for(i=0;i<GACHA_RARITY_ORDER.length;i++){
+    var rar = GACHA_RARITY_ORDER[i], cost = GACHA_RARITIES[rar].exchange, items = [];
+    for(j=0;j<GACHA_CATALOG.length;j++){
+      if(GACHA_CATALOG[j].rarity===rar && !have[GACHA_CATALOG[j].id]) items.push(GACHA_CATALOG[j]);
+    }
+    if(!items.length) continue;
+    missing += items.length;
+    var sec = document.createElement('section');
+    sec.className = 'zgroup';
+    sec.setAttribute('aria-labelledby', 'xg-' + rar);
+    var h = document.createElement('h3');
+    h.className = 'zgroup-h';
+    h.id = 'xg-' + rar;
+    h.appendChild(gachaRarityChip(rar));
+    appendText(h, 'そば札' + fmtPoints(cost) + '枚');
+    var cnt = document.createElement('span');
+    cnt.className = 'zgroup-count';
+    cnt.textContent = '未入手 ' + items.length + '種';
+    h.appendChild(cnt);
+    sec.appendChild(h);
+    var ul = document.createElement('ul');
+    ul.className = 'zgrid';
+    for(j=0;j<items.length;j++){
+      var it = items[j], season = gachaSeasonMode(it), avail = gachaItemAvailable(it, today);
+      var li = document.createElement('li');
+      var card = document.createElement('div');
+      card.className = 'zcard ex-card is-locked r-' + it.rarity;
+      card.appendChild(makeArt(it, false));
+      var nm = document.createElement('span');
+      nm.className = 'zcard-name';
+      fillItemName(nm, it);
+      card.appendChild(nm);
+      var cat = document.createElement('span');
+      cat.className = 'zcard-cat';
+      cat.textContent = itemKindText(it) + (season ? '・秋限定' : '');
+      card.appendChild(cat);
+      li.appendChild(card);
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'ex-btn';
+      b.setAttribute('data-ex', it.id);
+      var short = cost - g.tickets;
+      if(!gachaTablesOk){ b.disabled = true; b.textContent = '交換できません'; }
+      else if(!avail){ b.disabled = true; b.textContent = '期間外'; }
+      else if(short>0){ b.disabled = true; b.textContent = 'あと' + fmtPoints(short) + '枚'; }
+      else b.textContent = fmtPoints(cost) + '枚で交換';
+      b.setAttribute('aria-label', it.name + '（' + GACHA_RARITIES[rar].label + '）' + (b.disabled
+        ? ('：いまは交換できません（' + (!avail ? seasonSpan(season) + 'だけ' : b.textContent) + '）')
+        : ('をそば札' + fmtPoints(cost) + '枚で交換する')));
+      li.appendChild(b);
+      ul.appendChild(li);
+    }
+    sec.appendChild(ul);
+    exchangeGroups.appendChild(sec);
+  }
+  exchangeSummary.textContent = '';
+  if(missing){
+    appendText(exchangeSummary, 'まだ持っていないアイテム ');
+    appendBold(exchangeSummary, missing + '点');
+    appendText(exchangeSummary, '（図鑑 ' + gachaOwnedCount(g) + ' / ' + GACHA_CATALOG.length + '）');
+  } else {
+    exchangeSummary.textContent = '図鑑のアイテムをすべて持っています。交換できるものはありません。';
+  }
+}
+// the confirmation, then the result (with 装備する), in one small dialog
+function openExchangeConfirm(id){
+  var it = gachaItem(id);
+  if(!it) return;
+  var g = loadStore().gacha, cost = exchangeCost(it);
+  xm = {id:id, phase:'confirm', newTitle:null};
+  xmCard.className = 'zmodal-card r-' + it.rarity;
+  xmHead.textContent = '';
+  xmArt.textContent = '';
+  xmArt.appendChild(makeArt(it, false));
+  xmRar.className = 'rar r-' + it.rarity;
+  xmRar.textContent = GACHA_RARITIES[it.rarity].label;
+  xmCat.textContent = itemKindText(it);
+  xmName.textContent = it.name;
+  xmText.textContent = '';
+  appendText(xmText, 'そば札 ');
+  appendBold(xmText, fmtPoints(cost) + '枚');
+  appendText(xmText, ' と交換しますか？');
+  xmNote.hidden = false;
+  xmNote.textContent = 'いま ' + fmtPoints(g.tickets) + '枚 → 交換したあと ' + fmtPoints(Math.max(0, g.tickets - cost)) + '枚';
+  xmOk.hidden = false;
+  xmEquip.hidden = true;
+  xmCancel.textContent = 'やめる';
+  xModal.hidden = false;
+  document.body.style.overflow = 'hidden';
+  focusEl(xmOk);
+}
+function renderXmEquip(){
+  var it = gachaItem(xm.id);
+  if(!it) return;
+  var g = loadStore().gacha, slot = it.applyTo;
+  var on = g.equipped[slot]===it.id && equipAllowed(g, slot, it.id);
+  var note = Object.prototype.hasOwnProperty.call(SKIN_NOTES, it.id) ? SKIN_NOTES[it.id] : EQUIP_SLOT_NOTES[slot];
+  xmNote.hidden = false;
+  xmNote.textContent = '装備先：' + EQUIP_SLOT_LABELS[slot] + (on ? '（装備中）' : '') + '。' + note;
+  xmEquip.hidden = false;
+  xmEquip.textContent = on ? '外す' : '装備する';
+  xmEquip.classList.toggle('is-on', on);
+  xmEquip.setAttribute('aria-pressed', on ? 'true' : 'false');
+}
+function doExchange(){
+  var it = gachaItem(xm.id);
+  if(!it || xm.phase!=='confirm') return;
+  var res;
+  try{ res = runExchangeTransaction(it.id); }catch(e){ res = {ok:false, reason:'error'}; }
+  renderExchange();
+  if(!res.ok){
+    xm.phase = 'error';
+    xmText.textContent = exchangeFailText(res);
+    xmNote.hidden = true;
+    xmOk.hidden = true;
+    xmCancel.textContent = '閉じる';
+    setExchangeMsg(exchangeFailText(res), true);
+    focusEl(xmCancel);
+    return;
+  }
+  xm.phase = 'done';
+  xm.newTitle = res.newTitle;
+  playGachaReveal(it.rarity);            // the chime of that rarity, as when it comes out of the gacha
+  xmHead.textContent = res.newTitle ? ('図鑑コンプリート！　称号「' + GACHA_TITLES[res.newTitle].name + '」を手に入れました。') : '交換しました！';
+  xmArt.textContent = '';
+  xmArt.appendChild(makeArt(it, true));
+  xmText.textContent = it.desc;
+  xmOk.hidden = true;
+  xmCancel.textContent = '閉じる';
+  renderXmEquip();
+  setExchangeMsg('「' + it.name + '」を手に入れました（そば札 残り' + fmtPoints(res.tickets) + '枚）。');
+  focusEl(xmEquip);
+}
+function closeExchangeModal(){
+  if(xModal.hidden) return;
+  xModal.hidden = true;
+  document.body.style.overflow = '';
+  var el = null;
+  try{ if(xm.id) el = exchangeGroups.querySelector('.ex-btn[data-ex="' + xm.id + '"]'); }catch(e){ el = null; }
+  focusEl(el || exchangeTitleEl);                       // after an exchange the item has left the list
+  xm = {id:null, phase:'', newTitle:null};
+}
+function cycleXmFocus(back){
+  var list = [];
+  if(!xmOk.hidden) list.push(xmOk);
+  if(!xmEquip.hidden) list.push(xmEquip);
+  list.push(xmCancel);
+  var i = list.indexOf(document.activeElement);
+  var next = back ? (i<=0 ? list.length - 1 : i - 1) : (i<0 || i>=list.length - 1 ? 0 : i + 1);
+  focusEl(list[next]);
+}
+exchangeGroups.addEventListener('click', function(e){
+  var b = (e.target && e.target.closest) ? e.target.closest('.ex-btn') : null;
+  if(!b || b.disabled) return;
+  setExchangeMsg('');
+  openExchangeConfirm(b.getAttribute('data-ex'));
+});
+xmOk.addEventListener('click', doExchange);
+xmCancel.addEventListener('click', closeExchangeModal);
+xmEquip.addEventListener('click', function(){
+  var it = gachaItem(xm.id);
+  if(!it) return;
+  var g = loadStore().gacha, slot = it.applyTo;
+  var on = g.equipped[slot]===it.id && equipAllowed(g, slot, it.id);
+  var res = setEquipped(slot, on ? null : it.id);
+  if(res.ok && !on) previewEquipSound(it);
+  if(!res.ok) setExchangeMsg(res.reason==='save' ? '保存できなかったため、装備を変更できませんでした。' : 'このアイテムはいま装備できません。', true);
+  else setExchangeMsg(on ? ('「' + it.name + '」を外しました。') : ('「' + it.name + '」を' + EQUIP_SLOT_LABELS[slot] + 'に装備しました。'));
+  renderXmEquip();
+  focusEl(xmEquip);
+});
+xModal.addEventListener('click', function(e){
+  if(e.target && e.target.getAttribute && e.target.getAttribute('data-xclose')) closeExchangeModal();
+});
+document.addEventListener('keydown', function(e){
+  if(xModal.hidden) return;
+  if(e.key==='Escape' || e.key==='Esc'){ e.preventDefault(); closeExchangeModal(); }
+  else if(e.key==='Tab'){ e.preventDefault(); cycleXmFocus(e.shiftKey); }   // the focus stays inside the dialog
+});
+
+// ---------- 着せ替え画面: one tab per slot, the owned items for it, and a picture of the current look ----------
+var kisekaeTitleEl = document.getElementById('kisekae-title');
+var kisekaeTabs = document.getElementById('kisekae-tabs');
+var kisekaePanel = document.getElementById('kisekae-panel');
+var kisekaePanelH = document.getElementById('kisekae-panel-h');
+var kisekaeNote = document.getElementById('kisekae-note');
+var kisekaeList = document.getElementById('kisekae-list');
+var kisekaeEmpty = document.getElementById('kisekae-empty');
+var kisekaeMsg = document.getElementById('kisekae-msg');
+var kisekaeTitleChip = document.getElementById('kisekae-title-chip');
+var kisekaeTry = document.getElementById('kisekae-try');
+var kisekaeSum = document.getElementById('kisekae-sum');
+var kisekaeCanvas = document.getElementById('kisekae-canvas');
+var btnKisekae = document.getElementById('btn-kisekae');
+var btnKisekaeBack = document.getElementById('btn-kisekae-back');
+var btnKisekaeExchange = document.getElementById('btn-kisekae-exchange');
+var kkSlot = 'bowl';
+var kkRedrawTimer = 0;
+
+function setKisekaeMsg(text, isError){
+  kisekaeMsg.textContent = text;
+  kisekaeMsg.classList.toggle('is-error', !!isError);
+}
+// what a slot can wear: the owned catalog items for it (and, for 称号, the earned 図鑑 title)
+function slotChoices(g, slot){
+  var out = [], i;
+  for(i=0;i<GACHA_CATALOG.length;i++){
+    var it = GACHA_CATALOG[i];
+    if(it.applyTo===slot && g.owned.indexOf(it.id)>=0) out.push({id:it.id, name:it.name, item:it});
+  }
+  if(slot==='title'){
+    for(var t in GACHA_TITLES){
+      if(Object.prototype.hasOwnProperty.call(GACHA_TITLES, t) && g.titles.indexOf(t)>=0) out.push({id:t, name:GACHA_TITLES[t].name, item:null});
+    }
+  }
+  return out;
+}
+function slotTotal(slot){
+  var n = 0;
+  for(var i=0;i<GACHA_CATALOG.length;i++) if(GACHA_CATALOG[i].applyTo===slot) n++;
+  return slot==='title' ? n + Object.keys(GACHA_TITLES).length : n;
+}
+function renderKisekae(){
+  var g = loadStore().gacha, eq = validEquipped(g), i;
+  if(GACHA_SLOTS.indexOf(kkSlot)<0) kkSlot = 'bowl';
+  kisekaeTabs.textContent = '';
+  for(i=0;i<GACHA_SLOTS.length;i++){
+    var slot = GACHA_SLOTS[i], on = !!eq[slot];
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'kk-tab' + (on ? ' is-on' : '');
+    b.id = 'kk-tab-' + slot;
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', slot===kkSlot ? 'true' : 'false');
+    b.setAttribute('aria-controls', 'kisekae-panel');
+    b.setAttribute('data-slot', slot);
+    b.tabIndex = slot===kkSlot ? 0 : -1;
+    var l = document.createElement('span');
+    l.className = 'kk-tab-l';
+    l.textContent = EQUIP_SLOT_LABELS[slot];
+    b.appendChild(l);
+    var s = document.createElement('span');
+    s.className = 'kk-tab-s';
+    s.textContent = on ? '装備中' : 'なし';
+    b.appendChild(s);
+    b.setAttribute('aria-label', EQUIP_SLOT_LABELS[slot] + '（' + (on ? '「' + titleDisplayName(eq[slot]) + '」を装備中' : '装備なし') + '）');
+    kisekaeTabs.appendChild(b);
+  }
+  kisekaePanel.setAttribute('aria-labelledby', 'kk-tab-' + kkSlot);
+  var choices = slotChoices(g, kkSlot), cur = eq[kkSlot];
+  kisekaePanelH.textContent = EQUIP_SLOT_LABELS[kkSlot] + '（持っているもの ' + choices.length + ' / ' + slotTotal(kkSlot) + '）';
+  kisekaeNote.textContent = EQUIP_SLOT_NOTES[kkSlot];
+  kisekaeList.textContent = '';
+  kisekaeList.appendChild(kkItemEl(null, !cur));
+  for(i=0;i<choices.length;i++) kisekaeList.appendChild(kkItemEl(choices[i], cur===choices[i].id));
+  kisekaeEmpty.hidden = choices.length>0;
+  kisekaeEmpty.textContent = choices.length ? '' : 'この部位のアイテムはまだ持っていません。ガチャか交換所で手に入れると、ここで選べます。';
+  var parts = [];
+  for(i=0;i<GACHA_SLOTS.length;i++) parts.push(EQUIP_SLOT_LABELS[GACHA_SLOTS[i]] + '：' + (eq[GACHA_SLOTS[i]] ? titleDisplayName(eq[GACHA_SLOTS[i]]) : 'なし'));
+  kisekaeSum.textContent = 'いまの装備　' + parts.join('、');
+}
+function kkItemEl(choice, on){
+  var li = document.createElement('li');
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'kk-item' + (choice && choice.item ? ' r-' + choice.item.rarity : (choice ? ' r-kiwami' : ''));
+  b.setAttribute('data-kk', choice ? choice.id : '');
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  if(choice && choice.item) b.appendChild(makeArt(choice.item, true));
+  else{
+    var ph = document.createElement('span');
+    ph.className = choice ? 'art is-fallback' : 'kk-none-art';
+    ph.setAttribute('aria-hidden', 'true');
+    if(choice){
+      var ic = document.createElement('span');
+      ic.className = 'art-ic';
+      ic.textContent = '🏅';
+      ph.appendChild(ic);
+    } else ph.textContent = '—';
+    b.appendChild(ph);
+  }
+  var t = document.createElement('span');
+  t.className = 'kk-item-t';
+  var n = document.createElement('span');
+  n.className = 'kk-item-n';
+  n.textContent = choice ? choice.name : 'なし（元のまま）';
+  t.appendChild(n);
+  var s = document.createElement('span');
+  s.className = 'kk-item-s';
+  s.textContent = on ? '装備中' : (choice ? (choice.item ? GACHA_RARITIES[choice.item.rarity].label + '・' + choice.item.category : '図鑑コンプの称号') : '元の見た目と音');
+  t.appendChild(s);
+  b.appendChild(t);
+  li.appendChild(b);
+  return li;
+}
+function kkEquip(id){
+  var slot = kkSlot, g = loadStore().gacha;
+  var before = equipAllowed(g, slot, g.equipped[slot]) ? g.equipped[slot] : null;
+  if((id || null)===before) return;
+  var res = setEquipped(slot, id || null);
+  if(!res.ok){
+    setKisekaeMsg(res.reason==='save' ? '保存できなかったため、装備を変更できませんでした。' : 'このアイテムはいま装備できません。', true);
+  } else if(id){
+    var it = gachaItem(id);
+    if(it) previewEquipSound(it);
+    setKisekaeMsg('「' + titleDisplayName(id) + '」を' + EQUIP_SLOT_LABELS[slot] + 'に装備しました。');
+  } else {
+    setKisekaeMsg(EQUIP_SLOT_LABELS[slot] + 'を元に戻しました' + (before ? '（「' + titleDisplayName(before) + '」を外しました）' : '') + '。');
+  }
+  renderKisekae();
+  drawKisekaePreview();
+}
+kisekaeList.addEventListener('click', function(e){
+  var b = (e.target && e.target.closest) ? e.target.closest('.kk-item') : null;
+  if(!b) return;
+  var id = b.getAttribute('data-kk');
+  kkEquip(id);
+  focusEl(kisekaeList.querySelector('.kk-item[data-kk="' + id + '"]'));
+});
+function selectKkSlot(slot, focus){
+  if(GACHA_SLOTS.indexOf(slot)<0) return;
+  kkSlot = slot;
+  setKisekaeMsg('');
+  renderKisekae();
+  if(focus) focusEl(document.getElementById('kk-tab-' + slot));
+}
+kisekaeTabs.addEventListener('click', function(e){
+  var b = (e.target && e.target.closest) ? e.target.closest('.kk-tab') : null;
+  if(b) selectKkSlot(b.getAttribute('data-slot'), true);
+});
+kisekaeTabs.addEventListener('keydown', function(e){
+  var i = GACHA_SLOTS.indexOf(kkSlot), n = GACHA_SLOTS.length, to = -1;
+  if(e.key==='ArrowRight') to = (i + 1) % n;
+  else if(e.key==='ArrowLeft') to = (i - 1 + n) % n;
+  else if(e.key==='Home') to = 0;
+  else if(e.key==='End') to = n - 1;
+  if(to<0) return;
+  e.preventDefault();
+  selectKkSlot(GACHA_SLOTS[to], true);
+});
+// 音を試す: the equipped sounds, one after another (silent while 🔇)
+function tryKisekaeSounds(){
+  if(!audioEnabled){ setKisekaeMsg('効果音がオフ（🔇）のため鳴りません。右上の🔇で切り替えられます。', true); return; }
+  var sk = resolveSkin(), seq = [], evs = ['cut','just','round','serve'], i;
+  if(sk.sound) for(i=0;i<evs.length;i++) if(sk.sound[evs[i]]) seq.push(sk.sound[evs[i]]);
+  if(sk.tool && sk.tool.just) seq.push(sk.tool.just);
+  if(!seq.length){
+    playJustSound();
+    setKisekaeMsg('音のアイテム（音・道具）は装備していません。いまはJUST!の音だけです。');
+    return;
+  }
+  for(i=0;i<seq.length;i++) (function(name, at){ setTimeout(function(){ playSkinSound(name); }, at); })(seq[i], i*480);
+  setKisekaeMsg('装備している音を鳴らしました。');
+}
+kisekaeTry.addEventListener('click', tryKisekaeSounds);
+kisekaeSoundBtn.addEventListener('click', function(){
+  audioEnabled = !audioEnabled;
+  saveSoundPref(audioEnabled);
+  syncSoundButtons();
+  if(!audioEnabled) stopPourSound();
+});
+
+// --- the picture: the game's own drawing (lane, knife, cut ring, bowl, noodles, toppings, background), done on the
+// 着せ替え canvas with what is equipped now. The game's canvas, size and look are lent to it for a moment and put
+// back at once; nothing of the game's state changes.
+var KK_BATCH = [{thickness:6, points:100, seed:0.11}, {thickness:7, points:100, seed:0.48}, {thickness:6, points:100, seed:0.85},
+  {thickness:9, points:60, seed:0.23}, {thickness:6, points:100, seed:0.59}, {thickness:7, points:100, seed:0.96}];
+function kkStyle(){
+  var s = home.style;
+  if(!s){ try{ s = loadStore().lastStyle; }catch(e){ s = null; } }
+  return Object.prototype.hasOwnProperty.call(STYLES, s) ? s : DEFAULT_STYLE;
+}
+function drawKisekaePreview(){
+  if(kkRedrawTimer){ clearTimeout(kkRedrawTimer); kkRedrawTimer = 0; }
+  var c = null;
+  try{ c = kisekaeCanvas.getContext('2d'); }catch(e){ c = null; }
+  if(!c) return;
+  var r = kisekaeCanvas.getBoundingClientRect();
+  if(!(r.width>0 && r.height>0)) return;
+  var dpr = Math.min(window.devicePixelRatio||1, 2);
+  var pw = Math.round(r.width*dpr), ph = Math.round(r.height*dpr);
+  if(kisekaeCanvas.width!==pw || kisekaeCanvas.height!==ph){ kisekaeCanvas.width = pw; kisekaeCanvas.height = ph; }
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  var skin = resolveSkin();
+  var keep = {ctx:ctx, W:W, H:H, DPR:DPR, skin:state.skin, failed:skinFailed, style:state.style, mode:state.mode,
+              chop:state.knifeChop, thick:state.lastCutThickness, board:state.boardWidth};
+  ctx = c; W = r.width; H = r.height; DPR = dpr;
+  state.skin = skin; skinFailed = {};
+  state.style = kkStyle(); state.mode = 'normal'; state.knifeChop = 0; state.lastCutThickness = MIN_THICK; state.boardWidth = 74;
+  try{
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = COLORS.card || '#fbf7ec';
+    ctx.fillRect(0, 0, W, H);
+    drawEquippedBg();
+    var sc = Math.max(0.5, Math.min(0.72, (W*0.52)/222));
+    var bx = W - 10 - 110*sc, by = H*0.5 - 19*sc;
+    var laneW = Math.max(96, Math.min(210, bx - 110*sc - 14));
+    safeDraw(function(){ drawKkLane(laneW); });
+    safeDraw(function(){ drawKkBowl(bx, by, sc); });
+    safeDraw(function(){ drawFxParts(ctx, kkParticles(bx, by, sc), true); });
+  }catch(e){}
+  finally{
+    ctx = keep.ctx; W = keep.W; H = keep.H; DPR = keep.DPR; state.skin = keep.skin; skinFailed = keep.failed;
+    state.style = keep.style; state.mode = keep.mode; state.knifeChop = keep.chop; state.lastCutThickness = keep.thick; state.boardWidth = keep.board;
+  }
+  kisekaeTitleChip.hidden = !skin.title;
+  kisekaeTitleChip.textContent = skin.title ? ('称号「' + skin.title.name + '」') : '';
+  if(skin.bg && bgLayer.imgState==='loading') kkRedrawTimer = setTimeout(drawKisekaePreview, 250);   // an ART picture still loading
+}
+// the dough on the board with the knife over it, and the ring (and confetti) of a JUST! cut
+function drawKkLane(laneW){
+  var y = Math.round(H*0.38), h = Math.round(H*0.22), jx = Math.round(laneW*0.4);
+  var nsk = skinPart('noodle');
+  ctx.fillStyle = COLORS.board;
+  ctx.fillRect(0, y - 6, laneW, h + 12);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, y, laneW, h);
+  ctx.clip();
+  ctx.fillStyle = nsk ? nsk.dough : COLORS.dough;
+  ctx.fillRect(0, y, laneW, h);
+  ctx.strokeStyle = nsk ? nsk.doughDark : COLORS.doughDark;
+  ctx.globalAlpha = 0.5;
+  ctx.lineWidth = 1;
+  for(var sx=jx-5; sx>0; sx-=5){ ctx.beginPath(); ctx.moveTo(sx, y + 2); ctx.lineTo(sx, y + h - 2); ctx.stroke(); }
+  ctx.lineWidth = 2.5;
+  var folds = [0.26, 0.52, 0.78];
+  for(var i=0;i<folds.length;i++){
+    var fy = y + h*folds[i];
+    ctx.beginPath();
+    ctx.moveTo(jx, fy);
+    ctx.quadraticCurveTo((jx + laneW)/2, fy + 5, laneW, fy - 4);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+  drawKomaitaAndKnife(jx, y, h);
+  var ek = skinPart('effect'), fx = {t:110, rating:'JUST', seed:4242};
+  ctx.globalAlpha = 0.9;
+  ctx.strokeStyle = ek ? ek.just : '#ffd54a';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(jx, y + h/2, 10 + fx.t/6, 0, Math.PI*2);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  if(ek) guardedSkinDraw('effect', function(){ drawCutBits(jx, y + h/2, fx, ek); });
+}
+// the served bowl: the equipped bowl and noodles, in tsuyu, with the toppings
+function drawKkBowl(bx, by, sc){
+  var conf = detailConf(), pieces = KK_BATCH;
+  ctx.translate(bx, by);
+  ctx.scale(sc, sc);
+  drawServingBowl(0, 0);
+  if(!skinPart('bowl')) safeDraw(function(){ drawBowlLip(0, 0); });
+  safeDraw(function(){ drawTsuyuPool(0, 0, 1, conf); });
+  var nsk = skinPart('noodle'), look = noodleLook(nsk);
+  var heap = function(){
+    var bundles = heapLayout(pieces, conf, look);
+    ctx.beginPath();
+    ctx.ellipse(0, 32, 100, 26, 0, 0, Math.PI*2);
+    ctx.moveTo(-94, 32);
+    ctx.ellipse(0, 32, 94, 50, 0, Math.PI, Math.PI*2);
+    ctx.closePath();
+    ctx.clip();
+    drawNoodleHeap(bundles, 0, 0, look, 1, null, Math.min(0.6, look.shine + 0.1), heapScale(pieces.length));
+  };
+  if(nsk) guardedSkinDraw('noodle', heap);
+  else safeDraw(heap);
+  var set = toppingLayout(pieces, conf);
+  safeDraw(function(){ drawToppings(set, 0, 0, 5000); });
+}
+// a pleased customer's sparkles and confetti round the bowl, in the equipped 演出's colours (or the original ones)
+var KK_BITS = [[-1.02,-0.5,0.4],[-0.8,-0.98,1.9],[-0.38,-1.22,0.9],[0.1,-1.3,2.6],[0.55,-1.12,1.3],[0.92,-0.8,0.2],[1.05,-0.3,2.2],[-1.1,0.05,1.1]];
+var KK_SPARKS = [[-0.62,-1.25],[0.78,-1.28],[1.12,-0.9]];
+function kkParticles(bx, by, sc){
+  var ek = skinPart('effect'), out = [], i;
+  var cols = (ek && ek.bits && ek.bits.length) ? ek.bits : CONFETTI_COLS, spark = ek ? skinSparkColor(ek) : '#f5b82e';
+  for(i=0;i<KK_BITS.length;i++){
+    out.push({kind:'confetti', x:bx + KK_BITS[i][0]*98*sc, y:by + KK_BITS[i][1]*44*sc, vx:0, vy:0, g:0, rot:KK_BITS[i][2], vr:0,
+              size:3.2, col:cols[i % cols.length], age:400, life:100000});
+  }
+  for(i=0;i<KK_SPARKS.length;i++){
+    out.push({kind:'spark', x:bx + KK_SPARKS[i][0]*98*sc, y:by + KK_SPARKS[i][1]*44*sc, vx:0, vy:0, g:0, rot:0, vr:0,
+              size:5, col:spark, age:400, life:100000});
+  }
+  return out;
+}
+
+// ---------- 交換所・着せ替え: open from home, the gacha, the 図鑑 or each other; 戻る goes back where they came from ----------
+var subFrom = {exchange:null, kisekae:null};
+function showSubScreen(name){
+  if(name==='exchange'){ renderExchange(); showScreen('exchange'); }
+  else { renderKisekae(); showScreen('kisekae'); syncSoundButtons(); drawKisekaePreview(); }
+}
+function openSub(name, from, opener){
+  // going to the screen this one was opened from is simply 戻る, so the two never send each other round in circles
+  var here = subFrom[from];
+  if(here && here.screen===name){ closeSub(from); return; }
+  if(gStage.anim) endOpening();
+  closeZukanDetail();
+  subFrom[name] = {screen:from, opener:opener || null};
+  if(name==='exchange') setExchangeMsg('');
+  else { setKisekaeMsg(''); kkSlot = 'bowl'; }
+  showSubScreen(name);
+  focusEl(name==='exchange' ? exchangeTitleEl : kisekaeTitleEl);
+}
+function closeSub(name){
+  var f = subFrom[name] || {screen:'title', opener:null};
+  subFrom[name] = null;
+  if(name==='exchange') closeExchangeModal();
+  if(kkRedrawTimer){ clearTimeout(kkRedrawTimer); kkRedrawTimer = 0; }
+  var to = f.screen;
+  if(to==='gacha'){ showScreen('gacha'); syncSoundButtons(); stageResize(); renderGacha(); drawStageIdle(); }
+  else if(to==='zukan'){ renderZukan(); showScreen('zukan'); }
+  else if(to==='exchange' || to==='kisekae') showSubScreen(to);
+  else { showScreen('title'); renderHome(); }
+  focusEl(f.opener || (name==='exchange' ? btnExchange : btnKisekae));
+}
+btnExchange.addEventListener('click', function(){ openSub('exchange', 'title', btnExchange); });
+btnKisekae.addEventListener('click', function(){ openSub('kisekae', 'title', btnKisekae); });
+btnGachaExchange.addEventListener('click', function(){ openSub('exchange', 'gacha', btnGachaExchange); });
+btnZukanExchange.addEventListener('click', function(){ openSub('exchange', 'zukan', btnZukanExchange); });
+btnZukanKisekae.addEventListener('click', function(){ openSub('kisekae', 'zukan', btnZukanKisekae); });
+btnExchangeKisekae.addEventListener('click', function(){ openSub('kisekae', 'exchange', btnExchangeKisekae); });
+btnKisekaeExchange.addEventListener('click', function(){ openSub('exchange', 'kisekae', btnKisekaeExchange); });
+btnExchangeBack.addEventListener('click', function(){ closeSub('exchange'); });
+btnKisekaeBack.addEventListener('click', function(){ closeSub('kisekae'); });
+window.addEventListener('resize', function(){
+  if(screens.kisekae.classList.contains('active')) drawKisekaePreview();
 });
 
 // ---------- Update ----------
@@ -7670,26 +8533,54 @@ function drawGakuText(g, rt, fc){
   ctx.restore();
 }
 
-// particles for the reaction: little sparkles (good, just) and confetti (just); none when switched off
+// particles for the reaction: little sparkles (good, just) and confetti (just); none when switched off.
+// An equipped 演出 (着せ替え) colours them; with none equipped they keep their original colours.
 var serveFx = [];
 var CONFETTI_COLS = ['#e05a47','#f2b134','#5aa05a','#4a90c2','#e889a8','#f08a3c'];
+function hexRgb(hex){
+  var m = /^#([0-9a-f]{6})$/i.exec(String(hex || '').trim());
+  if(!m) return null;
+  var n = parseInt(m[1], 16);
+  return [(n>>16)&255, (n>>8)&255, n&255];
+}
+// how well a colour shows on a background: its difference in lightness, or (for a vivid colour) its colourfulness
+function colorShows(col, bg){
+  var c = hexRgb(col), g = hexRgb(bg);
+  if(!c || !g) return 0;
+  var luma = function(v){ return (0.299*v[0] + 0.587*v[1] + 0.114*v[2])/255; };
+  return Math.max(Math.abs(luma(c) - luma(g)), 0.5*(Math.max(c[0], c[1], c[2]) - Math.min(c[0], c[1], c[2]))/255);
+}
+// the equipped 演出's sparkle colour; when it would not show on this background (a white one on the light card),
+// its ring colour or one of its confetti colours that does
+function skinSparkColor(ek){
+  var bg = COLORS.card || '#fbf7ec', list = [ek.just, ek.ring].concat(ek.bits || []), best = ek.just, bestV = -1;
+  for(var i=0;i<list.length;i++){
+    var v = colorShows(list[i], bg);
+    if(v>=0.22) return list[i];
+    if(v>bestV){ bestV = v; best = list[i]; }
+  }
+  return best;
+}
 function startReactionFx(s){
   serveFx = [];
   var fc = fxConf(), tier = s.result.reaction, k = s.result.satisfaction;
   if(!fc.parts || (tier!=='good' && tier!=='just')) return;
   var g = customerGeom(), cx = bowlCX(), cy = bowlCY(), i, a, rr;
+  var ek = skinPart('effect');
+  var sparkCol = ek ? skinSparkColor(ek) : '#f5b82e', glintCol = ek ? sparkCol : '#ffd54a';
+  var confCols = (ek && ek.bits && ek.bits.length) ? ek.bits : CONFETTI_COLS;
   var sparks = tier==='good' ? Math.round((3 + 4*Math.max(0, (k - 70)/20))*fc.parts) : Math.round(6*fc.parts);
   for(i=0;i<sparks;i++){
     a = Math.random()*Math.PI*2; rr = g.r*(1.3 + Math.random()*0.8);
     serveFx.push({kind:'spark', x:g.x + Math.cos(a)*rr, y:g.y - g.r*0.35 + Math.sin(a)*rr*0.8, vx:0, vy:fc.still ? 0 : -10,
-                  g:0, rot:0, vr:0, size:3 + Math.random()*3, col:'#f5b82e', age:-i*70, life:700 + Math.random()*300});
+                  g:0, rot:0, vr:0, size:3 + Math.random()*3, col:sparkCol, age:-i*70, life:700 + Math.random()*300});
   }
   if(tier!=='just') return;
   var n = Math.round((16 + 24*Math.max(0, (k - 90)/10))*fc.parts);
   for(i=0;i<n;i++){
     var p = {kind:'confetti', x:cx + (Math.random() - 0.5)*40, y:cy + 4, vx:(Math.random() - 0.5)*320, vy:-(260 + Math.random()*230),
              g:640, rot:Math.random()*6, vr:(Math.random() - 0.5)*14, size:2.5 + Math.random()*2.5,
-             col:CONFETTI_COLS[i % CONFETTI_COLS.length], age:-Math.random()*120, life:1100 + Math.random()*450};
+             col:confCols[i % confCols.length], age:-Math.random()*120, life:1100 + Math.random()*450};
     if(fc.still){ p.x = cx + (Math.random() - 0.5)*200; p.y = cy - 70 + Math.random()*90; p.vx = p.vy = p.g = p.vr = 0; }
     serveFx.push(p);
   }
@@ -7697,13 +8588,15 @@ function startReactionFx(s){
   for(i=0;i<st;i++){                               // a few glints round the seal
     a = Math.random()*Math.PI*2; rr = 26 + Math.random()*14;
     serveFx.push({kind:'spark', x:W*0.19 + Math.cos(a)*rr, y:H*0.19 + Math.sin(a)*rr, vx:0, vy:0, g:0, rot:0, vr:0,
-                  size:3 + Math.random()*2.5, col:'#ffd54a', age:-120 - i*60, life:650});
+                  size:3 + Math.random()*2.5, col:glintCol, age:-120 - i*60, life:650});
   }
 }
-function updateServeFx(dt){
+// The particles themselves, shared with the gacha's capsule opening: each is {kind:'spark'|'confetti', x, y,
+// vx, vy (px per second), g (gravity), rot, vr, size, col, age (ms; below 0 = not yet), life}.
+function fxStep(list, dt){
   var sec = dt/1000;
-  for(var i=0;i<serveFx.length;i++){
-    var p = serveFx[i];
+  for(var i=0;i<list.length;i++){
+    var p = list[i];
     p.age += dt;
     if(p.age<0) continue;
     p.x += p.vx*sec;
@@ -7712,39 +8605,41 @@ function updateServeFx(dt){
     p.vx *= (1 - 0.8*sec);
     p.rot += p.vr*sec;
   }
-  serveFx = serveFx.filter(function(p){ return p.age<p.life; });
+  return list.filter(function(p){ return p.age<p.life; });
 }
-function drawServeFx(still){
-  for(var i=0;i<serveFx.length;i++){
-    var p = serveFx[i];
+function drawFxParts(c, list, still){
+  for(var i=0;i<list.length;i++){
+    var p = list[i];
     if(p.age<0) continue;
     var life = p.age/p.life, a = Math.min(1, p.age/80)*(life>0.7 ? Math.max(0, (1 - life)/0.3) : 1);
     if(a<=0) continue;
-    ctx.globalAlpha = a;
+    c.globalAlpha = a;
     if(p.kind==='confetti'){
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.scale(1, 0.25 + 0.75*Math.abs(Math.cos(p.rot*1.7)));
-      ctx.fillStyle = p.col;
-      ctx.fillRect(-p.size, -p.size*0.55, p.size*2, p.size*1.1);
-      ctx.restore();
+      c.save();
+      c.translate(p.x, p.y);
+      c.rotate(p.rot);
+      c.scale(1, 0.25 + 0.75*Math.abs(Math.cos(p.rot*1.7)));
+      c.fillStyle = p.col;
+      c.fillRect(-p.size, -p.size*0.55, p.size*2, p.size*1.1);
+      c.restore();
     } else {
       var s = p.size*(still ? 0.85 : 0.7 + 0.3*Math.sin(p.age*0.02));
-      ctx.fillStyle = p.col;
-      ctx.beginPath();
+      c.fillStyle = p.col;
+      c.beginPath();
       for(var k=0;k<8;k++){
         var an = k*Math.PI/4, rr = k % 2 ? s*0.32 : s;
-        ctx.lineTo(p.x + Math.cos(an)*rr, p.y + Math.sin(an)*rr);
+        c.lineTo(p.x + Math.cos(an)*rr, p.y + Math.sin(an)*rr);
       }
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.arc(p.x, p.y, s*0.22, 0, Math.PI*2); ctx.fill();
+      c.closePath();
+      c.fill();
+      c.fillStyle = '#ffffff';
+      c.beginPath(); c.arc(p.x, p.y, s*0.22, 0, Math.PI*2); c.fill();
     }
   }
-  ctx.globalAlpha = 1;
+  c.globalAlpha = 1;
 }
+function updateServeFx(dt){ serveFx = fxStep(serveFx, dt); }
+function drawServeFx(still){ drawFxParts(ctx, serveFx, still); }
 // the customer, and everything around their reaction
 function drawCustomerScene(s){
   var g = customerGeom(), fc = fxConf(), tier = s.result ? s.result.reaction : 'ok';
