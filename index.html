@@ -301,6 +301,13 @@ body{
 }
 .settings[open] summary::before{transform:rotate(45deg);}
 .settings-body{display:flex;flex-direction:column;gap:10px;padding:4px 2px 6px;}
+.snd-set{display:flex;flex-direction:column;gap:6px;}
+.snd-check{display:flex;align-items:center;gap:8px;font-size:.74rem;color:var(--ink);cursor:pointer;}
+.snd-check input{width:18px;height:18px;margin:0;accent-color:var(--accent-ink);}
+.snd-row{display:flex;align-items:center;gap:8px;font-size:.74rem;color:var(--ink);min-width:0;}
+.snd-name{flex:0 0 6.2em;}
+.snd-range{flex:1 1 auto;min-width:0;width:100%;margin:0;accent-color:var(--accent-ink);}
+.snd-val{flex:0 0 2.2em;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-soft);}
 .save-note{margin:0;font-size:.7rem;line-height:1.55;color:var(--ink-soft);}
 .clear-row{display:flex;flex-direction:column;align-items:flex-start;gap:6px;}
 .clear-confirm{width:100%;display:flex;flex-direction:column;gap:6px;padding:8px 10px;border:1px solid var(--accent2-ink);border-radius:var(--radius);background:var(--card);}
@@ -965,6 +972,14 @@ body{
     <details id="settings" class="settings">
       <summary>記録と設定</summary>
       <div class="settings-body">
+        <div class="snd-set" role="group" aria-labelledby="snd-set-title">
+          <p id="snd-set-title" class="backup-title">サウンド</p>
+          <label class="snd-check"><input id="set-sound-on" type="checkbox"> 効果音を鳴らす</label>
+          <label class="snd-row"><span class="snd-name">全体の音量</span><input id="set-vol-master" class="snd-range" type="range" min="0" max="100" step="5"><output id="set-vol-master-v" class="snd-val">80</output></label>
+          <label class="snd-row"><span class="snd-name">まな板の音</span><input id="set-vol-board" class="snd-range" type="range" min="0" max="100" step="5"><output id="set-vol-board-v" class="snd-val">80</output></label>
+          <label class="snd-row"><span class="snd-name">判定の音</span><input id="set-vol-judge" class="snd-range" type="range" min="0" max="100" step="5"><output id="set-vol-judge-v" class="snd-val">90</output></label>
+          <label class="snd-check"><input id="set-count-in" type="checkbox"> お手本の前にカウント音（1拍）を鳴らす</label>
+        </div>
         <p class="save-note">記録はこの端末のブラウザ内にのみ保存されます。端末やブラウザを変えると引き継がれません。</p>
         <div class="clear-row">
           <button id="btn-clear" class="btn-small btn-danger" type="button">記録を消す</button>
@@ -1976,10 +1991,17 @@ function sanitizeGacha(raw){
   }
   return out;
 }
-// settings: not used by this version, but kept exactly as saved if a save carries it
+// settings: kept as saved; settings.sound is checked and any missing sound setting gets its default
+var SOUND_DEFAULTS = {soundOn:true, masterVolume:0.8, boardVolume:0.8, judgeVolume:0.9, countIn:true};
 function sanitizeSettings(raw){
-  if(!isPlainObj(raw)) return null;
-  try{ return JSON.parse(JSON.stringify(raw)); }catch(e){ return null; }
+  var out = null;
+  if(isPlainObj(raw)){ try{ out = JSON.parse(JSON.stringify(raw)); }catch(e){ out = null; } }
+  if(!isPlainObj(out)) out = {};
+  var snd = isPlainObj(out.sound) ? out.sound : {};
+  var clean = sanitizeSoundSettings(snd);
+  for(var k in clean){ if(Object.prototype.hasOwnProperty.call(clean,k)) snd[k] = clean[k]; }
+  out.sound = snd;
+  return out;
 }
 
 function readRawLS(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
@@ -2049,7 +2071,7 @@ function ensureDailyFresh(store){
 }
 
 function defaultStore(){
-  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, rank:{bestTotal:0}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha() };
+  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, rank:{bestTotal:0}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha(), settings:sanitizeSettings(null) };
 }
 
 function sanitizeFlatBests(raw){
@@ -2143,8 +2165,7 @@ function coerceStore(obj){
     lastPlayedSeasonal:sanitizeLastSeasonal(obj.lastPlayedSeasonal),
     gacha:sanitizeGacha(obj.gacha)
   };
-  var settings = sanitizeSettings(obj.settings);
-  if(settings) out.settings = settings;
+  out.settings = sanitizeSettings(obj.settings);
   return out;
 }
 
@@ -2170,7 +2191,7 @@ function attemptMigration(){
   if(!any) return null;
   var bests = {};
   if(Object.keys(merged).length){ bests[DEFAULT_STYLE] = merged; }
-  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:bests, rank:{bestTotal:sumBests(bests)}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha() };
+  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:bests, rank:{bestTotal:sumBests(bests)}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha(), settings:sanitizeSettings(null) };
 }
 
 function loadStore(){
@@ -2692,6 +2713,9 @@ function spawnStageNotes(isDemo, startTime){
   for(var i=0;i<times.length;i++){
     state.notes.push({targetTime:times[i], judged:false, isDemo:isDemo});
   }
+  state.countInAt = isDemo ? times[0] - state.baseUnit*2 : null;   // one beat before the master's first chop
+  state.countInDone = false;
+  if(isDemo) boardSchedulerTick();
 }
 function startRound(){
   state.pattern = generateGaps(state.baseUnit);
@@ -3456,80 +3480,298 @@ function comboMultiplier(combo){
   return Math.min(1 + 0.1*(combo-1), 5.0);
 }
 
+// ---------- Sound: one WebAudio module (all synthesized, no sound files) ----------
+// Every sound goes through one bus: judge / board / sfx -> master gain -> limiter -> speakers.
+// The 🔊 setting (audioEnabled) and the master volume are applied here and nowhere else.
+var SND_MAX_VOICES = 24;     // polyphony cap: the oldest voice is faded out when a new one needs room
 var audioCtx = null;
+var sndBus = null;
+var sndVoices = [];
+var sndPrefs = null;         // filled from the save just below the setting helpers
 function getAudioCtx(){
   if(!audioCtx){
     try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
   }
+  if(audioCtx && !sndBus){
+    try{
+      var ac = audioCtx;
+      var limiter = ac.createDynamicsCompressor();   // a gentle brick wall so stacked sounds never clip
+      limiter.threshold.value = -6; limiter.knee.value = 0; limiter.ratio.value = 20;
+      limiter.attack.value = 0.002; limiter.release.value = 0.12;
+      var master = ac.createGain();
+      master.connect(limiter);
+      limiter.connect(ac.destination);
+      var judge = ac.createGain(), board = ac.createGain();
+      judge.connect(master); board.connect(master);
+      sndBus = {master:master, judge:judge, board:board};
+      sndApplyVolumes();
+    }catch(e){ sndBus = null; }
+  }
   return audioCtx;
 }
-// The 🔊 setting: settings.sound.soundOn in the save when it is there, otherwise the older echizenSoba.sound key.
-// Both are written on every change, so either one always gives the same answer.
-function loadSoundPref(){
+// where a voice connects: 'judge', 'board', or anything else = straight into the master
+function sndOut(ac, which){
+  if(!sndBus) getAudioCtx();
+  if(!sndBus) return ac.destination;
+  return which==='judge' ? sndBus.judge : which==='board' ? sndBus.board : sndBus.master;
+}
+function sndApplyVolumes(){
+  if(!sndBus || !audioCtx) return;
+  var t = audioCtx.currentTime, p = sndPrefs || SOUND_DEFAULTS;
   try{
-    var st = loadStore().settings;
-    if(st && st.sound && typeof st.sound.soundOn==='boolean') return st.sound.soundOn;
+    sndBus.master.gain.setTargetAtTime(audioEnabled ? p.masterVolume : 0, t, 0.015);   // 🔇 also silences sounds already booked
+    sndBus.judge.gain.setTargetAtTime(p.judgeVolume, t, 0.015);
+    sndBus.board.gain.setTargetAtTime(p.boardVolume, t, 0.015);
   }catch(e){}
+}
+// registers a started voice; past the cap the oldest one is faded out quickly
+function sndTrack(ac, src, gain, end){
+  var now = ac.currentTime;
+  sndVoices = sndVoices.filter(function(v){ return v.end>now; });
+  while(sndVoices.length>=SND_MAX_VOICES){
+    var old = sndVoices.shift();
+    try{
+      old.gain.gain.cancelScheduledValues(now);
+      old.gain.gain.setTargetAtTime(0, now, 0.008);
+      old.src.stop(now+0.05);
+    }catch(e){}
+  }
+  sndVoices.push({src:src, gain:gain, end:end});
+}
+function sndReady(){
+  if(!audioEnabled) return null;
+  var ac = getAudioCtx();
+  if(!ac) return null;
+  if(ac.state==='suspended'){ try{ ac.resume(); }catch(e){} }
+  return ac;
+}
+// Autoplay rules: the context is created and resumed on the first tap or key press anywhere.
+function sndUnlock(){
+  var ac = getAudioCtx();
+  if(ac && ac.state==='suspended'){ try{ ac.resume(); }catch(e){} }
+}
+['pointerdown','touchend','keydown'].forEach(function(ev){
+  window.addEventListener(ev, sndUnlock, {capture:true, passive:true});
+});
+
+// one oscillator partial with a fast attack and an exponential decay
+function sndPartial(ac, out, f, t0, dur, type, vol, attack, fEnd){
+  var osc = ac.createOscillator(), g = ac.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(f, t0);
+  if(fEnd) osc.frequency.exponentialRampToValueAtTime(fEnd, t0 + dur*0.6);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + (attack || 0.003));
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(g); g.connect(out);
+  osc.start(t0); osc.stop(t0 + dur + 0.02);
+  sndTrack(ac, osc, g, t0 + dur + 0.02);
+}
+// one filtered noise burst (uses the shared noise buffer)
+function sndNoise(ac, out, t0, dur, filter, f, q, vol, attack, rate){
+  var src = ac.createBufferSource(), flt = ac.createBiquadFilter(), g = ac.createGain();
+  src.buffer = sfxNoiseBuffer(ac);
+  src.playbackRate.value = rate || 1;
+  flt.type = filter; flt.frequency.value = f; if(q) flt.Q.value = q;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + (attack || 0.001));
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(flt); flt.connect(g); g.connect(out);
+  var off = Math.random()*0.8;
+  src.start(t0, off); src.stop(t0 + dur + 0.02);
+  sndTrack(ac, src, g, t0 + dur + 0.02);
+}
+
+// --- judge sounds: one table, one player. Each grade differs in colour AND length, so they can be told apart by ear. ---
+// partials: [frequency ratio, level, decay seconds, wave]
+var JUDGE_TONES = {
+  JUST:    {base:880, climbs:true,  lp:0,    partials:[[1,0.30,0.45,'sine'],[2.76,0.10,0.22,'sine'],[5.40,0.05,0.10,'sine'],[4,0.05,0.30,'triangle']], click:0.05},  // 澄んだ鈴
+  PERFECT: {base:880, climbs:true,  lp:0,    partials:[[1,0.26,0.30,'sine'],[2.76,0.07,0.14,'sine']], click:0.03},                                                 // 鈴（やや短い）
+  GOOD:    {base:880, climbs:true,  lp:3200, partials:[[1,0.22,0.16,'triangle'],[2,0.05,0.08,'sine']], attack:0.006},                                           // 柔らかく短いベル
+  OK:      {base:392, climbs:true,  lp:1400, partials:[[1,0.24,0.07,'sine']], wood:true, drop:0.55},                                                             // 木のこもったタップ
+  MISS:    {base:110, climbs:false, lp:700,  partials:[[1,0.12,0.19,'square'],[1.06,0.10,0.19,'sawtooth']], attack:0.004}                                         // 低い短いブザー
+};
+var PENTA_SEMITONES = [0,2,4,7,9,12,14,16,19];   // major pentatonic, the combo climbs one step per hit
+function comboPitch(combo){
+  var step = Math.max(0, Math.min(PENTA_SEMITONES.length-1, combo-1));
+  return Math.pow(2, PENTA_SEMITONES[step]/12);
+}
+var HIHAT_COMBO = 10;        // from this combo a light hi-hat is layered on every good cut
+function playJudgeSound(grade, combo){
+  var ac = sndReady();
+  if(!ac) return;
+  var tone = JUDGE_TONES[grade];
+  if(!tone) return;
+  try{
+    var t0 = ac.currentTime + 0.005;
+    var out = sndOut(ac, 'judge');
+    if(tone.lp){
+      var lp = ac.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = tone.lp; lp.Q.value = 0.5;
+      lp.connect(out);
+      out = lp;
+    }
+    var f0 = tone.base * (tone.climbs ? comboPitch(combo) : 1);
+    for(var i=0;i<tone.partials.length;i++){
+      var p = tone.partials[i];
+      sndPartial(ac, out, f0*p[0], t0, p[2], p[3], p[1], tone.attack, tone.drop ? f0*p[0]*tone.drop : 0);
+    }
+    if(tone.click) sndNoise(ac, out, t0, 0.02, 'highpass', 6000, 0.7, tone.click);
+    if(tone.wood) sndNoise(ac, out, t0, 0.045, 'bandpass', 1100, 3, 0.16);
+    if(grade!=='MISS' && combo>=HIHAT_COMBO) sndNoise(ac, sndOut(ac, 'judge'), t0 + 0.01, 0.04, 'highpass', 8000, 0.8, 0.07);
+  }catch(e){}
+}
+// aroma: 50ms after the cut and up high, so it never masks the judge sound
+function playAromaSound(){
+  var ac = sndReady();
+  if(!ac) return;
+  try{
+    var t0 = ac.currentTime + 0.05;
+    var hp = ac.createBiquadFilter();
+    hp.type = 'highpass'; hp.frequency.value = 2000;
+    hp.connect(sndOut(ac, 'judge'));
+    sndPartial(ac, hp, 2637, t0, 0.14, 'sine', 0.07, 0.004);
+    sndPartial(ac, hp, 3520, t0 + 0.04, 0.12, 'sine', 0.05, 0.004);
+  }catch(e){}
+}
+// --- the master's demo: the knife on the chopping board, booked ahead on the audio clock ---
+function playBoardAt(ac, t0){
+  var out = sndOut(ac, 'board');
+  var vary = 1 + (Math.random()*2-1)*0.07;          // a slightly different pitch and strength every chop
+  var vol = 0.9 + (Math.random()*2-1)*0.12;
+  sndNoise(ac, out, t0, 0.05, 'bandpass', 2300*vary, 1.3, 0.34*vol, 0.0008, vary);   // the blade's crack
+  sndNoise(ac, out, t0, 0.03, 'highpass', 5200*vary, 0.7, 0.10*vol, 0.0005, vary);   // its edge
+  sndPartial(ac, out, 190*vary, t0, 0.06, 'sine', 0.30*vol, 0.001, 120*vary);        // the wooden board's thump
+}
+function playCountInAt(ac, t0){
+  var out = sndOut(ac, 'board');
+  sndPartial(ac, out, 1568, t0, 0.05, 'triangle', 0.14, 0.001);   // 拍子木 style: high and dry, unlike the board
+  sndNoise(ac, out, t0, 0.025, 'bandpass', 3200, 4, 0.12);
+}
+// performance.now() milliseconds -> the audio clock (with the output latency folded in when the browser tells it)
+function perfToCtxTime(ac, perfMs){
+  var t;
+  try{
+    var ts = ac.getOutputTimestamp ? ac.getOutputTimestamp() : null;
+    if(ts && ts.performanceTime>0) t = ts.contextTime + (perfMs - ts.performanceTime)/1000;
+  }catch(e){}
+  if(typeof t!=='number' || !isFinite(t)) t = ac.currentTime + (perfMs - performance.now())/1000;
+  return Math.max(t, ac.currentTime);
+}
+var BOARD_LOOKAHEAD_MS = 100;
+var BOARD_TICK_MS = 25;
+var BOARD_LATE_MS = 30;      // a chop already this late is skipped rather than played off the beat
+function boardSchedulerTick(){
+  if(state.phase!=='playing' || state.roundStage!=='demo') return;
+  if(!audioEnabled || !audioCtx || audioCtx.state!=='running') return;
+  var ac = audioCtx, now = performance.now(), horizon = now + BOARD_LOOKAHEAD_MS;
+  try{
+    if(state.countInAt && !state.countInDone && state.countInAt<=horizon){
+      state.countInDone = true;
+      if(sndPrefs.countIn && state.countInAt>=now-BOARD_LATE_MS) playCountInAt(ac, perfToCtxTime(ac, state.countInAt));
+    }
+    for(var i=0;i<state.notes.length;i++){
+      var n = state.notes[i];
+      if(!n.isDemo || n.sndBooked || n.targetTime>horizon) continue;
+      n.sndBooked = true;
+      if(n.targetTime>=now-BOARD_LATE_MS) playBoardAt(ac, perfToCtxTime(ac, n.targetTime));
+    }
+  }catch(e){}
+}
+setInterval(boardSchedulerTick, BOARD_TICK_MS);
+
+// --- settings: settings.sound in the save (older saves get the defaults) ---
+function readLegacySoundOn(){
   try{ return localStorage.getItem('echizenSoba.sound')!=='off'; }catch(e){ return true; }
 }
-function saveSoundPref(on){
-  try{ localStorage.setItem('echizenSoba.sound', on?'on':'off'); }catch(e){}
+function unitVol(v, dflt){ return (typeof v==='number' && isFinite(v)) ? Math.max(0, Math.min(1, v)) : dflt; }
+function sanitizeSoundSettings(raw){
+  var s = isPlainObj(raw) ? raw : {};
+  return {
+    soundOn: typeof s.soundOn==='boolean' ? s.soundOn : readLegacySoundOn(),
+    masterVolume: unitVol(s.masterVolume, SOUND_DEFAULTS.masterVolume),
+    boardVolume: unitVol(s.boardVolume, SOUND_DEFAULTS.boardVolume),
+    judgeVolume: unitVol(s.judgeVolume, SOUND_DEFAULTS.judgeVolume),
+    countIn: typeof s.countIn==='boolean' ? s.countIn : SOUND_DEFAULTS.countIn
+  };
+}
+function loadSoundSettings(){
+  try{ var st = loadStore().settings; return sanitizeSoundSettings(st && st.sound); }
+  catch(e){ return sanitizeSoundSettings(null); }
+}
+function saveSoundSettings(){
+  try{ localStorage.setItem('echizenSoba.sound', sndPrefs.soundOn?'on':'off'); }catch(e){}
   try{
     var store = loadStore();
     var st = isPlainObj(store.settings) ? store.settings : {};
     var snd = isPlainObj(st.sound) ? st.sound : {};
-    snd.soundOn = !!on;
+    for(var k in sndPrefs){ if(Object.prototype.hasOwnProperty.call(sndPrefs,k)) snd[k] = sndPrefs[k]; }
     st.sound = snd;
     store.settings = st;
     saveStoreObj(store);
   }catch(e){}
 }
+// The 🔊 setting: settings.sound.soundOn in the save when it is there, otherwise the older echizenSoba.sound key.
+// Both are written on every change, so either one always gives the same answer.
+function loadSoundPref(){
+  sndPrefs = loadSoundSettings();
+  return sndPrefs.soundOn;
+}
+function saveSoundPref(on){
+  if(!sndPrefs) sndPrefs = loadSoundSettings();
+  sndPrefs.soundOn = !!on;
+  saveSoundSettings();
+  sndApplyVolumes();
+}
 var audioEnabled = loadSoundPref();
 btnSoundToggle.textContent = audioEnabled ? '🔊' : '🔇';
 btnSoundToggle.addEventListener('click', function(){
   audioEnabled = !audioEnabled;
-  btnSoundToggle.textContent = audioEnabled ? '🔊' : '🔇';
   saveSoundPref(audioEnabled);
+  syncSoundButtons();
 });
 
-function playJustSound(){
-  if(!audioEnabled) return;
-  var ctx2 = getAudioCtx();
-  if(!ctx2) return;
-  try{
-    if(ctx2.state==='suspended'){ ctx2.resume(); }
-    var osc = ctx2.createOscillator();
-    var gain = ctx2.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1200, ctx2.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1900, ctx2.currentTime+0.09);
-    gain.gain.setValueAtTime(0.16, ctx2.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime+0.2);
-    osc.connect(gain);
-    gain.connect(ctx2.destination);
-    osc.start();
-    osc.stop(ctx2.currentTime+0.22);
-  }catch(e){}
+// --- the sound block under ホーム「記録と設定」 ---
+var setSoundOn = document.getElementById('set-sound-on');
+var setCountIn = document.getElementById('set-count-in');
+var SOUND_SLIDERS = [
+  {key:'masterVolume', el:document.getElementById('set-vol-master'), out:document.getElementById('set-vol-master-v'), preview:function(){ playJudgeSound('PERFECT', 1); }},
+  {key:'boardVolume',  el:document.getElementById('set-vol-board'),  out:document.getElementById('set-vol-board-v'),  preview:function(){ var ac = sndReady(); if(ac) try{ playBoardAt(ac, ac.currentTime+0.01); }catch(e){} }},
+  {key:'judgeVolume',  el:document.getElementById('set-vol-judge'),  out:document.getElementById('set-vol-judge-v'),  preview:function(){ playJudgeSound('JUST', 1); }}
+];
+function renderSoundSettings(){
+  if(!sndPrefs) return;
+  setSoundOn.checked = !!audioEnabled;
+  setCountIn.checked = !!sndPrefs.countIn;
+  for(var i=0;i<SOUND_SLIDERS.length;i++){
+    var s = SOUND_SLIDERS[i], pct = Math.round(sndPrefs[s.key]*100);
+    s.el.value = pct;
+    s.out.textContent = pct;
+    s.el.disabled = !audioEnabled;
+  }
+  setCountIn.disabled = !audioEnabled;
 }
-function playAromaSound(){
-  if(!audioEnabled) return;
-  var ctx2 = getAudioCtx();
-  if(!ctx2) return;
-  try{
-    if(ctx2.state==='suspended'){ ctx2.resume(); }
-    var osc = ctx2.createOscillator();
-    var gain = ctx2.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(620, ctx2.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(520, ctx2.currentTime+0.12);
-    gain.gain.setValueAtTime(0.09, ctx2.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime+0.16);
-    osc.connect(gain);
-    gain.connect(ctx2.destination);
-    osc.start();
-    osc.stop(ctx2.currentTime+0.18);
-  }catch(e){}
-}
+setSoundOn.addEventListener('change', function(){
+  audioEnabled = setSoundOn.checked;
+  saveSoundPref(audioEnabled);
+  syncSoundButtons();
+});
+setCountIn.addEventListener('change', function(){
+  sndPrefs.countIn = setCountIn.checked;
+  saveSoundSettings();
+  if(sndPrefs.countIn){ var ac = sndReady(); if(ac) try{ playCountInAt(ac, ac.currentTime+0.01); }catch(e){} }
+});
+SOUND_SLIDERS.forEach(function(s){
+  s.el.addEventListener('input', function(){
+    sndPrefs[s.key] = unitVol(Number(s.el.value)/100, SOUND_DEFAULTS[s.key]);
+    s.out.textContent = Math.round(sndPrefs[s.key]*100);
+    sndApplyVolumes();
+  });
+  s.el.addEventListener('change', function(){
+    saveSoundSettings();
+    s.preview();
+  });
+});
 function showAromaPopup(gainDisplay){
   aromaPopupEl.textContent = '+香り '+gainDisplay;
   aromaPopupEl.classList.remove('show');
@@ -3538,11 +3780,9 @@ function showAromaPopup(gainDisplay){
   aromaPopupEl.classList.add('show');
 }
 function playSpiceSound(success){
-  if(!audioEnabled) return;
-  var ctx2 = getAudioCtx();
+  var ctx2 = sndReady();
   if(!ctx2) return;
   try{
-    if(ctx2.state==='suspended'){ ctx2.resume(); }
     var osc = ctx2.createOscillator();
     var gain = ctx2.createGain();
     osc.type = success ? 'sine' : 'sawtooth';
@@ -3556,9 +3796,10 @@ function playSpiceSound(success){
     gain.gain.setValueAtTime(0.13, ctx2.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime+0.2);
     osc.connect(gain);
-    gain.connect(ctx2.destination);
+    gain.connect(sndOut(ctx2, 'sfx'));
     osc.start();
     osc.stop(ctx2.currentTime+0.22);
+    sndTrack(ctx2, osc, gain, ctx2.currentTime+0.22);
   }catch(e){}
 }
 
@@ -3599,12 +3840,13 @@ function registerHit(err){
   state.cutFx.push({t:0, rating: isJust ? 'JUST' : rating});
   state.batch.push({thickness:thickness, points:points, seed:Math.random()});
   showPopup(isJust ? 'JUST!' : rating);
-  if(isJust) playJustSound();
+  playJudgeSound(isJust ? 'JUST' : rating, state.combo);
   equipSfx('cut', isJust);   // 着せ替え: the equipped cutting sound and blade ring (silent when none)
 }
 
 function onMiss(){
   state.combo = 0;
+  playJudgeSound('MISS', 0);
   if(state.styleConf.missPenalty){
     state.score = Math.max(0, state.score - state.styleConf.missPenalty);
   }
@@ -4400,9 +4642,10 @@ function gachaTone(ac, f, at, dur, type, vol, f2){
   gain.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
   gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   osc.connect(gain);
-  gain.connect(ac.destination);
+  gain.connect(sndOut(ac, 'sfx'));
   osc.start(t0);
   osc.stop(t0 + dur + 0.03);
+  sndTrack(ac, osc, gain, t0 + dur + 0.03);
 }
 function playGachaShake(ms){
   if(!audioEnabled) return;
@@ -4436,6 +4679,8 @@ function syncSoundButtons(){
   gachaSoundBtn.textContent = label;
   gachaSoundBtn.setAttribute('aria-pressed', audioEnabled ? 'true' : 'false');
   btnSoundToggle.textContent = label;
+  renderSoundSettings();
+  sndApplyVolumes();
 }
 
 // --- 開封演出: a そば猪口 sealed with washi paper shakes, the seal flies off and the contents burst out.
@@ -5072,9 +5317,10 @@ function sfxNoiseVoice(ac, v, at){
   gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   src.connect(filt);
   filt.connect(gain);
-  gain.connect(ac.destination);
+  gain.connect(sndOut(ac, 'sfx'));
   src.start(t0);
   src.stop(t0 + dur + 0.05);
+  sndTrack(ac, src, gain, t0 + dur + 0.05);
 }
 function playSkinSound(name){
   if(!audioEnabled || typeof name!=='string' || !Object.prototype.hasOwnProperty.call(SKIN_SFX, name)) return;
@@ -6036,6 +6282,7 @@ zukanTitleEquip.addEventListener('click', function(){
 
 // ---------- Update ----------
 function update(dt, now){
+  boardSchedulerTick();   // also from the frame loop, in case the 25ms timer is running late
   if(state.phase==='playing'){
     if(state.roundStage==='intro'){
       if(now>=state.introUntil){
