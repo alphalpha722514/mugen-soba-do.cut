@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>無限そば道・斬 - 越前そば切り本格アクションゲーム</title>
 <meta name="description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム77種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
 <!-- スマホ: ホーム画面に追加したときの見た目（アプリ名・ステータスバー・テーマ色） -->
@@ -148,9 +148,12 @@
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 [hidden]{display:none !important;}
-/* スマホ: ダブルタップでの拡大と引っ張り更新を止め、横向きで文字が勝手に大きくならないように */
-html{touch-action:manipulation;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
-button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+/* スマホ: ダブルタップでの拡大、長押しの文字選択とメニュー、引っ張り更新を止め、横向きで文字が勝手に大きくならないように
+   （iPhone の Safari 向けの仕上げは、スクリプトの「ダブルタップ拡大の防止」） */
+html,body,canvas,button{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;}
+html{overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+/* 文字を入れる欄と、長押しで保存できる結果の画像は、ふつうどおり選択・長押しできる */
+input,textarea,select,.share-preview img{-webkit-user-select:auto;user-select:auto;-webkit-touch-callout:default;}
 body{
   min-height:100vh;min-height:100dvh;
   background-color:var(--bg);
@@ -167,8 +170,10 @@ body{
   display:flex;flex-direction:column;position:relative;
 }
 .screen{display:none;flex:1;flex-direction:column;align-items:center;}
-/* 修行中: 長押しの選択・メニュー、ピンチでの拡大をしない（縦のスクロールだけ残す） */
-#screen-game{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:pan-y;}
+/* 修行中: 長押しの選択・メニュー、ピンチでの拡大をしない（縦のスクロールだけ残す）。切る場所（Canvas）はどのジェスチャーもさせない。
+   pan-y / none が使えないブラウザでは、先に書いた manipulation が残る */
+#screen-game{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;touch-action:pan-y;}
+#game-canvas,.canvas-wrap{touch-action:manipulation;touch-action:none;}
 .screen.active{display:flex;}
 .vh{position:absolute !important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 
@@ -3567,10 +3572,41 @@ document.getElementById('screen-game').addEventListener('pointerdown', function(
   if(state.phase==='serving' && state.serving && state.serving.stage!=='spice' && e.target && e.target.closest && e.target.closest('.sound-toggle')) return;
   onCut();
 });
-// 修行の画面では、長押しのメニュー（画像の保存など）と iPhone のピンチ拡大を出さない
+// 修行の画面では、長押しのメニュー（画像の保存など）を出さない
 document.getElementById('screen-game').addEventListener('contextmenu', function(e){ e.preventDefault(); });
-document.addEventListener('gesturestart', function(e){
-  if(screens.game.classList.contains('active')) e.preventDefault();
+// ---------- ダブルタップ拡大の防止（スマホ） ----------
+// iPhone の Safari は viewport や touch-action だけでは、素早い2回目のタップで画面を拡大することがある。前のタップから
+// DOUBLE_TAP_MS 以内に指を離したら、そのタップのブラウザ標準の動き（拡大）を止める。止めるとそのタップのクリックも
+// 出なくなるので、指がほとんど動いていなければ、触れた要素のクリックをここで代わりに起こす（連打してもボタンが反応する）。
+// 文字を入れる欄は止めない（フォーカスや入力を邪魔しない）。切る操作は pointerdown なので、ここの影響を受けない。
+var DOUBLE_TAP_MS = 300;
+var tapGuard = {lastEnd:0, x:0, y:0, moved:false};
+function isTextEntry(el){ return !!(el && el.closest && el.closest('input, textarea, select, [contenteditable="true"]')); }
+document.addEventListener('touchstart', function(e){
+  var t = e.touches && e.touches[0];
+  tapGuard.moved = !!(e.touches && e.touches.length>1);          // 2本指（ピンチ）はタップとして扱わない
+  if(t){ tapGuard.x = t.clientX; tapGuard.y = t.clientY; }
+}, {passive:true});
+document.addEventListener('touchmove', function(e){
+  var t = e.touches && e.touches[0];
+  if(!t || Math.abs(t.clientX - tapGuard.x)>10 || Math.abs(t.clientY - tapGuard.y)>10) tapGuard.moved = true;
+}, {passive:true});
+document.addEventListener('touchend', function(e){
+  var now = Date.now(), quick = now - tapGuard.lastEnd <= DOUBLE_TAP_MS;
+  tapGuard.lastEnd = now;
+  if(!quick || !e.cancelable || isTextEntry(e.target)) return;
+  e.preventDefault();
+  if(tapGuard.moved || (e.touches && e.touches.length)) return;
+  var el = e.target && e.target.nodeType===1 ? e.target : (e.target && e.target.parentElement);
+  if(!el) return;
+  try{
+    if(typeof el.click==='function') el.click();
+    else el.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true, view:window}));
+  }catch(err){}
+}, {passive:false});
+// ピンチイン・ピンチアウトでの拡大（iPhone の Safari のジェスチャー）
+['gesturestart','gesturechange','gestureend'].forEach(function(type){
+  document.addEventListener(type, function(e){ e.preventDefault(); }, {passive:false});
 });
 window.addEventListener('keydown', function(e){
   if(e.code!=='Space') return;
