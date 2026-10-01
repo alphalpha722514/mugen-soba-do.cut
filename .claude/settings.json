@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/zukan-check.mjs\"",
+            "timeout": 180,
+            "statusMessage": "アイテム図鑑を確認しています"
+          }
+        ]
+      }
+    ]
+  }
+}

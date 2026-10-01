@@ -20,3 +20,8 @@
 - ブラウザで `index.html` を開き、ホーム → 修行開始 → 5杯出してリザルトまで遊べること。
 - ガチャ・図鑑・交換所・着せ替え・遊び方の画面が開けること。
 - ブラウザのコンソールにエラーが出ないこと。
+
+## アイテム図鑑のアーティファクト
+- 「無限そば道・斬　アイテム図鑑」（https://claude.ai/artifact/2Bvaodir3XBDTfTb2XqoN5 ）は、`node tools/zukan/build.mjs` で `index.html` から作る1枚のページ（出力は `tools/zukan/out/item-zukan.html`、コミットしない）。
+- アイテムの内容や絵を変えたら、作り直して同じURLに再公開し（Artifact ツールに `url` を渡す）、`node tools/zukan/build.mjs --mark-published` で `tools/zukan/state.json` を更新してコミットする。
+- `.claude/settings.json` の Stop フックが、図鑑のページが変わったのに再公開されていないときに知らせる。
