@@ -3199,8 +3199,8 @@ function cardFilename(d){
   var t = d.date;
   function two(n){ return (n < 10 ? '0' : '') + n; }
   var score = String(d.score).replace(/[^0-9]/g, '') || '0';
-  if(!isFinite(t.getTime())) return 'echizen-soba-dojo_' + score + '.png';
-  return 'echizen-soba-dojo_' + t.getFullYear() + two(t.getMonth() + 1) + two(t.getDate()) + '_' + score + '.png';
+  if(!isFinite(t.getTime())) return 'mugen-sobamichi-zan_' + score + '.png';
+  return 'mugen-sobamichi-zan_' + t.getFullYear() + two(t.getMonth() + 1) + two(t.getDate()) + '_' + score + '.png';
 }
 
 // --- drawing helpers ---
