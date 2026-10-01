@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>プライバシーポリシー｜無限そば道・斬</title>
+<meta name="description" content="ゲーム「無限そば道・斬」のプライバシーポリシー。集める情報、保存場所、削除のしかたを説明します。" />
+<meta name="robots" content="index,follow" />
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e7e0cd;--card:#fbf7ec;--ink:#2c241a;--ink-soft:#5c5138;--line:#cbbf9f;--accent:#1f3f4a;--link:#1f5f74;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){color-scheme:dark;--bg:#181310;--card:#231c16;--ink:#ece3d0;--ink-soft:#b9ac8e;--line:#4a3f31;--accent:#86bfd2;--link:#86bfd2;}
+}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#181310;--card:#231c16;--ink:#ece3d0;--ink-soft:#b9ac8e;--line:#4a3f31;--accent:#86bfd2;--link:#86bfd2;}
+*{box-sizing:border-box;}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Hiragino Maru Gothic ProN','Yu Gothic Medium','Yu Gothic','Noto Sans JP',sans-serif;line-height:1.8;
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;
+}
+main{
+  max-width:680px;margin:0 auto;
+  padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(32px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+}
+h1{font-size:1.4rem;line-height:1.4;margin:.4em 0 .2em;}
+.sub{margin:0 0 1.2em;color:var(--ink-soft);font-size:.9rem;}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 12px;}
+h2{font-size:1.05rem;margin:0 0 .4em;color:var(--accent);}
+p,ul{margin:.3em 0;font-size:.95rem;}
+ul{padding-left:1.3em;}
+li{margin:.15em 0;}
+a{color:var(--link);overflow-wrap:anywhere;}
+.back{display:inline-block;margin-top:8px;font-weight:700;}
+</style>
+</head>
+<body>
+<main>
+  <h1>プライバシーポリシー</h1>
+  <p class="sub">無限そば道・斬 ～蕎麦切り修行～（以下「本ゲーム」）</p>
+
+  <section>
+    <h2>1. この方針について</h2>
+    <p>本ゲームの作者（個人）は、本ゲームを遊ぶ方の情報を、このページに書いた範囲でだけ扱います。本ゲームは、Web版（ブラウザ）と、それをそのまま表示する Android アプリで同じ内容です。</p>
+  </section>
+
+  <section>
+    <h2>2. 端末の中だけに保存する情報</h2>
+    <p>自己ベスト、称号、図鑑、そば猪口コイン、そば札、着せ替え、名前（表示名）、効果音や演出の設定などのゲームの記録は、お使いの端末のブラウザ（アプリ）の中に保存します。アカウントにログインしない限り、これらが端末の外に送られることはありません。</p>
+  </section>
+
+  <section>
+    <h2>3. アカウントを作ったときに保存する情報（任意）</h2>
+    <p>マイページでアカウントを作ると、端末どうしで記録を同期するために、次の情報をサーバーに保存します。アカウントを作らなくても、本ゲームはすべて遊べます。</p>
+    <ul>
+      <li>ユーザー名（ご自身で決めた3〜16文字の名前）</li>
+      <li>パスワードから作った値（パスワードそのものは保存も送信もしません。端末の中で SHA-256 で変換してから送り、サーバーではさらに塩を加えて PBKDF2 で変換したものだけを保存します）</li>
+      <li>ゲームの記録（上の2. と同じ内容。名前（表示名）を含みます）</li>
+      <li>ログインを続けるための符号（トークン。180日で無効になります）</li>
+    </ul>
+    <p>保存先は、Cloudflare, Inc. のサービス（Cloudflare Workers・Workers KV）です。通信はすべて暗号化（HTTPS）されます。</p>
+  </section>
+
+  <section>
+    <h2>4. 集めない情報</h2>
+    <ul>
+      <li>メールアドレス、本名、電話番号、住所、位置情報、連絡先、写真などは集めません。</li>
+      <li>広告、アクセス解析、広告IDの取得は行っていません。</li>
+      <li>アプリ内課金はありません（ガチャはゲーム内のコインだけで引けます）。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>5. 通信のときに相手のサービスに届く情報</h2>
+    <p>本ゲームを開くと、ページの配信（GitHub Pages・GitHub, Inc.）、文字の表示（Google Fonts・Google LLC）、同期（Cloudflare）のために、各サービスにお使いの端末の IP アドレスやブラウザの種類などが、ふつうのWebの通信と同じように届きます。作者はこれらを使って個人を特定したり追跡したりしません。各サービスでの扱いは、それぞれのプライバシーポリシーに従います。</p>
+  </section>
+
+  <section>
+    <h2>6. 使う目的と、ほかの人への提供</h2>
+    <p>3. の情報は、ログインと、端末どうしの記録の同期のためだけに使います。法令に基づく場合を除き、ほかの人や会社に提供・販売することはありません。</p>
+  </section>
+
+  <section>
+    <h2>7. 削除のしかた</h2>
+    <ul>
+      <li><b>アカウントとクラウドの記録</b>：本ゲームの「マイページ」→「アカウントを削除」で、パスワードを入力すると、サーバーからすぐに削除されます（元に戻せません）。</li>
+      <li><b>端末の記録</b>：ホーム最下部の「記録と設定」→「記録を消す」で戦績を消せます。すべて消すには、ブラウザのサイトデータを削除するか、アプリをアンインストールしてください。</li>
+      <li>パスワードを忘れて削除できない場合は、下のお問い合わせ先からユーザー名を添えてご連絡ください。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>8. お子さまの利用</h2>
+    <p>本ゲームは、個人を特定できる情報を集めません。13歳未満の方がアカウントを作るときは、保護者の方と一緒に行ってください。</p>
+  </section>
+
+  <section>
+    <h2>9. お問い合わせ・改定</h2>
+    <p>お問い合わせは、Google Play のアプリ情報に載っている連絡先、または <a href="https://github.com/alphalpha722514/mugen-soba-do.cut/issues">GitHub の Issues</a> までお願いします。</p>
+    <p>この方針を変えるときは、このページを更新してお知らせします。</p>
+    <p>制定：2026年10月1日</p>
+  </section>
+
+  <a class="back" href="./">← ゲームに戻る</a>
+</main>
+</body>
+</html>

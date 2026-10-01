@@ -1,0 +1,38 @@
+{
+  "name": "無限そば道・斬",
+  "short_name": "そば道・斬",
+  "description": "越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム77種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。",
+  "lang": "ja",
+  "dir": "ltr",
+  "id": "./index.html",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#e7e0cd",
+  "theme_color": "#e7e0cd",
+  "categories": [
+    "games",
+    "entertainment"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

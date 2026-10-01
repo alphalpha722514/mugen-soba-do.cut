@@ -34,40 +34,15 @@
 <meta name="twitter:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム77種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
 <meta name="twitter:image" content="https://alphalpha722514.github.io/mugen-soba-do.cut/og-image.jpg" />
 <script>
-// ホーム画面に追加（PWA）: マニフェストとアイコンをこのページの中で作る（ファイルを増やさない）。
-// http(s) で開いたときだけ。うまく作れない環境では何もしない（ゲームはそのまま遊べる）。
+// ホーム画面に追加（PWA）: manifest.webmanifest と icons/ は tools/pwa/build.mjs で作る。
+// http(s) で開いたときだけマニフェストをつなぐ（file:// で開いたとき、ブラウザがエラーを出さないように）。
 (function(){
   try{
     if(!/^https?:$/.test(location.protocol)) return;
-    var src = document.querySelector('link[rel="icon"]'), img = new Image();
-    if(!src) return;
-    img.onload = function(){
-      try{
-        var icons = [];
-        [192, 512].forEach(function(n){
-          var c = document.createElement('canvas');
-          c.width = c.height = n;
-          var g = c.getContext('2d');
-          g.fillStyle = '#1f3f4a';
-          g.fillRect(0, 0, n, n);
-          g.drawImage(img, 0, 0, n, n);
-          var url = c.toDataURL('image/png');
-          icons.push({src:url, sizes:n + 'x' + n, type:'image/png', purpose:'any'});
-          if(n===512) icons.push({src:url, sizes:'512x512', type:'image/png', purpose:'maskable'});
-        });
-        var start = new URL('./index.html', location.href).href;
-        var manifest = {
-          name:'無限そば道・斬', short_name:'そば道・斬', description:document.querySelector('meta[name="description"]').content,
-          lang:'ja', id:start, start_url:start, scope:new URL('./', location.href).href, display:'standalone',
-          background_color:'#e7e0cd', theme_color:'#e7e0cd', icons:icons
-        };
-        var link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
-        document.head.appendChild(link);
-      }catch(e){}
-    };
-    img.src = src.href;
+    var link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = 'manifest.webmanifest';
+    document.head.appendChild(link);
   }catch(e){}
 })();
 </script>
@@ -1422,11 +1397,12 @@ body{
       <ul class="gpoints">
         <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、描画の細かさ、お客さんの反応の演出。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
-        <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、コインとそば札は多いほう、図鑑・アイテム・称号は両方を合わせたものになります。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。</li>
+        <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、コインとそば札は多いほう、図鑑・アイテム・称号は両方を合わせたものになります。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
         <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。</li>
         <li><b>ガチャと図鑑</b>ホームの「ガチャを引く」で、コインを使って越前・福井にちなんだアイテムを引けます（1回500・10連4,500）。確率はガチャ画面にいつも表示しています（天井はありません）。被ったアイテムは「そば札」に変わり、「交換所」でまだ持っていないアイテムと交換できます。集めたアイテムは「図鑑」で見られ、「着せ替え」で器・麺・包丁・背景・演出の色・効果音・称号を着せ替えられます（見た目と音だけで、得点や判定は変わりません）。</li>
       </ul>
+      <p class="save-note"><a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a></p>
     </section>
 
     <button id="btn-howto-home" class="btn-small guide-back" type="button">ホームへ戻る</button>
@@ -1647,7 +1623,17 @@ body{
         <button id="mp-open-auth" class="btn-small btn-primary" type="button">アカウント作成 / ログイン</button>
         <button id="mp-sync-now" class="btn-small" type="button">今すぐ同期</button>
         <button id="mp-logout" class="btn-small" type="button">ログアウト</button>
+        <button id="mp-delete" class="btn-small btn-danger" type="button">アカウントを削除</button>
       </div>
+      <form id="mp-del-confirm" class="clear-confirm" hidden>
+        <p class="clear-q">クラウドに保存したアカウントと記録を削除します。元に戻せません（この端末の記録はそのまま残ります）。確認のため、パスワードを入力してください。</p>
+        <label for="mp-del-pass" class="mp-label">パスワード</label>
+        <input id="mp-del-pass" class="mp-input" type="password" maxlength="64" autocomplete="current-password">
+        <div class="clear-actions">
+          <button id="mp-del-yes" class="btn-small btn-danger-solid" type="submit">削除する</button>
+          <button id="mp-del-no" class="btn-small" type="button">やめる</button>
+        </div>
+      </form>
       <p id="mp-msg" class="mp-msg" role="status" aria-live="polite"></p>
       <p id="mp-cloud-note" class="mp-note"></p>
     </section>
@@ -10111,10 +10097,21 @@ var MockCloudAdapter = {
       u.updatedAt = Date.now();
       return writeRawLS(MOCK_CLOUD_KEY, JSON.stringify(db)) ? {ok:true, updatedAt:u.updatedAt} : {ok:false, error:'storage'};
     });
+  },
+  remove:function(name, token, hash){
+    var self = this;
+    return this.later(function(){
+      var db = self.read(), u = self.user(db, name, token);
+      if(!u) return {ok:false, error:'session'};
+      if(u.hash!==hash) return {ok:false, error:'auth'};
+      delete db.users[String(name).toLowerCase()];
+      return writeRawLS(MOCK_CLOUD_KEY, JSON.stringify(db)) ? {ok:true} : {ok:false, error:'storage'};
+    });
   }
 };
 // 汎用 REST: POST /register and /login {user, hash} → {ok, user, token}; GET /save → {ok, data, updatedAt};
-// PUT /save {data} → {ok, updatedAt}. The token goes as "Authorization: Bearer …".
+// PUT /save {data} → {ok, updatedAt}; DELETE /account {hash} → {ok} (the account and its save are gone).
+// The token goes as "Authorization: Bearer …".
 var RestAdapter = {
   id:'rest',
   label:'クラウド',
@@ -10137,7 +10134,8 @@ var RestAdapter = {
   register:function(name, hash){ return this.call('/register', 'POST', {user:name, hash:hash}); },
   login:function(name, hash){ return this.call('/login', 'POST', {user:name, hash:hash}); },
   load:function(name, token){ return this.call('/save', 'GET', null, token); },
-  save:function(name, token, data){ return this.call('/save', 'PUT', {data:data}, token); }
+  save:function(name, token, data){ return this.call('/save', 'PUT', {data:data}, token); },
+  remove:function(name, token, hash){ return this.call('/account', 'DELETE', {hash:hash}, token); }
 };
 
 // --- マージ: the better of this device and the cloud ---
@@ -10205,6 +10203,7 @@ var SYNC_ERRORS = {
   offline:'クラウドにつながりませんでした。通信できる状態で、もう一度試してください。',
   storage:'保存できませんでした。ブラウザの保存容量や設定を確かめてください。',
   nologin:'ログインしていません。',
+  notfound:'同期サーバーがこの操作に対応していません（サーバーの更新が必要です）。',
   user:'ユーザー名は3〜16文字の英数字・かな・漢字・_ - で入力してください。',
   pass:'パスワードは6文字以上で入力してください。'
 };
@@ -10249,6 +10248,19 @@ var SyncManager = {
   logout:function(){
     if(this.timer){ clearTimeout(this.timer); this.timer = 0; }
     this.setAccount(null);                        // the save on this device stays as it is
+  },
+  // the account and its cloud save are deleted (the password is asked again); the save on this device stays
+  deleteAccount:function(pass){
+    var self = this, acc = this.account();
+    if(!acc) return Promise.resolve({ok:false, error:'nologin'});
+    if(typeof pass!=='string' || pass.length<6) return Promise.resolve({ok:false, error:'pass'});
+    return passwordHash(acc.user, pass).then(function(hash){
+      return self.adapter.remove(acc.user, acc.token, hash);
+    }).then(function(res){
+      if(!res || !res.ok) return {ok:false, error:(res && res.error) || 'offline'};
+      self.logout();
+      return {ok:true};
+    }, function(){ return {ok:false, error:'offline'}; });
   },
   // a save was written: send it up a moment later (only while logged in; never for the sync's own write)
   request:function(){
@@ -10301,6 +10313,7 @@ var mpEls = {};
 ['mypage-title','btn-mypage-back','mp-avatar','mp-name','mp-name-edit','mp-title-btn','mp-title-name','mp-name-form','mp-name-input',
  'mp-name-cancel','mp-high','mp-total','mp-combo','mp-collect','mp-title-count','mp-title-list','mp-status','mp-sync','mp-auth','mp-user',
  'mp-pass','mp-register','mp-login','mp-auth-cancel','mp-open-auth','mp-sync-now','mp-logout','mp-msg','mp-cloud-note',
+ 'mp-delete','mp-del-confirm','mp-del-pass','mp-del-yes','mp-del-no',
  'tmodal','tm-h','tm-close','tm-now','tm-list','tm-msg'].forEach(function(id){ mpEls[id] = document.getElementById(id); });
 var mypageOpener = null, tmOpener = null, mpTick = 0;
 function openMypage(opener){
@@ -10308,6 +10321,7 @@ function openMypage(opener){
   setMpMsg('');
   mpEls['mp-name-form'].hidden = true;
   mpEls['mp-auth'].hidden = true;
+  mpEls['mp-del-confirm'].hidden = true;
   renderMypage();
   showScreen('mypage');
   focusEl(mpEls['mypage-title']);
@@ -10352,6 +10366,8 @@ function renderMypageAccount(){
   mpEls['mp-open-auth'].hidden = !!acc;
   mpEls['mp-sync-now'].hidden = !acc;
   mpEls['mp-logout'].hidden = !acc;
+  mpEls['mp-delete'].hidden = !acc;
+  if(!acc) mpEls['mp-del-confirm'].hidden = true;
   mpEls['mp-sync-now'].disabled = busy;
   mpEls['mp-register'].disabled = busy;
   mpEls['mp-login'].disabled = busy;
@@ -10424,6 +10440,36 @@ mpEls['mp-logout'].addEventListener('click', function(){
   renderMypage();
   setMpMsg('ログアウトしました。この端末の記録はそのまま残っています。');
   focusEl(mpEls['mp-open-auth']);
+});
+mpEls['mp-delete'].addEventListener('click', function(){
+  mpEls['mp-del-confirm'].hidden = false;
+  mpEls['mp-del-pass'].value = '';
+  setMpMsg('');
+  mpEls['mp-del-pass'].focus();
+});
+mpEls['mp-del-no'].addEventListener('click', function(){
+  mpEls['mp-del-confirm'].hidden = true;
+  mpEls['mp-del-pass'].value = '';
+  focusEl(mpEls['mp-delete']);
+});
+mpEls['mp-del-confirm'].addEventListener('submit', function(e){
+  e.preventDefault();
+  var pass = mpEls['mp-del-pass'].value;
+  mpEls['mp-del-yes'].disabled = true;
+  setMpMsg('アカウントを削除しています…');
+  SyncManager.deleteAccount(pass).then(function(r){
+    mpEls['mp-del-yes'].disabled = false;
+    mpEls['mp-del-pass'].value = '';             // the password is never kept
+    if(r.ok){
+      mpEls['mp-del-confirm'].hidden = true;
+      renderMypage();
+      setMpMsg('アカウントとクラウドの記録を削除しました。この端末の記録はそのまま残っています。');
+      focusEl(mpEls['mp-open-auth']);
+    } else {
+      renderMypageAccount();
+      setMpMsg(syncErrorText(r.error), true);
+    }
+  });
 });
 mpEls['btn-mypage-back'].addEventListener('click', closeMypage);
 
