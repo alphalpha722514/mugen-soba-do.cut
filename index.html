@@ -653,7 +653,7 @@ body{
 /* ---------- そば猪口ガチャ・図鑑 ---------- */
 /* rarity colours: 並 茶 / 上 藍 / 特上 金 / 極み 紫 */
 :root{
-  --r-nami:#74654a;--r-jo:#2f6f86;--r-tokujo:#8a6414;--r-kiwami:#7d3f8f;
+  --r-nami:#66583f;--r-jo:#275f74;--r-tokujo:#775610;--r-kiwami:#7d3f8f;
   --r-nami-bg:rgba(116,101,74,0.09);--r-jo-bg:rgba(47,111,134,0.10);--r-tokujo-bg:rgba(194,154,60,0.16);--r-kiwami-bg:rgba(125,63,143,0.12);
   --sil-filter:grayscale(1) brightness(0);
 }
@@ -1145,7 +1145,7 @@ body{
         <div class="clear-row">
           <button id="btn-clear" class="btn-small btn-danger" type="button">記録を消す</button>
           <div id="clear-confirm" class="clear-confirm" hidden>
-            <p class="clear-q">自己ベスト・限定ベスト・累計スコアなどの戦績・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備・獲得した称号・名前は残ります）。</p>
+            <p class="clear-q">自己ベスト・限定ベスト・累計スコアなどの戦績・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備・獲得した称号・名前は残ります）。ログイン中は、クラウドとほかの端末の戦績も消えます。</p>
             <div class="clear-actions">
               <button id="btn-clear-yes" class="btn-small btn-danger-solid" type="button">消す</button>
               <button id="btn-clear-no" class="btn-small" type="button">やめる</button>
@@ -1350,7 +1350,7 @@ body{
         <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、描画の細かさ、お客さんの反応の演出。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、コインとそば札は多いほう、図鑑・アイテム・称号は両方を合わせたものになります。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。</li>
-        <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前はそのまま）。</li>
+        <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
         <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。</li>
         <li><b>ガチャと図鑑</b>ホームの「ガチャを引く」で、コインを使って越前・福井にちなんだアイテムを引けます（1回500・10連4,500）。確率はガチャ画面にいつも表示しています（天井はありません）。被ったアイテムは「そば札」に変わり、「交換所」でまだ持っていないアイテムと交換できます。集めたアイテムは「図鑑」で見られ、「着せ替え」で器・麺・包丁・背景・演出の色・効果音・称号を着せ替えられます（見た目と音だけで、得点や判定は変わりません）。</li>
       </ul>
@@ -2756,7 +2756,7 @@ function defaultStore(){
   var g = defaultGacha();
   g.titles = ['t_nyumon'];                        // everyone starts as そば入門, wearing it
   g.equippedTitle = g.equipped.title = 't_nyumon';
-  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, daily:null, stats:sanitizeStats(null), lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:g, settings:defaultSettings(), profile:sanitizeProfile(null) };
+  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, daily:null, stats:sanitizeStats(null), lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:g, settings:defaultSettings(), profile:sanitizeProfile(null), recordsClearedAt:0 };
 }
 
 function sanitizeFlatBests(raw){
@@ -2765,6 +2765,7 @@ function sanitizeFlatBests(raw){
     for(var k in raw){
       if(!Object.prototype.hasOwnProperty.call(raw,k)) continue;
       var v = raw[k];
+      if(typeof v==='string' && /^\s*\d+(\.\d+)?\s*$/.test(v)) v = Number(v);   // a number saved as text ("1200")
       if(typeof v==='number' && isFinite(v) && v>=0){ out[k] = v; }
     }
   }
@@ -2777,7 +2778,7 @@ function sanitizeBests(raw){
   if(!raw || typeof raw!=='object' || Array.isArray(raw)) return out;
   var looksFlat = false;
   for(var k in raw){
-    if(Object.prototype.hasOwnProperty.call(raw,k) && typeof raw[k]==='number'){ looksFlat = true; break; }
+    if(Object.prototype.hasOwnProperty.call(raw,k) && (typeof raw[k]==='number' || typeof raw[k]==='string')){ looksFlat = true; break; }
   }
   if(looksFlat){
     var flat = sanitizeFlatBests(raw);
@@ -2857,6 +2858,7 @@ function coerceStore(obj){
   };
   out.settings = withEffectsDefaults(withVisualDefaults(sanitizeSettings(obj.settings)));   // visual / effects get their defaults when missing
   out.profile = sanitizeProfile(obj.profile);
+  out.recordsClearedAt = clampInt(obj.recordsClearedAt, 0, 1e15);   // when 「記録を消す」 was last used while logged in (0: never)
   if(!(typeof obj.schema==='number' && obj.schema>=11)) migrateToTitles(out, obj);   // 段位 → 称号 (schema 10 and before)
   evaluateTitles(out);
   return out;
@@ -2896,6 +2898,7 @@ function loadStore(){
     store = attemptMigration() || defaultStore();
   } else {
     store = safeParseStore(raw);
+    if(!isReadableStore(raw)) writeRawLS(STORE_KEY + '.backup-unreadable', raw);   // its text is kept before the fresh save replaces it
     upgraded = isOlderSchema(raw);
     if(upgraded) backupBeforeUpgrade(raw);
     settingsFilled = lacksSettingDefaults(raw) || lacksGachaDefaults(raw);
@@ -2921,6 +2924,10 @@ function lacksGachaDefaults(raw){
     var g = o.gacha;
     return !isPlainObj(g) || typeof g.tickets!=='number' || !isPlainObj(g.stats) || typeof g.stats.totalPulls!=='number';
   }catch(e){ return false; }
+}
+// A save that cannot be read as an object (broken JSON, null, an array, a bare string …)
+function isReadableStore(raw){
+  try{ return isPlainObj(JSON.parse(raw)); }catch(e){ return false; }
 }
 // A readable save from an older schema is written back once in the current shape (its bests carried over as they are).
 function isOlderSchema(raw){
@@ -2955,6 +2962,8 @@ function clearAllBests(){
   fresh.gacha = keep.gacha;                          // coins, そば札, the 図鑑 and earned 称号 are not play records: they stay
   if(keep.settings) fresh.settings = keep.settings;
   fresh.profile = keep.profile;
+  // logged in: the clear is stamped so the next sync clears the cloud's records too, instead of merging them back
+  fresh.recordsClearedAt = SyncManager.isLoggedIn() ? Date.now() : keep.recordsClearedAt;
   ensureDailyFresh(fresh);
   saveStoreObj(fresh);
   renderBests();
@@ -9921,6 +9930,7 @@ var ACCOUNT_KEY = STORE_KEY + '.account';          // this device's login: {user
 var MOCK_CLOUD_KEY = 'echizenSoba.mockCloud';      // the stand-in cloud (no server is set up)
 var SYNC_CONFIG = {adapter:'rest', endpoint:'https://soba-sync.yfhmbvzk72.workers.dev'};   // Cloudflare Workers + KV ({adapter:'mock', endpoint:''} for the stand-in cloud in this browser)
 var SYNC_DEBOUNCE_MS = 1500;
+var SYNC_TIMEOUT_MS = 15000;                       // a server that does not answer counts as offline after this
 
 // --- SHA-256: Web Crypto when the browser has it, otherwise the same digest worked out in plain JavaScript ---
 function sha256Fallback(text){
@@ -10034,11 +10044,17 @@ var RestAdapter = {
     if(!SYNC_CONFIG.endpoint || typeof fetch!=='function') return Promise.resolve({ok:false, error:'offline'});
     var headers = {'Content-Type':'application/json'};
     if(token) headers.Authorization = 'Bearer ' + token;
-    return fetch(SYNC_CONFIG.endpoint.replace(/\/+$/, '') + path, {method:method, headers:headers, body:body ? JSON.stringify(body) : undefined})
+    var ctrl = null, timer = 0;
+    try{ ctrl = typeof AbortController==='function' ? new AbortController() : null; }catch(e){ ctrl = null; }
+    var late = new Promise(function(res){
+      timer = setTimeout(function(){ if(ctrl){ try{ ctrl.abort(); }catch(e){} } res({ok:false, error:'offline'}); }, SYNC_TIMEOUT_MS);
+    });
+    var req = fetch(SYNC_CONFIG.endpoint.replace(/\/+$/, '') + path, {method:method, headers:headers, body:body ? JSON.stringify(body) : undefined, signal:ctrl ? ctrl.signal : undefined})
       .then(function(r){
         return r.json().then(function(j){ return (r.ok && isPlainObj(j)) ? j : {ok:false, error:(isPlainObj(j) && j.error) || ('http' + r.status)}; },
                              function(){ return {ok:false, error:'http' + r.status}; });
       }, function(){ return {ok:false, error:'offline'}; });
+    return Promise.race([req, late]).then(function(res){ clearTimeout(timer); return res; });
   },
   register:function(name, hash){ return this.call('/register', 'POST', {user:name, hash:hash}); },
   login:function(name, hash){ return this.call('/login', 'POST', {user:name, hash:hash}); },
@@ -10070,13 +10086,21 @@ function mergeStores(localRaw, cloudRaw){
   var L = coerceStore(localRaw);
   if(!isPlainObj(cloudRaw)) return L;
   var C = coerceStore(cloudRaw), out = coerceStore(localRaw), k;
-  out.bests = mergeMaxNested(L.bests, C.bests);
-  out.seasonal = mergeMaxNested(L.seasonal, C.seasonal);
-  out.satisfaction = mergeMaxMap(L.satisfaction, C.satisfaction);
-  for(k in out.stats){ if(Object.prototype.hasOwnProperty.call(out.stats, k)) out.stats[k] = Math.max(L.stats[k], C.stats[k]); }
-  if(L.daily && C.daily && L.daily.date===C.daily.date) out.daily.cleared = L.daily.cleared || C.daily.cleared;
-  else if(C.daily && (!L.daily || C.daily.date>L.daily.date)) out.daily = C.daily;
-  if(!out.lastPlayedSeasonal) out.lastPlayedSeasonal = C.lastPlayedSeasonal;
+  if(L.recordsClearedAt!==C.recordsClearedAt){
+    // 「記録を消す」 was used (while logged in) on one side after the other's last clear: that side's play records
+    // stand as they are, so the cleared records do not come back. Coins, the 図鑑 and titles still merge below.
+    var R = L.recordsClearedAt>C.recordsClearedAt ? L : C;
+    out.bests = R.bests; out.seasonal = R.seasonal; out.satisfaction = R.satisfaction; out.stats = R.stats;
+    out.daily = R.daily; out.lastPlayedSeasonal = R.lastPlayedSeasonal; out.recordsClearedAt = R.recordsClearedAt;
+  } else {
+    out.bests = mergeMaxNested(L.bests, C.bests);
+    out.seasonal = mergeMaxNested(L.seasonal, C.seasonal);
+    out.satisfaction = mergeMaxMap(L.satisfaction, C.satisfaction);
+    for(k in out.stats){ if(Object.prototype.hasOwnProperty.call(out.stats, k)) out.stats[k] = Math.max(L.stats[k], C.stats[k]); }
+    if(L.daily && C.daily && L.daily.date===C.daily.date) out.daily.cleared = L.daily.cleared || C.daily.cleared;
+    else if(C.daily && (!L.daily || C.daily.date>L.daily.date)) out.daily = C.daily;
+    if(!out.lastPlayedSeasonal) out.lastPlayedSeasonal = C.lastPlayedSeasonal;
+  }
   var g = out.gacha, lg = L.gacha, cg = C.gacha;
   g.currency = Math.max(lg.currency, cg.currency);
   g.tickets = Math.max(lg.tickets, cg.tickets);
