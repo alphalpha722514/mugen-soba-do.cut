@@ -23,6 +23,7 @@
 - `main` のリポジトリ直下を GitHub Pages で公開する（公開URL: https://alphalpha722514.github.io/mugen-soba-do.cut/ ）。ゲームは `index.html` だけで動く。
 - `<head>` には SEO・OGP・iOS/Android 用のメタタグと、アイコン（SVG・PNG をデータURIで埋め込み）、マニフェストを作る小さなスクリプトがある。マニフェストは http(s) で開いたときだけ作る。
 - 例外として置いてよい公開用ファイル: `og-image.jpg`（SNS共有カードの画像。ゲームは読まない。`node tools/og/build.mjs` で作り直す）と `.nojekyll`。
+- `googlef4f1cd7b25710dc9.html` は Google Search Console の所有権確認用。消すと確認が外れるので残す。
 - 公開URLを変えたら `canonical`・`og:url`・`og:image`・`twitter:image` を合わせて直す。
 
 ## 変更後の確認
