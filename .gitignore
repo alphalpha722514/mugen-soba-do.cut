@@ -1,0 +1,3 @@
+tools/zukan/out/
+.claude/zukan-cache.json
+.claude/settings.local.json
