@@ -695,7 +695,7 @@ body{
   position:relative;display:grid;place-items:center;flex:0 0 auto;width:100%;aspect-ratio:1/1;overflow:hidden;
   border-radius:10px;background:var(--rbg,var(--muted-fill));border:1px solid color-mix(in srgb,var(--rc,var(--ink-soft)) 45%,transparent);
 }
-.art img{display:block;width:100%;height:100%;object-fit:cover;}
+.art img,.art canvas{display:block;width:100%;height:100%;object-fit:cover;}
 .nseg{display:inline-block;}
 .art-ic{font-size:1.9rem;line-height:1;}
 .art.is-silhouette{background:var(--muted-fill);border:1px dashed var(--line);}
@@ -1079,7 +1079,7 @@ body{
             <button class="btn-small vis-opt" type="button" data-detail="standard" aria-pressed="true">標準</button>
             <button class="btn-small vis-opt" type="button" data-detail="low" aria-pressed="false">軽量</button>
           </div>
-          <p class="save-note">器のそばの見た目です（得点や判定は変わりません）。軽量にすると、そばの粒や香りの湯気を省いて描画を軽くします。</p>
+          <p class="save-note">器のそばと着せ替えの見た目です（得点や判定は変わりません）。軽量にすると、そばの粒や香りの湯気、着せ替えの粒や模様を省いて描画を軽くします。</p>
         </div>
         <div class="vis-row" role="group" aria-labelledby="fx-title">
           <span id="fx-title" class="backup-title">お客さんの反応の演出</span>
@@ -1544,7 +1544,7 @@ body{
 // ---------- 図鑑・ガチャの絵（画像アセット） ----------
 // キーは図鑑アイテムの id です。値に画像の base64 を入れると、その絵が図鑑とガチャに表示されます
 // （"data:image/png;base64,…" の形でも、base64 の中身だけでも可）。
-// 空のまま・読めない値のときは、レア度の色枠とアイコンで代わりに表示します（画面は壊れません）。
+// 空のまま・読めない値のときは、コードで描いた絵（持っていないアイテムはレア度の色枠とアイコン）で代わりに表示します（画面は壊れません）。
 const ART = {
   // 並
   "soba_field": "",
@@ -2075,80 +2075,132 @@ var SKIN_NOTES = {
   tsuchime_blade:'刃に鎚目が入り、JUST!のとき刃が長く澄んで鳴ります。'
 };
 
-// 器: body = the outside of the bowl, inner = the bed under the noodles, rim = the lip line, deco = the wall's pattern
+// ---- 1アイテム＝1パレット ----
+// Every slot has ONE base drawing (or sound) function that takes an item's palette: the 器 drawBowlBase, the 麺
+// noodleLook + drawDoughGrain, the 道具 drawToolBase, the 背景 paintBgBase, the 演出 drawSkinRing + drawCutBits and
+// the 音 playSkinSound. Adding an item to a slot is one palette line below, with no new drawing code. A field left
+// out takes the slot's value in SKIN_DEFAULTS. The palette words shared by the slots:
+//   deco / shape / hamon / scene / light = which pattern, outline or scene of the base function to use
+//   grain = how many grains and specks (0 none, 1 normal), gloss = how strong the shine is (0..1),
+//   density = how close the pattern is (1 normal), ink = the pattern's colours
+// Grains and patterns are drawn once into an offscreen canvas and kept, and settings.visual.detail thins them.
+var SKIN_DEFAULTS = {
+  bowl:  {shape:'bowl', deco:'plain', grain:0, gloss:0, density:1, gold:null, foot:true, unique:false, ink:['#ffffff']},
+  noodle:{speck:null, speckDensity:0.9, speckAlpha:0.6, husk:0, jitter:0.08, crack:0, wet:0, steam:1, doughGrain:0, shine:0.16},
+  tool:  {shape:'kiri', deco:'plain', hamon:'none', gloss:0.5, density:1, collar:null, mei:null},
+  bg:    {light:'noon', fine:false},
+  effect:{shape:'strip', spark:'star', ringStyle:'single', grav:1, spin:1},
+  sound: {icon:'board'},
+  title: {}
+};
+// 器: body = the outside, inner = the bed under the noodles, rim = the lip, deco = the wall's pattern (BOWL_PATTERNS),
+// shape = 'bowl' or 'jar' (BOWL_SHAPES), gold = a fine gold line on the rim, unique = a new pattern each time the page opens
 var SKIN_BOWLS = {
-  unglazed_bowl:            {body:'#a1603a', inner:'#d8c198', rim:'#b8764c', deco:'matte',     ink:['#7f4424','#c98c61']},
-  echizen_lacquer_bowl:     {body:'#7a1c16', inner:'#d3bd93', rim:'#1d1311', deco:'gloss',     ink:['#ffffff']},
-  echizen_ware_bowl:        {body:'#6a4a33', inner:'#cfb98f', rim:'#8a6a4b', deco:'ash',       ink:['#bca77f','#dccba6','#7c8f5a']},
-  wakasa_lacquer_bowl:      {body:'#2a1913', inner:'#d3bd93', rim:'#9b291d', deco:'speckle',   ink:['#efe2b4','#c9a24a','#7c9a63','#f4f0e6','#b8453a']},
-  chinkin_bowl:             {body:'#1c1411', inner:'#d3bd93', rim:'#c9a24a', deco:'chinkin',   ink:['#d8b457']},
-  wakasa_togidashi_bowl:    {body:'#3b1a13', inner:'#d3bd93', rim:'#b8872f', deco:'togidashi', ink:['#a8321f','#6f8f5c','#d8b457','#efe2b4','#1f120d']},
-  makie_chinkin_masterpiece:{body:'#140e0c', inner:'#d3bd93', rim:'#d8b457', deco:'makie',     ink:['#e0bd5c','#f5e2a3']},
-  natural_ash_jar:          {body:'#5b3b25', inner:'#cdb990', rim:'#72814f', deco:'drip',      ink:['#7f9158','#b3c38a']}
+  unglazed_bowl:            {body:'#a1603a', inner:'#d8c198', rim:'#b8764c', deco:'unglazed', grain:1.2, gloss:0, density:1, ink:['#7f4424','#c98c61','#8e5230','#b97a50']},
+  echizen_lacquer_bowl:     {body:'#7a1c16', inner:'#d3bd93', rim:'#1d1311', deco:'lacquer', grain:0, gloss:0.95, density:1, gold:'#c9a24a', ink:['#ffffff']},
+  echizen_ware_bowl:        {body:'#6a4a33', inner:'#cfb98f', rim:'#7d6a48', deco:'ashglaze', grain:1.3, gloss:0.35, density:1, ink:['#8a9a5e','#b5bd88','#4e3826','#35251a']},
+  wakasa_lacquer_bowl:      {body:'#2a1913', inner:'#d3bd93', rim:'#9b291d', deco:'togidashi', grain:1, gloss:0.6, density:1, unique:true, ink:['#9b291d','#c9a24a','#3b5a3a','#5a2a1c','#2a1913'], shell:'#f4f0e6', needle:'#7c9a63'},
+  chinkin_bowl:             {body:'#1c1411', inner:'#d3bd93', rim:'#c9a24a', deco:'chinkin', grain:0, gloss:0.55, density:1, ink:['#b8964a']},
+  wakasa_togidashi_bowl:    {body:'#1b2240', inner:'#d3bd93', rim:'#b8872f', deco:'togidashi', grain:2.2, gloss:0.85, density:1.9, unique:true, gold:'#d8b457', ink:['#1f3a6b','#a8321f','#2b4f8a','#c24a2a','#d8b457','#14213f','#7a1f14'], shell:'#f6f1e4', needle:'#d8b457'},
+  makie_chinkin_masterpiece:{body:'#140e0c', inner:'#d3bd93', rim:'#d8b457', deco:'makie', grain:1.6, gloss:0.85, density:1.4, gold:'#c9a64f', ink:['#e0bd5c','#f5e2a3','#b8964a']},
+  natural_ash_jar:          {body:'#5b3b25', inner:'#cdb990', rim:'#5f6b40', deco:'ashglaze', shape:'jar', grain:1.5, gloss:0.5, density:1.3, ink:['#7f9158','#b3c38a','#4a3220','#2f2014']}
 };
 // 麺: the dough on the lane and the noodles in the bowl (dry and soaked in tsuyu). The strand widths are never
-// touched: a noodle's thickness still shows how well it was cut.
+// touched: a noodle's thickness still shows how well it was cut. speck* = the grains on a strand, husk = flecks of
+// husk, jitter = how uneven the strands are, crack = hairline cracks, wet = a moist second shine, steam = how readily
+// the aroma's steam shows (looks only), doughGrain = the grains on the dough
 var SKIN_NOODLES = {
-  nihachi_noodle:   {dough:'#958d73', doughDark:'#686150', fills:['#a19880','#948c74','#7a735f'], outline:'#373226',
-                     soak:['#553722','#654429','#48301a'], outlineSoak:'#20140b', shine:0.24, speck:null},
-  juwari_noodle:    {dough:'#7e7763', doughDark:'#57513f', fills:['#867d67','#79715c','#5f5947'], outline:'#2d291f',
-                     soak:['#472d1b','#583a24','#3c2615'], outlineSoak:'#1c1209', shine:0.14, speck:'rgba(52,44,32,0.6)'},
-  inaka_noodle:     {dough:'#5e5646', doughDark:'#3a3429', fills:['#615847','#574e3f','#453d31'], outline:'#211c15',
-                     soak:['#3a2616','#4a321e','#2f1d10'], outlineSoak:'#150d06', shine:0.1, speck:'rgba(18,12,7,0.85)'},
-  hikigurumi_noodle:{dough:'#6d6553', doughDark:'#474134', fills:['#71685a','#665e4e','#50493c'], outline:'#28231a',
-                     soak:['#402a19','#513622','#352213'], outlineSoak:'#190f07', shine:0.12, speck:'rgba(24,17,10,0.9)'},
-  shinsoba_noodle:  {dough:'#8a8f67', doughDark:'#5f6446', fills:['#8b9268','#7c865e','#5f6a48'], outline:'#303423',
-                     soak:['#4b3b1d','#5b4926','#403117'], outlineSoak:'#1d160a', shine:0.22, speck:null}
+  nihachi_noodle:   {dough:'#a8946f', doughDark:'#76664c', fills:['#a48d66','#98825d','#7f6c4d'], outline:'#3d3324',
+                     soak:['#6e4f30','#7b5a37','#5d4228'], outlineSoak:'#22150b', shine:0.28, speck:'rgba(74,58,36,0.5)', speckDensity:0.3, speckAlpha:0.3, jitter:0.03, doughGrain:0.35},
+  juwari_noodle:    {dough:'#7e6a4c', doughDark:'#54462f', fills:['#7a6648','#6f5c40','#5a4a33'], outline:'#2b2318',
+                     soak:['#4a301d','#5a3c25','#3e2716'], outlineSoak:'#1c1209', shine:0.14, speck:'rgba(40,30,18,0.75)', speckDensity:1.3, speckAlpha:0.55, husk:0.06, jitter:0.1, crack:0.9, doughGrain:1.1},
+  inaka_noodle:     {dough:'#5c5244', doughDark:'#382f25', fills:['#5a4f40','#4f4537','#3e362b'], outline:'#1f1a13',
+                     soak:['#3a2616','#4a321e','#2f1d10'], outlineSoak:'#150d06', shine:0.1, speck:'rgba(16,11,6,0.85)', speckDensity:1.1, speckAlpha:0.6, husk:0.3, jitter:0.32, crack:0.2, doughGrain:1.2},
+  hikigurumi_noodle:{dough:'#6a5c47', doughDark:'#463b2d', fills:['#665844','#5b4e3c','#4a3f30'], outline:'#251f16',
+                     soak:['#402a19','#513622','#352213'], outlineSoak:'#190f07', shine:0.12, speck:'rgba(22,15,8,0.9)', speckDensity:2, speckAlpha:0.62, husk:0.4, jitter:0.14, steam:1.8, doughGrain:1.8},
+  shinsoba_noodle:  {dough:'#959c74', doughDark:'#666d4f', fills:['#97a27a','#88946c','#6c7855'], outline:'#2f3422',
+                     soak:['#55472a','#64532f','#483b22'], outlineSoak:'#1d160a', shine:0.34, speck:'rgba(60,72,40,0.45)', speckDensity:0.4, speckAlpha:0.3, jitter:0.05, wet:1, doughGrain:0.4}
 };
-// 道具: the knife over the komaita, and the sound its blade makes on a JUST!
+// 道具: the knife over the komaita, and the sound its blade makes on a JUST!. blade = 地鉄 (the iron body),
+// hagane = the hard steel along the edge, hamon = the temper line ('wave' | 'straight' | 'fine'), shape = 'kiri' | 'sickle'
 var SKIN_TOOLS = {
-  echizen_knife: {blade:'#e2e7e9', edge:'#66747a', handle:'#5b3a22', band:'#c8b28a', deco:'hamon',    just:'bladeChin'},
-  echizen_sickle:{blade:'#cbd2d0', edge:'#56615f', handle:'#7a5634', band:'#3b2a1a', deco:'sickle',   just:'bladeSwish'},
-  tsuchime_blade:{blade:'#c4ccd0', edge:'#4f5a5f', handle:'#231811', band:'#c9a24a', deco:'tsuchime', just:'bladeRing'}
+  echizen_knife: {blade:'#c3cacd', hagane:'#eef2f3', edge:'#5e6c72', handle:'#5b3a22', band:'#c8b28a', shape:'kiri', deco:'jigane', hamon:'wave', gloss:0.85, mei:'#7a2f22', just:'bladeChin'},
+  echizen_sickle:{blade:'#b9c1bf', hagane:'#e6ebea', edge:'#56615f', handle:'#7a5634', band:'#3b2a1a', shape:'sickle', deco:'jigane', hamon:'straight', gloss:0.6, collar:'#9a8a66', just:'bladeSwish'},
+  tsuchime_blade:{blade:'#98a3a8', hagane:'#edf1f2', edge:'#46525a', handle:'#231811', band:'#c9a24a', shape:'kiri', deco:'tsuchime', hamon:'fine', gloss:1, density:1.3, just:'bladeRing'}
 };
-// 背景: a scene drawn in code (used whenever ART has no picture for the item)
+// 背景: a scene drawn in code (BG_SCENES; used whenever ART has no picture for the item) and the light of its hour
 var SKIN_BGS = {
-  soba_field:{scene:'field'}, washi_noren:{scene:'noren'}, echizen_tansu:{scene:'tansu'}, maruoka_castle:{scene:'castle'},
-  yokokan_garden:{scene:'garden'}, echizen_cape:{scene:'cape'}, ichijodani_ruins:{scene:'ruins'}, eiheiji_temple:{scene:'temple'},
-  dinosaur_museum:{scene:'museum'}, eastern_cliff:{scene:'cliff'}, master_tansu:{scene:'tansu', fine:true}
+  soba_field:{scene:'field', light:'morning'}, washi_noren:{scene:'noren', light:'interior'}, echizen_tansu:{scene:'tansu', light:'interior'},
+  maruoka_castle:{scene:'castle', light:'morning'}, yokokan_garden:{scene:'garden', light:'noon'}, echizen_cape:{scene:'cape', light:'noon'},
+  ichijodani_ruins:{scene:'ruins', light:'mist'}, eiheiji_temple:{scene:'temple', light:'mist'}, dinosaur_museum:{scene:'museum', light:'noon'},
+  eastern_cliff:{scene:'cliff', light:'evening'}, master_tansu:{scene:'tansu', light:'interior', fine:true}
 };
-// 演出: the colours of the ring and the confetti when a cut lands (ring / JUST! ring / confetti), and of the
-// sparkles (just) and confetti (bits) when a customer is pleased after a bowl is served
+// 演出: the colours of the ring and the bits when a cut lands (ring / JUST! ring / bits), and of the sparkles and
+// bits when a customer is pleased after a bowl is served. shape = the bits (BIT_SHAPES), spark = 'star' | 'glint',
+// ringStyle = 'single' | 'double' | 'brush' | 'soft' | 'dots', grav / spin = how the bits fall and turn
 var SKIN_EFFECTS = {
-  washi_chopstick_sleeve:{ring:'#b3452e', just:'#e9d6a8', bits:['#f7f1e3','#e6d8b8','#b3452e']},
-  extra_negi:            {ring:'#4f8f2f', just:'#a9d65f', bits:['#6fae3f','#a5d364','#e3f1c4']},
-  extra_katsuobushi:     {ring:'#b86f58', just:'#f0b8a0', bits:['#e7b19c','#f5dccf','#c9866d']},
-  habutae_mochi:         {ring:'#efe7d4', just:'#ffffff', bits:['#fffdf7','#e9dcc0','#b89a64']},
-  mizu_yokan:            {ring:'#7a3328', just:'#c0685a', bits:['#6e2d24','#98493b','#cf8f7e']},
-  satsukigase:           {ring:'#b98646', just:'#f0cd86', bits:['#c99456','#e6c485','#8c5b2c']},
-  crab_chopstick_rest:   {ring:'#d24a2a', just:'#ffd54a', bits:['#e0603a','#f39a6b','#ffd54a']},
-  agate_chopstick_rest:  {ring:'#b83a33', just:'#f5a67b', bits:['#d4524c','#ef9b76','#f8d9c6']},
-  wakasa_chopsticks:     {ring:'#9b291d', just:'#e8c46a', bits:['#b8872f','#6f8f5c','#9b291d','#e8c46a']}
+  washi_chopstick_sleeve:{ring:'#b3452e', just:'#e9d6a8', bits:['#f7f1e3','#e6d8b8','#b3452e','#f2e6c8'], shape:'washi', spark:'star', ringStyle:'brush', grav:0.6, spin:0.7},
+  extra_negi:            {ring:'#4f8f2f', just:'#a9d65f', bits:['#4f9a31','#72b44a','#a8d27b'], shape:'negi', spark:'star', ringStyle:'single', grav:1.2, spin:1.2},
+  extra_katsuobushi:     {ring:'#b86f58', just:'#f0b8a0', bits:['#efd1bb','#e5bea1','#f5e2d0','#dcae90'], shape:'flake', spark:'star', ringStyle:'soft', grav:0.45, spin:1.6},
+  habutae_mochi:         {ring:'#d9cba8', just:'#ffffff', bits:['#fffdf7','#f4ecda','#e9dcc0'], shape:'mochi', spark:'glint', ringStyle:'soft', grav:0.8, spin:0.5},
+  mizu_yokan:            {ring:'#7a3328', just:'#c0685a', bits:['#5e241c','#7a3328','#98493b'], shape:'cube', spark:'star', ringStyle:'single', grav:1.3, spin:0.8},
+  satsukigase:           {ring:'#b98646', just:'#f0cd86', bits:['#c99456','#e6c485','#a8743c'], shape:'peanut', spark:'star', ringStyle:'dots', grav:1.1, spin:1},
+  crab_chopstick_rest:   {ring:'#d24a2a', just:'#ffd54a', bits:['#e0603a','#d24a2a','#f39a6b'], shape:'crab', spark:'star', ringStyle:'double', grav:1, spin:0.9},
+  agate_chopstick_rest:  {ring:'#b83a33', just:'#f5a67b', bits:['#d4524c','#ef9b76','#f8d9c6','#b83a33'], shape:'gem', spark:'glint', ringStyle:'double', grav:1, spin:1.1},
+  wakasa_chopsticks:     {ring:'#9b291d', just:'#e8c46a', bits:['#9b291d','#2a1913','#b8872f','#6f8f5c'], shape:'stick', spark:'glint', ringStyle:'brush', grav:0.9, spin:1.4}
 };
 // 音: which game moments get which sound (cut = every successful cut, just = a JUST!, round = each bowl begins,
-// serve = the customer eats). The sounds themselves are recipes in SKIN_SFX.
+// serve = the customer eats). The sounds themselves are recipes in SKIN_SFX; icon = the picture in the 図鑑.
 var SKIN_SOUNDS = {
-  wooden_board:        {cut:'woodKnock'},
-  knife_board_sound:   {cut:'boardTon'},
-  forging_hammer_sound:{cut:'hammerKan', just:'hammerKiin'},
-  millstone_sound:     {round:'millstone'},
-  slurp_sound:         {serve:'slurp'}
+  wooden_board:        {cut:'woodKnock', icon:'board'},
+  knife_board_sound:   {cut:'boardTon', icon:'knife'},
+  forging_hammer_sound:{cut:'hammerKan', just:'hammerKiin', icon:'hammer'},
+  millstone_sound:     {round:'millstone', icon:'millstone'},
+  slurp_sound:         {serve:'slurp', icon:'choko'}
 };
 // 称号: the item title; the 図鑑 completion title (GACHA_TITLES) can be equipped in the same slot
 var SKIN_TITLES = {soba_hitosuji_noren:{}};
 var SKIN_TABLES = {bowl:SKIN_BOWLS, noodle:SKIN_NOODLES, tool:SKIN_TOOLS, bg:SKIN_BGS, effect:SKIN_EFFECTS, sound:SKIN_SOUNDS, title:SKIN_TITLES};
-// Synthesized sounds (no audio files): tones through the game's own oscillator helper, plus filtered noise.
+// Synthesized sounds (no audio files): tones (sine/triangle partials with their own attack and decay) plus
+// band-limited noise. Each recipe is a list of voices: {t:'tone', wave, f, f2 (glide), dur, vol, at, atk} or
+// {t:'noise', filter, f, f2 (sweep), q, dur, vol, at, atk, trem (a rolling rumble)}.
+//   木のまな板 = low and dull (a woody body and a soft knock)   包丁とまな板 = a bright tick of steel, then the board
+//   槌音 = ringing metal with inharmonic partials              石臼 = a long low rumble with grit in it
+//   すする = two rising sweeps of air and a small gulp
 var SKIN_SFX = {
-  woodKnock: [{t:'tone', wave:'sine', f:190, f2:115, dur:0.11, vol:0.2}, {t:'noise', filter:'bandpass', f:1800, q:3, dur:0.03, vol:0.06}],
-  boardTon:  [{t:'noise', filter:'bandpass', f:3200, q:2.5, dur:0.045, vol:0.09}, {t:'tone', wave:'triangle', f:330, f2:210, dur:0.08, vol:0.11}],
-  hammerKan: [{t:'tone', wave:'triangle', f:1250, dur:0.2, vol:0.05}, {t:'tone', wave:'triangle', f:1873, dur:0.16, vol:0.035}, {t:'noise', filter:'highpass', f:3000, dur:0.02, vol:0.05}],
-  hammerKiin:[{t:'tone', wave:'sine', f:2093, dur:0.5, vol:0.045}, {t:'tone', wave:'sine', f:3170, dur:0.35, vol:0.025}, {t:'noise', filter:'highpass', f:3500, dur:0.025, vol:0.06}],
-  millstone: [{t:'noise', filter:'lowpass', f:260, dur:0.95, vol:0.22, trem:7}, {t:'tone', wave:'sine', f:62, dur:0.9, vol:0.08}],
-  slurp:     [{t:'noise', filter:'bandpass', f:900, f2:2600, q:4, dur:0.22, vol:0.14}, {t:'noise', filter:'bandpass', f:1100, f2:3000, q:4, dur:0.24, vol:0.12, at:0.26}],
-  bladeChin: [{t:'tone', wave:'sine', f:2637, dur:0.12, vol:0.05}],
-  bladeSwish:[{t:'noise', filter:'bandpass', f:5000, f2:1800, q:1.5, dur:0.16, vol:0.07}],
-  bladeRing: [{t:'tone', wave:'sine', f:1760, dur:0.55, vol:0.035}, {t:'tone', wave:'sine', f:2653, dur:0.4, vol:0.02}]
+  woodKnock: [{t:'tone', wave:'sine', f:200, f2:118, dur:0.16, vol:0.2, atk:0.003}, {t:'tone', wave:'sine', f:470, f2:300, dur:0.05, vol:0.06, atk:0.002},
+              {t:'tone', wave:'triangle', f:96, dur:0.1, vol:0.07, atk:0.004}, {t:'noise', filter:'bandpass', f:1100, q:2.2, dur:0.03, vol:0.07, atk:0.001},
+              {t:'noise', filter:'lowpass', f:500, dur:0.07, vol:0.05, atk:0.002}],
+  boardTon:  [{t:'noise', filter:'highpass', f:5200, dur:0.018, vol:0.07, atk:0.0008}, {t:'tone', wave:'sine', f:3950, dur:0.04, vol:0.022, atk:0.001},
+              {t:'noise', filter:'bandpass', f:2400, q:5, dur:0.045, vol:0.08, atk:0.001}, {t:'tone', wave:'triangle', f:340, f2:220, dur:0.085, vol:0.11, atk:0.002},
+              {t:'tone', wave:'sine', f:150, dur:0.06, vol:0.06, atk:0.002}],
+  hammerKan: [{t:'noise', filter:'highpass', f:3000, dur:0.016, vol:0.08, atk:0.0008}, {t:'tone', wave:'sine', f:140, f2:90, dur:0.07, vol:0.09, atk:0.002},
+              {t:'tone', wave:'triangle', f:1250, dur:0.34, vol:0.05, atk:0.001}, {t:'tone', wave:'sine', f:1873, dur:0.26, vol:0.035, atk:0.001},
+              {t:'tone', wave:'sine', f:2740, dur:0.18, vol:0.022, atk:0.001}, {t:'tone', wave:'sine', f:3720, dur:0.11, vol:0.014, atk:0.001}],
+  hammerKiin:[{t:'noise', filter:'highpass', f:3500, dur:0.022, vol:0.07, atk:0.001}, {t:'tone', wave:'sine', f:2093, dur:0.85, vol:0.045, atk:0.001},
+              {t:'tone', wave:'sine', f:2099, dur:0.85, vol:0.02, atk:0.001}, {t:'tone', wave:'sine', f:3170, dur:0.6, vol:0.026, atk:0.001},
+              {t:'tone', wave:'sine', f:4410, dur:0.38, vol:0.015, atk:0.001}],
+  millstone: [{t:'noise', filter:'lowpass', f:240, dur:1.15, vol:0.22, trem:6, atk:0.12}, {t:'noise', filter:'bandpass', f:130, q:1.4, dur:1.1, vol:0.12, trem:3, atk:0.1},
+              {t:'noise', filter:'bandpass', f:1500, q:3, dur:1.05, vol:0.025, trem:11, atk:0.1}, {t:'tone', wave:'sine', f:58, dur:1.05, vol:0.08, atk:0.1},
+              {t:'tone', wave:'sine', f:87, dur:0.95, vol:0.035, atk:0.12}],
+  slurp:     [{t:'noise', filter:'bandpass', f:700, f2:2700, q:5, dur:0.2, vol:0.13, atk:0.03}, {t:'noise', filter:'bandpass', f:900, f2:3200, q:5.5, dur:0.24, vol:0.12, at:0.25, atk:0.03},
+              {t:'noise', filter:'highpass', f:4200, dur:0.12, vol:0.025, at:0.27, atk:0.04}, {t:'tone', wave:'sine', f:320, f2:620, dur:0.16, vol:0.025, at:0.27, atk:0.03},
+              {t:'noise', filter:'lowpass', f:600, dur:0.08, vol:0.05, at:0.52, atk:0.005}],
+  bladeChin: [{t:'noise', filter:'highpass', f:6000, dur:0.012, vol:0.04, atk:0.0008}, {t:'tone', wave:'sine', f:2637, dur:0.18, vol:0.05, atk:0.001},
+              {t:'tone', wave:'sine', f:3956, dur:0.1, vol:0.02, atk:0.001}],
+  bladeSwish:[{t:'noise', filter:'bandpass', f:5200, f2:1600, q:1.4, dur:0.17, vol:0.07, atk:0.03}, {t:'noise', filter:'highpass', f:7000, dur:0.09, vol:0.02, atk:0.02}],
+  bladeRing: [{t:'tone', wave:'sine', f:1760, dur:0.75, vol:0.035, atk:0.001}, {t:'tone', wave:'sine', f:1764, dur:0.75, vol:0.015, atk:0.001},
+              {t:'tone', wave:'sine', f:2653, dur:0.5, vol:0.02, atk:0.001}, {t:'tone', wave:'sine', f:3520, dur:0.3, vol:0.012, atk:0.001}]
 };
+// One item's look: the slot's defaults, then its palette line (null when the id has no palette in that slot)
+function skinLook(slot, id){
+  var table = SKIN_TABLES[slot];
+  if(!table || !Object.prototype.hasOwnProperty.call(table, id)) return null;
+  var look = {id:id}, def = SKIN_DEFAULTS[slot] || {}, src = table[id], k;
+  for(k in def){ if(Object.prototype.hasOwnProperty.call(def, k)) look[k] = def[k]; }
+  for(k in src){ if(Object.prototype.hasOwnProperty.call(src, k)) look[k] = src[k]; }
+  return look;
+}
 
 // store.gacha. A save without it (or without tickets / stats) gets these defaults; nothing else is touched.
 function defaultGacha(){
@@ -3712,6 +3764,7 @@ function startGame(tierKey, modeId){
   resetServeShow();
   state.skin = resolveSkin();   // 着せ替え: the equipped look and sound for this game (anything invalid = the original)
   skinFailed = {};
+  prewarmSkin();
   state.mode = mode;
   state.tier = tierKey || 'regular';
   state.character = CHARACTERS[state.tier] || (mode==='hana' && SEASON_CHARACTERS[state.tier]) || CHARACTERS.regular;
@@ -4601,7 +4654,8 @@ function fillItemName(el, item){
 function appendText(el, text){ el.appendChild(document.createTextNode(text)); }
 function appendBold(el, text){ var b = document.createElement('b'); b.textContent = text; el.appendChild(b); }
 
-// --- pictures: ART (top of the script) when it holds a usable base64 image, otherwise an icon in a rarity frame ---
+// --- pictures: ART (top of the script) when it holds a usable base64 image; otherwise the item drawn in code
+// (itemThumb); and if that cannot be drawn, or for an item not owned yet (a silhouette), an icon in a rarity frame ---
 function gachaArtSrc(id){
   var v = '';
   try{ v = (typeof ART!=='undefined' && ART && typeof ART[id]==='string') ? ART[id].trim() : ''; }catch(e){ v = ''; }
@@ -4625,17 +4679,35 @@ function makeArt(item, owned){
     ic.textContent = Object.prototype.hasOwnProperty.call(GACHA_ICONS, item.id) ? GACHA_ICONS[item.id] : '🥢';
     box.appendChild(ic);
   }
+  function drawn(){
+    if(!owned) return false;
+    try{
+      var pic = itemThumb(item);
+      if(!pic) return false;
+      var cv = document.createElement('canvas');
+      cv.width = pic.width;
+      cv.height = pic.height;
+      var g = cv.getContext('2d');
+      if(!g) return false;
+      g.drawImage(pic, 0, 0);
+      box.textContent = '';
+      box.classList.remove('is-fallback');
+      box.appendChild(cv);
+      return true;
+    }catch(e){ return false; }
+  }
+  function noPicture(){ if(!drawn()) fallback(); }
   var src = gachaArtSrc(item.id);
-  if(!src){ fallback(); return box; }
+  if(!src){ noPicture(); return box; }
   try{
     var img = document.createElement('img');
     img.alt = '';
     img.decoding = 'async';
     img.draggable = false;
-    img.addEventListener('error', fallback);   // a broken image turns into the stand-in, never an error
+    img.addEventListener('error', noPicture);   // a broken image turns into the drawn picture (or the stand-in), never an error
     img.src = src;
     box.appendChild(img);
-  }catch(e){ fallback(); }
+  }catch(e){ noPicture(); }
   return box;
 }
 
@@ -5531,11 +5603,8 @@ function resolveSkin(){
       var slot = GACHA_SLOTS[i], id = g.equipped[slot];
       if(!equipAllowed(g, slot, id)) continue;
       if(slot==='title'){ out.title = {id:id, name:titleDisplayName(id)}; continue; }
-      var table = SKIN_TABLES[slot];
-      if(!table || !Object.prototype.hasOwnProperty.call(table, id)) continue;
-      var look = {id:id}, src = table[id];
-      for(var k in src){ if(Object.prototype.hasOwnProperty.call(src, k)) look[k] = src[k]; }
-      out[slot] = look;
+      var look = skinLook(slot, id);
+      if(look) out[slot] = look;
     }
   }catch(e){
     out = {bowl:null, noodle:null, tool:null, bg:null, effect:null, sound:null, title:null};
@@ -5562,7 +5631,7 @@ function setEquipped(slot, id){
   return {ok:true};
 }
 
-// --- ① 音: the game's WebAudio module (getAudioCtx, and gachaTone for tones) plus filtered noise; silent while 🔇 ---
+// --- ① 音: the game's WebAudio module (getAudioCtx) with tones and filtered noise from SKIN_SFX; silent while 🔇 ---
 var sfxNoise = null;
 function sfxNoiseBuffer(ac){
   if(sfxNoise && sfxNoise.sampleRate===ac.sampleRate) return sfxNoise;
@@ -5584,7 +5653,7 @@ function sfxNoiseVoice(ac, v, at){
   if(v.q) filt.Q.setValueAtTime(v.q, t0);
   var gain = ac.createGain();
   gain.gain.setValueAtTime(0.0001, t0);
-  gain.gain.exponentialRampToValueAtTime(v.vol, t0 + Math.min(0.02, dur*0.3));
+  gain.gain.exponentialRampToValueAtTime(v.vol, t0 + Math.min(typeof v.atk==='number' ? v.atk : 0.02, dur*0.3));
   if(v.trem){                                       // the millstone's rumble swells and fades as it turns
     var steps = Math.max(2, Math.floor(dur * v.trem * 2));
     for(var k=1;k<steps;k++) gain.gain.linearRampToValueAtTime(v.vol * (k%2 ? 0.4 : 1), t0 + dur*k/steps);
@@ -5596,6 +5665,21 @@ function sfxNoiseVoice(ac, v, at){
   src.start(t0);
   src.stop(t0 + dur + 0.05);
 }
+// a tone with its own attack (a struck board or metal starts at once; a rumble swells in) and a decay to silence
+function sfxToneVoice(ac, v, at){
+  var t0 = ac.currentTime + at, dur = v.dur, atk = Math.max(0.0005, Math.min(typeof v.atk==='number' ? v.atk : 0.012, dur*0.4));
+  var osc = ac.createOscillator(), gain = ac.createGain();
+  osc.type = v.wave || 'sine';
+  osc.frequency.setValueAtTime(v.f, t0);
+  if(v.f2) osc.frequency.exponentialRampToValueAtTime(v.f2, t0 + dur*0.8);
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(v.vol, t0 + atk);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain);
+  gain.connect(ac.destination);
+  osc.start(t0);
+  osc.stop(t0 + dur + 0.03);
+}
 function playSkinSound(name){
   if(!audioEnabled || typeof name!=='string' || !Object.prototype.hasOwnProperty.call(SKIN_SFX, name)) return;
   var ac = getAudioCtx();
@@ -5605,7 +5689,7 @@ function playSkinSound(name){
     var voices = SKIN_SFX[name];
     for(var i=0;i<voices.length;i++){
       var v = voices[i], at = v.at || 0;
-      if(v.t==='tone') gachaTone(ac, v.f, at, v.dur, v.wave, v.vol, v.f2);
+      if(v.t==='tone') sfxToneVoice(ac, v, at);
       else sfxNoiseVoice(ac, v, at);
     }
   }catch(e){}
@@ -5636,240 +5720,864 @@ function refreshSoundPref(){
   try{ audioEnabled = loadSoundPref(); syncSoundButtons(); }catch(e){}
 }
 
-// --- ③ 器: the bowl under the noodles. With nothing equipped it draws exactly the original two ellipses. ---
-function drawServingBowl(cx, cy){
-  var b = skinPart('bowl');
-  ctx.fillStyle = b ? b.body : '#3a2a1c';
-  ctx.beginPath();
-  ctx.ellipse(cx, cy+40, 110, 34, 0, 0, Math.PI*2);
-  ctx.fill();
-  if(b) guardedSkinDraw('bowl', function(){ drawBowlWall(cx, cy, b); });
-  ctx.fillStyle = b ? b.inner : '#cdba90';
-  ctx.beginPath();
-  ctx.ellipse(cx, cy+32, 100, 26, 0, 0, Math.PI*2);
-  ctx.fill();
-  if(b) guardedSkinDraw('bowl', function(){ drawBowlRim(cx, cy, b); });
-}
-function drawBowlWall(cx, cy, b){
-  ctx.beginPath();
-  ctx.ellipse(cx, cy+40, 110, 34, 0, 0, Math.PI*2);
-  ctx.clip();
-  var shade = ctx.createLinearGradient(cx-110, 0, cx+110, 0);
-  shade.addColorStop(0, 'rgba(255,255,255,0.14)');
-  shade.addColorStop(0.5, 'rgba(255,255,255,0)');
-  shade.addColorStop(1, 'rgba(0,0,0,0.25)');
-  ctx.fillStyle = shade;
-  ctx.fillRect(cx-112, cy+4, 224, 74);
-  if(Object.prototype.hasOwnProperty.call(BOWL_DECOS, b.deco)) BOWL_DECOS[b.deco](cx, cy, b);
-}
-function drawBowlRim(cx, cy, b){
-  ctx.strokeStyle = b.rim;
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.ellipse(cx, cy+32, 100, 26, 0, 0, Math.PI*2);
-  ctx.stroke();
-}
+// --- 着せ替えの絵: shared pieces. Grains and patterns are drawn once into an offscreen canvas (a sprite) and kept,
+// so a frame only copies it; settings.visual.detail (高・標準・軽量) thins the grains and patterns of a new sprite. ---
+var SKIN_SESSION_SEED = (Math.floor(Math.random()*4294967295) >>> 0) || 1;   // 若狭塗: a new pattern each time the page opens
+var SKIN_DETAIL_Q = {high:{grain:1.4, pattern:1.15}, standard:{grain:1, pattern:1}, low:{grain:0.3, pattern:0.55}};
+function skinQ(){ return SKIN_DETAIL_Q[visualDetail] || SKIN_DETAIL_Q.standard; }
+function skinNum(v, d){ return (typeof v==='number' && isFinite(v)) ? v : d; }
 function hashStr(str){
   var h = 2166136261;
   for(var i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
   return h;
 }
-// fixed points on the visible outer wall (inside the bowl, outside the soup), relative to (cx, cy)
-var bowlWallCache = {};
-function bowlWallPoints(key, n){
-  if(bowlWallCache[key]) return bowlWallCache[key];
-  var pts = [], rnd = cardRng(hashStr(key)), tries = 0;
-  while(pts.length<n && tries<n*60){
-    tries++;
-    var x = (rnd()*2 - 1)*110, y = 6 + rnd()*68;
-    var ox = x/110, oy = (y - 40)/34, ix = x/100, iy = (y - 32)/26;
-    if(ox*ox + oy*oy > 0.97) continue;               // keep clear of the outline
-    if(ix*ix + iy*iy < 1.03) continue;               // hidden under the soup
-    pts.push({x:x, y:y, r:rnd(), c:rnd()});
-  }
-  bowlWallCache[key] = pts;
-  return pts;
+function rgbaHex(hex, a){
+  var c = hexRgb(hex);
+  return c ? 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + Math.max(0, Math.min(1, a)).toFixed(3) + ')' : hex;
 }
-function bowlDots(cx, cy, key, n, colors, rMin, rMax, alpha){
-  var pts = bowlWallPoints(key, n);
-  for(var i=0;i<pts.length;i++){
-    var p = pts[i];
-    ctx.globalAlpha = alpha * (0.6 + p.r*0.4);
-    ctx.fillStyle = colors[Math.floor(p.c*colors.length) % colors.length];
-    ctx.beginPath();
-    ctx.ellipse(cx + p.x, cy + p.y, rMin + p.r*(rMax - rMin), (rMin + p.r*(rMax - rMin))*0.7, p.c*3, 0, Math.PI*2);
-    ctx.fill();
-  }
-  ctx.globalAlpha = 1;
+var skinSprites = {}, skinSpriteOrder = [];
+// key → a canvas of w × h units at res device pixels per unit, painted once by paint(g) (g is already scaled)
+function skinSprite(key, w, h, res, paint){
+  var k = key + '@' + res;
+  if(skinSprites[k]) return skinSprites[k];
+  var c = document.createElement('canvas');
+  c.width = Math.max(1, Math.ceil(w*res));
+  c.height = Math.max(1, Math.ceil(h*res));
+  var g = c.getContext('2d');
+  if(!g) return null;
+  g.setTransform(res, 0, 0, res, 0, 0);
+  paint(g);
+  skinSprites[k] = c;
+  skinSpriteOrder.push(k);
+  if(skinSpriteOrder.length>32) delete skinSprites[skinSpriteOrder.shift()];
+  return c;
 }
-function bowlShine(cx, cy, alpha){
-  ctx.strokeStyle = 'rgba(255,255,255,' + alpha + ')';
-  ctx.lineWidth = 3;
+// device pixels per drawing unit on c right now (so a sprite is never blurred or wastefully large)
+function spriteRes(c){
+  var s = DPR;
+  try{ var m = c.getTransform(); s = Math.sqrt(m.a*m.a + m.b*m.b); }catch(e){}
+  return Math.max(1, Math.min(4, Math.ceil(s*2)/2));
+}
+
+// --- ③ 器: one base drawing for every bowl (drawBowlBase); the palette picks the shape, pattern, grain and shine.
+// With nothing equipped it draws exactly the original two ellipses. ---
+function drawServingBowl(cx, cy){
+  var b = skinPart('bowl');
+  if(b){
+    var done = false;
+    guardedSkinDraw('bowl', function(){ done = drawBowlBase(ctx, cx, cy, b); });
+    if(done) return;
+  }
+  ctx.fillStyle = '#3a2a1c';
   ctx.beginPath();
-  ctx.ellipse(cx, cy+40, 102, 27, 0, 0.6*Math.PI, 0.86*Math.PI);
-  ctx.stroke();
-  ctx.strokeStyle = 'rgba(255,255,255,' + (alpha*0.5) + ')';
-  ctx.lineWidth = 2;
+  ctx.ellipse(cx, cy+40, 110, 34, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#cdba90';
   ctx.beginPath();
-  ctx.ellipse(cx, cy+40, 104, 29, 0, 0.16*Math.PI, 0.3*Math.PI);
-  ctx.stroke();
+  ctx.ellipse(cx, cy+32, 100, 26, 0, 0, Math.PI*2);
+  ctx.fill();
 }
-function bowlGoldLines(cx, cy, color, n){
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 0.9;
-  for(var k=0;k<n;k++){
-    ctx.beginPath();
-    ctx.ellipse(cx, cy+40, 106 - k*3.2, 31 - k*3.2, 0, 0.14*Math.PI, 0.86*Math.PI);
-    ctx.stroke();
+var BOWL_BOX = {x:-136, y:-4, w:272, h:146};      // the sprite's area round the bowl's (cx, cy)
+function bowlSeed(b){ return (hashStr(String(b.id || 'bowl')) ^ (b.unique ? SKIN_SESSION_SEED : 0)) >>> 0; }
+function bowlSprite(b, res){
+  return skinSprite('bowl|' + b.id + '|' + visualDetail + '|' + bowlSeed(b), BOWL_BOX.w, BOWL_BOX.h, res, function(g){
+    g.translate(-BOWL_BOX.x, -BOWL_BOX.y);
+    paintBowl(g, b, skinQ());
+  });
+}
+function drawBowlBase(c, cx, cy, b){
+  var sp = bowlSprite(b, spriteRes(c));
+  if(!sp) return false;
+  c.drawImage(sp, cx + BOWL_BOX.x, cy + BOWL_BOX.y, BOWL_BOX.w, BOWL_BOX.h);
+  return true;
+}
+// The shapes, relative to (cx, cy). The mouth (where the noodles sit) is the same ellipse for both: (0, 32, 100, 26).
+// sec(s) = the level ring s of the way down the wall (0 the lip, 1 near the foot), for patterns that follow the wall.
+function jarHalfW(y){
+  if(y<40) return 100 + 2*Math.max(0, y - 32)/8;
+  if(y<64) return 102 + 26*Math.sin((y - 40)/24*Math.PI/2);
+  return 128 - 56*Math.pow(Math.min(1, (y - 64)/48), 1.6);
+}
+function inMouth(x, y){ var u = x/101, v = (y - 32)/27; return u*u + v*v < 1; }
+var BOWL_SHAPES = {
+  bowl:{
+    outer:function(g){ g.beginPath(); g.ellipse(0, 40, 110, 34, 0, 0, Math.PI*2); },
+    inside:function(x, y){ var u = x/110, v = (y - 40)/34; return u*u + v*v < 0.95; },
+    sec:function(s){ return {cy:32 + 18*s, rx:104 - 44*s, ry:27 - 9*s}; },
+    band:function(x, y){ var u = Math.min(1, Math.abs(x)/101), top = 32 + 27*Math.sqrt(1 - u*u), bot = 40 + 34*Math.sqrt(Math.max(0, 1 - Math.pow(x/110, 2))); return Math.max(0, Math.min(1, (y - top)/Math.max(4, bot - top))); },
+    foot:{y:70, rx:52, ry:9, h:12}, gy:0, lip:2.5
+  },
+  jar:{                              // a large 甕: a short neck, the shoulder swelling out, then down to a narrow foot
+    outer:function(g){
+      g.beginPath();
+      g.ellipse(0, 32, 102, 28, 0, Math.PI, 0);
+      for(var y=32; y<=112; y+=2) g.lineTo(jarHalfW(y), y);
+      g.ellipse(0, 112, 72, 10, 0, 0, Math.PI);
+      for(var y2=112; y2>=32; y2-=2) g.lineTo(-jarHalfW(y2), y2);
+      g.closePath();
+    },
+    inside:function(x, y){ if(y<34 || y>112 + 10*Math.sqrt(Math.max(0, 1 - Math.pow(x/72, 2)))) return false; return Math.abs(x) < jarHalfW(Math.min(y, 112))*0.96; },
+    sec:function(s){ var y = 34 + 76*s, rx = jarHalfW(y); return {cy:y - rx*0.22, rx:rx, ry:rx*0.27}; },
+    band:function(x, y){ return Math.max(0, Math.min(1, (y - 40)/76)); },
+    foot:{y:110, rx:68, ry:9, h:8}, gy:16, lip:4.5
+  }
+};
+// a random point on the visible outer wall (not inside the mouth), or null
+function wallPoint(geo, rnd){
+  for(var i=0;i<40;i++){
+    var x = (rnd()*2 - 1)*132, y = 28 + rnd()*96;
+    if(geo.inside(x, y) && !inMouth(x, y)) return {x:x, y:y};
+  }
+  return null;
+}
+function paintBowl(g, b, q){
+  var geo = BOWL_SHAPES[b.shape] || BOWL_SHAPES.bowl;
+  var pat = BOWL_PATTERNS[b.deco] || BOWL_PATTERNS.plain;
+  var rnd = cardRng(bowlSeed(b));
+  var grain = skinNum(b.grain, 0)*q.grain, dens = skinNum(b.density, 1)*q.pattern, gloss = skinNum(b.gloss, 0);
+  if(b.foot!==false) paintBowlFoot(g, geo, b, pat, rnd);
+  geo.outer(g);
+  g.fillStyle = b.body;
+  g.fill();
+  g.save();
+  geo.outer(g);
+  g.clip();
+  var side = g.createLinearGradient(-132, 0, 132, 0);          // the light comes from the upper left
+  side.addColorStop(0, 'rgba(255,255,255,0.16)');
+  side.addColorStop(0.45, 'rgba(255,255,255,0)');
+  side.addColorStop(1, 'rgba(0,0,0,0.32)');
+  g.fillStyle = side;
+  g.fillRect(-140, -10, 280, 150);
+  var down = g.createLinearGradient(0, 34 + geo.gy, 0, 124);
+  down.addColorStop(0, 'rgba(0,0,0,0)');
+  down.addColorStop(1, 'rgba(0,0,0,0.3)');
+  g.fillStyle = down;
+  g.fillRect(-140, 30, 280, 110);
+  pat.wall(g, b, geo, rnd, grain, dens);
+  if(gloss>0) paintBowlGloss(g, geo, gloss);
+  g.restore();
+  geo.outer(g);
+  g.strokeStyle = 'rgba(0,0,0,0.28)';
+  g.lineWidth = 1;
+  g.stroke();
+  paintBowlInside(g, b, pat, rnd, gloss);
+  paintBowlRim(g, geo, b);
+}
+// 高台: the foot ring under the bowl, with its soft shadow on the table
+function paintBowlFoot(g, geo, b, pat, rnd){
+  var f = geo.foot;
+  g.save();
+  g.translate(0, f.y + f.h + 1);
+  g.scale(1, 0.14);
+  var sh = g.createRadialGradient(0, 0, 2, 0, 0, f.rx*1.55);
+  sh.addColorStop(0, 'rgba(20,12,6,0.3)');
+  sh.addColorStop(1, 'rgba(20,12,6,0)');
+  g.fillStyle = sh;
+  g.beginPath();
+  g.arc(0, 0, f.rx*1.55, 0, Math.PI*2);
+  g.fill();
+  g.restore();
+  g.beginPath();
+  g.moveTo(-f.rx, f.y);
+  g.lineTo(-f.rx*1.04, f.y + f.h);
+  g.ellipse(0, f.y + f.h, f.rx*1.04, f.ry, 0, Math.PI, 0, true);
+  g.lineTo(f.rx, f.y);
+  g.closePath();
+  g.fillStyle = mixHex(b.footColor || b.body, '#000000', 0.22);
+  g.fill();
+  g.save();
+  g.clip();
+  if(pat.foot) pat.foot(g, f, b, rnd);
+  g.restore();
+  g.strokeStyle = 'rgba(255,240,220,0.18)';
+  g.lineWidth = 1;
+  g.beginPath();
+  g.ellipse(0, f.y + f.h, f.rx*1.04, f.ry, 0, 0.1*Math.PI, 0.9*Math.PI);
+  g.stroke();
+}
+// the inside: the far wall seen over the rim (where a glossy bowl shows a reflection), then the bed of the noodles
+function paintBowlInside(g, b, pat, rnd, gloss){
+  g.save();
+  g.beginPath();
+  g.ellipse(0, 32, 100, 26, 0, 0, Math.PI*2);
+  g.clip();
+  g.fillStyle = b.wallIn || mixHex(b.body, '#000000', 0.18);
+  g.fillRect(-102, 4, 204, 58);
+  var dk = g.createLinearGradient(0, 6, 0, 40);
+  dk.addColorStop(0, 'rgba(0,0,0,0.38)');
+  dk.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = dk;
+  g.fillRect(-102, 4, 204, 40);
+  if(gloss>0){
+    g.fillStyle = rgbaHex(b.inner, 0.16*gloss);                 // the bed mirrored faintly on the far wall
+    g.beginPath(); g.ellipse(0, 15, 74, 6, 0, 0, Math.PI*2); g.fill();
+    g.lineCap = 'round';
+    g.strokeStyle = 'rgba(255,255,255,' + (0.1*gloss).toFixed(3) + ')';
+    g.lineWidth = 6;
+    g.beginPath(); g.ellipse(0, 32, 93, 21, 0, 1.2*Math.PI, 1.42*Math.PI); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,' + (0.4*gloss).toFixed(3) + ')';
+    g.lineWidth = 1.6;
+    g.beginPath(); g.ellipse(0, 32, 93, 21, 0, 1.22*Math.PI, 1.4*Math.PI); g.stroke();
+  }
+  g.fillStyle = b.inner;
+  g.beginPath();
+  g.ellipse(0, 36, 93, 21, 0, 0, Math.PI*2);
+  g.fill();
+  g.restore();
+}
+function paintBowlRim(g, geo, b){
+  g.strokeStyle = b.rim;
+  g.lineWidth = geo.lip;
+  g.beginPath();
+  g.ellipse(0, 32, 100, 26, 0, 0, Math.PI*2);
+  g.stroke();
+  g.strokeStyle = 'rgba(255,246,228,0.35)';
+  g.lineWidth = 1;
+  g.beginPath();
+  g.ellipse(0, 32 + geo.lip*0.3, 100, 26, 0, 0.12*Math.PI, 0.5*Math.PI);
+  g.stroke();
+  if(b.gold){                                                   // 金の細線 on the lip and just under it
+    g.strokeStyle = b.gold;
+    g.lineWidth = 0.8;
+    g.beginPath();
+    g.ellipse(0, 32, 100 - geo.lip*0.5 - 0.5, 26 - geo.lip*0.5 - 0.5, 0, 0, Math.PI*2);
+    g.stroke();
+    g.beginPath();
+    g.ellipse(0, 33.4 + geo.lip*0.3, 101.4, 27.4, 0, 0.03*Math.PI, 0.97*Math.PI);
+    g.stroke();
   }
 }
-var BOWL_DECOS = {
-  matte: function(cx, cy, b){        // 素焼き: an unglazed, sandy surface and a line from the potter's wheel
-    bowlDots(cx, cy, 'matte', 110, b.ink, 0.6, 1.5, 0.55);
-    ctx.strokeStyle = 'rgba(90,45,20,0.4)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.ellipse(cx, cy+40, 104, 28, 0, 0.12*Math.PI, 0.88*Math.PI);
-    ctx.stroke();
-  },
-  gloss: function(cx, cy, b){        // 越前漆器: the deep shine of lacquer
-    bowlShine(cx, cy, 0.4);
-  },
-  ash: function(cx, cy, b){          // 越前焼: ash speckles and a green glaze band from the wood-fired kiln
-    bowlDots(cx, cy, 'ash', 80, b.ink.slice(0, 2), 0.6, 1.6, 0.7);
-    ctx.strokeStyle = 'rgba(124,143,90,0.6)';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.ellipse(cx, cy+37, 103, 26, 0, 0.1*Math.PI, 0.9*Math.PI);
-    ctx.stroke();
-  },
-  speckle: function(cx, cy, b){      // 若狭塗: shell and eggshell flecks sealed under many coats
-    bowlDots(cx, cy, 'speckle', 150, b.ink, 0.8, 2.3, 0.95);
-    bowlShine(cx, cy, 0.3);
-  },
-  chinkin: function(cx, cy, b){      // 沈金: fine gold lines carved into black lacquer
-    bowlGoldLines(cx, cy, b.ink[0], 3);
-    ctx.lineWidth = 0.9;
-    for(var i=0;i<16;i++){
-      var a = (0.2 + i*0.04)*Math.PI, x0 = cx + Math.cos(a)*103, y0 = cy + 40 + Math.sin(a)*29;
-      ctx.beginPath();
-      ctx.moveTo(x0, y0);
-      ctx.quadraticCurveTo(x0 + 3, y0 - 5, x0 + 7, y0 - 8);
-      ctx.stroke();
+// 艶: a broad soft band, a sharp window highlight, the long lights along the curve and a warm light on the right
+function paintBowlGloss(g, geo, k){
+  var gy = geo.gy;
+  var band = g.createLinearGradient(-98, 0, -38, 0);
+  band.addColorStop(0, 'rgba(255,255,255,0)');
+  band.addColorStop(0.5, 'rgba(255,255,255,' + (0.2*k).toFixed(3) + ')');
+  band.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = band;
+  g.fillRect(-98, 30, 60, 110);
+  g.lineCap = 'round';
+  g.strokeStyle = 'rgba(255,255,255,' + (0.75*k).toFixed(3) + ')';
+  g.lineWidth = 2.2;
+  g.beginPath(); g.moveTo(-74, 50 + gy); g.quadraticCurveTo(-78, 61 + gy, -71, 71 + gy); g.stroke();
+  g.lineWidth = 1.1;
+  g.beginPath(); g.moveTo(-64, 53 + gy); g.quadraticCurveTo(-67, 61 + gy, -62, 68 + gy); g.stroke();
+  g.strokeStyle = 'rgba(255,255,255,' + (0.42*k).toFixed(3) + ')';
+  g.lineWidth = 3;
+  g.beginPath(); g.ellipse(0, 40 + gy, 102 + gy, 27 + gy*0.3, 0, 0.6*Math.PI, 0.86*Math.PI); g.stroke();
+  g.strokeStyle = 'rgba(255,255,255,' + (0.22*k).toFixed(3) + ')';
+  g.lineWidth = 2;
+  g.beginPath(); g.ellipse(0, 40 + gy, 104 + gy, 29 + gy*0.3, 0, 0.16*Math.PI, 0.3*Math.PI); g.stroke();
+  g.strokeStyle = 'rgba(255,214,170,' + (0.16*k).toFixed(3) + ')';
+  g.lineWidth = 5;
+  g.beginPath(); g.ellipse(0, 40 + gy, 98 + gy, 25 + gy*0.3, 0, 0.08*Math.PI, 0.2*Math.PI); g.stroke();
+}
+// soft patches of colour on the wall (色ムラ)
+function bowlBlobs(g, geo, rnd, n, colors, rMin, rMax, aMin, aMax, maxBand){
+  for(var i=0;i<n;i++){
+    var p = wallPoint(geo, rnd);
+    if(!p) continue;
+    if(maxBand!==undefined && geo.band(p.x, p.y)>maxBand) continue;
+    var r = rMin + rnd()*(rMax - rMin), col = colors[Math.floor(rnd()*colors.length) % colors.length], a = aMin + rnd()*(aMax - aMin);
+    var gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+    gr.addColorStop(0, rgbaHex(col, a));
+    gr.addColorStop(1, rgbaHex(col, 0));
+    g.fillStyle = gr;
+    g.beginPath(); g.ellipse(p.x, p.y, r, r*0.7, 0, 0, Math.PI*2); g.fill();
+  }
+}
+// fine grains (sand in the clay, gold dust …)
+function bowlGrains(g, geo, rnd, n, colors, rMin, rMax, alpha){
+  for(var i=0;i<n;i++){
+    var p = wallPoint(geo, rnd);
+    if(!p) continue;
+    var r = rMin + rnd()*(rMax - rMin);
+    g.globalAlpha = alpha*(0.5 + rnd()*0.5);
+    g.fillStyle = colors[Math.floor(rnd()*colors.length) % colors.length];
+    g.fillRect(p.x - r/2, p.y - r/2, r, r*0.8);
+  }
+  g.globalAlpha = 1;
+}
+// a point on the level ring s of the wall, at angle a (0..π is the front half)
+function secPoint(geo, s, a){ var c = geo.sec(s); return {x:c.rx*Math.cos(a), y:c.cy + c.ry*Math.sin(a)}; }
+function secArc(g, geo, s, a0, a1){ var c = geo.sec(s); g.beginPath(); g.ellipse(0, c.cy, c.rx, c.ry, 0, a0, a1); }
+// 沈金: a scroll of vines carved along the wall (a dark cut line under a dull gold one), with curls and small leaves
+function chinkinScroll(g, geo, rnd, gold, dens, w){
+  var curls = Math.max(3, Math.round(4 + 3*dens)), ph = rnd()*6.28;
+  function stemAt(t){ var s = 0.42 + 0.16*Math.sin(t*Math.PI*3 + ph); return secPoint(geo, s, (0.07 + t*0.86)*Math.PI); }
+  function carved(path, width){
+    g.strokeStyle = 'rgba(0,0,0,0.65)'; g.lineWidth = width + 0.5; g.save(); g.translate(0.3, 0.6); path(); g.stroke(); g.restore();
+    g.strokeStyle = gold; g.lineWidth = width; path(); g.stroke();
+  }
+  g.lineCap = 'round';
+  g.lineJoin = 'round';
+  carved(function(){ g.beginPath(); for(var i=0;i<=60;i++){ var p = stemAt(i/60); if(i) g.lineTo(p.x, p.y); else g.moveTo(p.x, p.y); } }, w);
+  for(var k=0;k<curls;k++){
+    var t = (k + 0.5)/curls, p = stemAt(t), up = k%2 ? 1 : -1, r0 = 7 + rnd()*3;
+    carved(function(){
+      g.beginPath();
+      for(var j=0;j<=24;j++){ var a = j/24*Math.PI*2.6, r = r0*(1 - j/30); var x = p.x + Math.cos(a*up)*r*1.2 - r0*1.2, y = p.y + up*Math.sin(a)*r*0.7; if(j) g.lineTo(x, y); else g.moveTo(p.x, p.y); }
+    }, w*0.8);
+    var lx = p.x + 4, ly = p.y - up*6;
+    carved(function(){ g.beginPath(); g.moveTo(p.x, p.y); g.quadraticCurveTo(lx + 4, ly - up*1, lx + 9, ly + up*1); g.quadraticCurveTo(lx + 3, ly + up*4, p.x, p.y); }, w*0.75);
+    g.strokeStyle = gold; g.lineWidth = w*0.45;
+    g.beginPath(); g.moveTo(lx + 1, ly + up*0.6); g.lineTo(lx + 5, ly + up*0.4); g.stroke();
+  }
+  g.fillStyle = gold;                                           // 点彫り: a row of tiny dots near the lip
+  var nd = Math.round(26 + 18*dens);
+  for(var d=0;d<nd;d++){ var q2 = secPoint(geo, 0.14, (0.05 + 0.9*d/(nd - 1))*Math.PI); g.beginPath(); g.arc(q2.x, q2.y, 0.55, 0, Math.PI*2); g.fill(); }
+  carved(function(){ secArc(g, geo, 0.08, 0.03*Math.PI, 0.97*Math.PI); }, w*0.8);
+  carved(function(){ secArc(g, geo, 0.8, 0.12*Math.PI, 0.88*Math.PI); }, w*0.8);
+}
+// 若狭塗の研ぎ出し: layers of colour polished back into rings like the grain of a tree, worked out pixel by pixel
+function togidashiField(b, rnd, dens, res){
+  var w = Math.ceil(272*res), h = Math.ceil(130*res);
+  var c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  var g = c.getContext('2d');
+  if(!g) return null;
+  var img = g.createImageData(w, h), d = img.data, cols = [];
+  for(var i=0;i<b.ink.length;i++) cols.push(hexRgb(b.ink[i]) || [0,0,0]);
+  var base = hexRgb(b.body) || [30,20,15];
+  var cen = [], nc = 3 + Math.floor(rnd()*2);
+  for(var k=0;k<nc;k++) cen.push({x:(rnd()*2 - 1)*120, y:20 + rnd()*90, w:0.6 + rnd()*0.8, s:2 + rnd()*1.6});
+  var p1 = rnd()*6.28, p2 = rnd()*6.28, p3 = rnd()*6.28, scale = 0.075*dens;
+  for(var py=0; py<h; py++){
+    var y = py/res + 2;
+    for(var px=0; px<w; px++){
+      var x = px/res - 136, f = 0;
+      for(var m=0;m<cen.length;m++){ var dx = x - cen[m].x, dy = (y - cen[m].y)*cen[m].s; f += cen[m].w*Math.sqrt(dx*dx + dy*dy); }
+      f = f*scale/cen.length + 0.9*Math.sin(x*0.045 + p1) + 0.55*Math.sin(y*0.12 + x*0.025 + p2) + 0.3*Math.sin(x*0.14 + y*0.07 + p3);
+      var band = Math.floor(f), fr = f - band, col = cols[((band % cols.length) + cols.length) % cols.length];
+      var edge = fr<0.07 ? 0.45 : fr>0.93 ? 0.75 : 1;           // a thin dark line between the layers
+      var mix = 0.82;
+      var o = (py*w + px)*4;
+      d[o]   = (col[0]*mix + base[0]*(1 - mix))*edge;
+      d[o+1] = (col[1]*mix + base[1]*(1 - mix))*edge;
+      d[o+2] = (col[2]*mix + base[2]*(1 - mix))*edge;
+      d[o+3] = 255;
     }
-  },
-  togidashi: function(cx, cy, b){    // 若狭塗・研ぎ出し: layer upon layer of colour, polished back to show through
-    bowlDots(cx, cy, 'togidashi', 120, b.ink, 1.4, 4.2, 0.9);
-    bowlShine(cx, cy, 0.35);
-  },
-  makie: function(cx, cy, b){        // 蒔絵沈金: gold plum blossoms over gold lines
-    bowlGoldLines(cx, cy, b.ink[0], 2);
-    for(var i=0;i<6;i++){
-      var a = (0.24 + i*0.105)*Math.PI, fx = cx + Math.cos(a)*102, fy = cy + 40 + Math.sin(a)*27;
-      ctx.fillStyle = b.ink[0];
-      for(var p=0;p<5;p++){
-        var pa = p*Math.PI*2/5 - Math.PI/2;
-        ctx.beginPath();
-        ctx.arc(fx + Math.cos(pa)*2.6, fy + Math.sin(pa)*2.6, 2.1, 0, Math.PI*2);
-        ctx.fill();
+  }
+  g.putImageData(img, 0, 0);
+  return c;
+}
+var BOWL_PATTERNS = {
+  plain:{wall:function(){}},
+  unglazed:{                         // 素焼き: no glaze; patches of colour, the wheel's lines, fingermarks and sand
+    wall:function(g, b, geo, rnd, grain, dens){
+      bowlBlobs(g, geo, rnd, Math.round(16*dens), b.ink, 14, 36, 0.16, 0.32);
+      g.lineWidth = 1;
+      var lv = [0.22, 0.4, 0.58, 0.76];
+      for(var i=0;i<lv.length;i++){
+        g.strokeStyle = i%2 ? 'rgba(255,226,190,0.18)' : 'rgba(80,40,18,0.3)';
+        secArc(g, geo, lv[i], 0.08*Math.PI, 0.92*Math.PI); g.stroke();
       }
-      ctx.fillStyle = b.ink[1];
-      ctx.beginPath();
-      ctx.arc(fx, fy, 1.2, 0, Math.PI*2);
-      ctx.fill();
+      g.lineCap = 'round';
+      var fm = Math.max(2, Math.round(4*dens));
+      for(var f=0; f<fm; f++){                                  // 指跡: grooves left by the potter's fingers
+        var a = (0.22 + 0.56*(f + rnd()*0.6)/fm)*Math.PI, p0 = secPoint(geo, 0.1, a), p1 = secPoint(geo, 0.66, a + 0.08);
+        g.strokeStyle = 'rgba(255,228,196,0.16)'; g.lineWidth = 4.5;
+        g.beginPath(); g.moveTo(p0.x, p0.y); g.quadraticCurveTo((p0.x + p1.x)/2 + 5, (p0.y + p1.y)/2, p1.x, p1.y); g.stroke();
+        g.strokeStyle = 'rgba(70,34,14,0.26)'; g.lineWidth = 1.2;
+        g.beginPath(); g.moveTo(p0.x + 2.4, p0.y + 0.6); g.quadraticCurveTo((p0.x + p1.x)/2 + 7.4, (p0.y + p1.y)/2 + 0.6, p1.x + 2.4, p1.y + 0.6); g.stroke();
+      }
+      bowlGrains(g, geo, rnd, Math.round(180*grain), b.ink, 0.6, 1.5, 0.6);
+    },
+    foot:function(g, f, b, rnd){                                // 高台の削り跡: the turning tool's spiral marks
+      for(var i=0;i<5;i++){
+        g.strokeStyle = i%2 ? 'rgba(255,226,190,0.22)' : 'rgba(60,28,10,0.35)';
+        g.lineWidth = 1;
+        g.beginPath(); g.ellipse(0, f.y + f.h - i*1.6, f.rx*(1.03 - i*0.012), f.ry, 0, (0.08 + i*0.04)*Math.PI, (0.92 - i*0.03)*Math.PI); g.stroke();
+      }
     }
   },
-  drip: function(cx, cy, b){         // 自然釉: glassy green ash glaze running down the wall
-    ctx.strokeStyle = b.ink[0];
-    ctx.globalAlpha = 0.75;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.ellipse(cx, cy+33, 101, 27, 0, 0.08*Math.PI, 0.92*Math.PI);
-    ctx.stroke();
-    for(var i=0;i<9;i++){
-      var a = (0.14 + i*0.09)*Math.PI, x0 = cx + Math.cos(a)*100, y0 = cy + 32 + Math.sin(a)*26, len = 6 + (i%3)*4;
-      ctx.globalAlpha = 0.85;
-      ctx.fillStyle = b.ink[0];
-      ctx.beginPath();
-      ctx.moveTo(x0 - 2.6, y0);
-      ctx.quadraticCurveTo(x0 - 2.2, y0 + len*0.7, x0, y0 + len);
-      ctx.quadraticCurveTo(x0 + 2.2, y0 + len*0.7, x0 + 2.6, y0);
-      ctx.closePath();
-      ctx.fill();
-      ctx.globalAlpha = 0.6;
-      ctx.fillStyle = b.ink[1];
-      ctx.fillRect(x0 - 0.6, y0 + 1, 1.2, len*0.5);
+  lacquer:{                          // 越前漆器: deep lacquer; the shine itself is the pattern
+    wall:function(g, b, geo, rnd, grain, dens){
+      var depth = g.createRadialGradient(-40, 46 + geo.gy, 6, -10, 50 + geo.gy, 140);
+      depth.addColorStop(0, 'rgba(255,255,255,0.07)');
+      depth.addColorStop(0.6, 'rgba(0,0,0,0)');
+      depth.addColorStop(1, 'rgba(0,0,0,0.3)');
+      g.fillStyle = depth;
+      g.fillRect(-140, 0, 280, 140);
     }
-    ctx.globalAlpha = 1;
+  },
+  ashglaze:{                         // 越前焼: rough clay, ash that melted into a green glaze, runs and pools of glass
+    wall:function(g, b, geo, rnd, grain, dens){
+      bowlBlobs(g, geo, rnd, Math.round(14*dens), [b.ink[2], b.ink[3]], 16, 40, 0.25, 0.45);
+      bowlGrains(g, geo, rnd, Math.round(240*grain), ['#2a1b10', '#a08260', '#1a110a'], 0.6, 1.6, 0.55);
+      var n = Math.round(26*dens);
+      for(var i=0;i<n;i++){                                     // the ash band where it fell on the upper wall
+        var a = (0.03 + 0.94*(i + rnd())/n)*Math.PI, p = secPoint(geo, 0.03 + rnd()*0.14, a), r = 9 + rnd()*9;
+        var gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        gr.addColorStop(0, rgbaHex(b.ink[rnd()<0.3 ? 1 : 0], 0.85));
+        gr.addColorStop(0.7, rgbaHex(b.ink[0], 0.5));
+        gr.addColorStop(1, rgbaHex(b.ink[0], 0));
+        g.fillStyle = gr;
+        g.beginPath(); g.ellipse(p.x, p.y, r*1.3, r*0.8, 0, 0, Math.PI*2); g.fill();
+      }
+      var drips = Math.round(10*dens);
+      for(var k=0;k<drips;k++){                                 // runs of glaze, each ending in a pool
+        var a2 = (0.1 + 0.8*(k + rnd())/drips)*Math.PI, s0 = secPoint(geo, 0.12, a2), len = (10 + rnd()*26)*(geo===BOWL_SHAPES.jar ? 1.5 : 1), wd = 1.6 + rnd()*1.6;
+        var dg = g.createLinearGradient(0, s0.y, 0, s0.y + len);
+        dg.addColorStop(0, rgbaHex(b.ink[0], 0.8));
+        dg.addColorStop(1, rgbaHex(mixHex(b.ink[0], '#1e2a14', 0.45), 0.95));
+        g.fillStyle = dg;
+        g.beginPath();
+        g.moveTo(s0.x - wd, s0.y);
+        g.quadraticCurveTo(s0.x - wd*0.8, s0.y + len*0.7, s0.x, s0.y + len);
+        g.quadraticCurveTo(s0.x + wd*0.8, s0.y + len*0.7, s0.x + wd, s0.y);
+        g.closePath();
+        g.fill();
+        g.fillStyle = rgbaHex(mixHex(b.ink[0], '#16210f', 0.5), 0.95);
+        g.beginPath(); g.ellipse(s0.x, s0.y + len, wd*1.3, wd, 0, 0, Math.PI*2); g.fill();
+        g.fillStyle = 'rgba(255,255,255,0.7)';                  // 釉だまり: a glassy point of light
+        g.beginPath(); g.arc(s0.x - wd*0.4, s0.y + len - wd*0.3, 0.6, 0, Math.PI*2); g.fill();
+      }
+      bowlGrains(g, geo, rnd, Math.round(60*grain), [b.ink[1]], 0.5, 1.2, 0.7);
+    },
+    foot:function(g, f){
+      g.strokeStyle = 'rgba(30,18,10,0.4)'; g.lineWidth = 1;
+      for(var i=0;i<3;i++){ g.beginPath(); g.ellipse(0, f.y + f.h - i*2.2, f.rx*1.02, f.ry, 0, 0.15*Math.PI, 0.85*Math.PI); g.stroke(); }
+    }
+  },
+  togidashi:{                        // 若狭塗: rings of polished-back layers, eggshell flecks and thin pine needles
+    wall:function(g, b, geo, rnd, grain, dens){
+      var field = togidashiField(b, rnd, dens, visualDetail==='low' ? 1 : 2);
+      if(field) g.drawImage(field, -136, 2, 272, 130);
+      var fine = 1/(0.7 + dens*0.3);                            // more layers → finer flecks
+      var shells = Math.round(70*grain);
+      for(var i=0;i<shells;i++){                                // 卵殻: small cracked pieces of eggshell
+        var p = wallPoint(geo, rnd);
+        if(!p) continue;
+        var r = (0.8 + rnd()*1.8)*fine, sides = 3 + Math.floor(rnd()*3), a0 = rnd()*6.28;
+        g.fillStyle = b.shell || '#f4f0e6';
+        g.globalAlpha = 0.75 + rnd()*0.25;
+        g.beginPath();
+        for(var s=0;s<sides;s++){ var a = a0 + s/sides*Math.PI*2, rr = r*(0.6 + rnd()*0.5); if(s) g.lineTo(p.x + Math.cos(a)*rr, p.y + Math.sin(a)*rr*0.8); else g.moveTo(p.x + Math.cos(a)*rr, p.y + Math.sin(a)*rr*0.8); }
+        g.closePath();
+        g.fill();
+      }
+      g.globalAlpha = 1;
+      var needles = Math.round(24*dens);
+      g.strokeStyle = b.needle || '#7c9a63';
+      g.lineWidth = 0.7*fine;
+      g.lineCap = 'round';
+      for(var k=0;k<needles;k++){                               // 松葉: two needles from one point
+        var q2 = wallPoint(geo, rnd);
+        if(!q2) continue;
+        var dir = rnd()*6.28, len = (6 + rnd()*4)*fine;
+        g.beginPath();
+        g.moveTo(q2.x, q2.y); g.lineTo(q2.x + Math.cos(dir - 0.18)*len, q2.y + Math.sin(dir - 0.18)*len*0.8);
+        g.moveTo(q2.x, q2.y); g.lineTo(q2.x + Math.cos(dir + 0.18)*len, q2.y + Math.sin(dir + 0.18)*len*0.8);
+        g.stroke();
+      }
+      var gold = b.gold || b.ink[1];
+      bowlGrains(g, geo, rnd, Math.round(50*grain), [gold], 0.5*fine, 1.2*fine, 0.9);
+    }
+  },
+  chinkin:{                          // 沈金: fine lines carved into the lacquer and filled with dull gold
+    wall:function(g, b, geo, rnd, grain, dens){
+      BOWL_PATTERNS.lacquer.wall(g, b, geo, rnd, grain, dens);
+      chinkinScroll(g, geo, rnd, b.ink[0], dens, 0.75);
+    }
+  },
+  makie:{                            // 蒔絵沈金: gold dust scattered in clouds, carved gold lines and gold plum blossoms
+    wall:function(g, b, geo, rnd, grain, dens){
+      BOWL_PATTERNS.lacquer.wall(g, b, geo, rnd, grain, dens);
+      var clouds = [];
+      for(var c=0;c<4;c++){ var cp = wallPoint(geo, rnd); if(cp) clouds.push(cp); }
+      var dust = Math.round(520*grain);
+      for(var i=0;i<dust;i++){                                  // 梨地: gold dust, thick in clouds and thin elsewhere
+        var cl = clouds.length ? clouds[i % clouds.length] : {x:0, y:60}, x, y;
+        if(rnd()<0.7){ var ang = rnd()*6.28, rr = Math.pow(rnd(), 1.6)*34; x = cl.x + Math.cos(ang)*rr*1.4; y = cl.y + Math.sin(ang)*rr*0.6; }
+        else { var wp = wallPoint(geo, rnd); if(!wp) continue; x = wp.x; y = wp.y; }
+        if(!geo.inside(x, y) || inMouth(x, y)) continue;
+        g.globalAlpha = 0.45 + rnd()*0.55;
+        g.fillStyle = b.ink[rnd()<0.75 ? 0 : 1];
+        g.beginPath(); g.arc(x, y, 0.35 + rnd()*0.55, 0, Math.PI*2); g.fill();
+      }
+      g.globalAlpha = 1;
+      chinkinScroll(g, geo, rnd, b.ink[2] || b.ink[0], dens*0.8, 0.6);
+      var fl = Math.round(5 + 2*dens);
+      for(var f=0; f<fl; f++){                                  // 梅: five petals, an outline and a bright heart
+        var fp = secPoint(geo, 0.3 + rnd()*0.3, (0.15 + 0.7*(f + rnd()*0.5)/fl)*Math.PI), pr = 2.4 + rnd()*1.2;
+        for(var p=0;p<5;p++){
+          var pa = p*Math.PI*2/5 - Math.PI/2;
+          g.fillStyle = b.ink[0];
+          g.beginPath(); g.ellipse(fp.x + Math.cos(pa)*pr, fp.y + Math.sin(pa)*pr*0.8, pr*0.85, pr*0.7, pa, 0, Math.PI*2); g.fill();
+          g.strokeStyle = 'rgba(90,60,10,0.6)'; g.lineWidth = 0.35; g.stroke();
+        }
+        g.fillStyle = b.ink[1];
+        g.beginPath(); g.arc(fp.x, fp.y, pr*0.45, 0, Math.PI*2); g.fill();
+      }
+    }
   }
 };
 
-// --- 道具: the knife's blade pattern and handle bands (in the knife's own coordinates: blade x 0..38, y -42..2) ---
-var tsuchimeDents = null;
-function drawBladeDeco(tk){
-  if(tk.deco==='hamon'){                     // 越前打刃物の包丁: a wavy temper line and the smith's small stamp
-    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(1, -7);
-    for(var x=1;x<=37;x+=3) ctx.lineTo(x, -7 + Math.sin(x*0.7)*1.6);
-    ctx.stroke();
-    ctx.fillStyle = '#7a2f22';
-    ctx.fillRect(28, -27, 4, 6);
-  } else if(tk.deco==='sickle'){             // 鎌: a curved tip and a darker spine
-    ctx.fillStyle = tk.blade;
-    ctx.strokeStyle = tk.edge;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(38, -16);
-    ctx.quadraticCurveTo(54, -12, 52, 7);
-    ctx.quadraticCurveTo(47, -3, 38, 2);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(40,48,50,0.35)';
-    ctx.fillRect(0, -33, 38, 5);
-  } else if(tk.deco==='tsuchime'){           // 鎚目: hammer dents over the blade and a clear temper line
-    if(!tsuchimeDents) tsuchimeDents = seededList(733, 24, function(r){ return {x:3 + r()*32, y:-31 + r()*18, a:r()*3.14, light:r()<0.5}; });
-    for(var i=0;i<tsuchimeDents.length;i++){
-      var d = tsuchimeDents[i];
-      ctx.fillStyle = d.light ? 'rgba(255,255,255,0.5)' : 'rgba(40,50,56,0.3)';
-      ctx.beginPath();
-      ctx.ellipse(d.x, d.y, 2.3, 1.5, d.a, 0, Math.PI*2);
-      ctx.fill();
-    }
-    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(1, -8);
-    ctx.bezierCurveTo(12, -11, 24, -5, 37, -8);
-    ctx.stroke();
+// --- 麺: the dough on the lane gets the noodle's grains (drawn once into a small tile that repeats) ---
+var doughTiles = {};
+function doughTile(nsk){
+  var n = Math.round(skinNum(nsk.doughGrain, 0)*skinQ().grain*46);
+  if(n<=0) return null;
+  var key = nsk.id + '|' + visualDetail;
+  if(doughTiles[key]) return doughTiles[key];
+  var c = document.createElement('canvas');
+  c.width = c.height = 64;                       // 32 × 32 units at twice the resolution
+  var g = c.getContext('2d');
+  if(!g) return null;
+  g.scale(2, 2);
+  var rnd = cardRng(hashStr(key)), husk = skinNum(nsk.husk, 0);
+  for(var i=0;i<n;i++){
+    var x = rnd()*32, y = rnd()*32;
+    g.fillStyle = nsk.speck || nsk.doughDark;
+    g.globalAlpha = 0.35 + rnd()*0.45;
+    if(rnd()<husk){ g.beginPath(); g.ellipse(x, y, 1.1, 0.5, rnd()*3.14, 0, Math.PI*2); g.fill(); }
+    else { var s = 0.5 + rnd()*0.6; g.fillRect(x, y, s, s); }
+  }
+  if(skinNum(nsk.wet, 0)>0){                     // 新そば: small moist highlights
+    g.fillStyle = '#ffffff';
+    for(var k=0;k<10;k++){ g.globalAlpha = 0.12 + rnd()*0.12; g.fillRect(rnd()*32, rnd()*32, 1.6, 0.5); }
+  }
+  g.globalAlpha = 1;
+  doughTiles[key] = c;
+  return c;
+}
+// builds this game's sprites as it starts, so the first bowl served never waits for them
+function prewarmSkin(){
+  var parts = [['bowl', function(b){ bowlSprite(b, spriteRes(ctx)); }], ['tool', function(t){ toolSprite(t, spriteRes(ctx)); }], ['noodle', doughTile]];
+  for(var i=0;i<parts.length;i++){
+    var p = skinPart(parts[i][0]);
+    if(!p) continue;
+    try{ parts[i][1](p); }catch(e){ skinFailed[parts[i][0]] = true; }
   }
 }
-function drawHandleDeco(tk){
-  ctx.fillStyle = tk.band;
-  ctx.fillRect(7, -42, 3, 9);
-  ctx.fillRect(28, -42, 3, 9);
+function drawDoughGrain(c, nsk, x, y, w, h){
+  var tile = doughTile(nsk);
+  if(!tile) return;
+  var p = c.createPattern(tile, 'repeat');
+  if(!p) return;
+  c.translate(x, y);
+  c.scale(0.5, 0.5);
+  c.fillStyle = p;
+  c.fillRect(0, 0, w*2, h*2);
 }
 
-// --- ② 演出: confetti around a cut, in the equipped colours (the same pieces the gacha opening throws) ---
-function drawConfettiPiece(c, strip, size){
-  if(strip){ c.fillRect(-4.5*size, -2*size, 9*size, 4*size); }
-  else { c.beginPath(); c.arc(0, 0, 3*size, 0, Math.PI*2); c.fill(); }
+// --- 道具: one base drawing for every knife (drawToolBase), in the knife's own coordinates: the blade x 0..38,
+// y -42..2 with its edge along y = 2 and the handle along the top. 地鉄 and 刃 are two layers split by the 刃紋. ---
+var TOOL_BOX = {x:-6, y:-48, w:72, h:64};
+function toolSprite(tk, res){
+  return skinSprite('tool|' + tk.id + '|' + visualDetail, TOOL_BOX.w, TOOL_BOX.h, Math.max(2, res), function(g){
+    g.translate(-TOOL_BOX.x, -TOOL_BOX.y);
+    paintTool(g, tk, skinQ());
+  });
 }
+function drawToolBase(c, tk){
+  var sp = toolSprite(tk, spriteRes(c));
+  if(!sp) return false;
+  c.drawImage(sp, TOOL_BOX.x, TOOL_BOX.y, TOOL_BOX.w, TOOL_BOX.h);
+  return true;
+}
+var TOOL_SHAPES = {
+  kiri:  {outline:function(g){ g.beginPath(); g.moveTo(0, 2); g.lineTo(38, 2); g.lineTo(38, -42); g.lineTo(0, -42); g.closePath(); },
+          edge:function(g){ g.moveTo(0, 2); g.lineTo(38, 2); }, tip:[33, 0.5]},
+  sickle:{outline:function(g){ g.beginPath(); g.moveTo(0, -33); g.lineTo(24, -33); g.bezierCurveTo(44, -33, 58, -20, 60, 8); g.bezierCurveTo(52, -6, 40, -6, 26, -1); g.lineTo(0, 2); g.closePath(); },
+          edge:function(g){ g.moveTo(60, 8); g.bezierCurveTo(52, -6, 40, -6, 26, -1); g.lineTo(0, 2); }, tip:[55, 0]}
+};
+// the 刃紋 line for a straight blade: notare waves, a nearly straight line, or small repeated rounds (gunome)
+var HAMON_LINES = {
+  wave:    function(x){ return -8 + 1.8*Math.sin(x*0.42 + 0.5); },
+  straight:function(x){ return -7.5 + 0.35*Math.sin(x*0.3); },
+  fine:    function(x){ return -9 + 1.7*Math.abs(Math.sin(x*0.62)) - 0.4*Math.sin(x*1.9); }
+};
+function paintTool(g, tk, q){
+  var shape = TOOL_SHAPES[tk.shape] || TOOL_SHAPES.kiri, dens = skinNum(tk.density, 1)*q.pattern, gloss = skinNum(tk.gloss, 0.5);
+  var rnd = cardRng(hashStr(String(tk.id || 'tool')));
+  shape.outline(g);
+  g.fillStyle = tk.blade;
+  g.fill();
+  g.save();
+  shape.outline(g);
+  g.clip();
+  var n = Math.round(26*dens);
+  g.lineWidth = 0.5;
+  for(var i=0;i<n;i++){                                         // 地肌: the grain of folded iron
+    var y = -42 + rnd()*44;
+    g.strokeStyle = rnd()<0.5 ? 'rgba(255,255,255,0.22)' : 'rgba(40,50,56,0.16)';
+    g.beginPath(); g.moveTo(-4, y); g.bezierCurveTo(16, y + (rnd() - 0.5)*3, 34, y + (rnd() - 0.5)*3, 64, y + (rnd() - 0.5)*2); g.stroke();
+  }
+  if(tk.deco==='tsuchime') paintTsuchime(g, dens);
+  paintHagane(g, tk, shape);
+  var lg = g.createLinearGradient(2, -42, 30, 6);              // a band of light across the blade
+  lg.addColorStop(0, 'rgba(255,255,255,0)');
+  lg.addColorStop(0.4, 'rgba(255,255,255,0)');
+  lg.addColorStop(0.48, 'rgba(255,255,255,' + (0.3*gloss).toFixed(3) + ')');
+  lg.addColorStop(0.56, 'rgba(255,255,255,0)');
+  lg.addColorStop(1, 'rgba(0,0,0,' + (0.12*gloss).toFixed(3) + ')');
+  g.fillStyle = lg;
+  g.fillRect(-6, -48, 72, 64);
+  var tx = shape.tip[0], ty = shape.tip[1];                     // 刃先の反射: a bright point at the edge
+  var rg = g.createRadialGradient(tx, ty, 0, tx, ty, 9);
+  rg.addColorStop(0, 'rgba(255,255,255,' + (0.9*gloss).toFixed(3) + ')');
+  rg.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = rg;
+  g.fillRect(tx - 10, ty - 10, 20, 20);
+  g.restore();
+  g.lineJoin = 'round';
+  g.strokeStyle = tk.edge;
+  g.lineWidth = 1.2;
+  shape.outline(g);
+  g.stroke();
+  g.save();
+  g.translate(0, -0.9);
+  g.strokeStyle = 'rgba(255,255,255,0.85)';
+  g.lineWidth = 0.6;
+  g.beginPath(); shape.edge(g); g.stroke();
+  g.restore();
+  if(tk.mei){ g.fillStyle = tk.mei; g.fillRect(28, -27, 4, 6); g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(28.8, -26, 0.8, 4); }   // 銘
+  paintToolHandle(g, tk);
+}
+function paintHagane(g, tk, shape){
+  var line = HAMON_LINES[tk.hamon];
+  if(!line) return;
+  if(tk.shape==='sickle'){                                      // a curved blade: the hard steel follows the edge
+    g.lineJoin = 'round';
+    g.strokeStyle = 'rgba(255,255,255,0.3)';
+    g.lineWidth = 16;
+    g.beginPath(); shape.edge(g); g.stroke();
+    g.strokeStyle = tk.hagane;
+    g.lineWidth = 11;
+    g.beginPath(); shape.edge(g); g.stroke();
+    return;
+  }
+  g.beginPath();
+  g.moveTo(-1, line(-1));
+  for(var x=0;x<=40;x+=1) g.lineTo(x, line(x));
+  g.lineTo(40, 4);
+  g.lineTo(-1, 4);
+  g.closePath();
+  g.fillStyle = tk.hagane;
+  g.fill();
+  function trace(dy){ g.beginPath(); g.moveTo(-1, line(-1) + dy); for(var x2=0;x2<=40;x2+=1) g.lineTo(x2, line(x2) + dy); }
+  g.strokeStyle = 'rgba(255,255,255,0.4)'; g.lineWidth = 3; trace(0); g.stroke();      // 匂: a soft bright mist
+  g.strokeStyle = 'rgba(255,255,255,0.95)'; g.lineWidth = 0.7; trace(0); g.stroke();
+  if(tk.hamon==='fine'){                                        // a second line and the small 足 toward the edge
+    g.strokeStyle = 'rgba(255,255,255,0.5)'; g.lineWidth = 0.45; trace(1.6); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.4)';
+    for(var a=2;a<38;a+=2.6){ g.beginPath(); g.moveTo(a, line(a) + 0.4); g.lineTo(a + 0.4, line(a) + 3); g.stroke(); }
+  }
+}
+// 鎚目: hammer dents set in even rows over the iron (a light upper edge and a shaded lower one)
+function paintTsuchime(g, dens){
+  var sx = 5.4/Math.sqrt(dens), sy = 4.4/Math.sqrt(dens), row = 0;
+  for(var y=-39; y<=-13; y+=sy, row++){
+    for(var x=2 + (row%2)*sx/2; x<=37; x+=sx){
+      g.fillStyle = 'rgba(30,38,44,0.08)';
+      g.beginPath(); g.ellipse(x, y, 2.3, 1.55, -0.2, 0, Math.PI*2); g.fill();
+      g.lineWidth = 0.8;
+      g.strokeStyle = 'rgba(255,255,255,0.6)';
+      g.beginPath(); g.ellipse(x, y, 2.2, 1.45, -0.2, 0.95*Math.PI, 1.85*Math.PI); g.stroke();
+      g.strokeStyle = 'rgba(28,36,42,0.38)';
+      g.beginPath(); g.ellipse(x, y, 2.2, 1.45, -0.2, -0.05*Math.PI, 0.85*Math.PI); g.stroke();
+    }
+  }
+}
+function paintToolHandle(g, tk){
+  g.fillStyle = tk.handle;
+  cardRoundRect(g, 4, -42, 30, 9, 2);
+  g.fill();
+  g.strokeStyle = 'rgba(0,0,0,0.25)';
+  g.lineWidth = 0.5;
+  for(var i=0;i<3;i++){ var y = -39.5 + i*2.4; g.beginPath(); g.moveTo(5, y); g.bezierCurveTo(14, y - 0.6, 22, y + 0.6, 33, y); g.stroke(); }
+  g.fillStyle = 'rgba(255,255,255,0.18)';
+  g.fillRect(5, -41.4, 28, 1);
+  g.fillStyle = tk.band;
+  g.fillRect(7, -42, 3, 9);
+  g.fillRect(28, -42, 3, 9);
+  g.fillStyle = 'rgba(255,255,255,0.3)';
+  g.fillRect(7.4, -41.6, 0.8, 8.2);
+  g.fillRect(28.4, -41.6, 0.8, 8.2);
+  g.fillStyle = tk.band;                                        // 目釘
+  g.beginPath(); g.arc(19, -37.5, 1, 0, Math.PI*2); g.fill();
+  if(tk.collar){                                                // 鎌の口金: the metal collar at the root of the blade
+    var cg = g.createLinearGradient(0, -44, 0, -32);
+    cg.addColorStop(0, mixHex(tk.collar, '#ffffff', 0.4));
+    cg.addColorStop(0.5, tk.collar);
+    cg.addColorStop(1, mixHex(tk.collar, '#000000', 0.35));
+    g.fillStyle = cg;
+    g.fillRect(-1, -43.5, 7, 12);
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 0.6; g.strokeRect(-1, -43.5, 7, 12);
+    g.fillStyle = 'rgba(40,30,20,0.7)';
+    g.beginPath(); g.arc(2.5, -37.5, 0.9, 0, Math.PI*2); g.fill();
+  }
+}
+
+// --- ② 演出: one base for every 演出 (drawSkinRing + drawCutBits); the palette picks the colours, the shape of the
+// bits, the sparkle and the ring. The bits follow settings.effects (level and particlesOn) and are capped. ---
+var CUT_BITS_MAX = 18, CUT_FX_RECENT = 4, SERVE_FX_MAX = 96;
+// The bits, each drawn round (0, 0) at about 9 units across for s = 1
+var BIT_SHAPES = {
+  strip:function(c, s, col){ c.fillStyle = col; c.fillRect(-4.5*s, -2*s, 9*s, 4*s); },
+  round:function(c, s, col){ c.fillStyle = col; c.beginPath(); c.arc(0, 0, 3*s, 0, Math.PI*2); c.fill(); },
+  washi:function(c, s, col){         // a torn scrap of washi with a fibre in it
+    c.fillStyle = col;
+    c.beginPath();
+    c.moveTo(-5*s, -2.2*s); c.lineTo(4.6*s, -2.6*s); c.lineTo(5*s, -0.6*s); c.lineTo(4.3*s, 0.4*s); c.lineTo(5.2*s, 2.2*s); c.lineTo(-4.6*s, 2.4*s); c.lineTo(-5.2*s, 0.2*s);
+    c.closePath(); c.fill();
+    c.strokeStyle = 'rgba(120,90,60,0.4)'; c.lineWidth = 0.5*s;
+    c.beginPath(); c.moveTo(-3*s, -1*s); c.lineTo(2.5*s, 0.8*s); c.stroke();
+  },
+  negi:function(c, s, col){          // a ring of spring onion, its pale heart showing
+    c.strokeStyle = col; c.lineWidth = 1.6*s;
+    c.beginPath(); c.ellipse(0, 0, 2.8*s, 2.4*s, 0, 0, Math.PI*2); c.stroke();
+    c.fillStyle = 'rgba(236,246,220,0.9)';
+    c.beginPath(); c.ellipse(0, 0, 1.4*s, 1.1*s, 0, 0, Math.PI*2); c.fill();
+  },
+  flake:function(c, s, col){         // 花かつお: a thin curled shaving with a darker edge
+    c.fillStyle = col;
+    c.beginPath();
+    c.moveTo(-5*s, 0); c.bezierCurveTo(-3*s, -3.4*s, 2*s, -3.6*s, 5*s, -1*s); c.bezierCurveTo(3*s, 0.2*s, 1*s, 2.6*s, -1.5*s, 2.8*s); c.bezierCurveTo(-3.5*s, 2.6*s, -4.6*s, 1.4*s, -5*s, 0);
+    c.closePath(); c.fill();
+    c.strokeStyle = 'rgba(160,100,70,0.5)'; c.lineWidth = 0.5*s; c.stroke();
+  },
+  mochi:function(c, s, col){         // 羽二重餅: a soft square dusted with starch
+    c.fillStyle = col;
+    cardRoundRect(c, -3.6*s, -3.2*s, 7.2*s, 6.4*s, 2.4*s); c.fill();
+    c.strokeStyle = 'rgba(180,160,120,0.45)'; c.lineWidth = 0.5*s; c.stroke();
+    c.fillStyle = 'rgba(255,255,255,0.8)';
+    c.beginPath(); c.ellipse(-1*s, -1.2*s, 1.6*s, 0.9*s, -0.3, 0, Math.PI*2); c.fill();
+  },
+  cube:function(c, s, col){          // 水ようかん: a little block with a lighter top
+    c.fillStyle = col; c.fillRect(-3.4*s, -1.4*s, 6.8*s, 4.4*s);
+    c.fillStyle = mixHex(col, '#ffffff', 0.28);
+    c.beginPath(); c.moveTo(-3.4*s, -1.4*s); c.lineTo(-1.8*s, -3*s); c.lineTo(5*s, -3*s); c.lineTo(3.4*s, -1.4*s); c.closePath(); c.fill();
+    c.fillStyle = mixHex(col, '#000000', 0.3);
+    c.beginPath(); c.moveTo(3.4*s, -1.4*s); c.lineTo(5*s, -3*s); c.lineTo(5*s, 1.4*s); c.lineTo(3.4*s, 3*s); c.closePath(); c.fill();
+    c.fillStyle = 'rgba(255,255,255,0.45)'; c.fillRect(-2.8*s, -0.8*s, 2.2*s, 0.5*s);
+  },
+  peanut:function(c, s, col){        // 五月ヶ瀬の落花生: two lobes and a waist
+    c.fillStyle = col;
+    c.beginPath(); c.arc(-1.8*s, 0, 2.3*s, 0, Math.PI*2); c.fill();
+    c.beginPath(); c.arc(1.9*s, 0.1*s, 2.1*s, 0, Math.PI*2); c.fill();
+    c.strokeStyle = mixHex(col, '#000000', 0.3); c.lineWidth = 0.5*s;
+    c.beginPath(); c.moveTo(0, -1.6*s); c.lineTo(0, 1.6*s); c.stroke();
+    c.fillStyle = 'rgba(255,255,255,0.45)'; c.beginPath(); c.arc(-2.4*s, -0.9*s, 0.7*s, 0, Math.PI*2); c.fill();
+  },
+  crab:function(c, s, col){          // 越前がに: a red shell, little legs and eyes
+    c.strokeStyle = col; c.lineWidth = 0.8*s; c.lineCap = 'round';
+    for(var i=-1;i<=1;i++){
+      c.beginPath(); c.moveTo(-2.6*s, i*1.1*s); c.lineTo(-4.6*s, i*1.6*s - 0.6*s); c.lineTo(-5.2*s, i*1.8*s + 0.4*s); c.stroke();
+      c.beginPath(); c.moveTo(2.6*s, i*1.1*s); c.lineTo(4.6*s, i*1.6*s - 0.6*s); c.lineTo(5.2*s, i*1.8*s + 0.4*s); c.stroke();
+    }
+    c.fillStyle = col;
+    c.beginPath(); c.ellipse(0, 0, 3.5*s, 2.6*s, 0, 0, Math.PI*2); c.fill();
+    c.fillStyle = 'rgba(255,255,255,0.4)'; c.beginPath(); c.ellipse(-1*s, -1*s, 1.4*s, 0.7*s, 0, 0, Math.PI*2); c.fill();
+    c.fillStyle = '#2b1a14';
+    c.beginPath(); c.arc(-0.9*s, -2.6*s, 0.5*s, 0, Math.PI*2); c.arc(0.9*s, -2.6*s, 0.5*s, 0, Math.PI*2); c.fill();
+  },
+  gem:function(c, s, col){           // めのう: a polished stone with bands and a point of light
+    c.fillStyle = col;
+    c.beginPath();
+    var pts = [[0,-3.8],[3.2,-1.8],[3.4,1.6],[0.6,3.6],[-3,2.4],[-3.6,-1.2]];
+    for(var i=0;i<pts.length;i++){ if(i) c.lineTo(pts[i][0]*s, pts[i][1]*s); else c.moveTo(pts[i][0]*s, pts[i][1]*s); }
+    c.closePath(); c.fill();
+    c.strokeStyle = mixHex(col, '#ffffff', 0.4); c.lineWidth = 0.6*s;
+    c.beginPath(); c.ellipse(0.2*s, 0.3*s, 2.2*s, 1.5*s, 0.5, 0, Math.PI*2); c.stroke();
+    c.fillStyle = 'rgba(255,255,255,0.85)'; c.beginPath(); c.arc(-1.4*s, -1.6*s, 0.6*s, 0, Math.PI*2); c.fill();
+  },
+  stick:function(c, s, col){         // 若狭塗箸: a lacquered chopstick tapering to its tip, with gold flecks
+    c.fillStyle = col;
+    c.beginPath(); c.moveTo(-6*s, -1*s); c.lineTo(6*s, -0.35*s); c.lineTo(6*s, 0.35*s); c.lineTo(-6*s, 1*s); c.closePath(); c.fill();
+    c.fillStyle = '#e8c46a';
+    c.beginPath(); c.arc(-3.6*s, 0, 0.45*s, 0, Math.PI*2); c.arc(-1.2*s, -0.1*s, 0.35*s, 0, Math.PI*2); c.fill();
+  }
+};
+// a sparkle: an eight-pointed star, or a long four-pointed glint with a glow
+function drawSparkShape(c, x, y, s, col, kind){
+  if(kind==='glint'){
+    var gl = c.createRadialGradient(x, y, 0, x, y, s*1.6);
+    gl.addColorStop(0, rgbaHex(col, 0.45));
+    gl.addColorStop(1, rgbaHex(col, 0));
+    c.fillStyle = gl;
+    c.beginPath(); c.arc(x, y, s*1.6, 0, Math.PI*2); c.fill();
+    c.fillStyle = col;
+    c.beginPath();
+    for(var k=0;k<8;k++){ var an = k*Math.PI/4, rr = k%2 ? s*0.18 : (k%4 ? s*0.8 : s*1.5); c.lineTo(x + Math.cos(an)*rr, y + Math.sin(an)*rr); }
+    c.closePath(); c.fill();
+  } else {
+    c.fillStyle = col;
+    c.beginPath();
+    for(var j=0;j<8;j++){ var a = j*Math.PI/4, r = j%2 ? s*0.32 : s; c.lineTo(x + Math.cos(a)*r, y + Math.sin(a)*r); }
+    c.closePath(); c.fill();
+  }
+  c.fillStyle = '#ffffff';
+  c.beginPath(); c.arc(x, y, s*0.22, 0, Math.PI*2); c.fill();
+}
+// the ring where a cut lands, in the equipped 演出's style (a JUST! adds a soft glow behind it)
+function drawSkinRing(c, cx, cy, fx, ek){
+  var t = fx.t, a = Math.max(0, 1 - t/400), r = 10 + t/6, just = fx.rating==='JUST', col = just ? ek.just : ek.ring;
+  if(a<=0) return;
+  c.globalAlpha = a;
+  if(just){
+    var gl = c.createRadialGradient(cx, cy, r*0.55, cx, cy, r*1.5);
+    gl.addColorStop(0, rgbaHex(col, 0));
+    gl.addColorStop(0.55, rgbaHex(col, 0.3));
+    gl.addColorStop(1, rgbaHex(col, 0));
+    c.fillStyle = gl;
+    c.beginPath(); c.arc(cx, cy, r*1.5, 0, Math.PI*2); c.fill();
+  }
+  c.strokeStyle = col;
+  c.lineCap = 'round';
+  var style = ek.ringStyle;
+  if(style==='double'){
+    c.lineWidth = just ? 2.4 : 2;
+    c.beginPath(); c.arc(cx, cy, r, 0, Math.PI*2); c.stroke();
+    c.strokeStyle = just ? ek.ring : col; c.lineWidth = 1;
+    c.beginPath(); c.arc(cx, cy, r*0.7, 0, Math.PI*2); c.stroke();
+  } else if(style==='brush'){                                   // like one stroke of a brush, thick to thin
+    var a0 = -Math.PI/2 + t*0.004, seg = Math.PI*1.8/6;
+    for(var k=0;k<6;k++){ c.lineWidth = 3.8*(1 - k/7) + 0.5; c.beginPath(); c.arc(cx, cy, r, a0 + k*seg, a0 + (k + 1)*seg + 0.02); c.stroke(); }
+  } else if(style==='soft'){
+    c.globalAlpha = a*0.35; c.lineWidth = 6;
+    c.beginPath(); c.arc(cx, cy, r, 0, Math.PI*2); c.stroke();
+    c.globalAlpha = a; c.lineWidth = 1.5;
+    c.beginPath(); c.arc(cx, cy, r, 0, Math.PI*2); c.stroke();
+  } else if(style==='dots'){
+    c.fillStyle = col;
+    for(var d=0; d<12; d++){ var an = d/12*Math.PI*2 + t*0.003; c.beginPath(); c.arc(cx + Math.cos(an)*r, cy + Math.sin(an)*r, just ? 1.8 : 1.4, 0, Math.PI*2); c.fill(); }
+  } else {
+    c.lineWidth = just ? 2.6 : 2;
+    c.beginPath(); c.arc(cx, cy, r, 0, Math.PI*2); c.stroke();
+  }
+  c.globalAlpha = 1;
+}
+// bits flying out of a cut (none when particles are off; fewer on 控えめ; held still for reduced motion)
 function drawCutBits(cx, cy, fx, ek){
+  var fc = fxConf();
+  if(!fc.parts) return;
   if(fx.seed===undefined) fx.seed = Math.floor(Math.random()*1e9);
-  var rnd = cardRng(fx.seed), just = fx.rating==='JUST';
-  var n = just ? 10 : 6, t = fx.t;
-  ctx.globalAlpha = Math.max(0, 1 - t/400);
+  var rnd = cardRng(fx.seed), just = fx.rating==='JUST', t = fx.t;
+  var n = Math.min(CUT_BITS_MAX, Math.round((just ? 11 : 6)*fc.parts));
+  var mot = fc.still ? 0 : fc.motion, grav = skinNum(ek.grav, 1), spin = skinNum(ek.spin, 1);
+  var shape = BIT_SHAPES[ek.shape] || BIT_SHAPES.strip, cols = (ek.bits && ek.bits.length) ? ek.bits : CONFETTI_COLS;
+  var fade = Math.max(0, 1 - t/400);
+  if(fade<=0) return;
   for(var i=0;i<n;i++){
-    var ang = rnd()*Math.PI*2, sp = 0.05 + rnd()*0.07, d = 8 + sp*t;
-    ctx.fillStyle = ek.bits[i % ek.bits.length];
+    var ang = rnd()*Math.PI*2, sp = 0.05 + rnd()*0.07, d = (fc.still ? 22 : 8 + sp*t*mot), rot0 = rnd()*6.28, sz = (just ? 0.95 : 0.75)*(0.8 + rnd()*0.4);
+    var sway = Math.sin(t*0.012 + rot0)*3*(1 - grav)*mot;
+    ctx.globalAlpha = fade;
     ctx.save();
-    ctx.translate(cx + Math.cos(ang)*d, cy + Math.sin(ang)*d + 0.00012*t*t);
-    ctx.rotate(ang + t*0.01);
-    drawConfettiPiece(ctx, i%2===1, just ? 0.9 : 0.7);
+    ctx.translate(cx + Math.cos(ang)*d + sway, cy + Math.sin(ang)*d + 0.00012*t*t*grav*mot);
+    ctx.rotate(rot0 + t*0.01*spin*mot);
+    shape(ctx, sz, cols[i % cols.length]);
     ctx.restore();
+  }
+  if(just){
+    var m = Math.min(4, Math.round(3*fc.parts)), col = skinSparkColor(ek);
+    for(var k=0;k<m;k++){
+      var a = k/m*Math.PI*2 + 0.4, rr = 12 + t/5;
+      ctx.globalAlpha = fade;
+      drawSparkShape(ctx, cx + Math.cos(a)*rr, cy + Math.sin(a)*rr, 3.2*(0.6 + 0.4*fade), col, ek.spark);
+    }
   }
   ctx.globalAlpha = 1;
 }
@@ -5909,10 +6617,10 @@ function drawCoverImage(g, img, w, h){
   g.drawImage(img, (w - dw)/2, (h - dh)/2, dw, dh);
   return true;
 }
-// The background is drawn once into its own canvas (again only when the size, theme or picture changes).
+// The background is drawn once into its own canvas (again only when the size, theme, detail or picture changes).
 function bgLayerFor(b){
   var useImg = bgImageReady(b.id);
-  var key = b.id + '|' + Math.round(W) + 'x' + Math.round(H) + '@' + DPR + '|' + (useImg ? 'img' : 'draw') + '|' + COLORS.card;
+  var key = b.id + '|' + Math.round(W) + 'x' + Math.round(H) + '@' + DPR + '|' + (useImg ? 'img' : 'draw:' + visualDetail) + '|' + COLORS.card;
   if(bgLayer.key===key && bgLayer.canvas) return bgLayer.canvas;
   var c = document.createElement('canvas');
   c.width = Math.max(1, Math.round(W*DPR));
@@ -5922,10 +6630,7 @@ function bgLayerFor(b){
   g.setTransform(DPR, 0, 0, DPR, 0, 0);
   var drawn = false;
   if(useImg){ try{ drawn = drawCoverImage(g, bgLayer.img, W, H); }catch(e){ drawn = false; bgLayer.imgState = 'bad'; } }
-  if(!drawn){
-    if(!Object.prototype.hasOwnProperty.call(BG_SCENES, b.scene)) return null;
-    BG_SCENES[b.scene](g, W, H, b);
-  }
+  if(!drawn && !paintBgBase(g, W, H, b)) return null;
   g.globalAlpha = isDarkCard() ? 0.5 : 0.28;          // soften it, so the lane and the marks stay easy to read
   g.fillStyle = COLORS.card || '#fbf7ec';
   g.fillRect(0, 0, W, H);
@@ -5933,6 +6638,15 @@ function bgLayerFor(b){
   bgLayer.key = key;
   bgLayer.canvas = c;
   return c;
+}
+// One base for every background: the palette's scene, then the light of its hour over it
+function paintBgBase(g, W, H, b){
+  if(!b || !Object.prototype.hasOwnProperty.call(BG_SCENES, b.scene)) return false;
+  g.save();
+  BG_SCENES[b.scene](g, W, H, b, skinQ());
+  g.restore();
+  sceneLight(g, W, H, b.light);
+  return true;
 }
 function drawEquippedBg(){
   var b = skinPart('bg');
@@ -5953,7 +6667,7 @@ function sceneRidge(g, W, H, base, amp, freq, phase, color){
   g.fillStyle = color;
   g.beginPath();
   g.moveTo(0, H);
-  for(var x=0;x<=W+6;x+=6) g.lineTo(x, base - amp*(0.6*Math.sin(x/W*freq + phase) + 0.4*Math.sin(x/W*freq*2.3 + phase*1.7)));
+  for(var x=0;x<=W+6;x+=6) g.lineTo(x, base - amp*(0.6*Math.sin(x/W*freq + phase) + 0.4*Math.sin(x/W*freq*2.3 + phase*1.7) + 0.12*Math.sin(x/W*freq*7.1 + phase*3.1)));
   g.lineTo(W, H);
   g.closePath();
   g.fill();
@@ -5970,17 +6684,73 @@ function sceneDots(g, seed, n, x, y, w, h, rMin, rMax, colors, alpha){
   }
   g.globalAlpha = 1;
 }
-function sceneFlower(g, px, py, rr, petal, heart){
-  g.fillStyle = petal;
-  g.beginPath(); g.arc(px, py, rr, 0, Math.PI*2); g.fill();
-  g.fillStyle = heart;
-  g.beginPath(); g.arc(px, py, rr*0.4, 0, Math.PI*2); g.fill();
-}
-function sceneCloud(g, x, y, r){
-  g.fillStyle = 'rgba(255,255,255,0.75)';
+function sceneCloud(g, x, y, r, tint){
+  g.fillStyle = tint || 'rgba(255,255,255,0.75)';
   g.beginPath(); g.ellipse(x, y, r, r*0.35, 0, 0, Math.PI*2); g.fill();
   g.beginPath(); g.ellipse(x - r*0.45, y + r*0.08, r*0.55, r*0.25, 0, 0, Math.PI*2); g.fill();
   g.beginPath(); g.ellipse(x + r*0.5, y + r*0.06, r*0.6, r*0.24, 0, 0, Math.PI*2); g.fill();
+  g.beginPath(); g.ellipse(x + r*0.1, y - r*0.16, r*0.42, r*0.24, 0, 0, Math.PI*2); g.fill();
+}
+// the light of the hour over a whole scene
+function sceneLight(g, W, H, kind){
+  var L, M = Math.max(W, H);
+  if(kind==='morning'){
+    L = g.createRadialGradient(W*0.1, H*0.03, 4, W*0.1, H*0.03, M*0.95);
+    L.addColorStop(0, 'rgba(255,240,205,0.42)'); L.addColorStop(0.45, 'rgba(255,236,200,0.1)'); L.addColorStop(1, 'rgba(70,90,120,0.12)');
+  } else if(kind==='evening'){
+    L = g.createLinearGradient(W, H*0.4, 0, H);
+    L.addColorStop(0, 'rgba(255,160,90,0.2)'); L.addColorStop(1, 'rgba(60,30,70,0.24)');
+  } else if(kind==='mist'){
+    L = g.createLinearGradient(0, 0, 0, H);
+    L.addColorStop(0, 'rgba(236,241,236,0.26)'); L.addColorStop(0.5, 'rgba(236,241,236,0.06)'); L.addColorStop(1, 'rgba(40,52,45,0.14)');
+  } else if(kind==='interior'){
+    L = g.createLinearGradient(0, 0, W, H*0.7);
+    L.addColorStop(0, 'rgba(255,228,170,0.26)'); L.addColorStop(0.55, 'rgba(255,228,170,0)'); L.addColorStop(1, 'rgba(40,24,10,0.22)');
+  } else {
+    L = g.createRadialGradient(W*0.5, -H*0.1, 4, W*0.5, -H*0.1, M*1.1);
+    L.addColorStop(0, 'rgba(255,252,235,0.28)'); L.addColorStop(1, 'rgba(50,60,70,0.1)');
+  }
+  g.fillStyle = L;
+  g.fillRect(0, 0, W, H);
+}
+// a band of haze between two depths
+function sceneHaze(g, W, y0, y1, rgb, a){
+  var h = g.createLinearGradient(0, y0, 0, y1);
+  h.addColorStop(0, 'rgba(' + rgb + ',0)');
+  h.addColorStop(0.5, 'rgba(' + rgb + ',' + a + ')');
+  h.addColorStop(1, 'rgba(' + rgb + ',0)');
+  g.fillStyle = h;
+  g.fillRect(0, y0, W, y1 - y0);
+}
+// a soft shadow cast on the ground
+function sceneShadow(g, x, y, rx, ry, a){
+  g.save();
+  g.translate(x, y);
+  g.scale(1, ry/rx);
+  var s = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+  s.addColorStop(0, 'rgba(20,14,8,' + a + ')');
+  s.addColorStop(1, 'rgba(20,14,8,0)');
+  g.fillStyle = s;
+  g.beginPath(); g.arc(0, 0, rx, 0, Math.PI*2); g.fill();
+  g.restore();
+}
+// a line of round-topped trees, lit from the upper left
+function sceneTrees(g, seed, n, x0, x1, baseY, size, cols){
+  var t = seededList(seed, n, function(r){ return {x:r(), s:r(), c:r()}; });
+  t.sort(function(a, b){ return b.s - a.s; });
+  for(var i=0;i<t.length;i++){
+    var p = t[i], x = x0 + p.x*(x1 - x0), r = size*(0.6 + p.s*0.6), col = cols[Math.floor(p.c*cols.length) % cols.length];
+    g.fillStyle = col;
+    g.beginPath();
+    g.arc(x, baseY - r*0.85, r, 0, Math.PI*2);
+    g.arc(x - r*0.62, baseY - r*0.42, r*0.7, 0, Math.PI*2);
+    g.arc(x + r*0.62, baseY - r*0.45, r*0.74, 0, Math.PI*2);
+    g.fill();
+    g.fillStyle = 'rgba(255,250,220,0.16)';
+    g.beginPath(); g.arc(x - r*0.3, baseY - r*1.1, r*0.5, 0, Math.PI*2); g.fill();
+    g.fillStyle = 'rgba(0,0,0,0.14)';
+    g.beginPath(); g.arc(x + r*0.45, baseY - r*0.35, r*0.6, 0, Math.PI*2); g.fill();
+  }
 }
 // a roof whose eaves turn up at the corners
 function sceneRoof(g, cx, y, half, h, color){
@@ -5994,6 +6764,36 @@ function sceneRoof(g, cx, y, half, h, color){
   g.closePath();
   g.fill();
 }
+// the same roof with its tiles, a dark outline, the ridge and the shadow it throws on the wall below
+function sceneTiledRoof(g, cx, y, half, h, color, shadowH){
+  if(shadowH){
+    var sh = g.createLinearGradient(0, y, 0, y + shadowH);
+    sh.addColorStop(0, 'rgba(20,16,12,0.45)');
+    sh.addColorStop(1, 'rgba(20,16,12,0)');
+    g.fillStyle = sh;
+    g.fillRect(cx - half*0.86, y, half*1.72, shadowH);
+  }
+  sceneRoof(g, cx, y, half, h, color);
+  g.save();
+  sceneRoof(g, cx, y, half, h, color);
+  g.clip();
+  g.strokeStyle = 'rgba(255,255,255,0.13)';
+  g.lineWidth = 1;
+  var n = Math.max(6, Math.round(half/3.2));
+  for(var i=0;i<=n;i++){ var x = cx - half + i*half*2/n; g.beginPath(); g.moveTo(x, y + 2); g.lineTo(cx + (x - cx)*0.62, y - h); g.stroke(); }
+  var lit = g.createLinearGradient(cx - half, 0, cx + half, 0);
+  lit.addColorStop(0, 'rgba(255,255,255,0.12)');
+  lit.addColorStop(1, 'rgba(0,0,0,0.22)');
+  g.fillStyle = lit;
+  g.fillRect(cx - half, y - h, half*2, h*1.4);
+  g.restore();
+  g.strokeStyle = 'rgba(20,18,16,0.7)';
+  g.lineWidth = 1.2;
+  sceneRoof(g, cx, y, half, h, 'rgba(0,0,0,0)');
+  g.stroke();
+  g.fillStyle = mixHex(color, '#000000', 0.35);
+  g.fillRect(cx - half*0.62, y - h - 2, half*1.24, 3);
+}
 function scenePine(g, x, baseY, size){
   g.strokeStyle = '#5a4331';
   g.lineWidth = Math.max(2, size*0.07);
@@ -6002,24 +6802,32 @@ function scenePine(g, x, baseY, size){
   g.moveTo(x, baseY);
   g.quadraticCurveTo(x - size*0.15, baseY - size*0.5, x + size*0.05, baseY - size*0.85);
   g.stroke();
-  g.fillStyle = '#3f5f3b';
+  g.lineWidth = Math.max(1, size*0.03);
+  g.beginPath(); g.moveTo(x - size*0.06, baseY - size*0.48); g.lineTo(x - size*0.3, baseY - size*0.55); g.moveTo(x + size*0.02, baseY - size*0.66); g.lineTo(x + size*0.26, baseY - size*0.7); g.stroke();
   var tufts = [[-0.3,-0.55,0.32],[0.25,-0.7,0.28],[-0.05,-0.9,0.3],[0.35,-0.42,0.22]];
   for(var i=0;i<tufts.length;i++){
-    g.beginPath();
-    g.ellipse(x + tufts[i][0]*size, baseY + tufts[i][1]*size, tufts[i][2]*size, tufts[i][2]*size*0.38, 0, 0, Math.PI*2);
-    g.fill();
+    var tx = x + tufts[i][0]*size, ty = baseY + tufts[i][1]*size, tr = tufts[i][2]*size;
+    g.fillStyle = '#334f30';
+    g.beginPath(); g.ellipse(tx, ty, tr, tr*0.4, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#4f7448';                                    // the lit upper side of each pad of needles
+    g.beginPath(); g.ellipse(tx - tr*0.1, ty - tr*0.12, tr*0.82, tr*0.24, 0, 0, Math.PI*2); g.fill();
   }
 }
 function sceneCedar(g, x, baseY, hgt, wid, color){
   g.fillStyle = '#4a3726';
   g.fillRect(x - wid*0.05, baseY - hgt*0.2, wid*0.1, hgt*0.2);
-  g.fillStyle = color;
-  for(var k=0;k<4;k++){
-    var top = baseY - hgt + k*hgt*0.18, bot = top + hgt*0.36, half = wid*(0.2 + k*0.1);
+  g.fillStyle = 'rgba(255,230,190,0.18)';
+  g.fillRect(x - wid*0.05, baseY - hgt*0.2, wid*0.03, hgt*0.2);
+  for(var k=0;k<5;k++){
+    var top = baseY - hgt + k*hgt*0.15, bot = top + hgt*0.3, half = wid*(0.16 + k*0.085);
+    g.fillStyle = color;
     g.beginPath(); g.moveTo(x, top); g.lineTo(x + half, bot); g.lineTo(x - half, bot); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(0,0,0,0.16)';
+    g.beginPath(); g.moveTo(x, top); g.lineTo(x + half, bot); g.lineTo(x + half*0.1, bot); g.closePath(); g.fill();
   }
 }
 function sceneLantern(g, x, baseY, s){
+  sceneShadow(g, x + s*0.2, baseY, s*0.45, s*0.1, 0.3);
   g.fillStyle = '#8e8b82';
   g.fillRect(x - s*0.3, baseY - s*0.12, s*0.6, s*0.12);
   g.fillRect(x - s*0.08, baseY - s*0.62, s*0.16, s*0.5);
@@ -6029,21 +6837,40 @@ function sceneLantern(g, x, baseY, s){
   g.fillStyle = '#7d7a72';
   g.beginPath(); g.moveTo(x - s*0.42, baseY - s*0.8); g.lineTo(x, baseY - s*1.02); g.lineTo(x + s*0.42, baseY - s*0.8); g.closePath(); g.fill();
   g.beginPath(); g.arc(x, baseY - s*1.06, s*0.06, 0, Math.PI*2); g.fill();
+  g.fillStyle = 'rgba(0,0,0,0.18)';
+  g.fillRect(x + s*0.02, baseY - s*0.62, s*0.06, s*0.5);
+  g.fillStyle = 'rgba(110,140,80,0.55)';                        // moss on the stone
+  g.beginPath(); g.ellipse(x - s*0.12, baseY - s*0.84, s*0.16, s*0.04, 0, 0, Math.PI*2); g.fill();
 }
 function sceneFern(g, x, y, s){
   g.strokeStyle = '#557a3f';
   g.lineWidth = 1.6;
   g.lineCap = 'round';
   for(var i=-3;i<=3;i++){
-    var a = -Math.PI/2 + i*0.32;
+    var a = -Math.PI/2 + i*0.32, ex = x + Math.cos(a)*s, ey = y + Math.sin(a)*s*0.9;
     g.beginPath();
     g.moveTo(x, y);
-    g.quadraticCurveTo(x + Math.cos(a)*s*0.5, y + Math.sin(a)*s*0.7, x + Math.cos(a)*s, y + Math.sin(a)*s*0.9);
+    g.quadraticCurveTo(x + Math.cos(a)*s*0.5, y + Math.sin(a)*s*0.7, ex, ey);
     g.stroke();
+    g.lineWidth = 0.8;
+    for(var k=1;k<5;k++){ var fx = x + (ex - x)*k/5, fy = y + (ey - y)*k/5 + s*0.04*k; g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx - s*0.08, fy - s*0.06); g.moveTo(fx, fy); g.lineTo(fx + s*0.08, fy - s*0.06); g.stroke(); }
+    g.lineWidth = 1.6;
+  }
+}
+// grass blades along the ground
+function sceneGrass(g, seed, n, x0, y0, w, h, color){
+  var b = seededList(seed, n, function(r){ return {x:r(), y:r(), l:r(), a:r()}; });
+  g.strokeStyle = color;
+  g.lineWidth = 1;
+  g.lineCap = 'round';
+  for(var i=0;i<b.length;i++){
+    var x = x0 + b[i].x*w, y = y0 + b[i].y*h, l = 3 + b[i].l*6*(0.5 + b[i].y);
+    g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + (b[i].a - 0.5)*4, y - l*0.6, x + (b[i].a - 0.5)*7, y - l); g.stroke();
   }
 }
 // a small raptor like the ones found in Fukui, facing left, standing on (x, y)
 function sceneDino(g, x, y, s, color){
+  sceneShadow(g, x + 10*s, y + 1, 52*s, 6*s, 0.35);
   g.save();
   g.translate(x, y);
   g.scale(s, s);
@@ -6061,247 +6888,574 @@ function sceneDino(g, x, y, s, color){
   g.quadraticCurveTo(40, -36, 80, -44);
   g.closePath();
   g.fill();
+  g.save();
+  g.clip();
+  g.fillStyle = 'rgba(255,240,210,0.22)';                       // the lit back and the pale belly
+  g.beginPath(); g.ellipse(10, -58, 60, 6, -0.05, 0, Math.PI*2); g.fill();
+  g.fillStyle = 'rgba(0,0,0,0.2)';
+  g.beginPath(); g.ellipse(10, -36, 50, 5, 0, 0, Math.PI*2); g.fill();
+  g.strokeStyle = 'rgba(0,0,0,0.18)';
+  g.lineWidth = 1;
+  for(var i=0;i<8;i++){ g.beginPath(); g.moveTo(-14 + i*10, -56); g.lineTo(-18 + i*10, -40); g.stroke(); }
+  g.restore();
   g.strokeStyle = color;
   g.lineCap = 'round';
   g.lineJoin = 'round';
   g.lineWidth = 6;
   g.beginPath(); g.moveTo(4, -40); g.lineTo(-4, -18); g.lineTo(6, 0); g.lineTo(-6, 0); g.stroke();
+  g.strokeStyle = mixHex(color, '#000000', 0.25);
   g.beginPath(); g.moveTo(16, -40); g.lineTo(18, -20); g.lineTo(26, -2); g.lineTo(16, -2); g.stroke();
+  g.strokeStyle = color;
   g.lineWidth = 3;
   g.beginPath(); g.moveTo(-26, -48); g.lineTo(-32, -38); g.lineTo(-28, -34); g.stroke();
   g.fillStyle = '#efe6d0';
   g.beginPath(); g.arc(-54, -78, 1.6, 0, Math.PI*2); g.fill();
+  g.fillStyle = '#1a120c';
+  g.beginPath(); g.arc(-54.4, -78, 0.8, 0, Math.PI*2); g.fill();
   g.restore();
 }
+// そばの花: five white petals round a pink heart
+function sceneFloret(g, x, y, r){
+  g.fillStyle = '#fbfaf3';
+  for(var k=0;k<5;k++){ var a = k*Math.PI*2/5 - Math.PI/2; g.beginPath(); g.arc(x + Math.cos(a)*r*0.62, y + Math.sin(a)*r*0.62, r*0.52, 0, Math.PI*2); g.fill(); }
+  g.fillStyle = '#e3a2b4';
+  g.beginPath(); g.arc(x, y, r*0.32, 0, Math.PI*2); g.fill();
+}
+// 水仙: six white petals round a yellow cup
+function sceneNarcissus(g, x, y, r, a){
+  g.fillStyle = '#fbfaf2';
+  for(var k=0;k<6;k++){ var pa = a + k*Math.PI/3; g.beginPath(); g.ellipse(x + Math.cos(pa)*r*0.6, y + Math.sin(pa)*r*0.5, r*0.55, r*0.28, pa, 0, Math.PI*2); g.fill(); }
+  g.fillStyle = '#f2c233';
+  g.beginPath(); g.arc(x, y, r*0.36, 0, Math.PI*2); g.fill();
+  g.strokeStyle = '#d9962a';
+  g.lineWidth = Math.max(0.4, r*0.12);
+  g.beginPath(); g.arc(x, y, r*0.36, 0, Math.PI*2); g.stroke();
+}
+// a farmhouse with a thatched roof
+function sceneHouse(g, x, baseY, s){
+  sceneShadow(g, x + s*0.3, baseY, s*0.9, s*0.12, 0.3);
+  g.fillStyle = '#e8dcc2';
+  g.fillRect(x - s*0.5, baseY - s*0.36, s, s*0.36);
+  g.fillStyle = '#5a4532';
+  g.fillRect(x - s*0.5, baseY - s*0.36, s*0.06, s*0.36);
+  g.fillRect(x + s*0.44, baseY - s*0.36, s*0.06, s*0.36);
+  g.fillRect(x - s*0.12, baseY - s*0.26, s*0.22, s*0.26);
+  g.fillStyle = '#8a6f45';
+  g.beginPath(); g.moveTo(x - s*0.66, baseY - s*0.34); g.lineTo(x - s*0.2, baseY - s*0.86); g.lineTo(x + s*0.2, baseY - s*0.86); g.lineTo(x + s*0.66, baseY - s*0.34); g.closePath(); g.fill();
+  g.fillStyle = 'rgba(0,0,0,0.2)';
+  g.beginPath(); g.moveTo(x + s*0.2, baseY - s*0.86); g.lineTo(x + s*0.66, baseY - s*0.34); g.lineTo(x + s*0.1, baseY - s*0.34); g.closePath(); g.fill();
+  g.fillStyle = '#4d3c28';
+  g.fillRect(x - s*0.24, baseY - s*0.9, s*0.48, s*0.06);
+}
+// 柱状節理: one basalt column — its lit face, its shaded face, the joints across it and its top catching the light
+function sceneColumn(g, x, top, w, bottom, lit, shade, cap, seed){
+  var lw = w*0.56;
+  g.fillStyle = lit;
+  g.fillRect(x, top, lw, bottom - top);
+  g.fillStyle = shade;
+  g.beginPath(); g.moveTo(x + lw, top); g.lineTo(x + w, top - w*0.12); g.lineTo(x + w, bottom); g.lineTo(x + lw, bottom); g.closePath(); g.fill();
+  g.fillStyle = cap;
+  g.beginPath(); g.moveTo(x, top); g.lineTo(x + w*0.18, top - w*0.2); g.lineTo(x + w*0.72, top - w*0.24); g.lineTo(x + w, top - w*0.12); g.lineTo(x + lw, top); g.closePath(); g.fill();
+  g.strokeStyle = 'rgba(0,0,0,0.3)';
+  g.lineWidth = 1;
+  var j = seededList(seed, 4, function(r){ return r(); });
+  for(var i=0;i<j.length;i++){
+    var jy = top + (bottom - top)*(0.15 + j[i]*0.8);
+    g.beginPath(); g.moveTo(x, jy); g.lineTo(x + lw, jy + 1.5); g.lineTo(x + w, jy - 1); g.stroke();
+  }
+  g.strokeStyle = 'rgba(255,210,160,0.35)';
+  g.beginPath(); g.moveTo(x + 0.5, top); g.lineTo(x + 0.5, bottom); g.stroke();
+}
 // The scenes keep their subjects above and below the lane (the lane covers about 30–45% of the height).
+// Each has a far, a middle and a near layer; q.pattern (from settings.visual.detail) sets how dense the small
+// things are, and the light of the hour is laid over by paintBgBase.
 var BG_SCENES = {
-  field: function(g, W, H){          // そば畑: far hills and a field of white soba flowers
-    sceneSky(g, W, H, [[0,'#b9d3e2'],[0.45,'#eef0e2'],[1,'#eef0e2']]);
-    sceneRidge(g, W, H, H*0.22, H*0.035, 5.2, 0.8, '#a9bcc0');
-    sceneRidge(g, W, H, H*0.28, H*0.03, 7.4, 2.1, '#8ea88f');
-    var f = g.createLinearGradient(0, H*0.46, 0, H);
-    f.addColorStop(0, '#9dba7c');
-    f.addColorStop(1, '#5d8447');
+  field: function(g, W, H, b, q){    // そば畑: far hills, a farmhouse among trees, and a field of white soba flowers
+    sceneSky(g, W, H, [[0,'#a6c6dd'],[0.38,'#e6ecdf'],[1,'#e9eedf']]);
+    sceneCloud(g, W*0.72, H*0.07, W*0.13);
+    sceneCloud(g, W*0.3, H*0.12, W*0.07);
+    sceneRidge(g, W, H, H*0.21, H*0.04, 4.6, 0.8, '#b7c6cc');
+    sceneHaze(g, W, H*0.17, H*0.27, '236,240,232', 0.55);
+    sceneRidge(g, W, H, H*0.27, H*0.03, 7.4, 2.1, '#8faa90');
+    var top = H*0.47;
+    g.fillStyle = '#7f9c6a';
+    g.fillRect(0, H*0.45, W, H*0.03);
+    sceneTrees(g, 717, 4 + Math.round(8*q.pattern), -W*0.05, W*1.05, H*0.475, Math.min(W, H)*0.035, ['#5d7a4c','#6b8a55','#55704a']);
+    sceneHouse(g, W*0.8, H*0.478, Math.min(W, H)*0.08);
+    var f = g.createLinearGradient(0, top, 0, H);
+    f.addColorStop(0, '#9ab57a');
+    f.addColorStop(1, '#4f7a3e');
     g.fillStyle = f;
-    g.fillRect(0, H*0.46, W, H*0.54);
-    g.strokeStyle = 'rgba(52,78,36,0.35)';
+    g.fillRect(0, top, W, H - top);
+    g.strokeStyle = 'rgba(48,74,34,0.28)';
     g.lineWidth = 1;
-    for(var i=0;i<10;i++){ var yy = H*(0.49 + i*0.055); g.beginPath(); g.moveTo(-4, yy); g.quadraticCurveTo(W/2, yy - 6, W + 4, yy); g.stroke(); }
-    var pts = seededList(4242, 160, function(r){ return {x:r(), y:r(), s:r()}; });
-    for(var k=0;k<pts.length;k++){ var p = pts[k]; sceneFlower(g, p.x*W, H*(0.47 + p.y*0.53), 1.1 + p.y*1.5 + p.s*0.6, '#fbfaf3', '#e3a2b4'); }
+    for(var i=-9;i<=9;i++){ g.beginPath(); g.moveTo(W*0.5 + i*W*0.02, top); g.lineTo(W*0.5 + i*W*0.34, H); g.stroke(); }
+    var n = Math.round(520*q.pattern), sz = Math.min(W, H)/340;
+    var pts = seededList(4242, n, function(r){ return {x:r(), y:Math.pow(r(), 1.6), s:r(), k:r()}; });
+    pts.sort(function(a, b2){ return a.y - b2.y; });
+    for(var k=0;k<pts.length;k++){
+      var p = pts[k], y = top + 4 + p.y*(H - top - 4), d = (y - top)/(H - top), x = p.x*W, r = (0.6 + d*2.8)*sz;
+      if(d<0.22){ g.fillStyle = 'rgba(251,250,243,0.85)'; g.fillRect(x, y, r*1.2, r*0.8); continue; }
+      if(d>0.45){ g.strokeStyle = '#a5524e'; g.lineWidth = Math.max(0.6, r*0.25); g.beginPath(); g.moveTo(x, y); g.lineTo(x + (p.s - 0.5)*r, y + r*3.5); g.stroke(); }
+      var m = 2 + Math.floor(p.k*3);
+      for(var c=0;c<m;c++) sceneFloret(g, x + (c - (m - 1)/2)*r*1.5 + (p.s - 0.5)*r, y + ((c*7) % 3 - 1)*r*0.8, r);
+    }
+    var lv = seededList(99, Math.round(18*q.pattern), function(r){ return {x:r(), y:r()}; });
+    g.fillStyle = '#3f6a32';                                    // heart-shaped leaves in the front
+    for(var l=0;l<lv.length;l++){ var lx = lv[l].x*W, ly = H*(0.9 + lv[l].y*0.1); g.beginPath(); g.ellipse(lx, ly, 6*sz, 4*sz, (lv[l].x - 0.5), 0, Math.PI*2); g.fill(); }
   },
-  noren: function(g, W, H){          // 越前和紙ののれん: a shop front with washi noren and a wooden counter
-    sceneSky(g, W, H, [[0,'#efe3cb'],[1,'#e1d0b0']]);
-    sceneDots(g, 311, 120, 0, 0, W, H, 0.5, 1.4, ['#d9c7a3','#f6eedd'], 0.5);
+  noren: function(g, W, H, b, q){    // 越前和紙ののれん: a shop front with washi noren, a lit lattice and a wooden counter
+    sceneSky(g, W, H, [[0,'#f0e4cc'],[1,'#ddcaa6']]);
+    sceneDots(g, 311, Math.round(160*q.grain) + 20, 0, 0, W, H, 0.5, 1.4, ['#d9c7a3','#f6eedd'], 0.5);
+    var tileH = H*0.032, tw = Math.max(10, W*0.06);
+    g.fillStyle = '#4f5457';
+    g.fillRect(0, 0, W, tileH);
+    for(var tx=0; tx<W + tw; tx+=tw){
+      g.fillStyle = '#6a7074'; g.beginPath(); g.arc(tx + tw/2, tileH, tw*0.46, Math.PI, 0); g.fill();
+      g.fillStyle = 'rgba(255,255,255,0.2)'; g.beginPath(); g.arc(tx + tw/2, tileH, tw*0.46, 1.1*Math.PI, 1.45*Math.PI); g.lineTo(tx + tw/2, tileH); g.fill();
+    }
     g.fillStyle = '#4b3423';
-    g.fillRect(0, 0, W, H*0.045);
-    g.fillStyle = '#6a4a32';
-    g.fillRect(0, H*0.045, W, Math.max(3, H*0.012));
-    var top = H*0.057, bot = H*0.27, pad = W*0.06, gap = W*0.018, pw = (W - pad*2 - gap*2)/3;
+    g.fillRect(0, tileH, W, H*0.03);
+    var under = g.createLinearGradient(0, tileH + H*0.03, 0, tileH + H*0.07);
+    under.addColorStop(0, 'rgba(40,24,10,0.35)');
+    under.addColorStop(1, 'rgba(40,24,10,0)');
+    g.fillStyle = under;
+    g.fillRect(0, tileH + H*0.03, W, H*0.04);
+    var top = tileH + H*0.03, bot = H*0.27, pad = W*0.06, gap = W*0.018, pw = (W - pad*2 - gap*2)/3;
     for(var i=0;i<3;i++){
       var x = pad + i*(pw + gap);
-      g.fillStyle = '#f6efdd';
-      g.fillRect(x, top, pw, bot - top);
+      g.fillStyle = 'rgba(60,40,20,0.14)';
+      g.fillRect(x + 3, top + 3, pw, bot - top);
+      var lit = g.createLinearGradient(0, top, 0, bot);
+      lit.addColorStop(0, '#fbf5e6');
+      lit.addColorStop(1, '#efe5cd');
+      g.fillStyle = lit;
+      g.beginPath(); g.moveTo(x, top); g.lineTo(x + pw, top); g.lineTo(x + pw, bot); g.quadraticCurveTo(x + pw/2, bot + 3, x, bot); g.closePath(); g.fill();
       g.strokeStyle = 'rgba(150,120,80,0.22)';
       g.lineWidth = 1;
-      var fib = seededList(500 + i, 26, function(r){ return {x:r(), y:r(), l:r(), a:r()}; });
-      for(var k=0;k<fib.length;k++){ var q = fib[k], fx = x + q.x*pw, fy = top + q.y*(bot - top); g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx + (q.a - 0.5)*10, fy + q.l*6); g.stroke(); }
+      var fib = seededList(500 + i, Math.round(40*q.grain) + 8, function(r){ return {x:r(), y:r(), l:r(), a:r()}; });
+      for(var k=0;k<fib.length;k++){ var fq = fib[k], fx = x + fq.x*pw, fy = top + fq.y*(bot - top); g.beginPath(); g.moveTo(fx, fy); g.quadraticCurveTo(fx + (fq.a - 0.5)*6, fy + fq.l*3, fx + (fq.a - 0.5)*10, fy + fq.l*6); g.stroke(); }
       g.strokeStyle = 'rgba(110,80,45,0.4)';
       g.strokeRect(x + 0.5, top + 0.5, pw - 1, bot - top - 1);
       g.fillStyle = '#b3452e';
       g.fillRect(x, bot - (bot - top)*0.16, pw, (bot - top)*0.05);
+      g.fillStyle = 'rgba(0,0,0,0.06)';
+      g.fillRect(x + pw*0.7, top, pw*0.3, bot - top);
     }
     g.fillStyle = '#2c241a';
     g.textAlign = 'center';
     g.textBaseline = 'middle';
     g.font = '700 ' + Math.max(12, Math.round(Math.min(pw*0.5, (bot - top)*0.46))) + 'px ' + CARD_SERIF;
     g.fillText('そば', pad + pw*1.5 + gap, top + (bot - top)*0.42);
+    var ly = H*0.47, lh = H*0.33;                               // the lattice front, lit from inside
+    var glow = g.createLinearGradient(0, ly, 0, ly + lh);
+    glow.addColorStop(0, '#f6dfa6');
+    glow.addColorStop(1, '#e2bb76');
+    g.fillStyle = glow;
+    g.fillRect(0, ly, W, lh);
+    var sw = Math.max(3, W*0.012), step = Math.max(7, W*0.035);
+    g.fillStyle = '#5b3e27';
+    for(var sx=0; sx<W; sx+=step) g.fillRect(sx, ly, sw, lh);
+    g.fillRect(0, ly, W, H*0.012);
+    g.fillRect(0, ly + lh*0.5, W, H*0.008);
+    g.fillStyle = '#3e2a1a';
+    g.fillRect(0, ly, W*0.04, lh);
+    g.fillRect(W*0.96, ly, W*0.04, lh);
     var c = g.createLinearGradient(0, H*0.8, 0, H);
     c.addColorStop(0, '#9a7048');
     c.addColorStop(1, '#6f4c2e');
     g.fillStyle = c;
     g.fillRect(0, H*0.8, W, H*0.2);
+    g.fillStyle = 'rgba(255,236,200,0.35)';
+    g.fillRect(0, H*0.8, W, 2);
     g.fillStyle = 'rgba(40,25,10,0.35)';
-    g.fillRect(0, H*0.8, W, 3);
+    g.fillRect(0, H*0.8 - 4, W, 4);
     g.strokeStyle = 'rgba(60,38,18,0.25)';
-    for(var j=0;j<5;j++){ var gy = H*(0.84 + j*0.03); g.beginPath(); g.moveTo(0, gy); g.bezierCurveTo(W*0.3, gy - 3, W*0.6, gy + 4, W, gy - 1); g.stroke(); }
+    g.lineWidth = 1;
+    for(var j=0;j<6;j++){ var gy = H*(0.83 + j*0.028); g.beginPath(); g.moveTo(0, gy); g.bezierCurveTo(W*0.3, gy - 3, W*0.6, gy + 4, W, gy - 1); g.stroke(); }
+    var s = Math.min(W, H)/340, cx = W*0.78, cy = H*0.835;     // a そば猪口 and a small zaru on the counter
+    sceneShadow(g, cx + 4*s, cy + 2*s, 22*s, 4*s, 0.35);
+    g.fillStyle = '#eef0f2';
+    g.beginPath(); g.moveTo(cx - 14*s, cy - 22*s); g.lineTo(cx + 14*s, cy - 22*s); g.lineTo(cx + 11*s, cy); g.lineTo(cx - 11*s, cy); g.closePath(); g.fill();
+    g.strokeStyle = '#3f5f8f'; g.lineWidth = 1.4*s;
+    g.beginPath(); g.moveTo(cx - 13*s, cy - 16*s); g.lineTo(cx + 13*s, cy - 16*s); g.moveTo(cx - 12*s, cy - 7*s); g.lineTo(cx + 12*s, cy - 7*s); g.stroke();
+    g.fillStyle = '#4a2c16'; g.beginPath(); g.ellipse(cx, cy - 22*s, 14*s, 3*s, 0, 0, Math.PI*2); g.fill();
+    var zx = W*0.22, zy = H*0.84;
+    sceneShadow(g, zx + 4*s, zy + 4*s, 34*s, 5*s, 0.3);
+    g.fillStyle = '#c9a76a'; g.beginPath(); g.ellipse(zx, zy, 32*s, 8*s, 0, 0, Math.PI*2); g.fill();
+    g.strokeStyle = 'rgba(110,80,40,0.45)'; g.lineWidth = 0.8;
+    for(var zr=1; zr<5; zr++){ g.beginPath(); g.ellipse(zx, zy, 32*s*zr/5, 8*s*zr/5, 0, 0, Math.PI*2); g.stroke(); }
+    g.strokeStyle = '#6f5f45'; g.lineWidth = 1.6*s;
+    for(var zn=0; zn<5; zn++){ g.beginPath(); g.moveTo(zx - 20*s, zy - 2*s + zn*1.2*s); g.bezierCurveTo(zx - 6*s, zy - 6*s + zn*s, zx + 6*s, zy + 2*s, zx + 20*s, zy - 3*s + zn*1.4*s); g.stroke(); }
   },
-  tansu: function(g, W, H, b){       // 越前箪笥: a keyaki chest with hand-forged iron fittings (匠の逸品: darker wood, gold fittings)
+  tansu: function(g, W, H, b, q){    // 越前箪笥: a keyaki chest with hand-forged iron (匠の逸品: darker wood, gold fittings, a lamp)
     var fine = !!(b && b.fine);
     sceneSky(g, W, H, fine ? [[0,'#e6d9bf'],[1,'#d5c29e']] : [[0,'#ece2cc'],[1,'#dfd0b2']]);
+    g.fillStyle = '#6f5034';
+    g.fillRect(0, H*0.012, W, H*0.012);
     var sx = W*0.06, sy = H*0.035, sw = W*0.36, sh = H*0.22;
-    g.fillStyle = '#f8f3e6';
+    var beam = g.createLinearGradient(sx, sy, W*0.75, H*0.95);   // light falling from the shoji
+    beam.addColorStop(0, 'rgba(255,244,214,0.35)');
+    beam.addColorStop(1, 'rgba(255,244,214,0)');
+    g.fillStyle = beam;
+    g.beginPath(); g.moveTo(sx, sy + sh); g.lineTo(sx + sw, sy); g.lineTo(W*0.95, H*0.88); g.lineTo(W*0.35, H*0.95); g.closePath(); g.fill();
+    g.fillStyle = '#fbf7ec';
     g.fillRect(sx, sy, sw, sh);
     g.strokeStyle = '#7a5a3a';
     g.lineWidth = 2.5;
     g.strokeRect(sx, sy, sw, sh);
     g.lineWidth = 1;
     for(var i=1;i<4;i++){ g.beginPath(); g.moveTo(sx + sw*i/4, sy); g.lineTo(sx + sw*i/4, sy + sh); g.stroke(); }
-    for(var j=1;j<4;j++){ g.beginPath(); g.moveTo(sx, sy + sh*j/4); g.lineTo(sx + sw, sy + sh*j/4); g.stroke(); }
-    g.fillStyle = fine ? '#7d5d3b' : '#a8845a';
-    g.fillRect(0, H*0.88, W, H*0.12);
-    g.fillStyle = 'rgba(0,0,0,0.12)';
-    g.fillRect(0, H*0.88, W, 2);
-    var tx = W*0.46, ty = H*0.5, tw = W*0.48, th = H*0.38;
+    for(var j=1;j<6;j++){ g.beginPath(); g.moveTo(sx, sy + sh*j/6); g.lineTo(sx + sw, sy + sh*j/6); g.stroke(); }
+    var fl = H*0.88;                                            // the tatami floor and its edging
+    var tg = g.createLinearGradient(0, fl, 0, H);
+    tg.addColorStop(0, fine ? '#b9a978' : '#cbbd8a');
+    tg.addColorStop(1, fine ? '#9a8a5c' : '#ae9f6c');
+    g.fillStyle = tg;
+    g.fillRect(0, fl, W, H - fl);
+    g.strokeStyle = 'rgba(90,80,40,0.25)';
+    g.lineWidth = 0.6;
+    for(var tl=0; tl<Math.round(14*q.pattern); tl++){ var ty = fl + (H - fl)*tl/Math.round(14*q.pattern); g.beginPath(); g.moveTo(0, ty); g.lineTo(W, ty); g.stroke(); }
+    g.fillStyle = '#2f4a35';
+    g.fillRect(0, fl, W, 3);
+    g.beginPath(); g.moveTo(W*0.38, fl); g.lineTo(W*0.38 + 3, fl); g.lineTo(W*0.3 + 5, H); g.lineTo(W*0.3, H); g.closePath(); g.fill();
+    var tx = W*0.46, ty2 = H*0.5, tw = W*0.48, th = H*0.38;
+    sceneShadow(g, tx + tw*0.55, fl + 2, tw*0.62, H*0.02, 0.45);
+    g.fillStyle = 'rgba(60,40,20,0.18)';
+    g.fillRect(tx + 5, ty2 - 3, tw, th);
     var body = g.createLinearGradient(tx, 0, tx + tw, 0);
     body.addColorStop(0, fine ? '#5e2f16' : '#8a5530');
     body.addColorStop(1, fine ? '#3a1a0b' : '#63391d');
     g.fillStyle = body;
-    g.fillRect(tx, ty, tw, th);
-    g.fillStyle = 'rgba(0,0,0,0.25)';
-    g.fillRect(tx, ty, tw, th*0.05);
-    var metal = fine ? '#c9a24a' : '#2d2724', rows = [[0.07,0.3,2],[0.33,0.63,1],[0.66,0.96,1]];
+    g.fillRect(tx, ty2, tw, th);
+    g.save();                                                   // 欅の杢: rings of grain on the fronts
+    g.beginPath(); g.rect(tx, ty2, tw, th); g.clip();
+    var grain = seededList(fine ? 77 : 55, 5, function(r){ return {x:r(), y:r(), s:0.6 + r()*0.8}; });
+    g.lineWidth = 0.8;
+    for(var gi=0; gi<grain.length; gi++){
+      var gx = tx + grain[gi].x*tw, gy = ty2 + grain[gi].y*th;
+      for(var rr=1; rr<=Math.round(9*q.pattern); rr++){
+        g.strokeStyle = rr%2 ? 'rgba(25,10,2,0.2)' : 'rgba(255,220,170,0.08)';
+        g.beginPath(); g.ellipse(gx, gy, rr*6*grain[gi].s, rr*2.6*grain[gi].s, 0.1, 0, Math.PI*2); g.stroke();
+      }
+    }
+    if(fine){ g.fillStyle = 'rgba(255,240,210,0.16)'; g.fillRect(tx + tw*0.08, ty2, tw*0.08, th); }   // 拭き漆 shine
+    g.restore();
+    g.fillStyle = 'rgba(0,0,0,0.28)';
+    g.fillRect(tx, ty2, tw, th*0.05);
+    g.fillStyle = fine ? '#6a3a1e' : '#9a6639';
+    g.fillRect(tx - 3, ty2 - th*0.04, tw + 6, th*0.04);
+    g.fillStyle = 'rgba(255,230,190,0.3)';
+    g.fillRect(tx - 3, ty2 - th*0.04, tw + 6, 1.5);
+    var metal = fine ? '#c9a24a' : '#2d2724', metalHi = fine ? 'rgba(255,244,200,0.75)' : 'rgba(255,255,255,0.22)';
+    var rows = [[0.07,0.3,2],[0.33,0.63,1],[0.66,0.96,1]];
     for(var r=0;r<rows.length;r++){
-      var y0 = ty + th*rows[r][0], y1 = ty + th*rows[r][1], cols = rows[r][2];
+      var y0 = ty2 + th*rows[r][0], y1 = ty2 + th*rows[r][1], cols = rows[r][2];
       for(var ci=0;ci<cols;ci++){
         var cw = tw*0.9/cols, x0 = tx + tw*0.05 + ci*cw, x1 = x0 + cw - (cols>1 ? tw*0.02 : 0);
-        g.strokeStyle = 'rgba(20,10,4,0.55)';
+        g.strokeStyle = 'rgba(20,10,4,0.6)';
         g.lineWidth = 1.5;
         g.strokeRect(x0, y0, x1 - x0, y1 - y0);
-        var mx = (x0 + x1)/2, my = (y0 + y1)/2, pw2 = Math.min(22, (x1 - x0)*0.3), ph2 = Math.min(14, (y1 - y0)*0.45);
+        g.strokeStyle = 'rgba(255,220,170,0.15)';
+        g.lineWidth = 1;
+        g.beginPath(); g.moveTo(x0 + 1, y1 - 1); g.lineTo(x0 + 1, y0 + 1); g.lineTo(x1 - 1, y0 + 1); g.stroke();
+        var mx = (x0 + x1)/2, my = (y0 + y1)/2, pw2 = Math.min(26, (x1 - x0)*0.34), ph2 = Math.min(16, (y1 - y0)*0.5);
         g.fillStyle = metal;
         cardRoundRect(g, mx - pw2/2, my - ph2/2, pw2, ph2, 3);
         g.fill();
+        g.strokeStyle = metalHi;
+        g.lineWidth = 0.6;
+        g.beginPath(); g.moveTo(mx - pw2*0.35, my - ph2*0.2); g.quadraticCurveTo(mx, my - ph2*0.45, mx + pw2*0.35, my - ph2*0.2); g.stroke();
+        g.fillStyle = metalHi;                                   // 鋲: rivets at the plate's corners
+        var rv = [[-0.38,-0.32],[0.38,-0.32],[-0.38,0.32],[0.38,0.32]];
+        for(var v=0; v<rv.length; v++){ g.beginPath(); g.arc(mx + rv[v][0]*pw2, my + rv[v][1]*ph2, 0.9, 0, Math.PI*2); g.fill(); }
         g.strokeStyle = metal;
         g.lineWidth = 2;
         g.beginPath(); g.arc(mx, my + ph2*0.3, ph2*0.45, 0.1*Math.PI, 0.9*Math.PI); g.stroke();
-        if(fine){ g.strokeStyle = 'rgba(255,240,200,0.6)'; g.lineWidth = 0.8; g.beginPath(); g.arc(mx, my, ph2*0.25, 0, Math.PI*2); g.stroke(); }
+        g.strokeStyle = metalHi;
+        g.lineWidth = 0.6;
+        g.beginPath(); g.arc(mx, my + ph2*0.3, ph2*0.45, 0.2*Math.PI, 0.45*Math.PI); g.stroke();
       }
     }
-    var cs = Math.min(tw, th)*0.09;
-    g.fillStyle = metal;
-    g.fillRect(tx, ty, cs, cs); g.fillRect(tx + tw - cs, ty, cs, cs);
-    g.fillRect(tx, ty + th - cs, cs, cs); g.fillRect(tx + tw - cs, ty + th - cs, cs, cs);
-    if(fine){                        // a paper lamp beside the chest
+    var cs = Math.min(tw, th)*0.1;
+    var corners = [[tx, ty2, 1, 1], [tx + tw, ty2, -1, 1], [tx, ty2 + th, 1, -1], [tx + tw, ty2 + th, -1, -1]];
+    for(var cn=0; cn<corners.length; cn++){                      // L-shaped corner fittings with rivets
+      var kx = corners[cn][0], ky = corners[cn][1], dx = corners[cn][2], dy = corners[cn][3];
+      g.fillStyle = metal;
+      g.beginPath(); g.moveTo(kx, ky); g.lineTo(kx + dx*cs, ky); g.lineTo(kx + dx*cs, ky + dy*cs*0.4); g.lineTo(kx + dx*cs*0.4, ky + dy*cs*0.4); g.lineTo(kx + dx*cs*0.4, ky + dy*cs); g.lineTo(kx, ky + dy*cs); g.closePath(); g.fill();
+      g.fillStyle = metalHi;
+      g.beginPath(); g.arc(kx + dx*cs*0.2, ky + dy*cs*0.2, 0.9, 0, Math.PI*2); g.fill();
+    }
+    if(fine){                        // an andon lamp beside the chest
       var lx = W*0.22, ly = H*0.66, lw = W*0.12, lh = H*0.16;
-      var glow = g.createRadialGradient(lx, ly, 2, lx, ly, lw*1.8);
-      glow.addColorStop(0, 'rgba(255,214,140,0.55)');
+      var glow = g.createRadialGradient(lx, ly, 2, lx, ly, lw*2.2);
+      glow.addColorStop(0, 'rgba(255,214,140,0.6)');
       glow.addColorStop(1, 'rgba(255,214,140,0)');
       g.fillStyle = glow;
-      g.fillRect(lx - lw*2, ly - lw*2, lw*4, lw*4);
+      g.fillRect(lx - lw*2.4, ly - lw*2.4, lw*4.8, lw*4.8);
+      sceneShadow(g, lx + lw*0.4, fl + 1, lw*0.9, H*0.012, 0.35);
       g.fillStyle = '#f7e7c4';
       g.fillRect(lx - lw/2, ly - lh/2, lw, lh);
       g.strokeStyle = '#4a3322';
       g.lineWidth = 2;
       g.strokeRect(lx - lw/2, ly - lh/2, lw, lh);
-      g.beginPath(); g.moveTo(lx - lw/2, ly + lh/2); g.lineTo(lx - lw/2, H*0.88); g.moveTo(lx + lw/2, ly + lh/2); g.lineTo(lx + lw/2, H*0.88); g.stroke();
+      g.lineWidth = 1;
+      g.beginPath(); g.moveTo(lx, ly - lh/2); g.lineTo(lx, ly + lh/2); g.moveTo(lx - lw/2, ly); g.lineTo(lx + lw/2, ly); g.stroke();
+      g.lineWidth = 2;
+      g.beginPath(); g.moveTo(lx - lw/2, ly + lh/2); g.lineTo(lx - lw/2, fl); g.moveTo(lx + lw/2, ly + lh/2); g.lineTo(lx + lw/2, fl); g.stroke();
     }
   },
-  castle: function(g, W, H){         // 丸岡城: a small keep on its stone base, with a moat and pines below
-    sceneSky(g, W, H, [[0,'#c7dbe8'],[0.55,'#f1eee1'],[1,'#f1eee1']]);
+  castle: function(g, W, H, b, q){   // 丸岡城: a small keep on its stone base above the trees, a moat and pines below
+    sceneSky(g, W, H, [[0,'#bcd4e6'],[0.55,'#f1eee1'],[1,'#f1eee1']]);
     sceneCloud(g, W*0.2, H*0.08, W*0.12);
     sceneCloud(g, W*0.45, H*0.15, W*0.08);
+    sceneRidge(g, W, H, H*0.24, H*0.03, 3.6, 2.4, '#aebfc4');
+    sceneHaze(g, W, H*0.2, H*0.28, '240,242,236', 0.5);
     sceneRidge(g, W, H, H*0.29, H*0.015, 3.1, 1.2, '#94a98a');
     var s = Math.min(W/340, H/460), cx = W*0.74, base = H*0.29;
-    g.fillStyle = '#8d8a80';
+    sceneTrees(g, 31, 3 + Math.round(4*q.pattern), cx - 80*s, cx + 80*s, base + 2, 9*s, ['#4f6e45','#5d7c4f']);
+    g.fillStyle = '#8d8a80';                                     // 野面積み: the stone base of rough stones
     g.beginPath(); g.moveTo(cx - 60*s, base); g.lineTo(cx + 60*s, base); g.lineTo(cx + 48*s, base - 22*s); g.lineTo(cx - 48*s, base - 22*s); g.closePath(); g.fill();
-    g.strokeStyle = 'rgba(60,58,52,0.45)';
-    g.lineWidth = 1;
-    for(var i=1;i<3;i++){ var yy = base - 22*s*i/3; g.beginPath(); g.moveTo(cx - 60*s + 12*s*i/3, yy); g.lineTo(cx + 60*s - 12*s*i/3, yy); g.stroke(); }
+    g.save();
+    g.clip();
+    var st = seededList(808, Math.round(40*q.pattern) + 10, function(r){ return {x:r(), y:r(), w:r(), c:r()}; });
+    for(var k=0;k<st.length;k++){
+      var bx = cx - 60*s + st[k].x*120*s, by = base - 22*s + st[k].y*22*s, bw = (5 + st[k].w*7)*s, bh = bw*0.55;
+      g.fillStyle = ['#9a968b','#827f75','#a6a397','#77746b'][Math.floor(st[k].c*4)];
+      g.beginPath(); g.moveTo(bx, by); g.lineTo(bx + bw, by - bh*0.15); g.lineTo(bx + bw*0.92, by + bh); g.lineTo(bx + bw*0.05, by + bh*0.9); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(40,38,34,0.45)'; g.lineWidth = 0.6; g.stroke();
+    }
+    g.fillStyle = 'rgba(0,0,0,0.18)';
+    g.fillRect(cx + 8*s, base - 24*s, 60*s, 26*s);
+    g.restore();
     var wy = base - 22*s;
-    g.fillStyle = '#f3f0e8';
-    g.fillRect(cx - 40*s, wy - 24*s, 80*s, 24*s);
-    sceneRoof(g, cx, wy - 22*s, 56*s, 14*s, '#56626a');
-    g.fillStyle = '#f3f0e8';
-    g.fillRect(cx - 26*s, wy - 54*s, 52*s, 20*s);
-    sceneRoof(g, cx, wy - 52*s, 40*s, 13*s, '#56626a');
-    g.fillStyle = '#56626a';
-    g.beginPath(); g.moveTo(cx - 12*s, wy - 64*s); g.lineTo(cx, wy - 73*s); g.lineTo(cx + 12*s, wy - 64*s); g.closePath(); g.fill();
+    function story(y, hw, hh){                                    // white plaster over black boards, the right side in shade
+      g.fillStyle = '#f3f0e8';
+      g.fillRect(cx - hw, y - hh, hw*2, hh);
+      g.fillStyle = '#2f2b28';
+      g.fillRect(cx - hw, y - hh*0.42, hw*2, hh*0.42);
+      g.strokeStyle = 'rgba(255,255,255,0.12)';
+      g.lineWidth = 0.6;
+      for(var bx2=cx - hw; bx2<cx + hw; bx2+=3*s){ g.beginPath(); g.moveTo(bx2, y - hh*0.42); g.lineTo(bx2, y); g.stroke(); }
+      g.fillStyle = 'rgba(40,40,50,0.2)';
+      g.fillRect(cx + hw*0.25, y - hh, hw*0.75, hh);
+    }
+    story(wy, 40*s, 24*s);
     g.fillStyle = '#3b3f40';
-    for(var w1=-2; w1<=2; w1++) g.fillRect(cx + w1*14*s - 3*s, wy - 16*s, 6*s, 6*s);
-    for(var w2=-1; w2<=1; w2++) g.fillRect(cx + w2*14*s - 3*s, wy - 47*s, 6*s, 6*s);
+    for(var w1=-2; w1<=2; w1++) g.fillRect(cx + w1*14*s - 3*s, wy - 20*s, 6*s, 6*s);
+    sceneTiledRoof(g, cx, wy - 22*s, 56*s, 14*s, '#5f6a70', 5*s);
+    story(wy - 34*s, 26*s, 20*s);
+    g.strokeStyle = '#3a2a22';                                    // the lookout's railing
+    g.lineWidth = 1;
+    g.beginPath(); g.moveTo(cx - 30*s, wy - 38*s); g.lineTo(cx + 30*s, wy - 38*s); g.stroke();
+    for(var rl=-6; rl<=6; rl++){ g.beginPath(); g.moveTo(cx + rl*5*s, wy - 38*s); g.lineTo(cx + rl*5*s, wy - 34*s); g.stroke(); }
+    g.fillStyle = '#3b3f40';
+    for(var w2=-1; w2<=1; w2++) g.fillRect(cx + w2*14*s - 3*s, wy - 50*s, 6*s, 6*s);
+    sceneTiledRoof(g, cx, wy - 52*s, 40*s, 13*s, '#5f6a70', 4*s);
+    g.fillStyle = '#5f6a70';
+    g.beginPath(); g.moveTo(cx - 12*s, wy - 64*s); g.lineTo(cx, wy - 73*s); g.lineTo(cx + 12*s, wy - 64*s); g.closePath(); g.fill();
+    g.fillStyle = '#2b2f31';                                      // 鯱 at the ends of the ridge
+    g.beginPath(); g.moveTo(cx - 25*s, wy - 66*s); g.quadraticCurveTo(cx - 28*s, wy - 72*s, cx - 23*s, wy - 74*s); g.lineTo(cx - 22*s, wy - 66*s); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(cx + 25*s, wy - 66*s); g.quadraticCurveTo(cx + 28*s, wy - 72*s, cx + 23*s, wy - 74*s); g.lineTo(cx + 22*s, wy - 66*s); g.closePath(); g.fill();
     g.fillStyle = '#8ea37f';
     g.fillRect(0, H*0.47, W, H*0.09);
+    sceneTrees(g, 47, 5 + Math.round(6*q.pattern), -W*0.02, W*1.02, H*0.56, Math.min(W, H)*0.04, ['#5a7a4c','#4d6b42','#668a55']);
     var m = g.createLinearGradient(0, H*0.56, 0, H*0.74);
     m.addColorStop(0, '#9fbfc8');
     m.addColorStop(1, '#6f97a3');
     g.fillStyle = m;
     g.fillRect(0, H*0.56, W, H*0.18);
+    g.fillStyle = 'rgba(40,70,60,0.3)';                           // the trees mirrored in the moat
+    g.fillRect(0, H*0.56, W, H*0.03);
     g.strokeStyle = 'rgba(255,255,255,0.45)';
-    for(var k=0;k<7;k++){ var ry = H*(0.59 + k*0.02); g.beginPath(); g.moveTo(W*(0.1 + (k%3)*0.25), ry); g.lineTo(W*(0.22 + (k%3)*0.25), ry); g.stroke(); }
+    g.lineWidth = 1;
+    var rp = seededList(12, Math.round(16*q.pattern), function(r){ return {x:r(), y:r(), l:r()}; });
+    for(var k2=0;k2<rp.length;k2++){ var ry = H*(0.6 + rp[k2].y*0.12), rx = rp[k2].x*W; g.beginPath(); g.moveTo(rx, ry); g.lineTo(rx + W*(0.04 + rp[k2].l*0.08), ry); g.stroke(); }
+    g.fillStyle = '#8b8778';
+    g.fillRect(0, H*0.735, W, H*0.012);
     g.fillStyle = '#5c7a4f';
-    g.fillRect(0, H*0.74, W, H*0.26);
-    for(var p=0;p<5;p++) scenePine(g, W*(0.08 + p*0.22), H*(0.92 + (p%2)*0.04), Math.min(W, H)*0.14);
+    g.fillRect(0, H*0.747, W, H*0.26);
+    sceneGrass(g, 5, Math.round(80*q.pattern), 0, H*0.76, W, H*0.24, 'rgba(40,70,30,0.5)');
+    for(var p=0;p<5;p++){ sceneShadow(g, W*(0.1 + p*0.22), H*(0.925 + (p%2)*0.04), Math.min(W, H)*0.09, Math.min(W, H)*0.015, 0.3); scenePine(g, W*(0.08 + p*0.22), H*(0.92 + (p%2)*0.04), Math.min(W, H)*0.14); }
   },
-  garden: function(g, W, H){         // 養浩館庭園: the villa's deep eaves, a pine, and the pond with stepping stones
-    sceneSky(g, W, H, [[0,'#dde5da'],[1,'#d2dccd']]);
+  garden: function(g, W, H, b, q){   // 養浩館庭園: the villa's deep eaves, a pine, and the pond with its stepping stones
+    sceneSky(g, W, H, [[0,'#dbe5d8'],[1,'#d2dccd']]);
+    sceneTrees(g, 64, 4 + Math.round(5*q.pattern), -W*0.05, W*0.7, H*0.12, Math.min(W, H)*0.05, ['#7c9a6c','#89a879']);
     g.fillStyle = '#efe9da';
     g.fillRect(0, H*0.12, W*0.58, H*0.17);
+    g.fillStyle = 'rgba(255,248,225,0.55)';                       // the shoji lit from inside
+    for(var sp=0; sp<6; sp++) g.fillRect(sp*W*0.58/6 + 2, H*0.135, W*0.58/6 - 4, H*0.065);
     g.strokeStyle = '#6d5238';
     g.lineWidth = 1.2;
     for(var i=0;i<=6;i++){ var x = i*W*0.58/6; g.beginPath(); g.moveTo(x, H*0.12); g.lineTo(x, H*0.29); g.stroke(); }
     g.beginPath(); g.moveTo(0, H*0.205); g.lineTo(W*0.58, H*0.205); g.stroke();
+    g.lineWidth = 0.5;
+    for(var gx=0; gx<W*0.58; gx+=W*0.024){ g.beginPath(); g.moveTo(gx, H*0.135); g.lineTo(gx, H*0.2); g.stroke(); }
+    var eave = g.createLinearGradient(0, H*0.12, 0, H*0.2);       // the deep eaves throw a shadow on the house
+    eave.addColorStop(0, 'rgba(30,26,20,0.5)');
+    eave.addColorStop(1, 'rgba(30,26,20,0)');
+    g.fillStyle = eave;
+    g.fillRect(0, H*0.12, W*0.62, H*0.08);
     g.fillStyle = '#4b4d49';
     g.beginPath(); g.moveTo(-6, H*0.03); g.lineTo(W*0.5, H*0.03); g.lineTo(W*0.66, H*0.13); g.lineTo(-6, H*0.13); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.12)';
+    g.beginPath(); g.moveTo(-6, H*0.03); g.lineTo(W*0.5, H*0.03); g.lineTo(W*0.53, H*0.05); g.lineTo(-6, H*0.05); g.closePath(); g.fill();
+    g.strokeStyle = '#1f201e';
+    g.lineWidth = 1.2;
+    g.beginPath(); g.moveTo(-6, H*0.13); g.lineTo(W*0.66, H*0.13); g.lineTo(W*0.5, H*0.03); g.stroke();
     g.fillStyle = '#6d5238';
     g.fillRect(0, H*0.28, W*0.6, H*0.012);
+    g.fillStyle = '#5d7f4e';                                      // clipped azalea mounds along the veranda
+    for(var az=0; az<4; az++){ var ax = W*(0.06 + az*0.16); g.beginPath(); g.ellipse(ax, H*0.29, W*0.07, H*0.022, 0, Math.PI, 0); g.fill(); g.fillStyle = 'rgba(255,255,230,0.18)'; g.beginPath(); g.ellipse(ax - W*0.015, H*0.28, W*0.04, H*0.008, 0, 0, Math.PI*2); g.fill(); g.fillStyle = '#5d7f4e'; }
     scenePine(g, W*0.84, H*0.29, Math.min(W, H)*0.26);
     g.fillStyle = '#7f9b69';
     g.fillRect(0, H*0.47, W, H*0.53);
+    sceneGrass(g, 8, Math.round(70*q.pattern), 0, H*0.48, W, H*0.52, 'rgba(60,90,45,0.45)');
+    function pondPath(){
+      g.beginPath();
+      g.moveTo(W*0.02, H*0.66);
+      g.bezierCurveTo(W*0.2, H*0.52, W*0.75, H*0.55, W*0.98, H*0.64);
+      g.bezierCurveTo(W*1.02, H*0.86, W*0.6, H*0.95, W*0.3, H*0.92);
+      g.bezierCurveTo(W*0.08, H*0.9, -W*0.02, H*0.78, W*0.02, H*0.66);
+      g.closePath();
+    }
+    g.fillStyle = 'rgba(70,60,40,0.35)';
+    g.save(); g.translate(0, 3); pondPath(); g.fill(); g.restore();
     var pond = g.createLinearGradient(0, H*0.56, 0, H*0.92);
-    pond.addColorStop(0, '#a3c0bd');
-    pond.addColorStop(1, '#6c9392');
+    pond.addColorStop(0, '#a9c6c2');
+    pond.addColorStop(1, '#5f8988');
     g.fillStyle = pond;
-    g.beginPath();
-    g.moveTo(W*0.02, H*0.66);
-    g.bezierCurveTo(W*0.2, H*0.52, W*0.75, H*0.55, W*0.98, H*0.64);
-    g.bezierCurveTo(W*1.02, H*0.86, W*0.6, H*0.95, W*0.3, H*0.92);
-    g.bezierCurveTo(W*0.08, H*0.9, -W*0.02, H*0.78, W*0.02, H*0.66);
-    g.closePath();
+    pondPath();
     g.fill();
+    g.save();
+    pondPath();
+    g.clip();
+    g.fillStyle = 'rgba(50,70,50,0.35)';                          // the pine and the bank mirrored in the water
+    g.beginPath(); g.ellipse(W*0.8, H*0.62, W*0.16, H*0.04, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.25)';
+    g.beginPath(); g.ellipse(W*0.4, H*0.62, W*0.25, H*0.02, 0, 0, Math.PI*2); g.fill();
+    var koi = seededList(21, 4 + Math.round(3*q.pattern), function(r){ return {x:r(), y:r(), a:r(), c:r()}; });
+    for(var kk=0; kk<koi.length; kk++){
+      var kx = W*(0.2 + koi[kk].x*0.6), ky = H*(0.68 + koi[kk].y*0.18);
+      g.fillStyle = koi[kk].c<0.5 ? 'rgba(230,110,50,0.8)' : 'rgba(250,245,235,0.85)';
+      g.beginPath(); g.ellipse(kx, ky, 4, 1.6, koi[kk].a*0.8 - 0.4, 0, Math.PI*2); g.fill();
+      g.beginPath(); g.moveTo(kx - 4*Math.cos(koi[kk].a*0.8 - 0.4), ky - 4*Math.sin(koi[kk].a*0.8 - 0.4)); g.lineTo(kx - 6.5*Math.cos(koi[kk].a*0.8 - 0.4) - 1.2, ky - 6.5*Math.sin(koi[kk].a*0.8 - 0.4) + 1.2); g.lineTo(kx - 6.5*Math.cos(koi[kk].a*0.8 - 0.4) + 1.2, ky - 6.5*Math.sin(koi[kk].a*0.8 - 0.4) - 1.2); g.closePath(); g.fill();
+    }
+    g.restore();
     g.strokeStyle = 'rgba(255,255,255,0.45)';
     g.lineWidth = 1;
-    for(var k=0;k<5;k++){ var ry = H*(0.66 + k*0.045); g.beginPath(); g.moveTo(W*(0.2 + (k%2)*0.2), ry); g.lineTo(W*(0.34 + (k%2)*0.2), ry); g.stroke(); }
+    for(var k=0;k<5 + Math.round(4*q.pattern);k++){ var ry = H*(0.66 + (k%5)*0.045), ox = (k>4 ? 0.1 : 0); g.beginPath(); g.moveTo(W*(0.2 + (k%2)*0.2 + ox), ry); g.lineTo(W*(0.34 + (k%2)*0.2 + ox), ry); g.stroke(); }
     var stones = [[0.22,0.88],[0.36,0.83],[0.5,0.79],[0.64,0.75],[0.78,0.72]];
     for(var s=0;s<stones.length;s++){
+      sceneShadow(g, W*stones[s][0] + 3, H*stones[s][1] + 3, W*0.05, H*0.014, 0.4);
       g.fillStyle = '#a9a69c';
       g.beginPath(); g.ellipse(W*stones[s][0], H*stones[s][1], W*0.045, H*0.018, 0, 0, Math.PI*2); g.fill();
       g.fillStyle = 'rgba(255,255,255,0.3)';
       g.beginPath(); g.ellipse(W*stones[s][0] - 2, H*stones[s][1] - 2, W*0.03, H*0.008, 0, 0, Math.PI*2); g.fill();
     }
+    g.fillStyle = '#6b8f4a';                                      // moss on the bank
+    for(var ms=0; ms<6; ms++){ g.beginPath(); g.ellipse(W*(0.05 + ms*0.18), H*(0.55 + (ms%2)*0.02), W*0.05, H*0.012, 0, Math.PI, 0); g.fill(); }
     sceneLantern(g, W*0.1, H*0.62, Math.min(W, H)*0.1);
   },
-  cape: function(g, W, H){           // 越前岬: the sea, the headland with its white lighthouse, and wild daffodils
-    sceneSky(g, W, H, [[0,'#c8dfec'],[0.5,'#eef3f0'],[1,'#eef3f0']]);
+  cape: function(g, W, H, b, q){     // 越前岬: the sea, the headland with its white lighthouse, and slopes of wild daffodils
+    sceneSky(g, W, H, [[0,'#bdd8ea'],[0.5,'#eef3f0'],[1,'#eef3f0']]);
     sceneCloud(g, W*0.25, H*0.1, W*0.1);
     var hz = H*0.5;
+    g.fillStyle = '#9fb3bb';                                      // a far coast in the haze
+    g.beginPath(); g.moveTo(0, hz); g.lineTo(0, hz - H*0.025); g.quadraticCurveTo(W*0.12, hz - H*0.04, W*0.3, hz - H*0.012); g.lineTo(W*0.36, hz); g.closePath(); g.fill();
     var sea = g.createLinearGradient(0, hz, 0, H);
     sea.addColorStop(0, '#6d9db4');
-    sea.addColorStop(1, '#3b6b85');
+    sea.addColorStop(1, '#2f5f7a');
     g.fillStyle = sea;
     g.fillRect(0, hz, W, H - hz);
     g.strokeStyle = 'rgba(255,255,255,0.5)';
     g.lineWidth = 1.2;
-    var waves = seededList(77, 18, function(r){ return {x:r(), y:r(), l:r()}; });
-    for(var i=0;i<waves.length;i++){ var wv = waves[i], wx = W*0.3 + wv.x*W*0.3, wy = hz + 6 + wv.y*(H - hz - 10), wl = 8 + wv.l*16; g.beginPath(); g.moveTo(wx, wy); g.quadraticCurveTo(wx + wl/2, wy - 3, wx + wl, wy); g.stroke(); }
+    var waves = seededList(77, Math.round(30*q.pattern), function(r){ return {x:r(), y:r(), l:r()}; });
+    for(var i=0;i<waves.length;i++){ var wv = waves[i], wx = wv.x*W*0.6, wy = hz + 6 + wv.y*(H - hz - 10), wl = (8 + wv.l*16)*(0.5 + wv.y); g.beginPath(); g.moveTo(wx, wy); g.quadraticCurveTo(wx + wl/2, wy - 3, wx + wl, wy); g.stroke(); }
+    sceneDots(g, 71, Math.round(40*q.pattern), W*0.1, hz + 2, W*0.5, H*0.08, 0.5, 1.2, ['#ffffff'], 0.6);   // glitter on the water
     g.fillStyle = '#6e6a50';
     g.beginPath(); g.moveTo(W, H); g.lineTo(W*0.56, H); g.lineTo(W*0.62, H*0.78); g.lineTo(W*0.66, H*0.56); g.lineTo(W*0.7, H*0.36); g.lineTo(W*0.76, H*0.2); g.lineTo(W, H*0.17); g.closePath(); g.fill();
+    g.save();
+    g.clip();
+    g.fillStyle = 'rgba(255,240,210,0.2)';                        // the sunlit face and the strata of the rock
+    g.beginPath(); g.moveTo(W*0.56, H); g.lineTo(W*0.62, H*0.78); g.lineTo(W*0.66, H*0.56); g.lineTo(W*0.7, H*0.36); g.lineTo(W*0.76, H*0.2); g.lineTo(W*0.8, H*0.2); g.lineTo(W*0.7, H); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(40,36,24,0.3)';
+    g.lineWidth = 1;
+    for(var sl=0; sl<Math.round(12*q.pattern); sl++){ var sy = H*(0.24 + sl*0.06); g.beginPath(); g.moveTo(W*0.55, sy + H*0.05); g.lineTo(W, sy - H*0.02); g.stroke(); }
+    g.fillStyle = 'rgba(0,0,0,0.18)';
+    g.fillRect(W*0.88, H*0.17, W*0.12, H*0.83);
+    g.restore();
+    var foam = seededList(19, Math.round(22*q.pattern), function(r){ return {y:r(), s:r()}; });
+    g.fillStyle = 'rgba(255,255,255,0.75)';                       // surf breaking at the foot of the cliff
+    for(var fm=0; fm<foam.length; fm++){ var fy0 = H*(0.6 + foam[fm].y*0.4), fx0 = W*0.56 + W*0.06*(1 - (fy0 - H*0.78)/(H*0.22)); g.beginPath(); g.ellipse(Math.min(fx0, W*0.66) - 2, fy0, 3 + foam[fm].s*6, 1.4 + foam[fm].s, 0, 0, Math.PI*2); g.fill(); }
     g.fillStyle = '#7f9860';
     g.beginPath(); g.moveTo(W*0.74, H*0.22); g.lineTo(W*0.78, H*0.18); g.lineTo(W, H*0.16); g.lineTo(W, H*0.24); g.closePath(); g.fill();
     var lx = W*0.88, lb = H*0.18, lh = H*0.13, lw = W*0.05;
+    sceneShadow(g, lx + lw, lb, lw*1.2, lw*0.2, 0.35);
     g.fillStyle = '#f8f8f4';
     g.beginPath(); g.moveTo(lx - lw/2, lb); g.lineTo(lx + lw/2, lb); g.lineTo(lx + lw*0.35, lb - lh); g.lineTo(lx - lw*0.35, lb - lh); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(80,90,100,0.22)';
+    g.beginPath(); g.moveTo(lx + lw*0.05, lb); g.lineTo(lx + lw/2, lb); g.lineTo(lx + lw*0.35, lb - lh); g.lineTo(lx + lw*0.02, lb - lh); g.closePath(); g.fill();
     g.fillStyle = '#3e4a50';
+    g.fillRect(lx - lw*0.55, lb - lh - lw*0.08, lw*1.1, lw*0.1);
     g.fillRect(lx - lw*0.4, lb - lh - lw*0.55, lw*0.8, lw*0.55);
+    g.fillStyle = '#f7e7a0';
+    g.fillRect(lx - lw*0.25, lb - lh - lw*0.48, lw*0.5, lw*0.3);
+    g.fillStyle = '#3e4a50';
     g.beginPath(); g.moveTo(lx - lw*0.5, lb - lh - lw*0.55); g.lineTo(lx, lb - lh - lw*1.05); g.lineTo(lx + lw*0.5, lb - lh - lw*0.55); g.closePath(); g.fill();
-    g.fillStyle = '#7c9a5b';
+    var sg = g.createLinearGradient(0, H*0.62, 0, H);
+    sg.addColorStop(0, '#86a262');
+    sg.addColorStop(1, '#5e7d43');
+    g.fillStyle = sg;
     g.beginPath(); g.moveTo(0, H*0.62); g.quadraticCurveTo(W*0.25, H*0.66, W*0.46, H); g.lineTo(0, H); g.closePath(); g.fill();
-    var fl = seededList(912, 60, function(r){ return {u:r(), v:r(), s:r()}; });
+    function inSlope(x, y){ return y>H*0.64 && x < W*0.46*(y - H*0.62)/(H*0.38); }
+    var dist = seededList(913, Math.round(120*q.pattern), function(r){ return {u:r(), v:r()}; });
+    g.fillStyle = 'rgba(252,250,238,0.9)';                          // the far colony, just specks of white
+    for(var d=0; d<dist.length; d++){ var dy = H*(0.65 + dist[d].v*0.12), dx = dist[d].u*W*0.46; if(inSlope(dx, dy)) g.fillRect(dx, dy, 1.4, 1.1); }
+    var fl = seededList(912, Math.round(140*q.pattern), function(r){ return {u:r(), v:r(), s:r(), a:r()}; });
+    fl.sort(function(a, b2){ return a.v - b2.v; });
+    var sc = Math.min(W, H)/340;
     for(var k=0;k<fl.length;k++){
-      var fy = H*(0.68 + fl[k].v*0.3), fxMax = W*0.44*(fy - H*0.64)/(H*0.36);
-      sceneFlower(g, fl[k].u*fxMax, fy, 1.4 + fl[k].s*1.2, '#fbfaf2', '#f2c233');
+      var fy = H*(0.7 + fl[k].v*0.3), fxMax = W*0.44*(fy - H*0.64)/(H*0.36), fx = fl[k].u*fxMax, d2 = (fy - H*0.7)/(H*0.3), rr = (1.6 + d2*3.2 + fl[k].s)*sc;
+      g.strokeStyle = '#3f6a35';                                     // two or three blade-like leaves
+      g.lineWidth = Math.max(0.6, rr*0.25);
+      g.beginPath(); g.moveTo(fx, fy + rr*3); g.quadraticCurveTo(fx - rr*0.4, fy + rr, fx - rr*0.9, fy - rr*0.6); g.moveTo(fx, fy + rr*3); g.quadraticCurveTo(fx + rr*0.3, fy + rr*1.2, fx + rr*0.7, fy - rr*0.2); g.stroke();
+      g.strokeStyle = '#5b8a45';
+      g.beginPath(); g.moveTo(fx, fy + rr*3); g.lineTo(fx + rr*0.1, fy + rr*0.4); g.stroke();
+      sceneNarcissus(g, fx, fy, rr, fl[k].a*Math.PI);
     }
   },
-  ruins: function(g, W, H){          // 一乗谷朝倉氏遺跡: the narrow valley, the karamon gate, restored houses and stone walls
+  ruins: function(g, W, H, b, q){    // 一乗谷朝倉氏遺跡: the narrow valley, the karamon gate, restored houses and stone walls
     sceneSky(g, W, H, [[0,'#d6e2dc'],[1,'#edf0e6']]);
-    g.fillStyle = '#6f8a67';
-    g.beginPath(); g.moveTo(0, H*0.02); g.quadraticCurveTo(W*0.25, H*0.12, W*0.42, H*0.3); g.lineTo(0, H*0.3); g.closePath(); g.fill();
-    g.beginPath(); g.moveTo(W, H*0.04); g.quadraticCurveTo(W*0.75, H*0.14, W*0.58, H*0.3); g.lineTo(W, H*0.3); g.closePath(); g.fill();
+    var layers = [['#a9bcae', 0.06, 0.38], ['#8aa38a', 0.03, 0.44], ['#6f8a67', 0.0, 0.42]];
+    for(var L=0; L<layers.length; L++){                          // the valley's slopes, far to near, with mist between
+      g.fillStyle = layers[L][0];
+      var t = H*layers[L][1], reach = layers[L][2];
+      g.beginPath(); g.moveTo(0, t + H*0.02); g.quadraticCurveTo(W*reach*0.6, t + H*0.1, W*reach, H*0.3); g.lineTo(0, H*0.3); g.closePath(); g.fill();
+      g.beginPath(); g.moveTo(W, t + H*0.04); g.quadraticCurveTo(W*(1 - reach*0.6), t + H*0.12, W*(1 - reach), H*0.3); g.lineTo(W, H*0.3); g.closePath(); g.fill();
+      if(L<2) sceneHaze(g, W, H*(0.12 + L*0.05), H*(0.3 + L*0.02), '238,242,236', 0.35);
+    }
+    sceneDots(g, 41, Math.round(70*q.pattern), 0, H*0.02, W*0.38, H*0.26, 1.5, 3.2, ['#5d7a56','#7d9a72'], 0.55);   // trees on the slopes
+    sceneDots(g, 42, Math.round(70*q.pattern), W*0.62, H*0.04, W*0.38, H*0.24, 1.5, 3.2, ['#5d7a56','#7d9a72'], 0.55);
     var gx = W*0.5, gb = H*0.29, gs = Math.min(W/340, H/460);
+    g.fillStyle = '#9b9488';                                      // the stone wall either side of the gate
+    g.fillRect(gx - 70*gs, gb - 10*gs, 140*gs, 10*gs);
+    g.strokeStyle = 'rgba(60,58,52,0.4)';
+    g.lineWidth = 0.6;
+    for(var sw=0; sw<14; sw++){ g.strokeRect(gx - 70*gs + sw*10*gs, gb - 10*gs + (sw%2)*5*gs, 10*gs, 5*gs); }
+    sceneShadow(g, gx + 6*gs, gb, 34*gs, 3*gs, 0.35);
     g.fillStyle = '#4d3f33';
     g.fillRect(gx - 22*gs, gb - 30*gs, 5*gs, 30*gs);
     g.fillRect(gx + 17*gs, gb - 30*gs, 5*gs, 30*gs);
-    g.fillStyle = '#403a35';
+    g.fillStyle = '#6a5340';
+    g.fillRect(gx - 17*gs, gb - 26*gs, 34*gs, 26*gs);
+    g.strokeStyle = 'rgba(30,20,12,0.5)';
+    g.beginPath(); g.moveTo(gx, gb - 26*gs); g.lineTo(gx, gb); g.stroke();
+    g.fillStyle = '#c9a24a';
+    g.beginPath(); g.arc(gx - 2*gs, gb - 13*gs, 1*gs, 0, Math.PI*2); g.arc(gx + 2*gs, gb - 13*gs, 1*gs, 0, Math.PI*2); g.fill();
+    g.fillStyle = 'rgba(20,14,10,0.45)';
+    g.fillRect(gx - 22*gs, gb - 30*gs, 44*gs, 5*gs);
+    g.fillStyle = '#403a35';                                      // 唐破風: the gate's curved roof
     g.beginPath();
     g.moveTo(gx - 32*gs, gb - 28*gs);
     g.quadraticCurveTo(gx - 16*gs, gb - 34*gs, gx - 10*gs, gb - 44*gs);
@@ -6309,36 +7463,70 @@ var BG_SCENES = {
     g.quadraticCurveTo(gx + 16*gs, gb - 34*gs, gx + 32*gs, gb - 28*gs);
     g.closePath();
     g.fill();
+    g.strokeStyle = '#1e1a17';
+    g.lineWidth = 1.2;
+    g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.18)';
+    g.lineWidth = 0.8;
+    g.beginPath(); g.moveTo(gx - 28*gs, gb - 30*gs); g.quadraticCurveTo(gx - 14*gs, gb - 35*gs, gx - 9*gs, gb - 43*gs); g.stroke();
     g.fillStyle = '#b9ad90';
     g.fillRect(0, H*0.47, W, H*0.53);
+    g.fillStyle = '#cbbf9f';                                      // the old road running up the valley
+    g.beginPath(); g.moveTo(W*0.44, H*0.47); g.lineTo(W*0.56, H*0.47); g.lineTo(W*0.8, H); g.lineTo(W*0.2, H); g.closePath(); g.fill();
     for(var i=0;i<4;i++){
       var hx = W*(0.02 + i*0.25), hw = W*0.22, hy = H*0.6;
+      sceneShadow(g, hx + hw*0.6, hy + H*0.135, hw*0.7, H*0.012, 0.35);
       g.fillStyle = '#e2d6b8';
       g.fillRect(hx, hy, hw, H*0.13);
+      g.strokeStyle = 'rgba(90,70,45,0.35)';                      // board walls
+      g.lineWidth = 0.6;
+      for(var pl=hx; pl<hx + hw; pl+=Math.max(3, hw/10)){ g.beginPath(); g.moveTo(pl, hy + H*0.03); g.lineTo(pl, hy + H*0.09); g.stroke(); }
       g.fillStyle = '#6a5a45';
       g.fillRect(hx, hy + H*0.09, hw, H*0.04);
+      g.fillStyle = 'rgba(30,20,10,0.3)';
+      g.fillRect(hx, hy, hw, H*0.015);
       g.fillStyle = '#5b5448';
       g.beginPath(); g.moveTo(hx - W*0.015, hy); g.lineTo(hx + hw/2, hy - H*0.06); g.lineTo(hx + hw + W*0.015, hy); g.closePath(); g.fill();
-      g.fillStyle = '#8b8577';
-      for(var si=0;si<3;si++){ g.beginPath(); g.arc(hx + hw*(0.25 + si*0.25), hy - H*0.025, 2.2, 0, Math.PI*2); g.fill(); }
+      g.fillStyle = 'rgba(255,255,255,0.12)';
+      g.beginPath(); g.moveTo(hx - W*0.015, hy); g.lineTo(hx + hw/2, hy - H*0.06); g.lineTo(hx + hw*0.3, hy); g.closePath(); g.fill();
+      g.strokeStyle = '#2f2a24'; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(hx - W*0.015, hy); g.lineTo(hx + hw/2, hy - H*0.06); g.lineTo(hx + hw + W*0.015, hy); g.stroke();
+      g.fillStyle = '#8b8577';                                     // 石置き屋根: stones holding the boards down
+      for(var sr=0; sr<2; sr++) for(var si=0;si<4;si++){ g.beginPath(); g.arc(hx + hw*(0.18 + si*0.21), hy - H*(0.018 + sr*0.02), 2.2, 0, Math.PI*2); g.fill(); }
     }
     g.fillStyle = '#8f8b80';
     g.fillRect(0, H*0.8, W, H*0.07);
-    g.strokeStyle = 'rgba(60,58,52,0.5)';
-    g.lineWidth = 1;
-    var st = seededList(61, 26, function(r){ return {x:r(), y:r()}; });
-    for(var k=0;k<st.length;k++) g.strokeRect(st[k].x*W, H*0.8 + st[k].y*H*0.05, W*0.07, H*0.022);
+    var st = seededList(61, Math.round(40*q.pattern) + 10, function(r){ return {x:r(), y:r(), w:r(), c:r()}; });
+    for(var k=0;k<st.length;k++){
+      var sx0 = st[k].x*W, sy0 = H*0.8 + st[k].y*H*0.05, sw0 = W*(0.04 + st[k].w*0.05);
+      g.fillStyle = ['#9d998e','#85827a','#a8a498'][Math.floor(st[k].c*3)];
+      g.beginPath(); g.moveTo(sx0, sy0); g.lineTo(sx0 + sw0, sy0 - 1); g.lineTo(sx0 + sw0*0.95, sy0 + H*0.02); g.lineTo(sx0 + sw0*0.05, sy0 + H*0.021); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(60,58,52,0.5)'; g.lineWidth = 0.8; g.stroke();
+    }
+    g.fillStyle = 'rgba(0,0,0,0.18)';
+    g.fillRect(0, H*0.865, W, 3);
     g.fillStyle = '#cdbf9c';
     g.fillRect(0, H*0.87, W, H*0.13);
+    sceneGrass(g, 61, Math.round(50*q.pattern), 0, H*0.88, W, H*0.12, 'rgba(90,110,60,0.5)');
   },
-  temple: function(g, W, H){         // 永平寺: tall cedars in the mist, a great roof, and stone steps
+  temple: function(g, W, H, b, q){   // 永平寺: tall cedars in the mist, a great roof, light through the trees and stone steps
     sceneSky(g, W, H, [[0,'#cdd7cd'],[0.6,'#e7eae1'],[1,'#e2e5da']]);
+    var far = seededList(303, 6 + Math.round(8*q.pattern), function(r){ return {x:r(), h:r()}; });
+    for(var f=0; f<far.length; f++) sceneCedar(g, far[f].x*W, H*0.3, H*(0.18 + far[f].h*0.1), W*0.12, '#9fb2a2');
+    sceneHaze(g, W, H*0.08, H*0.32, '236,240,232', 0.55);
     var cx = W*0.5, ry = H*0.2;
+    sceneShadow(g, cx, ry + H*0.09, W*0.26, H*0.012, 0.35);
     g.fillStyle = '#7a5236';
     g.fillRect(cx - W*0.2, ry, W*0.4, H*0.09);
     g.fillStyle = '#f1ece0';
     for(var i=0;i<4;i++) g.fillRect(cx - W*0.18 + i*W*0.095, ry + H*0.015, W*0.07, H*0.06);
-    sceneRoof(g, cx, ry + 2, W*0.34, H*0.1, '#3f413e');
+    g.strokeStyle = 'rgba(110,80,50,0.5)';
+    g.lineWidth = 0.6;
+    for(var i2=0;i2<4;i2++){ var px = cx - W*0.18 + i2*W*0.095; for(var gl=1; gl<4; gl++){ g.beginPath(); g.moveTo(px + W*0.07*gl/4, ry + H*0.015); g.lineTo(px + W*0.07*gl/4, ry + H*0.075); g.stroke(); } }
+    g.fillStyle = '#5a3a26';
+    for(var pi=0; pi<5; pi++) g.fillRect(cx - W*0.2 + pi*W*0.095 - 1, ry, 3, H*0.09);
+    sceneTiledRoof(g, cx, ry + 2, W*0.34, H*0.1, '#3f413e', H*0.03);
+    sceneTiledRoof(g, cx, ry - H*0.085, W*0.16, H*0.045, '#3f413e', 0);
     var trees = [[0.05,0.98,0.95],[0.16,0.9,0.8],[0.95,0.98,0.95],[0.84,0.92,0.78],[0.27,0.62,0.45],[0.73,0.6,0.42]];
     for(var t=0;t<trees.length;t++) sceneCedar(g, W*trees[t][0], H*trees[t][1], H*trees[t][2], W*0.2, t%2 ? '#35523e' : '#2c4634');
     for(var s=0;s<6;s++){
@@ -6347,7 +7535,16 @@ var BG_SCENES = {
       g.fillRect(inset, sy, W - inset*2, H*0.05);
       g.fillStyle = 'rgba(255,255,255,0.35)';
       g.fillRect(inset, sy, W - inset*2, 2);
+      g.fillStyle = 'rgba(0,0,0,0.18)';
+      g.fillRect(inset, sy + H*0.045, W - inset*2, H*0.006);
+      g.fillStyle = 'rgba(100,130,80,0.5)';                        // moss at the ends of each step
+      g.fillRect(inset, sy + 2, W*0.03, H*0.044);
+      g.fillRect(W - inset - W*0.03, sy + 2, W*0.03, H*0.044);
     }
+    sceneLantern(g, W*0.24, H*0.62, Math.min(W, H)*0.09);
+    sceneLantern(g, W*0.76, H*0.62, Math.min(W, H)*0.09);
+    g.fillStyle = 'rgba(255,250,225,0.16)';                       // shafts of light through the cedars
+    for(var sh=0; sh<3; sh++){ var x0 = W*(0.12 + sh*0.22); g.beginPath(); g.moveTo(x0, 0); g.lineTo(x0 + W*0.08, 0); g.lineTo(x0 + W*0.34, H); g.lineTo(x0 + W*0.2, H); g.closePath(); g.fill(); }
     var mist = g.createLinearGradient(0, H*0.3, 0, H*0.55);
     mist.addColorStop(0, 'rgba(240,242,236,0)');
     mist.addColorStop(0.5, 'rgba(240,242,236,0.6)');
@@ -6355,33 +7552,65 @@ var BG_SCENES = {
     g.fillStyle = mist;
     g.fillRect(0, H*0.3, W, H*0.25);
   },
-  museum: function(g, W, H){         // 福井県立恐竜博物館: the silver egg-shaped dome on the hill, and a dinosaur
-    sceneSky(g, W, H, [[0,'#cde0eb'],[0.55,'#eef2ee'],[1,'#e7e3d3']]);
+  museum: function(g, W, H, b, q){   // 福井県立恐竜博物館: the silver egg-shaped dome on the hill, and a dinosaur
+    sceneSky(g, W, H, [[0,'#c4dceb'],[0.55,'#eef2ee'],[1,'#e7e3d3']]);
     sceneCloud(g, W*0.75, H*0.08, W*0.1);
+    sceneRidge(g, W, H, H*0.22, H*0.035, 3.3, 0.9, '#a9bac2');
+    sceneHaze(g, W, H*0.18, H*0.26, '238,242,238', 0.5);
     sceneRidge(g, W, H, H*0.27, H*0.02, 4.2, 0.4, '#8fae84');
+    sceneTrees(g, 19, 4 + Math.round(5*q.pattern), W*0.5, W*1.05, H*0.275, Math.min(W, H)*0.03, ['#6f9465','#5f8456']);
     var dx = W*0.32, dy = H*0.2, rx = W*0.2, ry2 = H*0.1;
-    var dome = g.createLinearGradient(dx - rx, dy - ry2, dx + rx, dy + ry2);
-    dome.addColorStop(0, '#f6f8fa');
-    dome.addColorStop(0.5, '#c9d1d6');
-    dome.addColorStop(1, '#8f9aa1');
     g.save();
     g.beginPath(); g.rect(0, 0, W, H*0.255); g.clip();
+    g.fillStyle = 'rgba(40,50,56,0.25)';
+    g.beginPath(); g.ellipse(dx + 6, dy + 4, rx, ry2, -0.12, 0, Math.PI*2); g.fill();
+    var dome = g.createLinearGradient(dx - rx, dy - ry2, dx + rx, dy + ry2);
+    dome.addColorStop(0, '#f6f8fa');
+    dome.addColorStop(0.45, '#c9d1d6');
+    dome.addColorStop(1, '#7f8a91');
     g.fillStyle = dome;
     g.beginPath(); g.ellipse(dx, dy, rx, ry2, -0.12, 0, Math.PI*2); g.fill();
-    g.strokeStyle = 'rgba(90,100,106,0.45)';
-    g.lineWidth = 1;
-    for(var i=0;i<=2;i++){ g.beginPath(); g.ellipse(dx, dy, rx*(0.3 + i*0.3), ry2, -0.12, 0, Math.PI*2); g.stroke(); }
+    g.save();
+    g.beginPath(); g.ellipse(dx, dy, rx, ry2, -0.12, 0, Math.PI*2); g.clip();
+    g.strokeStyle = 'rgba(90,100,106,0.4)';
+    g.lineWidth = 0.8;
+    for(var i=0;i<=Math.round(5*q.pattern);i++){ var k = (i + 0.5)/(Math.round(5*q.pattern) + 1); g.beginPath(); g.ellipse(dx, dy, rx*k, ry2, -0.12, 0, Math.PI*2); g.stroke(); }
+    for(var j=1;j<5;j++){ g.beginPath(); g.ellipse(dx, dy - ry2 + j*ry2*0.4, rx, ry2*0.12, -0.12, 0, Math.PI*2); g.stroke(); }
+    g.fillStyle = 'rgba(255,255,255,0.55)';
+    g.beginPath(); g.ellipse(dx - rx*0.4, dy - ry2*0.45, rx*0.3, ry2*0.16, -0.3, 0, Math.PI*2); g.fill();
     g.restore();
+    g.strokeStyle = 'rgba(60,70,76,0.6)';
+    g.lineWidth = 1;
+    g.beginPath(); g.ellipse(dx, dy, rx, ry2, -0.12, 0, Math.PI*2); g.stroke();
+    g.restore();
+    g.fillStyle = '#d7dde0';                                      // the low hall in front of the dome
+    g.fillRect(dx - rx*1.1, H*0.235, rx*2.4, H*0.02);
+    g.fillStyle = '#5f7f95';
+    g.fillRect(dx - rx*1.05, H*0.24, rx*2.3, H*0.008);
     var gr = g.createLinearGradient(0, H*0.47, 0, H);
     gr.addColorStop(0, '#d2c49b');
     gr.addColorStop(1, '#a8966c');
     g.fillStyle = gr;
     g.fillRect(0, H*0.47, W, H*0.53);
-    for(var f=0;f<4;f++) sceneFern(g, W*(0.06 + f*0.1), H*(0.97 - (f%2)*0.04), Math.min(W, H)*0.08);
+    g.strokeStyle = 'rgba(120,100,60,0.3)';                       // the layers of rock where the fossils lie
+    g.lineWidth = 1;
+    for(var l=0; l<5; l++){ var ly = H*(0.52 + l*0.06); g.beginPath(); g.moveTo(0, ly); g.bezierCurveTo(W*0.3, ly - 6, W*0.6, ly + 5, W, ly - 2); g.stroke(); }
+    g.fillStyle = 'rgba(90,70,40,0.35)';                          // footprints
+    var fp = [[0.2,0.6],[0.28,0.64],[0.36,0.6],[0.44,0.64]];
+    for(var p=0;p<fp.length;p++){ var fx = W*fp[p][0], fy = H*fp[p][1]; for(var tt=-1; tt<=1; tt++){ g.beginPath(); g.ellipse(fx + tt*3, fy - 3, 1.2, 3, tt*0.4, 0, Math.PI*2); g.fill(); } g.beginPath(); g.ellipse(fx, fy + 1, 2.2, 1.6, 0, 0, Math.PI*2); g.fill(); }
+    for(var f2=0;f2<4;f2++) sceneFern(g, W*(0.06 + f2*0.1), H*(0.97 - (f2%2)*0.04), Math.min(W, H)*0.08);
+    var cyc = W*0.92, cyy = H*0.95, cs = Math.min(W, H)*0.1;     // a cycad
+    g.fillStyle = '#6b5235';
+    g.fillRect(cyc - cs*0.08, cyy - cs*0.5, cs*0.16, cs*0.5);
+    g.strokeStyle = '#4f7a3e';
+    g.lineWidth = 1.6;
+    for(var fr=-4; fr<=4; fr++){ var a = -Math.PI/2 + fr*0.36; g.beginPath(); g.moveTo(cyc, cyy - cs*0.5); g.quadraticCurveTo(cyc + Math.cos(a)*cs*0.6, cyy - cs*0.5 + Math.sin(a)*cs*0.8, cyc + Math.cos(a)*cs, cyy - cs*0.5 + Math.sin(a)*cs*0.5 + cs*0.2); g.stroke(); }
     sceneDino(g, W*0.66, H*0.92, Math.min(W/340, H/460)*1.3, '#5d4a3a');
   },
-  cliff: function(g, W, H){          // 東尋坊: columnar basalt cliffs against the evening sea
+  cliff: function(g, W, H, b, q){    // 東尋坊: columns of basalt from the front to the back, a rough evening sea and spray
     sceneSky(g, W, H, [[0,'#6f5f86'],[0.3,'#c98a8e'],[0.5,'#f2c38a'],[1,'#f2c38a']]);
+    sceneCloud(g, W*0.25, H*0.12, W*0.14, 'rgba(255,190,170,0.55)');
+    sceneCloud(g, W*0.62, H*0.2, W*0.1, 'rgba(255,210,170,0.5)');
     var hz = H*0.52;
     var sun = g.createRadialGradient(W*0.7, hz - H*0.02, 2, W*0.7, hz - H*0.02, H*0.16);
     sun.addColorStop(0, 'rgba(255,236,190,1)');
@@ -6395,22 +7624,49 @@ var BG_SCENES = {
     g.fillStyle = sea;
     g.fillRect(0, hz, W, H - hz);
     g.fillStyle = 'rgba(255,200,130,0.55)';
-    for(var i=0;i<8;i++){ var ry = hz + 4 + i*H*0.03, rw = W*(0.12 - i*0.01); g.fillRect(W*0.7 - rw/2, ry, rw, 2); }
-    g.fillStyle = '#3c3645';
-    g.beginPath(); g.ellipse(W*0.24, hz, W*0.09, H*0.022, 0, Math.PI, 0); g.fill();
-    var cols = seededList(1509, 12, function(r){ return {h:r()}; });
-    var x = 0, cw = W*0.045;
-    for(var c=0;c<cols.length;c++){
-      var top = H*(0.6 + cols[c].h*0.08 + c*0.006);
-      g.fillStyle = ['#4b4038','#5a4c42','#3e342e'][c%3];
-      g.fillRect(x, top, cw + 1, H - top);
-      g.fillStyle = 'rgba(255,190,140,0.25)';
-      g.fillRect(x, top, cw + 1, 3);
-      g.fillStyle = 'rgba(0,0,0,0.25)';
-      g.fillRect(x + cw - 2, top, 2, H - top);
-      x += cw;
+    for(var i=0;i<Math.round(14*q.pattern);i++){ var ry = hz + 3 + i*H*0.018, rw = W*(0.13 - i*0.006)*(0.7 + ((i*7)%5)/10); if(rw>0) g.fillRect(W*0.7 - rw/2, ry, rw, 1.6); }
+    g.fillStyle = '#3c3645';                                      // 雄島 and its red bridge, far out
+    g.beginPath(); g.ellipse(W*0.24, hz, W*0.09, H*0.024, 0, Math.PI, 0); g.fill();
+    g.fillStyle = '#2f2a38';
+    g.beginPath(); g.ellipse(W*0.27, hz - H*0.008, W*0.04, H*0.012, 0, Math.PI, 0); g.fill();
+    g.strokeStyle = '#b8453a';
+    g.lineWidth = 1.2;
+    g.beginPath(); g.moveTo(W*0.08, hz - 1); g.quadraticCurveTo(W*0.12, hz - H*0.012, W*0.16, hz - 1); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.35)';                     // rough water
+    g.lineWidth = 1;
+    var wv = seededList(14, Math.round(30*q.pattern), function(r){ return {x:r(), y:r(), l:r()}; });
+    for(var w=0; w<wv.length; w++){ var wx = wv[w].x*W, wy = hz + 6 + wv[w].y*(H - hz)*0.5, wl = 6 + wv[w].l*14; g.beginPath(); g.moveTo(wx, wy); g.quadraticCurveTo(wx + wl*0.5, wy - 2.5, wx + wl, wy); g.stroke(); }
+    var rows = [                                                  // back to front: the columns grow taller and wider
+      {seed:1511, n:10, x0:W*0.42, x1:W, top:H*0.565, vr:H*0.025, w:W*0.03, lit:'#5a4a44', shade:'#3a302e', cap:'#b98068'},
+      {seed:1509, n:12, x0:W*0.18, x1:W, top:H*0.62, vr:H*0.05, w:W*0.05, lit:'#55463e', shade:'#352b27', cap:'#c88a6a'},
+      {seed:1507, n:8, x0:-W*0.05, x1:W*1.05, top:H*0.74, vr:H*0.08, w:W*0.11, lit:'#4b3f37', shade:'#2e2622', cap:'#d0946e'}
+    ];
+    var sprayAt = [];
+    for(var r=0; r<rows.length; r++){
+      var R = rows[r], cols = seededList(R.seed, R.n, function(rr){ return {h:rr(), w:rr()}; }), x = R.x0;
+      while(x < R.x1){
+        for(var c=0; c<cols.length && x<R.x1; c++){
+          var cw = R.w*(0.75 + cols[c].w*0.5), top = R.top + cols[c].h*R.vr - (r===2 ? (x/W)*H*0.03 : 0);
+          sceneColumn(g, x, top, cw, H, R.lit, R.shade, R.cap, R.seed + c*13 + Math.round(x));
+          if(r<2 && cols[c].h>0.5) sprayAt.push({x:x + cw/2, y:top + (H - top)*0.15, r:r});
+          x += cw*0.98;
+        }
+      }
+      var foam = g.createLinearGradient(0, R.top + R.vr*0.6, 0, R.top + R.vr*1.4);   // surf churning between the rows
+      foam.addColorStop(0, 'rgba(255,255,255,0)');
+      foam.addColorStop(0.5, 'rgba(240,236,240,' + (0.32 - r*0.08) + ')');
+      foam.addColorStop(1, 'rgba(255,255,255,0)');
+      if(r<2){ g.fillStyle = foam; g.fillRect(R.x0, R.top + R.vr*0.6, R.x1 - R.x0, R.vr*0.8); }
     }
-    sceneDots(g, 88, 30, x - W*0.05, H*0.6, W*0.12, H*0.2, 0.8, 2.2, ['#ffffff'], 0.55);
+    var sprays = Math.round(sprayAt.length*0.5*q.pattern);
+    for(var sp=0; sp<Math.min(sprays, sprayAt.length); sp++){      // 飛沫: spray thrown up against the columns
+      var S = sprayAt[sp], dots = seededList(900 + sp, 4 + Math.round(6*q.pattern), function(rr){ return {a:rr(), d:rr(), s:rr()}; });
+      for(var dd=0; dd<dots.length; dd++){
+        var ang = -Math.PI/2 + (dots[dd].a - 0.5)*1.6, dist = (4 + dots[dd].d*16)*(S.r ? 1.3 : 0.8);
+        g.fillStyle = 'rgba(255,255,255,' + (0.25 + dots[dd].s*0.4).toFixed(3) + ')';
+        g.beginPath(); g.arc(S.x + Math.cos(ang)*dist, S.y + Math.sin(ang)*dist, 0.5 + dots[dd].s*1.1, 0, Math.PI*2); g.fill();
+      }
+    }
   }
 };
 
@@ -7016,12 +8272,7 @@ function drawKisekaePreview(){
   if(kisekaeCanvas.width!==pw || kisekaeCanvas.height!==ph){ kisekaeCanvas.width = pw; kisekaeCanvas.height = ph; }
   c.setTransform(dpr, 0, 0, dpr, 0, 0);
   var skin = resolveSkin();
-  var keep = {ctx:ctx, W:W, H:H, DPR:DPR, skin:state.skin, failed:skinFailed, style:state.style, mode:state.mode,
-              chop:state.knifeChop, thick:state.lastCutThickness, board:state.boardWidth};
-  ctx = c; W = r.width; H = r.height; DPR = dpr;
-  state.skin = skin; skinFailed = {};
-  state.style = kkStyle(); state.mode = 'normal'; state.knifeChop = 0; state.lastCutThickness = MIN_THICK; state.boardWidth = 74;
-  try{
+  try{ withCanvas(c, r.width, r.height, dpr, skin, function(){
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = COLORS.card || '#fbf7ec';
     ctx.fillRect(0, 0, W, H);
@@ -7032,11 +8283,7 @@ function drawKisekaePreview(){
     safeDraw(function(){ drawKkLane(laneW); });
     safeDraw(function(){ drawKkBowl(bx, by, sc); });
     safeDraw(function(){ drawFxParts(ctx, kkParticles(bx, by, sc), true); });
-  }catch(e){}
-  finally{
-    ctx = keep.ctx; W = keep.W; H = keep.H; DPR = keep.DPR; state.skin = keep.skin; skinFailed = keep.failed;
-    state.style = keep.style; state.mode = keep.mode; state.knifeChop = keep.chop; state.lastCutThickness = keep.thick; state.boardWidth = keep.board;
-  }
+  }); }catch(e){}
   kisekaeTitleChip.hidden = !skin.title;
   kisekaeTitleChip.textContent = skin.title ? ('称号「' + skin.title.name + '」') : '';
   if(skin.bg && bgLayer.imgState==='loading') kkRedrawTimer = setTimeout(drawKisekaePreview, 250);   // an ART picture still loading
@@ -7053,6 +8300,7 @@ function drawKkLane(laneW){
   ctx.clip();
   ctx.fillStyle = nsk ? nsk.dough : COLORS.dough;
   ctx.fillRect(0, y, laneW, h);
+  if(nsk) guardedSkinDraw('noodle', function(){ drawDoughGrain(ctx, nsk, 0, y, laneW, h); });
   ctx.strokeStyle = nsk ? nsk.doughDark : COLORS.doughDark;
   ctx.globalAlpha = 0.5;
   ctx.lineWidth = 1;
@@ -7070,14 +8318,18 @@ function drawKkLane(laneW){
   ctx.restore();
   drawKomaitaAndKnife(jx, y, h);
   var ek = skinPart('effect'), fx = {t:110, rating:'JUST', seed:4242};
+  if(ek){
+    guardedSkinDraw('effect', function(){ drawSkinRing(ctx, jx, y + h/2, fx, ek); });
+    guardedSkinDraw('effect', function(){ drawCutBits(jx, y + h/2, fx, ek); });
+    return;
+  }
   ctx.globalAlpha = 0.9;
-  ctx.strokeStyle = ek ? ek.just : '#ffd54a';
+  ctx.strokeStyle = '#ffd54a';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.arc(jx, y + h/2, 10 + fx.t/6, 0, Math.PI*2);
   ctx.stroke();
   ctx.globalAlpha = 1;
-  if(ek) guardedSkinDraw('effect', function(){ drawCutBits(jx, y + h/2, fx, ek); });
 }
 // the served bowl: the equipped bowl and noodles, in tsuyu, with the toppings
 function drawKkBowl(bx, by, sc){
@@ -7111,14 +8363,330 @@ function kkParticles(bx, by, sc){
   var cols = (ek && ek.bits && ek.bits.length) ? ek.bits : CONFETTI_COLS, spark = ek ? skinSparkColor(ek) : '#f5b82e';
   for(i=0;i<KK_BITS.length;i++){
     out.push({kind:'confetti', x:bx + KK_BITS[i][0]*98*sc, y:by + KK_BITS[i][1]*44*sc, vx:0, vy:0, g:0, rot:KK_BITS[i][2], vr:0,
-              size:3.2, col:cols[i % cols.length], age:400, life:100000});
+              size:3.2, col:cols[i % cols.length], age:400, life:100000, shape:ek ? ek.shape : null});
   }
   for(i=0;i<KK_SPARKS.length;i++){
     out.push({kind:'spark', x:bx + KK_SPARKS[i][0]*98*sc, y:by + KK_SPARKS[i][1]*44*sc, vx:0, vy:0, g:0, rot:0, vr:0,
-              size:5, col:spark, age:400, life:100000});
+              size:5, col:spark, age:400, life:100000, spark:ek ? ek.spark : null});
   }
   return out;
 }
+
+// ---------- 図鑑の絵: each item drawn in code from its palette (used when ART has no picture for it) ----------
+// The picture comes from the same base function the game uses for that slot, on a backdrop in the rarity's
+// colours (並 paper, 上 a cool light, 特上 gold, 極み a deep night with gold dust). Pictures are kept once drawn.
+var THUMB_SIZE = 96, THUMB_RES = 2;
+var THUMB_BACKS = {
+  nami:  {top:'#f7efdc', bot:'#e2d1ad', glow:'rgba(255,252,240,0.6)', dust:0,  frame:null},
+  jo:    {top:'#eef4f5', bot:'#c2d5db', glow:'rgba(255,255,255,0.7)', dust:0,  frame:'#5d8fa1'},
+  tokujo:{top:'#fbf1d6', bot:'#deb968', glow:'rgba(255,244,200,0.9)', dust:24, dustCol:'#fffbe8', frame:'#b88a2a'},
+  kiwami:{top:'#3c2449', bot:'#120a19', glow:'rgba(222,170,240,0.5)', dust:44, dustCol:'#f5e2a3', frame:'#d8b457'}
+};
+var thumbCache = {};
+// Runs fn with the game's drawing globals pointed at another canvas (the 着せ替え preview and the 図鑑 pictures),
+// with the given equipment; everything is put back afterwards, whatever happens.
+function withCanvas(c, w, h, dpr, skin, fn){
+  var keep = {ctx:ctx, W:W, H:H, DPR:DPR, skin:state.skin, failed:skinFailed, style:state.style, mode:state.mode,
+              chop:state.knifeChop, thick:state.lastCutThickness, board:state.boardWidth};
+  ctx = c; W = w; H = h; DPR = dpr;
+  state.skin = skin; skinFailed = {};
+  state.style = kkStyle(); state.mode = 'normal'; state.knifeChop = 0; state.lastCutThickness = MIN_THICK; state.boardWidth = 74;
+  try{ fn(); }
+  finally{
+    ctx = keep.ctx; W = keep.W; H = keep.H; DPR = keep.DPR; state.skin = keep.skin; skinFailed = keep.failed;
+    state.style = keep.style; state.mode = keep.mode; state.knifeChop = keep.chop; state.lastCutThickness = keep.thick; state.boardWidth = keep.board;
+  }
+}
+function itemThumb(item){
+  if(!item) return null;
+  var key = item.id + '|' + visualDetail;
+  if(thumbCache[key]) return thumbCache[key];
+  var paint = THUMB_SLOTS[item.applyTo];
+  if(!paint) return null;
+  var c = document.createElement('canvas');
+  c.width = c.height = THUMB_SIZE*THUMB_RES;
+  var g = c.getContext('2d');
+  if(!g) return null;
+  var S = THUMB_SIZE;
+  g.setTransform(THUMB_RES, 0, 0, THUMB_RES, 0, 0);
+  paintThumbBack(g, item.rarity, S);
+  g.save();
+  paint(g, item, S);
+  g.restore();
+  g.setTransform(THUMB_RES, 0, 0, THUMB_RES, 0, 0);
+  paintThumbFrame(g, item.rarity, S);
+  thumbCache[key] = c;
+  return c;
+}
+function paintThumbBack(g, rarity, S){
+  var B = THUMB_BACKS[rarity] || THUMB_BACKS.nami;
+  var bg = g.createLinearGradient(0, 0, 0, S);
+  bg.addColorStop(0, B.top);
+  bg.addColorStop(1, B.bot);
+  g.fillStyle = bg;
+  g.fillRect(0, 0, S, S);
+  var gl = g.createRadialGradient(S*0.5, S*0.45, 2, S*0.5, S*0.45, S*0.62);
+  gl.addColorStop(0, B.glow);
+  gl.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gl;
+  g.fillRect(0, 0, S, S);
+  if(rarity==='nami') sceneDots(g, 5, 60, 0, 0, S, S, 0.3, 0.8, ['#cdb88f','#fffaf0'], 0.5);   // 和紙の繊維
+  if(B.dust){
+    var d = seededList(rarity==='kiwami' ? 97 : 53, B.dust, function(r){ return {x:r(), y:r(), s:r()}; });
+    for(var i=0;i<d.length;i++){
+      g.globalAlpha = 0.35 + d[i].s*0.6;
+      g.fillStyle = B.dustCol;
+      g.beginPath(); g.arc(d[i].x*S, d[i].y*S, 0.3 + d[i].s*0.8, 0, Math.PI*2); g.fill();
+    }
+    g.globalAlpha = 1;
+  }
+}
+function paintThumbFrame(g, rarity, S){
+  var B = THUMB_BACKS[rarity] || THUMB_BACKS.nami;
+  if(!B.frame) return;
+  g.strokeStyle = B.frame;
+  g.lineWidth = rarity==='jo' ? 0.8 : 1.2;
+  g.strokeRect(3.5, 3.5, S - 7, S - 7);
+  if(rarity==='kiwami'){
+    g.lineWidth = 0.6;
+    g.strokeRect(5.5, 5.5, S - 11, S - 11);
+    g.fillStyle = B.frame;
+    var cs = [[3.5,3.5],[S - 3.5,3.5],[3.5,S - 3.5],[S - 3.5,S - 3.5]];
+    for(var i=0;i<cs.length;i++){ g.beginPath(); g.moveTo(cs[i][0], cs[i][1] - 3); g.lineTo(cs[i][0] + 3, cs[i][1]); g.lineTo(cs[i][0], cs[i][1] + 3); g.lineTo(cs[i][0] - 3, cs[i][1]); g.closePath(); g.fill(); }
+    var sp = [[0.84,0.16],[0.14,0.8],[0.8,0.86]];
+    for(var k=0;k<sp.length;k++) drawSparkShape(g, sp[k][0]*S, sp[k][1]*S, 2.6, '#f5e2a3', 'glint');
+  } else if(rarity==='tokujo'){
+    drawSparkShape(g, S*0.86, S*0.15, 2.2, '#fff4cc', 'star');
+  }
+}
+// a table top under bowls and noodles (wood on the lighter backdrops)
+function thumbTable(g, S, y){
+  var t = g.createLinearGradient(0, y, 0, S);
+  t.addColorStop(0, 'rgba(120,84,50,0.55)');
+  t.addColorStop(1, 'rgba(70,46,26,0.7)');
+  g.fillStyle = t;
+  g.fillRect(0, y, S, S - y);
+  g.strokeStyle = 'rgba(255,230,190,0.2)';
+  g.lineWidth = 0.6;
+  for(var i=1;i<4;i++){ var ly = y + (S - y)*i/4; g.beginPath(); g.moveTo(0, ly); g.bezierCurveTo(S*0.3, ly - 1, S*0.6, ly + 1.2, S, ly); g.stroke(); }
+}
+var THUMB_SLOTS = {
+  bowl:function(g, it, S){                                     // the bowl itself, large, with a little tsuyu in it
+    var look = skinLook('bowl', it.id);
+    if(!look) return;
+    var jar = look.shape==='jar', sc = jar ? 0.32 : 0.37;
+    thumbTable(g, S, S*(jar ? 0.8 : 0.72));
+    withCanvas(g, S, S, THUMB_RES, {bowl:look}, function(){
+      safeDraw(function(){
+        ctx.translate(S*0.5, S*(jar ? 0.2 : 0.26));
+        ctx.scale(sc, sc*1.45);                                // seen a little more from the side, so the wall shows
+        drawServingBowl(0, 0);
+        drawTsuyuPool(0, 0, 0.7, detailConf());
+      });
+    });
+  },
+  noodle:function(g, it, S){                                   // a heap of the noodles on a bamboo zaru, and the dough
+    var look = skinLook('noodle', it.id);
+    if(!look) return;
+    thumbTable(g, S, S*0.6);
+    g.save();                                                  // a slab of the dough at the back
+    g.translate(S*0.2, S*0.3);
+    g.fillStyle = look.dough;
+    g.fillRect(-14, -9, 34, 15);
+    drawDoughGrain(g, look, -14, -9, 34, 15);
+    g.restore();
+    g.fillStyle = look.doughDark;
+    g.fillRect(S*0.2 - 14, S*0.3 + 6, 34, 3);
+    g.strokeStyle = look.doughDark;
+    g.lineWidth = 0.6;
+    for(var cut=0; cut<5; cut++){ g.beginPath(); g.moveTo(S*0.2 + 10 + cut*2, S*0.3 - 9); g.lineTo(S*0.2 + 10 + cut*2, S*0.3 + 6); g.stroke(); }
+    g.save();
+    g.translate(S*0.54, S*0.52);
+    g.fillStyle = 'rgba(30,20,10,0.3)';
+    g.beginPath(); g.ellipse(2, 9, 40, 11, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#c9a76a';
+    g.beginPath(); g.ellipse(0, 6, 40, 13, 0, 0, Math.PI*2); g.fill();
+    g.strokeStyle = 'rgba(110,80,40,0.5)';
+    g.lineWidth = 0.6;
+    for(var zr=1; zr<6; zr++){ g.beginPath(); g.ellipse(0, 6, 40*zr/6, 13*zr/6, 0, 0, Math.PI*2); g.stroke(); }
+    g.strokeStyle = '#8a6a3a';
+    g.lineWidth = 1.4;
+    g.beginPath(); g.ellipse(0, 6, 40, 13, 0, 0, Math.PI*2); g.stroke();
+    g.restore();
+    withCanvas(g, S, S, THUMB_RES, {noodle:look}, function(){
+      var nl = noodleLook(look), conf = detailConf(), sc = 0.42;
+      ctx.translate(S*0.54, S*0.52 - 30*sc);
+      ctx.scale(sc, sc);
+      var bundles = heapLayout(KK_BATCH, conf, nl);
+      drawNoodleHeap(bundles, 0, 0, nl, 0, null, Math.min(0.6, nl.shine + 0.1), heapScale(KK_BATCH.length));
+    });
+  },
+  tool:function(g, it, S){                                     // the knife on its komaita
+    var look = skinLook('tool', it.id);
+    if(!look) return;
+    g.save();
+    g.translate(S*0.5, S*0.55);
+    g.rotate(-0.32);
+    g.fillStyle = 'rgba(30,20,10,0.25)';
+    g.fillRect(-36, 6, 76, 16);
+    g.fillStyle = '#d9c69c';
+    g.fillRect(-38, 2, 76, 16);
+    g.fillStyle = '#8a6f42';
+    g.fillRect(-38, 2, 76, 2.5);
+    g.strokeStyle = 'rgba(120,90,50,0.3)';
+    g.lineWidth = 0.6;
+    for(var i=0;i<3;i++){ g.beginPath(); g.moveTo(-38, 8 + i*3.6); g.lineTo(38, 8 + i*3.6 - 1); g.stroke(); }
+    g.translate(-22, 2);
+    g.scale(1.25, 1.25);
+    g.fillStyle = 'rgba(20,14,8,0.22)';
+    g.beginPath(); g.ellipse(20, 4, 26, 3, 0, 0, Math.PI*2); g.fill();
+    drawToolBase(g, look);
+    g.restore();
+  },
+  bg:function(g, it, S){                                       // the scene itself, in a small frame
+    var look = skinLook('bg', it.id);
+    if(!look) return;
+    var c = document.createElement('canvas'), w = 120, h = 160;
+    c.width = w*THUMB_RES; c.height = h*THUMB_RES;
+    var sg = c.getContext('2d');
+    if(!sg) return;
+    sg.setTransform(THUMB_RES, 0, 0, THUMB_RES, 0, 0);
+    if(!paintBgBase(sg, w, h, look)) return;
+    g.save();
+    cardRoundRect(g, 8, 8, S - 16, S - 16, 5);
+    g.clip();
+    g.drawImage(c, 0, 0, c.width, c.height, 8, 8, S - 16, S - 16);
+    g.restore();
+    g.strokeStyle = 'rgba(40,30,20,0.35)';
+    g.lineWidth = 1;
+    cardRoundRect(g, 8, 8, S - 16, S - 16, 5);
+    g.stroke();
+  },
+  effect:function(g, it, S){                                   // its ring and a burst of its bits round a pile of them
+    var look = skinLook('effect', it.id);
+    if(!look) return;
+    var shape = BIT_SHAPES[look.shape] || BIT_SHAPES.strip, cols = look.bits && look.bits.length ? look.bits : CONFETTI_COLS;
+    drawSkinRing(g, S*0.5, S*0.5, {t:140, rating:'JUST'}, look);
+    var rnd = cardRng(hashStr(it.id));
+    for(var i=0;i<12;i++){
+      var a = i/12*Math.PI*2 + rnd()*0.3, d = S*(0.33 + rnd()*0.08);
+      g.save(); g.translate(S*0.5 + Math.cos(a)*d, S*0.5 + Math.sin(a)*d); g.rotate(rnd()*6.28);
+      shape(g, 0.9 + rnd()*0.3, cols[i % cols.length]);
+      g.restore();
+    }
+    var pile = [[-0.1,0.06,0.4],[0.1,0.05,-0.5],[0,-0.06,0.1],[-0.02,0.12,1.2]];
+    for(var k=0;k<pile.length;k++){
+      g.save(); g.translate(S*(0.5 + pile[k][0]), S*(0.5 + pile[k][1])); g.rotate(pile[k][2]);
+      g.fillStyle = 'rgba(20,14,8,0.18)';
+      g.beginPath(); g.ellipse(1.5, 3, 14, 6, 0, 0, Math.PI*2); g.fill();
+      shape(g, 2.6, cols[k % cols.length]);
+      g.restore();
+    }
+    var spk = [[0.24,0.22],[0.78,0.3],[0.7,0.8]], sc = skinSparkColor(look);
+    for(var j=0;j<spk.length;j++) drawSparkShape(g, spk[j][0]*S, spk[j][1]*S, 4, sc, look.spark);
+  },
+  sound:function(g, it, S){                                    // what makes the sound, and its sound spreading out
+    var look = skinLook('sound', it.id);
+    if(!look) return;
+    var icon = SOUND_ICONS[look.icon] || SOUND_ICONS.board;
+    g.save();
+    icon(g, S);
+    g.restore();
+    g.strokeStyle = 'rgba(90,60,30,0.55)';
+    g.lineCap = 'round';
+    for(var i=0;i<3;i++){ g.lineWidth = 1.6 - i*0.3; g.beginPath(); g.arc(S*0.7, S*0.3, 6 + i*5, -0.6, 0.6); g.stroke(); }
+  },
+  title:function(g, it, S){                                    // そば一筋のれん: indigo cloth with the words dyed white
+    g.fillStyle = '#6b4a2b';
+    g.fillRect(S*0.16, S*0.16, S*0.68, 4);
+    g.fillStyle = 'rgba(255,230,180,0.4)';
+    g.fillRect(S*0.16, S*0.16, S*0.68, 1);
+    var top = S*0.16 + 4, bot = S*0.84, half = S*0.34;
+    for(var p=0;p<2;p++){
+      var x0 = S*0.16 + p*(half + 1), w = half - 1;
+      var cl = g.createLinearGradient(x0, 0, x0 + w, 0);
+      cl.addColorStop(0, '#24365c');
+      cl.addColorStop(1, '#16223d');
+      g.fillStyle = cl;
+      g.beginPath(); g.moveTo(x0, top); g.lineTo(x0 + w, top); g.lineTo(x0 + w, bot); g.quadraticCurveTo(x0 + w/2, bot + 2, x0, bot); g.closePath(); g.fill();
+      g.fillStyle = 'rgba(255,255,255,0.08)';
+      g.fillRect(x0 + w*0.15, top, w*0.08, bot - top);
+    }
+    g.fillStyle = '#f6f1e4';
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.font = '700 15px ' + CARD_SERIF;
+    var words = ['そ','ば','一','筋'];
+    for(var i=0;i<4;i++) g.fillText(words[i], S*0.16 + (i<2 ? half*1.5 : half*0.5), top + 13 + (i%2)*20);
+    g.strokeStyle = '#d8b457';
+    g.lineWidth = 1;
+    g.beginPath(); g.arc(S*0.5, bot - 10, 6, 0, Math.PI*2); g.stroke();
+  }
+};
+// 音の絵: what makes each sound
+var SOUND_ICONS = {
+  board:function(g, S){                                        // 木のまな板
+    g.translate(S*0.46, S*0.6);
+    g.fillStyle = 'rgba(30,20,10,0.25)'; g.beginPath(); g.ellipse(2, 12, 34, 7, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#c99b62'; g.fillRect(-32, -6, 64, 14);
+    g.fillStyle = '#e2bd84'; g.beginPath(); g.moveTo(-32, -6); g.lineTo(-24, -14); g.lineTo(40, -14); g.lineTo(32, -6); g.closePath(); g.fill();
+    g.fillStyle = '#a77a45'; g.beginPath(); g.moveTo(32, -6); g.lineTo(40, -14); g.lineTo(40, 0); g.lineTo(32, 8); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(120,80,40,0.45)'; g.lineWidth = 0.6;
+    for(var i=0;i<4;i++){ g.beginPath(); g.moveTo(-28 + i*4, -8 - i*1.5); g.lineTo(34 + i*1.5, -8 - i*1.5); g.stroke(); }
+  },
+  knife:function(g, S){                                        // 包丁とまな板
+    SOUND_ICONS.board(g, S);
+    g.translate(-16, -9);
+    g.rotate(-0.2);
+    drawToolBase(g, skinLook('tool', 'echizen_knife') || {id:'k', blade:'#c3cacd', edge:'#5e6c72', handle:'#5b3a22', band:'#c8b28a', shape:'kiri'});
+  },
+  hammer:function(g, S){                                       // 槌と金床、飛ぶ火花
+    g.translate(S*0.44, S*0.66);
+    g.fillStyle = 'rgba(30,20,10,0.25)'; g.beginPath(); g.ellipse(2, 10, 30, 6, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#4a4f54'; g.beginPath(); g.moveTo(-26, -4); g.lineTo(26, -4); g.lineTo(18, 4); g.lineTo(10, 4); g.lineTo(10, 10); g.lineTo(-10, 10); g.lineTo(-10, 4); g.lineTo(-18, 4); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.25)'; g.fillRect(-24, -4, 48, 1.5);
+    g.fillStyle = '#e8792e'; g.fillRect(-8, -8, 18, 4);
+    g.fillStyle = '#ffd27a'; g.fillRect(-6, -7.5, 12, 1.5);
+    g.save(); g.translate(14, -20); g.rotate(0.6);
+    g.fillStyle = '#7a5634'; g.fillRect(-2, -2, 30, 4);
+    g.fillStyle = '#5d646a'; g.fillRect(-10, -6, 9, 12);
+    g.fillStyle = 'rgba(255,255,255,0.3)'; g.fillRect(-10, -6, 9, 2);
+    g.restore();
+    var sp = [[-4,-14],[8,-16],[-12,-12],[2,-20],[14,-11]];
+    for(var i=0;i<sp.length;i++) drawSparkShape(g, sp[i][0], sp[i][1], 2.4, '#ffb347', 'star');
+  },
+  millstone:function(g, S){                                    // 石臼: two stones and the wooden handle
+    g.translate(S*0.46, S*0.62);
+    g.fillStyle = 'rgba(30,20,10,0.25)'; g.beginPath(); g.ellipse(2, 16, 32, 6, 0, 0, Math.PI*2); g.fill();
+    for(var k=1;k>=0;k--){
+      var y = k*-12;
+      g.fillStyle = k ? '#9c988e' : '#88847a';
+      g.fillRect(-26, y, 52, 12);
+      g.beginPath(); g.ellipse(0, y + 12, 26, 6, 0, 0, Math.PI); g.fill();
+      g.fillStyle = k ? '#b4b0a6' : '#a09c92';
+      g.beginPath(); g.ellipse(0, y, 26, 6, 0, 0, Math.PI*2); g.fill();
+    }
+    g.fillStyle = '#5c5850'; g.beginPath(); g.ellipse(0, -12, 4, 2, 0, 0, Math.PI*2); g.fill();
+    sceneDots(g, 3, 30, -24, -10, 48, 22, 0.3, 0.8, ['#6f6b62','#c4c0b6'], 0.6);
+    g.fillStyle = '#7a5634'; g.fillRect(18, -26, 4, 16);
+    g.fillStyle = '#e8dcc0';                                   // そば粉 falling from between the stones
+    g.beginPath(); g.ellipse(-20, 14, 10, 3, 0, 0, Math.PI*2); g.fill();
+  },
+  choko:function(g, S){                                        // そば猪口と、すするそば
+    g.translate(S*0.42, S*0.64);
+    g.fillStyle = 'rgba(30,20,10,0.25)'; g.beginPath(); g.ellipse(2, 14, 24, 5, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#eef0f2';
+    g.beginPath(); g.moveTo(-20, -18); g.lineTo(20, -18); g.lineTo(16, 12); g.lineTo(-16, 12); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(0,0,0,0.08)'; g.beginPath(); g.moveTo(6, -18); g.lineTo(20, -18); g.lineTo(16, 12); g.lineTo(4, 12); g.closePath(); g.fill();
+    g.strokeStyle = '#3f5f8f'; g.lineWidth = 1.4;
+    g.beginPath(); g.moveTo(-19, -10); g.lineTo(19, -10); g.moveTo(-17.5, 2); g.lineTo(17.5, 2); g.stroke();
+    g.lineWidth = 0.8;
+    for(var i=0;i<6;i++){ g.beginPath(); g.moveTo(-15 + i*6, -8); g.quadraticCurveTo(-12 + i*6, -4, -15 + i*6, 0); g.stroke(); }
+    g.fillStyle = '#4a2c16'; g.beginPath(); g.ellipse(0, -18, 20, 4, 0, 0, Math.PI*2); g.fill();
+    g.strokeStyle = '#7d6a4a'; g.lineWidth = 1.6;
+    for(var n=0;n<3;n++){ g.beginPath(); g.moveTo(-4 + n*3, -18); g.bezierCurveTo(-2 + n*3, -28, 6 + n*3, -30, 10 + n*3, -40); g.stroke(); }
+  }
+};
 
 // ---------- 交換所・着せ替え: open from home, the gacha, the 図鑑 or each other; 戻る goes back where they came from ----------
 var subFrom = {exchange:null, kisekae:null};
@@ -7348,8 +8916,13 @@ function drawKomaitaAndKnife(jx, y, h){
   ctx.save();
   ctx.translate(edgeX, y-liftY);
   ctx.rotate(0.16);
-  ctx.fillStyle = tk ? tk.blade : '#d7dee0';
-  ctx.strokeStyle = tk ? tk.edge : '#7d8a8f';
+  if(tk){
+    var drawn = false;
+    guardedSkinDraw('tool', function(){ drawn = drawToolBase(ctx, tk); });
+    if(drawn){ ctx.restore(); return; }
+  }
+  ctx.fillStyle = '#d7dee0';
+  ctx.strokeStyle = '#7d8a8f';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(0,2);
@@ -7359,10 +8932,8 @@ function drawKomaitaAndKnife(jx, y, h){
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
-  if(tk) guardedSkinDraw('tool', function(){ drawBladeDeco(tk); });
-  ctx.fillStyle = tk ? tk.handle : '#3f2c1d';
+  ctx.fillStyle = '#3f2c1d';
   ctx.fillRect(4,-42,30,9);
-  if(tk) guardedSkinDraw('tool', function(){ drawHandleDeco(tk); });
   ctx.restore();
 }
 
@@ -7381,6 +8952,7 @@ function drawLane(){
   var nskLane = state.mode==='shinsoba' ? null : skinPart('noodle');   // 着せ替え: the equipped noodles tint the dough
   ctx.fillStyle = state.mode==='shinsoba' ? SHINSOBA_DOUGH : (nskLane ? nskLane.dough : COLORS.dough);
   ctx.fillRect(0,y,W,h);
+  if(nskLane) guardedSkinDraw('noodle', function(){ drawDoughGrain(ctx, nskLane, 0, y, W, h); });
 
   ctx.strokeStyle = nskLane ? nskLane.doughDark : COLORS.doughDark;
   ctx.globalAlpha = 0.5;
@@ -7435,15 +9007,19 @@ function drawLane(){
   var ek = skinPart('effect');   // ② 演出 (着せ替え: the equipped colours; none = the original)
   for(var f=0;f<state.cutFx.length;f++){
     var fx = state.cutFx[f];
+    if(ek && fx.rating!=='DEMO'){
+      guardedSkinDraw('effect', function(){ drawSkinRing(ctx, jx, y+h/2, fx, ek); });
+      if(f>=state.cutFx.length - CUT_FX_RECENT) guardedSkinDraw('effect', function(){ drawCutBits(jx, y+h/2, fx, ek); });   // only the newest cuts throw bits
+      if(!skinFailed.effect) continue;
+    }
     var a = 1-fx.t/400;
     ctx.globalAlpha = Math.max(a,0);
-    ctx.strokeStyle = fx.rating==='DEMO' ? '#c9a24a' : ek ? (fx.rating==='JUST' ? ek.just : ek.ring) : fx.rating==='JUST' ? '#ffd54a' : COLORS.accent;
+    ctx.strokeStyle = fx.rating==='DEMO' ? '#c9a24a' : fx.rating==='JUST' ? '#ffd54a' : COLORS.accent;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(jx, y+h/2, 10+fx.t/6, 0, Math.PI*2);
     ctx.stroke();
     ctx.globalAlpha = 1;
-    if(ek && fx.rating!=='DEMO') guardedSkinDraw('effect', function(){ drawCutBits(jx, y+h/2, fx, ek); });
   }
 }
 
@@ -7532,8 +9108,9 @@ function batchKey(pieces){
 function noodleLook(nsk){
   var f = FLOUR_LOOKS[state.style] || FLOUR_LOOKS[DEFAULT_STYLE];
   if(nsk) return {id:'skin:' + nsk.id, fills:nsk.fills, soak:nsk.soak, outline:nsk.outline, outlineSoak:nsk.outlineSoak,
-                  speck:nsk.speck || null, speckDensity:0.9, speckAlpha:0.6, husk:0, jitter:0.08,
-                  shine:(typeof nsk.shine==='number' ? nsk.shine : 0.16)};
+                  speck:nsk.speck || null, speckDensity:skinNum(nsk.speckDensity, 0.9), speckAlpha:skinNum(nsk.speckAlpha, 0.6),
+                  husk:skinNum(nsk.husk, 0), jitter:skinNum(nsk.jitter, 0.08), shine:skinNum(nsk.shine, 0.16),
+                  crack:skinNum(nsk.crack, 0), wet:skinNum(nsk.wet, 0)};
   if(state.mode==='shinsoba') return {id:'shin:' + f.id, fills:STRAND_FILLS_SHIN, soak:f.soak, outline:f.outline, outlineSoak:f.outlineSoak,
                   speck:f.speck, speckDensity:f.speckDensity, speckAlpha:f.speckAlpha, husk:f.husk, jitter:f.jitter, shine:f.shine};
   return f;
@@ -7609,14 +9186,15 @@ function buildBundle(p, i, conf, look, sc){
       if(q>0){ var dx = xs[q] - xs[q-1], dy = ys[q] - ys[q-1]; len += Math.sqrt(dx*dx + dy*dy); }
       if(j===0) depth += a.d;
     }
-    strands.push({xs:xs, ys:ys, w:w, c:(i + j) % 3, specks:(look.speck && conf.speck>0) ? strandSpecks(xs, ys, len, w, grain, conf, look) : null});
+    strands.push({xs:xs, ys:ys, w:w, c:(i + j) % 3, specks:((look.speck || look.crack) && conf.speck>0) ? strandSpecks(xs, ys, len, w, grain, conf, look) : null});
   }
   return {strands:strands, depth:depth/m};
 }
 // そば粉の粒: faint small dark dots along a strand, and for 十割・挽きぐるみ a few larger flecks of husk
 function strandSpecks(xs, ys, len, w, rnd, conf, look){
-  var count = Math.round(look.speckDensity*conf.speck*(len/10)*(0.5 + w/5));
-  if(count<=0) return null;
+  var count = look.speck ? Math.round(look.speckDensity*conf.speck*(len/10)*(0.5 + w/5)) : 0;
+  var cracks = (look.crack && conf.husk) ? Math.round(look.crack*conf.speck*len/26) : 0;   // 十割: hairline cracks (none on 'low')
+  if(count<=0 && cracks<=0) return null;
   var out = [], m = xs.length;
   for(var s=0;s<count;s++){
     var t = rnd()*(m - 1), q = Math.min(m - 2, Math.floor(t)), fr = t - q;
@@ -7626,6 +9204,11 @@ function strandSpecks(xs, ys, len, w, rnd, conf, look){
     var sz = husk ? 1.5 + rnd()*0.8 : 0.8 + rnd()*0.6;
     out.push({x:xs[q] + tx*fr - ty/tl*o, y:ys[q] + ty*fr + tx/tl*o, s:sz, a:Math.min(0.8, look.speckAlpha*(husk ? 1.6 : 0.7 + rnd()*0.6)),
               h:husk ? Math.atan2(ty, tx) + (rnd() - 0.5)*0.8 : null});
+  }
+  for(var c=0;c<cracks;c++){
+    var t2 = rnd()*(m - 1), q2 = Math.min(m - 2, Math.floor(t2)), f2 = t2 - q2;
+    var dx = xs[q2+1] - xs[q2], dy = ys[q2+1] - ys[q2];
+    out.push({x:xs[q2] + dx*f2, y:ys[q2] + dy*f2, s:Math.max(1.2, w*0.75), a:0.55, h:null, k:Math.atan2(dy, dx) + Math.PI/2 + (rnd() - 0.5)*0.5});
   }
   return out;
 }
@@ -7691,7 +9274,15 @@ function drawNoodleHeap(bundles, cx, cy, look, soak, liftT, shine, sc){
         for(var s=0;s<S.specks.length;s++){
           var sp = S.specks[s];
           ctx.globalAlpha = sp.a;
-          if(sp.h===null) ctx.fillRect(cx + sp.x - sp.s/2, oy + sp.y - sp.s/2, sp.s, sp.s);
+          if(sp.k!==undefined){                       // a hairline crack across the strand
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 0.6;
+            ctx.beginPath();
+            ctx.moveTo(cx + sp.x - Math.cos(sp.k)*sp.s/2, oy + sp.y - Math.sin(sp.k)*sp.s/2);
+            ctx.lineTo(cx + sp.x + Math.cos(sp.k)*sp.s/2, oy + sp.y + Math.sin(sp.k)*sp.s/2);
+            ctx.stroke();
+          }
+          else if(sp.h===null) ctx.fillRect(cx + sp.x - sp.s/2, oy + sp.y - sp.s/2, sp.s, sp.s);
           else{ ctx.beginPath(); ctx.ellipse(cx + sp.x, oy + sp.y, sp.s*0.7, sp.s*0.35, sp.h, 0, Math.PI*2); ctx.fill(); }   // a fleck of husk
         }
         ctx.globalAlpha = 1;
@@ -7702,6 +9293,12 @@ function drawNoodleHeap(bundles, cx, cy, look, soak, liftT, shine, sc){
         ctx.strokeStyle = sheen;
         ctx.lineWidth = Math.max(0.6, S.w*0.3);
         ctx.stroke();
+        if(look.wet){                                   // 新そば: a second, thin wet shine
+          traceStrand(S.xs, S.ys, Math.floor(last*0.4), Math.max(Math.floor(last*0.4) + 1, Math.floor(last*0.58)), cx, oy - S.w*0.32);
+          ctx.strokeStyle = 'rgba(255,255,255,' + (0.55*look.wet).toFixed(3) + ')';
+          ctx.lineWidth = Math.max(0.4, S.w*0.12);
+          ctx.stroke();
+        }
       }
     }
   }
@@ -8573,14 +10170,16 @@ function startReactionFx(s){
   for(i=0;i<sparks;i++){
     a = Math.random()*Math.PI*2; rr = g.r*(1.3 + Math.random()*0.8);
     serveFx.push({kind:'spark', x:g.x + Math.cos(a)*rr, y:g.y - g.r*0.35 + Math.sin(a)*rr*0.8, vx:0, vy:fc.still ? 0 : -10,
-                  g:0, rot:0, vr:0, size:3 + Math.random()*3, col:sparkCol, age:-i*70, life:700 + Math.random()*300});
+                  g:0, rot:0, vr:0, size:3 + Math.random()*3, col:sparkCol, age:-i*70, life:700 + Math.random()*300, spark:ek ? ek.spark : null});
   }
   if(tier!=='just') return;
+  var grav = ek ? skinNum(ek.grav, 1) : 1, spin = ek ? skinNum(ek.spin, 1) : 1;
   var n = Math.round((16 + 24*Math.max(0, (k - 90)/10))*fc.parts);
   for(i=0;i<n;i++){
     var p = {kind:'confetti', x:cx + (Math.random() - 0.5)*40, y:cy + 4, vx:(Math.random() - 0.5)*320, vy:-(260 + Math.random()*230),
-             g:640, rot:Math.random()*6, vr:(Math.random() - 0.5)*14, size:2.5 + Math.random()*2.5,
-             col:confCols[i % confCols.length], age:-Math.random()*120, life:1100 + Math.random()*450};
+             g:640*grav, rot:Math.random()*6, vr:(Math.random() - 0.5)*14*spin, size:2.5 + Math.random()*2.5,
+             col:confCols[i % confCols.length], age:-Math.random()*120, life:1100 + Math.random()*450,
+             shape:ek ? ek.shape : null, sw:(ek && grav<1) ? 40*(1 - grav) : 0};   // light bits (花かつお, 和紙) flutter as they fall
     if(fc.still){ p.x = cx + (Math.random() - 0.5)*200; p.y = cy - 70 + Math.random()*90; p.vx = p.vy = p.g = p.vr = 0; }
     serveFx.push(p);
   }
@@ -8588,8 +10187,9 @@ function startReactionFx(s){
   for(i=0;i<st;i++){                               // a few glints round the seal
     a = Math.random()*Math.PI*2; rr = 26 + Math.random()*14;
     serveFx.push({kind:'spark', x:W*0.19 + Math.cos(a)*rr, y:H*0.19 + Math.sin(a)*rr, vx:0, vy:0, g:0, rot:0, vr:0,
-                  size:3 + Math.random()*2.5, col:glintCol, age:-120 - i*60, life:650});
+                  size:3 + Math.random()*2.5, col:glintCol, age:-120 - i*60, life:650, spark:ek ? ek.spark : null});
   }
+  if(serveFx.length>SERVE_FX_MAX) serveFx.length = SERVE_FX_MAX;   // a cap on how many are alive at once
 }
 // The particles themselves, shared with the gacha's capsule opening: each is {kind:'spark'|'confetti', x, y,
 // vx, vy (px per second), g (gravity), rot, vr, size, col, age (ms; below 0 = not yet), life}.
@@ -8599,7 +10199,7 @@ function fxStep(list, dt){
     var p = list[i];
     p.age += dt;
     if(p.age<0) continue;
-    p.x += p.vx*sec;
+    p.x += p.vx*sec + (p.sw ? Math.sin(p.age*0.008 + p.rot)*p.sw*sec : 0);
     p.y += p.vy*sec;
     p.vy += p.g*sec;
     p.vx *= (1 - 0.8*sec);
@@ -8619,9 +10219,11 @@ function drawFxParts(c, list, still){
       c.translate(p.x, p.y);
       c.rotate(p.rot);
       c.scale(1, 0.25 + 0.75*Math.abs(Math.cos(p.rot*1.7)));
-      c.fillStyle = p.col;
-      c.fillRect(-p.size, -p.size*0.55, p.size*2, p.size*1.1);
+      if(p.shape && Object.prototype.hasOwnProperty.call(BIT_SHAPES, p.shape)) BIT_SHAPES[p.shape](c, p.size/3, p.col);   // the equipped 演出's bits
+      else { c.fillStyle = p.col; c.fillRect(-p.size, -p.size*0.55, p.size*2, p.size*1.1); }
       c.restore();
+    } else if(p.spark==='glint'){
+      drawSparkShape(c, p.x, p.y, p.size*(still ? 0.85 : 0.7 + 0.3*Math.sin(p.age*0.02)), p.col, 'glint');
     } else {
       var s = p.size*(still ? 0.85 : 0.7 + 0.3*Math.sin(p.age*0.02));
       c.fillStyle = p.col;
@@ -8771,7 +10373,8 @@ function drawServing(){
     else safeDraw(heap);
     var set = toppingLayout(pieces, conf);
     safeDraw(function(){ drawToppings(set, cx, cy, clock); });
-    if(poured && aromaK>0 && conf.steam) safeDraw(function(){ drawAromaSteam(cx, cy, aromaK*Math.min(1, (s.stage==='pour' ? s.t : 300)/300), conf.steam); });
+    var steamK = nsk ? Math.min(1, aromaK*skinNum(nsk.steam, 1)) : aromaK;   // 着せ替えの麺: how readily the steam shows (looks only)
+    if(poured && aromaK>0 && conf.steam) safeDraw(function(){ drawAromaSteam(cx, cy, steamK*Math.min(1, (s.stage==='pour' ? s.t : 300)/300), conf.steam); });
   }
 
   safeDraw(function(){ drawDashiPour(cx, cy, s); });      // ② the ladle and the stream of dashi
