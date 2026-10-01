@@ -1057,7 +1057,7 @@ body{
       </div>
       <div class="collect-actions">
         <button id="btn-gacha" class="btn-small collect-btn" type="button">ガチャを引く</button>
-        <button id="btn-zukan" class="btn-small collect-btn" type="button">図鑑 <span id="home-zukan">0/42</span></button>
+        <button id="btn-zukan" class="btn-small collect-btn" type="button">図鑑 <span id="home-zukan">0/77</span></button>
         <button id="btn-exchange" class="btn-small collect-btn" type="button">交換所</button>
         <button id="btn-kisekae" class="btn-small collect-btn" type="button">着せ替え</button>
       </div>
@@ -1366,8 +1366,8 @@ body{
       <button id="btn-zukan-back" class="btn-small" type="button">戻る</button>
     </div>
     <div class="zukan-sum card">
-      <p class="zs-row"><span class="zs-label">集めた数</span><span id="zukan-count" class="zs-count">0 / 42</span></p>
-      <div id="zukan-progress" class="progress" role="progressbar" aria-label="図鑑の集まり具合" aria-valuemin="0" aria-valuemax="42" aria-valuenow="0">
+      <p class="zs-row"><span class="zs-label">集めた数</span><span id="zukan-count" class="zs-count">0 / 77</span></p>
+      <div id="zukan-progress" class="progress" role="progressbar" aria-label="図鑑の集まり具合" aria-valuemin="0" aria-valuemax="77" aria-valuenow="0">
         <div id="zukan-progress-fill" class="progress-fill"></div>
       </div>
       <p id="zukan-rarity-counts" class="zs-rar"></p>
@@ -1591,7 +1591,43 @@ const ART = {
   "tsuchime_blade": "",
   "natural_ash_jar": "",
   "master_tansu": "",
-  "soba_hitosuji_noren": ""
+  "soba_hitosuji_noren": "",
+  // 追加アイテム（並・上・特上・極み）
+  "heshiko_amber": "",
+  "tomitsu_kintoki": "",
+  "sauce_katsudon_bowl": "",
+  "mikuni_auction_bowl": "",
+  "katsuyama_black_noodle": "",
+  "ancient_green_noodle": "",
+  "crab_knife": "",
+  "kehi_matsubara": "",
+  "dig_site_night": "",
+  "echizen_isaribi": "",
+  "habutae_powder": "",
+  "crab_bubbles": "",
+  "kamisho_taro_aura": "",
+  "taniguchiya_age": "",
+  "kokoshizen_jar_bowl": "",
+  "claw_mark_bowl": "",
+  "ono_spring_noodle": "",
+  "kanimiso_gold_noodle": "",
+  "dig_hammer_knife": "",
+  "mikata_rainbow": "",
+  "asuwa_sakura": "",
+  "mikuni_auction": "",
+  "oshima_island": "",
+  "raptor_slash": "",
+  "yokan_slice": "",
+  "guji_scales": "",
+  "phoenix_makie_bowl": "",
+  "fukuiraptor_fossil_bowl": "",
+  "crab_shell_bowl": "",
+  "ryusen_knife": "",
+  "heisenji_moss": "",
+  "dino_forest": "",
+  "dino_roar_fx": "",
+  "yellow_tag_aura": "",
+  "fossil_aura": ""
 };
 (function(){
 'use strict';
@@ -1897,7 +1933,7 @@ var COIN_RATE10 = {beginner:10, lover:12, regular:15, enthusiast:20, farmer:12};
 var TICKET_MAX = 9999999;
 var GACHA_SLOTS = ['bowl','noodle','tool','bg','effect','sound','title'];
 
-// ---------- そば猪口ガチャ: the 42-item catalog and the draw rules ----------
+// ---------- そば猪口ガチャ: the 77-item catalog and the draw rules ----------
 // Each item is {id, name, rarity, category, applyTo, desc}.
 //   rarity:  'nami' 並 / 'jo' 上 / 'tokujo' 特上 / 'kiwami' 極み
 //   applyTo: the equip slot it dresses (one of GACHA_SLOTS). Every prize is a look or a sound — nothing changes play.
@@ -1907,14 +1943,14 @@ var GACHA_SLOTS = ['bowl','noodle','tool','bg','effect','sound','title'];
 // そば札 buy any item not owned yet (exchange = the price in そば札).
 var GACHA_RARITY_ORDER = ['nami','jo','tokujo','kiwami'];
 var GACHA_RARITIES = {
-  nami:  {label:'並',   rate:6000, dupTickets:1,  exchange:10,  count:14},
-  jo:    {label:'上',   rate:2500, dupTickets:3,  exchange:30,  count:12},
-  tokujo:{label:'特上', rate:1200, dupTickets:10, exchange:80,  count:9},
-  kiwami:{label:'極み', rate:300,  dupTickets:25, exchange:200, count:7}
+  nami:  {label:'並',   rate:6000, dupTickets:1,  exchange:10,  count:16},
+  jo:    {label:'上',   rate:2500, dupTickets:3,  exchange:30,  count:24},
+  tokujo:{label:'特上', rate:1200, dupTickets:10, exchange:80,  count:21},
+  kiwami:{label:'極み', rate:300,  dupTickets:25, exchange:200, count:16}
 };
 var GACHA_RATE_TOTAL = 10000;   // rates are in hundredths of a percent: 6000 = 60.00% (they must add up to 100%)
 var GACHA_TEN_MIN_INDEX = 1;    // GACHA_RARITY_ORDER index of 上: the 10連's sure slot is 上以上 = 上 + 特上 + 極み
-var GACHA_TOTAL_ITEMS = 42;
+var GACHA_TOTAL_ITEMS = 77;
 var GACHA_PULLS = {
   single:{count:1,  cost:500,  guaranteeMin:0},
   ten:   {count:10, cost:4500, guaranteeMin:GACHA_TEN_MIN_INDEX}   // 10連: the last slot is 上以上 if none came before it
@@ -1926,7 +1962,7 @@ var GACHA_COMPLETE_TITLE = 'soba_hitosuji';
 var GACHA_TITLES = {soba_hitosuji:{name:'そば一筋'}};
 
 var GACHA_CATALOG = [
-  // ---- 並 (14) ----
+  // ---- 並 (16) ----
   {id:'soba_field', name:'そば畑の背景', rarity:'nami', category:'背景', applyTo:'bg',
    desc:'福井県はそばの作付けが全国でも上位の産地。9〜10月には畑一面に白い花が咲く。'},
   {id:'unglazed_bowl', name:'素焼きの椀', rarity:'nami', category:'器', applyTo:'bowl',
@@ -1955,7 +1991,11 @@ var GACHA_CATALOG = [
    desc:'福井では冬にこたつで食べるのが定番。平たい箱に流した、あっさり甘い水ようかん。'},
   {id:'satsukigase', name:'五月ヶ瀬', rarity:'nami', category:'おまけ', applyTo:'effect',
    desc:'福井で長く親しまれている、落花生がぎっしり入った煎餅。'},
-  // ---- 上 (12) ----
+  {id:'heshiko_amber', name:'へしこのアンバーゴールド', rarity:'nami', category:'演出', applyTo:'effect',
+   desc:'へしこは、鯖を塩漬けにしてから糠に漬けこみ、じっくり熟成させた若狭の郷土料理。'},
+  {id:'tomitsu_kintoki', name:'とみつ金時のほくほく蜜光', rarity:'nami', category:'演出', applyTo:'effect',
+   desc:'あわら市の砂地の畑で育つさつまいも、とみつ金時。焼くとほくほくで、蜜のように甘い。'},
+  // ---- 上 (24) ----
   {id:'echizen_lacquer_bowl', name:'越前漆器の椀', rarity:'jo', category:'器', applyTo:'bowl',
    desc:'鯖江市の河和田地区を中心に作られる越前漆器。約1500年の歴史があると伝わる。'},
   {id:'echizen_ware_bowl', name:'越前焼の椀', rarity:'jo', category:'器', applyTo:'bowl',
@@ -1980,7 +2020,31 @@ var GACHA_CATALOG = [
    desc:'熱した鋼を槌で打ち鍛える音。越前打刃物では今も手作業の鍛造が受け継がれている。'},
   {id:'crab_chopstick_rest', name:'越前がにの箸置き', rarity:'jo', category:'小物', applyTo:'effect',
    desc:'越前がには福井県で水揚げされるオスのズワイガニ。黄色いタグが目印。'},
-  // ---- 特上 (9) ----
+  {id:'sauce_katsudon_bowl', name:'福井名物ソースカツ丼風椀', rarity:'jo', category:'器', applyTo:'bowl',
+   desc:'福井でカツ丼といえば、薄いカツをソースにくぐらせてご飯にのせるソースカツ丼。その丼を思わせる深めの器。'},
+  {id:'mikuni_auction_bowl', name:'三国港の競り朱椀', rarity:'jo', category:'器', applyTo:'bowl',
+   desc:'坂井市の三国港は越前がにが水揚げされる港のひとつ。冬の競りのにぎわいを思わせる朱塗りの椀。'},
+  {id:'katsuyama_black_noodle', name:'勝山黒そば', rarity:'jo', category:'麺', applyTo:'noodle',
+   desc:'奥越前の山あいで打つ、甘皮ごと挽いた色の黒い粉の太打ちそばをイメージした麺。'},
+  {id:'ancient_green_noodle', name:'太古の緑そば', rarity:'jo', category:'麺', applyTo:'noodle',
+   desc:'恐竜が歩いていた時代の森に茂ったシダをモチーフにした、濃い緑の太打ち麺。'},
+  {id:'crab_knife', name:'極上カニ捌き包丁', rarity:'jo', category:'道具', applyTo:'tool',
+   desc:'越前がにを捌くための小ぶりの打刃物。細く尖った刃先が、殻の継ぎ目にすっと入る。'},
+  {id:'kehi_matsubara', name:'気比の松原', rarity:'jo', category:'背景', applyTo:'bg',
+   desc:'敦賀市の海岸に続く松林。白い砂と青い松が美しく、日本三大松原のひとつに数えられる。'},
+  {id:'dig_site_night', name:'発掘現場の地層ナイト', rarity:'jo', category:'背景', applyTo:'bg',
+   desc:'勝山市では恐竜の化石がたくさん見つかっている。夜の発掘現場で、ライトに照らされた地層と化石。'},
+  {id:'echizen_isaribi', name:'越前海岸・冬の漁火', rarity:'jo', category:'背景', applyTo:'bg',
+   desc:'越前がに漁は毎年11月6日に解禁。冬の夜の越前海岸では、沖に漁船の灯りが浮かぶ。'},
+  {id:'habutae_powder', name:'羽二重餅の粉雪', rarity:'jo', category:'演出', applyTo:'effect',
+   desc:'羽二重餅にまぶした白い粉が、粉雪のようにふわりと舞う。'},
+  {id:'crab_bubbles', name:'カニの泡吹雪', rarity:'jo', category:'演出', applyTo:'effect',
+   desc:'カニが口からぶくぶく吹く泡をイメージ。真珠色の泡が下から湧き上がる。'},
+  {id:'kamisho_taro_aura', name:'上庄さといもの粘りオーラ', rarity:'jo', category:'演出', applyTo:'effect',
+   desc:'大野市上庄地区の上庄さといもは、きめが細かく、ねっとりとした強い粘りが特長。'},
+  {id:'taniguchiya_age', name:'谷口屋のお揚げ・黄金フリット', rarity:'jo', category:'演出', applyTo:'effect',
+   desc:'坂井市丸岡町竹田の谷口屋は、分厚い油揚げで知られる老舗。揚げたての黄金色と、あたたかな湯気。'},
+  // ---- 特上 (21) ----
   {id:'wakasa_lacquer_bowl', name:'若狭塗の椀', rarity:'tokujo', category:'器', applyTo:'bowl',
    desc:'小浜市の若狭塗。貝殻や卵の殻で模様をつけ、漆を塗り重ねて研ぎ出す。'},
   {id:'agate_chopstick_rest', name:'若狭めのう細工の箸置き', rarity:'tokujo', category:'小物', applyTo:'effect',
@@ -1999,7 +2063,31 @@ var GACHA_CATALOG = [
    desc:'沈金は、漆の面に細い線を彫り、金箔や金粉を埋めて模様を描く技法。'},
   {id:'wakasa_chopsticks', name:'若狭塗箸', rarity:'tokujo', category:'小物', applyTo:'effect',
    desc:'小浜市は塗箸の一大産地で、全国の生産の8割以上を占めるといわれる。'},
-  // ---- 極み (7) ----
+  {id:'kokoshizen_jar_bowl', name:'古越前・室町の壺椀', rarity:'tokujo', category:'器', applyTo:'bowl',
+   desc:'古越前は越前焼の古い焼き物。室町時代には大きな甕や壺がさかんに焼かれ、日本海を通って各地へ運ばれた。'},
+  {id:'claw_mark_bowl', name:'漆塗り爪痕椀', rarity:'tokujo', category:'器', applyTo:'bowl',
+   desc:'漆黒の椀に、恐竜の爪痕のような三本の線を沈金で入れた。恐竜王国・福井にちなむ意匠。'},
+  {id:'ono_spring_noodle', name:'大野名水仕込みそば', rarity:'tokujo', category:'麺', applyTo:'noodle',
+   desc:'大野市は湧き水の町。名水百選の「御清水（おしょうず）」をイメージした、つやと透明感のある麺。'},
+  {id:'kanimiso_gold_noodle', name:'蟹味噌仕込みの黄金そば', rarity:'tokujo', category:'麺', applyTo:'noodle',
+   desc:'越前がにのかに味噌をイメージした、こくのある山吹色の贅沢な麺。'},
+  {id:'dig_hammer_knife', name:'発掘ハンマー＆化石包丁', rarity:'tokujo', category:'道具', applyTo:'tool',
+   desc:'恐竜の骨の化石をかたどった柄の打刃物。刃には発掘ハンマーの刻印が入る。'},
+  {id:'mikata_rainbow', name:'三方五湖 レインボーライン', rarity:'tokujo', category:'背景', applyTo:'bg',
+   desc:'美浜町と若狭町にまたがる三方五湖。レインボーラインの山頂からは、色の違う5つの湖を見渡せる。'},
+  {id:'asuwa_sakura', name:'足羽川の桜並木', rarity:'tokujo', category:'背景', applyTo:'bg',
+   desc:'福井市の足羽川沿いに約2.2km続く桜並木。4月上旬ごろ、花のトンネルになる。'},
+  {id:'mikuni_auction', name:'三国港・早朝のカニ競り市', rarity:'tokujo', category:'背景', applyTo:'bg',
+   desc:'冬の三国港では、黄色いタグのついた越前がにがずらりと並び、威勢のよい競りが行われる。'},
+  {id:'oshima_island', name:'雄島（おしま）', rarity:'tokujo', category:'背景', applyTo:'bg',
+   desc:'東尋坊の沖に浮かぶ島。朱色の雄島橋で渡ることができ、島は原生林におおわれている。'},
+  {id:'raptor_slash', name:'ラプトルの斬撃', rarity:'tokujo', category:'演出', applyTo:'effect',
+   desc:'勝山市で化石が見つかった肉食恐竜、フクイラプトル。その鋭い爪にちなむ演出。'},
+  {id:'yokan_slice', name:'水ようかんの和風スライス', rarity:'tokujo', category:'演出', applyTo:'effect',
+   desc:'福井の冬の水ようかんは、黒砂糖のこくとつるんとした口当たり。四角く切り分ける包丁さばきを演出に。'},
+  {id:'guji_scales', name:'若狭ぐじの松笠うろこ舞い', rarity:'tokujo', category:'演出', applyTo:'effect',
+   desc:'若狭ぐじは若狭湾でとれるアカアマダイ。うろこを立てて焼く「松笠焼き」は、パリッとした食感が魅力。'},
+  // ---- 極み (16) ----
   {id:'eastern_cliff', name:'東尋坊', rarity:'kiwami', category:'背景', applyTo:'bg',
    desc:'坂井市三国町の海岸に約1km続く断崖。柱状節理の岩が並び、国の天然記念物・名勝。'},
   {id:'wakasa_togidashi_bowl', name:'若狭塗・研ぎ出し極', rarity:'kiwami', category:'器', applyTo:'bowl',
@@ -2013,7 +2101,25 @@ var GACHA_CATALOG = [
   {id:'master_tansu', name:'越前箪笥・匠の逸品', rarity:'kiwami', category:'背景', applyTo:'bg',
    desc:'欅や桐の木目に手打ちの鉄金具を合わせ、職人が一棹ずつ仕上げた越前箪笥。'},
   {id:'soba_hitosuji_noren', name:'そば一筋のれん', rarity:'kiwami', category:'称号', applyTo:'title',
-   desc:'そば一筋の心意気を染め抜いたのれん。越前そばは江戸時代から伝わる福井の食文化。'}
+   desc:'そば一筋の心意気を染め抜いたのれん。越前そばは江戸時代から伝わる福井の食文化。'},
+  {id:'phoenix_makie_bowl', name:'越前漆器・金蒔絵『鳳凰』', rarity:'kiwami', category:'器', applyTo:'bowl',
+   desc:'深い朱の漆に、金の蒔絵で鳳凰を描いた椀。越前漆器の蒔絵の技を尽くした一品。'},
+  {id:'fukuiraptor_fossil_bowl', name:'フクイラプトルの化石発掘椀', rarity:'kiwami', category:'器', applyTo:'bowl',
+   desc:'フクイラプトルは勝山市で化石が見つかった肉食恐竜。その骨格を浮き彫りにした、古越前の風合いの椀。'},
+  {id:'crab_shell_bowl', name:'越前がに極み甲羅鉢', rarity:'kiwami', category:'器', applyTo:'bowl',
+   desc:'越前がにの甲羅に見立てた鉢。越前がには福井県の港に水揚げされたオスのズワイガニで、黄色いタグが目印。'},
+  {id:'ryusen_knife', name:'龍泉刃物・打刃物包丁', rarity:'kiwami', category:'道具', applyTo:'tool',
+   desc:'越前市の打刃物の工房、龍泉刃物にちなむ包丁。流れるような刃紋と鋭い切れ味が持ち味。'},
+  {id:'heisenji_moss', name:'平泉寺白山神社（苔の回廊）', rarity:'kiwami', category:'背景', applyTo:'bg',
+   desc:'勝山市の平泉寺白山神社。杉の大木の下に一面の苔が広がり、「苔宮」とも呼ばれる。'},
+  {id:'dino_forest', name:'太古の勝山・恐竜の森', rarity:'kiwami', category:'背景', applyTo:'bg',
+   desc:'白亜紀前期の勝山は、恐竜が暮らす森だった。シダやソテツの茂る原生林を、巨大な恐竜の影がゆく。'},
+  {id:'dino_roar_fx', name:'恐竜王国の咆哮', rarity:'kiwami', category:'演出', applyTo:'effect',
+   desc:'国内で見つかった恐竜化石の多くが出ている福井県は、「恐竜王国」と呼ばれる。'},
+  {id:'yellow_tag_aura', name:'ブランド黄タグのオーラ', rarity:'kiwami', category:'演出', applyTo:'effect',
+   desc:'越前がにの黄色いタグは、福井県の港に水揚げされた証。その誇りを金色の光で。'},
+  {id:'fossil_aura', name:'恐竜の化石オーラ', rarity:'kiwami', category:'演出', applyTo:'effect',
+   desc:'勝山市北谷の地層からは、多くの恐竜化石が見つかっている。太古の骨と地層のかけらが舞う。'}
 ];
 // Stand-in pictures while ART is empty: an icon inside a frame in the rarity's colour.
 var GACHA_ICONS = {
@@ -2026,13 +2132,28 @@ var GACHA_ICONS = {
   wakasa_lacquer_bowl:'🥣', agate_chopstick_rest:'💎', hikigurumi_noodle:'🍜', ichijodani_ruins:'🏘️',
   eiheiji_temple:'🔔', dinosaur_museum:'🦕', shinsoba_noodle:'🌱', chinkin_bowl:'✨', wakasa_chopsticks:'🥢',
   eastern_cliff:'🌊', wakasa_togidashi_bowl:'💠', makie_chinkin_masterpiece:'🌸', tsuchime_blade:'🗡️',
-  natural_ash_jar:'🏺', master_tansu:'🗝️', soba_hitosuji_noren:'🏆'
+  natural_ash_jar:'🏺', master_tansu:'🗝️', soba_hitosuji_noren:'🏆',
+  heshiko_amber:'🐟', tomitsu_kintoki:'🍠',
+  sauce_katsudon_bowl:'🍱', mikuni_auction_bowl:'🥣', katsuyama_black_noodle:'🍜', ancient_green_noodle:'🌿', crab_knife:'🔪',
+  kehi_matsubara:'🌲', dig_site_night:'🔦', echizen_isaribi:'🚢', habutae_powder:'❄️', crab_bubbles:'🫧', kamisho_taro_aura:'🥔',
+  taniguchiya_age:'🧈',
+  kokoshizen_jar_bowl:'🏺', claw_mark_bowl:'🥣', ono_spring_noodle:'💧', kanimiso_gold_noodle:'🍜', dig_hammer_knife:'⛏️',
+  mikata_rainbow:'🌈', asuwa_sakura:'🌸', mikuni_auction:'🦀', oshima_island:'🏝️', raptor_slash:'⚡', yokan_slice:'🔲', guji_scales:'🐠',
+  phoenix_makie_bowl:'🐦', fukuiraptor_fossil_bowl:'🦴', crab_shell_bowl:'🦀', ryusen_knife:'🗡️', heisenji_moss:'⛩️', dino_forest:'🦕',
+  dino_roar_fx:'🦖', yellow_tag_aura:'🏷️', fossil_aura:'🦴'
 };
 // Where a long name may wrap on a narrow card (names with 「・」 wrap after it), so a word such as 「めのう」 is never split.
 var GACHA_NAME_LINES = {
   washi_noren:['越前和紙の','のれん'], knife_board_sound:['包丁と','まな板の音'], slurp_sound:['そば猪口を','すする音'],
   echizen_knife:['越前打刃物の','包丁'], crab_chopstick_rest:['越前がにの','箸置き'], agate_chopstick_rest:['若狭めのう','細工の','箸置き'],
-  ichijodani_ruins:['一乗谷','朝倉氏遺跡'], dinosaur_museum:['福井県立','恐竜博物館']
+  ichijodani_ruins:['一乗谷','朝倉氏遺跡'], dinosaur_museum:['福井県立','恐竜博物館'],
+  heshiko_amber:['へしこの','アンバーゴールド'], tomitsu_kintoki:['とみつ金時の','ほくほく蜜光'],
+  sauce_katsudon_bowl:['福井名物','ソースカツ丼風椀'], mikuni_auction_bowl:['三国港の','競り朱椀'], crab_knife:['極上','カニ捌き包丁'],
+  dig_site_night:['発掘現場の','地層ナイト'], kamisho_taro_aura:['上庄さといもの','粘りオーラ'],
+  ono_spring_noodle:['大野名水','仕込みそば'], kanimiso_gold_noodle:['蟹味噌仕込みの','黄金そば'], dig_hammer_knife:['発掘ハンマー＆','化石包丁'],
+  mikata_rainbow:['三方五湖 ','レインボーライン'], yokan_slice:['水ようかんの','和風スライス'], guji_scales:['若狭ぐじの','松笠うろこ舞い'],
+  phoenix_makie_bowl:['越前漆器・','金蒔絵『鳳凰』'], fukuiraptor_fossil_bowl:['フクイラプトルの','化石発掘椀'], crab_shell_bowl:['越前がに','極み甲羅鉢'],
+  heisenji_moss:['平泉寺白山神社','（苔の回廊）'], oshima_island:['雄島','（おしま）'], yellow_tag_aura:['ブランド黄タグの','オーラ']
 };
 var GACHA_BY_ID = {};
 (function(){ for(var i=0;i<GACHA_CATALOG.length;i++) GACHA_BY_ID[GACHA_CATALOG[i].id] = GACHA_CATALOG[i]; })();
@@ -2072,7 +2193,22 @@ var SKIN_NOTES = {
   slurp_sound:'お客さんが食べるときに、そばをすする音が鳴ります。',
   echizen_knife:'刃に波の刃文が入り、JUST!のとき刃がチンと鳴ります。',
   echizen_sickle:'刃先が鎌の形になり、JUST!のときシュッと風を切る音が鳴ります。',
-  tsuchime_blade:'刃に鎚目が入り、JUST!のとき刃が長く澄んで鳴ります。'
+  tsuchime_blade:'刃に鎚目が入り、JUST!のとき刃が長く澄んで鳴ります。',
+  ryusen_knife:'刃に流れる地紋と乱れ刃の刃文が入り、JUST!のとき刃が高く長く鳴ります。',
+  dig_hammer_knife:'柄が化石の骨になり、刃にハンマーの刻印が入ります。JUST!のとき槌の音が鳴ります。',
+  crab_knife:'刃先が細く尖った小ぶりの包丁になり、JUST!のとき刃がチンと鳴ります。',
+  dino_roar_fx:'JUST!のとき画面が揺れて衝撃波が走り、恐竜の足跡と化石のかけらが散ります（演出が「控えめ」か動きを減らす設定では揺れません）。',
+  yellow_tag_aura:'JUST!のとき黄色いタグがさっと横切り、金色の光線が広がります。',
+  fossil_aura:'切ったところから骨と地層のかけらがゆっくり舞い上がります。',
+  raptor_slash:'JUST!のとき、三本爪の光の線がレーンを引き裂きます。',
+  yokan_slice:'JUST!のとき、四角く切り分ける直線が走り、黒糖色の角切りが散ります。',
+  guji_scales:'切るたびに金色のうろこがパチパチとはじけます。',
+  habutae_powder:'白い粉がふわりと舞い、ゆっくり落ちていきます。',
+  crab_bubbles:'切ったところや喜んだお客さんのまわりに、下から泡が湧き上がります。',
+  kamisho_taro_aura:'切ったところと盛り付けた麺のまわりに、もっちりした白いオーラが広がります。',
+  taniguchiya_age:'黄金色の揚げのかけらがはじけ、あたたかな湯気が立ちます。',
+  heshiko_amber:'切ったところに琥珀色の光がにじみます。',
+  tomitsu_kintoki:'蜜色の光とほんのりとした湯気が立ちます。'
 };
 
 // ---- 1アイテム＝1パレット ----
@@ -2085,16 +2221,18 @@ var SKIN_NOTES = {
 //   density = how close the pattern is (1 normal), ink = the pattern's colours
 // Grains and patterns are drawn once into an offscreen canvas and kept, and settings.visual.detail thins them.
 var SKIN_DEFAULTS = {
-  bowl:  {shape:'bowl', deco:'plain', grain:0, gloss:0, density:1, gold:null, foot:true, unique:false, ink:['#ffffff']},
+  bowl:  {shape:'bowl', deco:'plain', grain:0, gloss:0, density:1, gold:null, foot:true, unique:false, ink:['#ffffff'], mark:null, markStyle:'paint', tag:null},
   noodle:{speck:null, speckDensity:0.9, speckAlpha:0.6, husk:0, jitter:0.08, crack:0, wet:0, steam:1, doughGrain:0, shine:0.16},
-  tool:  {shape:'kiri', deco:'plain', hamon:'none', gloss:0.5, density:1, collar:null, mei:null},
+  tool:  {shape:'kiri', deco:'plain', hamon:'none', gloss:0.5, density:1, collar:null, mei:null, meiShape:'stamp', handleStyle:'wood'},
   bg:    {light:'noon', fine:false},
-  effect:{shape:'strip', spark:'star', ringStyle:'single', grav:1, spin:1},
+  effect:{shape:'strip', spark:'star', ringStyle:'single', grav:1, spin:1, overlay:null, rays:false, glow:null, steam:false, rise:false, aura:null, shake:0},
   sound: {icon:'board'},
   title: {}
 };
 // 器: body = the outside, inner = the bed under the noodles, rim = the lip, deco = the wall's pattern (BOWL_PATTERNS),
-// shape = 'bowl' or 'jar' (BOWL_SHAPES), gold = a fine gold line on the rim, unique = a new pattern each time the page opens
+// shape = 'bowl', 'jar', 'donburi' or 'crab' (BOWL_SHAPES), gold = a fine gold line on the rim, unique = a new pattern
+// each time the page opens, mark = a character painted or carved on the wall (markStyle 'paint' | 'carve'),
+// tag = the colour of a 越前がに tag hanging from the rim
 var SKIN_BOWLS = {
   unglazed_bowl:            {body:'#a1603a', inner:'#d8c198', rim:'#b8764c', deco:'unglazed', grain:1.2, gloss:0, density:1, ink:['#7f4424','#c98c61','#8e5230','#b97a50']},
   echizen_lacquer_bowl:     {body:'#7a1c16', inner:'#d3bd93', rim:'#1d1311', deco:'lacquer', grain:0, gloss:0.95, density:1, gold:'#c9a24a', ink:['#ffffff']},
@@ -2103,7 +2241,14 @@ var SKIN_BOWLS = {
   chinkin_bowl:             {body:'#1c1411', inner:'#d3bd93', rim:'#c9a24a', deco:'chinkin', grain:0, gloss:0.55, density:1, ink:['#b8964a']},
   wakasa_togidashi_bowl:    {body:'#1b2240', inner:'#d3bd93', rim:'#b8872f', deco:'togidashi', grain:2.2, gloss:0.85, density:1.9, unique:true, gold:'#d8b457', ink:['#1f3a6b','#a8321f','#2b4f8a','#c24a2a','#d8b457','#14213f','#7a1f14'], shell:'#f6f1e4', needle:'#d8b457'},
   makie_chinkin_masterpiece:{body:'#140e0c', inner:'#d3bd93', rim:'#d8b457', deco:'makie', grain:1.6, gloss:0.85, density:1.4, gold:'#c9a64f', ink:['#e0bd5c','#f5e2a3','#b8964a']},
-  natural_ash_jar:          {body:'#5b3b25', inner:'#cdb990', rim:'#5f6b40', deco:'ashglaze', shape:'jar', grain:1.5, gloss:0.5, density:1.3, ink:['#7f9158','#b3c38a','#4a3220','#2f2014']}
+  natural_ash_jar:          {body:'#5b3b25', inner:'#cdb990', rim:'#5f6b40', deco:'ashglaze', shape:'jar', grain:1.5, gloss:0.5, density:1.3, ink:['#7f9158','#b3c38a','#4a3220','#2f2014']},
+  sauce_katsudon_bowl:      {body:'#eee8dc', inner:'#d3bd93', rim:'#2f4f8a', deco:'bands', shape:'donburi', grain:0.3, gloss:0.6, density:1, ink:['#2f4f8a','#c0392b','#2f4f8a'], wallIn:'#e2dccf'},
+  mikuni_auction_bowl:      {body:'#b8321f', inner:'#d3bd93', rim:'#1d1311', deco:'lacquer', grain:0, gloss:0.8, density:1, ink:['#ffffff'], mark:'三', markColor:'#1d1311', markStyle:'paint'},
+  kokoshizen_jar_bowl:      {body:'#7a4a2c', inner:'#cfb98f', rim:'#6a3f24', deco:'unglazed', shape:'jar', grain:1.6, gloss:0.05, density:1.2, ink:['#5a3018','#a06a42','#8e5a36','#3e2414'], mark:'〆', markColor:'#3a2010', markStyle:'carve'},
+  claw_mark_bowl:           {body:'#120d0b', inner:'#d3bd93', rim:'#c9a64f', deco:'claw', grain:0, gloss:0.7, density:1, gold:'#c9a64f', ink:['#d8b457','#f0d890']},
+  phoenix_makie_bowl:       {body:'#8a1a12', inner:'#d3bd93', rim:'#d8b457', deco:'phoenix', grain:1.6, gloss:0.95, density:1.3, gold:'#d8b457', ink:['#e0bd5c','#f5e2a3','#b8964a']},
+  fukuiraptor_fossil_bowl:  {body:'#6e4a30', inner:'#cfb98f', rim:'#7a5a3c', deco:'fossil', grain:1.5, gloss:0.15, density:1.2, ink:['#d9c9a3','#a88a5c','#3e2a1a','#8e6a48']},
+  crab_shell_bowl:          {body:'#c8452a', inner:'#d8c69e', rim:'#e07a3a', deco:'crabshell', shape:'crab', grain:1.2, gloss:0.45, density:1.2, tag:'#f2d22e', ink:['#e2703e','#9e2e1a','#f4b07a']}
 };
 // 麺: the dough on the lane and the noodles in the bowl (dry and soaked in tsuyu). The strand widths are never
 // touched: a noodle's thickness still shows how well it was cut. speck* = the grains on a strand, husk = flecks of
@@ -2119,25 +2264,44 @@ var SKIN_NOODLES = {
   hikigurumi_noodle:{dough:'#6a5c47', doughDark:'#463b2d', fills:['#665844','#5b4e3c','#4a3f30'], outline:'#251f16',
                      soak:['#402a19','#513622','#352213'], outlineSoak:'#190f07', shine:0.12, speck:'rgba(22,15,8,0.9)', speckDensity:2, speckAlpha:0.62, husk:0.4, jitter:0.14, steam:1.8, doughGrain:1.8},
   shinsoba_noodle:  {dough:'#959c74', doughDark:'#666d4f', fills:['#97a27a','#88946c','#6c7855'], outline:'#2f3422',
-                     soak:['#55472a','#64532f','#483b22'], outlineSoak:'#1d160a', shine:0.34, speck:'rgba(60,72,40,0.45)', speckDensity:0.4, speckAlpha:0.3, jitter:0.05, wet:1, doughGrain:0.4}
+                     soak:['#55472a','#64532f','#483b22'], outlineSoak:'#1d160a', shine:0.34, speck:'rgba(60,72,40,0.45)', speckDensity:0.4, speckAlpha:0.3, jitter:0.05, wet:1, doughGrain:0.4},
+  katsuyama_black_noodle:{dough:'#4e463b', doughDark:'#2e2820', fills:['#4a4238','#40382f','#322b24'], outline:'#17130e',
+                     soak:['#33221a','#3f2a1e','#281a12'], outlineSoak:'#0f0a06', shine:0.1, speck:'rgba(10,7,4,0.85)', speckDensity:1.6, speckAlpha:0.6, husk:0.45, jitter:0.35, doughGrain:1.8},
+  ancient_green_noodle:{dough:'#566f40', doughDark:'#384a2a', fills:['#4f6b3a','#435e31','#344a26'], outline:'#1c2814',
+                     soak:['#3a3a1c','#464520','#2e2f16'], outlineSoak:'#14140a', shine:0.16, speck:'rgba(20,40,10,0.7)', speckDensity:0.9, speckAlpha:0.5, jitter:0.3, doughGrain:1},
+  ono_spring_noodle:{dough:'#b4aa8e', doughDark:'#80785f', fills:['#b6ab90','#a89d82','#8c826a'], outline:'#4a4232',
+                     soak:['#7e6040','#8c6c48','#6c5238'], outlineSoak:'#2c1e10', shine:0.42, speck:'rgba(90,80,60,0.35)', speckDensity:0.2, speckAlpha:0.25, jitter:0.02, wet:1.5, doughGrain:0.25},
+  kanimiso_gold_noodle:{dough:'#c4a052', doughDark:'#8f7032', fills:['#c9a24a','#b88f3a','#9c7630'], outline:'#4a3612',
+                     soak:['#8a5e22','#9a6a28','#74501c'], outlineSoak:'#2c1c06', shine:0.32, speck:'rgba(150,90,30,0.55)', speckDensity:0.6, speckAlpha:0.45, jitter:0.06, wet:0.5, doughGrain:0.6}
 };
 // 道具: the knife over the komaita, and the sound its blade makes on a JUST!. blade = 地鉄 (the iron body),
-// hagane = the hard steel along the edge, hamon = the temper line ('wave' | 'straight' | 'fine'), shape = 'kiri' | 'sickle'
+// hagane = the hard steel along the edge, hamon = the temper line ('wave' | 'straight' | 'fine' | 'midare'),
+// shape = 'kiri' | 'sickle' | 'kani', deco = 'jigane' | 'tsuchime' | 'flow', handleStyle = 'wood' | 'bone',
+// meiShape = 'stamp' | 'hammer'
 var SKIN_TOOLS = {
   echizen_knife: {blade:'#c3cacd', hagane:'#eef2f3', edge:'#5e6c72', handle:'#5b3a22', band:'#c8b28a', shape:'kiri', deco:'jigane', hamon:'wave', gloss:0.85, mei:'#7a2f22', just:'bladeChin'},
   echizen_sickle:{blade:'#b9c1bf', hagane:'#e6ebea', edge:'#56615f', handle:'#7a5634', band:'#3b2a1a', shape:'sickle', deco:'jigane', hamon:'straight', gloss:0.6, collar:'#9a8a66', just:'bladeSwish'},
-  tsuchime_blade:{blade:'#98a3a8', hagane:'#edf1f2', edge:'#46525a', handle:'#231811', band:'#c9a24a', shape:'kiri', deco:'tsuchime', hamon:'fine', gloss:1, density:1.3, just:'bladeRing'}
+  tsuchime_blade:{blade:'#98a3a8', hagane:'#edf1f2', edge:'#46525a', handle:'#231811', band:'#c9a24a', shape:'kiri', deco:'tsuchime', hamon:'fine', gloss:1, density:1.3, just:'bladeRing'},
+  crab_knife:    {blade:'#c8cfd1', hagane:'#eef2f3', edge:'#5b6a70', handle:'#b3402a', band:'#f2d22e', shape:'kani', deco:'jigane', hamon:'straight', gloss:0.8, just:'bladeChin'},
+  dig_hammer_knife:{blade:'#b4bbbd', hagane:'#e8edee', edge:'#5a6468', handle:'#d9c9a3', band:'#8a7a5a', shape:'kiri', deco:'jigane', hamon:'straight', gloss:0.6, handleStyle:'bone', mei:'#5a4a3a', meiShape:'hammer', just:'hammerKan'},
+  ryusen_knife:  {blade:'#a9b3b8', hagane:'#f2f5f6', edge:'#3f4a50', handle:'#1a1210', band:'#d8b457', shape:'kiri', deco:'flow', hamon:'midare', gloss:1, density:1.4, mei:'#b8872f', just:'bladeKiran'}
 };
 // 背景: a scene drawn in code (BG_SCENES; used whenever ART has no picture for the item) and the light of its hour
 var SKIN_BGS = {
   soba_field:{scene:'field', light:'morning'}, washi_noren:{scene:'noren', light:'interior'}, echizen_tansu:{scene:'tansu', light:'interior'},
   maruoka_castle:{scene:'castle', light:'morning'}, yokokan_garden:{scene:'garden', light:'noon'}, echizen_cape:{scene:'cape', light:'noon'},
   ichijodani_ruins:{scene:'ruins', light:'mist'}, eiheiji_temple:{scene:'temple', light:'mist'}, dinosaur_museum:{scene:'museum', light:'noon'},
-  eastern_cliff:{scene:'cliff', light:'evening'}, master_tansu:{scene:'tansu', light:'interior', fine:true}
+  eastern_cliff:{scene:'cliff', light:'evening'}, master_tansu:{scene:'tansu', light:'interior', fine:true},
+  kehi_matsubara:{scene:'kehi', light:'noon'}, dig_site_night:{scene:'digNight', light:'night'}, echizen_isaribi:{scene:'isaribi', light:'night'},
+  mikata_rainbow:{scene:'mikata', light:'noon'}, asuwa_sakura:{scene:'asuwa', light:'noon'}, mikuni_auction:{scene:'auction', light:'morning'},
+  oshima_island:{scene:'oshima', light:'mist'}, heisenji_moss:{scene:'heisenji', light:'mist'}, dino_forest:{scene:'dinoForest', light:'evening'}
 };
 // 演出: the colours of the ring and the bits when a cut lands (ring / JUST! ring / bits), and of the sparkles and
-// bits when a customer is pleased after a bowl is served. shape = the bits (BIT_SHAPES), spark = 'star' | 'glint',
-// ringStyle = 'single' | 'double' | 'brush' | 'soft' | 'dots', grav / spin = how the bits fall and turn
+// bits when a customer is pleased after a bowl is served. shape = the bits (BIT_SHAPES; a list mixes them),
+// spark = 'star' | 'glint', ringStyle = 'single' | 'double' | 'brush' | 'soft' | 'dots', grav / spin = how the bits
+// fall and turn (a negative grav floats up), rise = bits well up from below, overlay = a JUST! moment drawn over the
+// lane ('quake' | 'tag' | 'claw' | 'slice'), rays = gold rays on a JUST!, glow / aura = a soft light (aura also wraps
+// the served noodles), steam = warm steam from the cut, shake = how far the play area shakes on a JUST! (px)
 var SKIN_EFFECTS = {
   washi_chopstick_sleeve:{ring:'#b3452e', just:'#e9d6a8', bits:['#f7f1e3','#e6d8b8','#b3452e','#f2e6c8'], shape:'washi', spark:'star', ringStyle:'brush', grav:0.6, spin:0.7},
   extra_negi:            {ring:'#4f8f2f', just:'#a9d65f', bits:['#4f9a31','#72b44a','#a8d27b'], shape:'negi', spark:'star', ringStyle:'single', grav:1.2, spin:1.2},
@@ -2147,7 +2311,19 @@ var SKIN_EFFECTS = {
   satsukigase:           {ring:'#b98646', just:'#f0cd86', bits:['#c99456','#e6c485','#a8743c'], shape:'peanut', spark:'star', ringStyle:'dots', grav:1.1, spin:1},
   crab_chopstick_rest:   {ring:'#d24a2a', just:'#ffd54a', bits:['#e0603a','#d24a2a','#f39a6b'], shape:'crab', spark:'star', ringStyle:'double', grav:1, spin:0.9},
   agate_chopstick_rest:  {ring:'#b83a33', just:'#f5a67b', bits:['#d4524c','#ef9b76','#f8d9c6','#b83a33'], shape:'gem', spark:'glint', ringStyle:'double', grav:1, spin:1.1},
-  wakasa_chopsticks:     {ring:'#9b291d', just:'#e8c46a', bits:['#9b291d','#2a1913','#b8872f','#6f8f5c'], shape:'stick', spark:'glint', ringStyle:'brush', grav:0.9, spin:1.4}
+  wakasa_chopsticks:     {ring:'#9b291d', just:'#e8c46a', bits:['#9b291d','#2a1913','#b8872f','#6f8f5c'], shape:'stick', spark:'glint', ringStyle:'brush', grav:0.9, spin:1.4},
+  heshiko_amber:         {ring:'#9a5a1a', just:'#e8a040', bits:['#b8761e','#d4943a','#7a4a14'], shape:'amber', spark:'glint', ringStyle:'soft', grav:0.9, spin:0.8, glow:'#d08a2a'},
+  tomitsu_kintoki:       {ring:'#a8466a', just:'#f5c25a', bits:['#f2c25a','#e8a840','#a8466a'], shape:'drop', spark:'star', ringStyle:'soft', grav:0.8, spin:0.6, glow:'#f0b040', steam:true},
+  habutae_powder:        {ring:'#d6ccb6', just:'#ffffff', bits:['#ffffff','#f6f2e8','#ece6d6'], shape:'powder', spark:'glint', ringStyle:'soft', grav:0.25, spin:0.3},
+  crab_bubbles:          {ring:'#6fa3b8', just:'#e8f6ff', bits:['#f4fbff','#d8ecf4','#c0dce8'], shape:'bubble', spark:'glint', ringStyle:'soft', grav:1, spin:0.2, rise:true},
+  kamisho_taro_aura:     {ring:'#cfc4ae', just:'#fffaf0', bits:['#8a6a4a','#f6f0e4','#a8865e'], shape:'taro', spark:'glint', ringStyle:'soft', grav:0.7, spin:0.5, aura:'#fffaf0'},
+  taniguchiya_age:       {ring:'#c8862a', just:'#ffd27a', bits:['#e8b048','#d49a30','#f4cc70'], shape:'fry', spark:'star', ringStyle:'single', grav:1.1, spin:1.2, steam:true},
+  raptor_slash:          {ring:'#5f6e76', just:'#e8f4ff', bits:['#dfe8ee','#9fb2bd','#ffffff'], shape:'shard', spark:'glint', ringStyle:'single', grav:1, spin:1.6, overlay:'claw'},
+  yokan_slice:           {ring:'#4a2216', just:'#a0522d', bits:['#2e140c','#4a2216','#6b3322'], shape:'cube', spark:'star', ringStyle:'single', grav:1.4, spin:0.8, overlay:'slice'},
+  guji_scales:           {ring:'#e07a3a', just:'#ffd27a', bits:['#f2c25a','#e8a040','#fff0b8'], shape:'scale', spark:'glint', ringStyle:'dots', grav:0.9, spin:2.2},
+  dino_roar_fx:          {ring:'#8a5a2b', just:'#f0c060', bits:['#c9b48a','#a88a5c','#6e5638'], shape:['footprint','bone','chip'], spark:'star', ringStyle:'double', grav:1.2, spin:0.6, shake:5, overlay:'quake'},
+  yellow_tag_aura:       {ring:'#d9a816', just:'#fff1a8', bits:['#f2d22e','#ffe680','#e0a81a'], shape:'tag', spark:'glint', ringStyle:'double', grav:0.8, spin:0.9, overlay:'tag', rays:true},
+  fossil_aura:           {ring:'#a88a5c', just:'#efe2c0', bits:['#e8dcc0','#c9b48a','#8a7a5a','#6e5a40'], shape:['bone','chip'], spark:'glint', ringStyle:'soft', grav:-0.35, spin:0.8, glow:'#e8d8b0'}
 };
 // 音: which game moments get which sound (cut = every successful cut, just = a JUST!, round = each bowl begins,
 // serve = the customer eats). The sounds themselves are recipes in SKIN_SFX; icon = the picture in the 図鑑.
@@ -2189,6 +2365,9 @@ var SKIN_SFX = {
   bladeChin: [{t:'noise', filter:'highpass', f:6000, dur:0.012, vol:0.04, atk:0.0008}, {t:'tone', wave:'sine', f:2637, dur:0.18, vol:0.05, atk:0.001},
               {t:'tone', wave:'sine', f:3956, dur:0.1, vol:0.02, atk:0.001}],
   bladeSwish:[{t:'noise', filter:'bandpass', f:5200, f2:1600, q:1.4, dur:0.17, vol:0.07, atk:0.03}, {t:'noise', filter:'highpass', f:7000, dur:0.09, vol:0.02, atk:0.02}],
+  bladeKiran:[{t:'noise', filter:'highpass', f:7000, dur:0.015, vol:0.05, atk:0.0008}, {t:'tone', wave:'sine', f:3136, dur:0.95, vol:0.03, atk:0.001},
+              {t:'tone', wave:'sine', f:3142, dur:0.95, vol:0.014, atk:0.001}, {t:'tone', wave:'sine', f:4699, dur:0.6, vol:0.016, atk:0.001},
+              {t:'tone', wave:'sine', f:6272, dur:0.3, vol:0.008, atk:0.001}],
   bladeRing: [{t:'tone', wave:'sine', f:1760, dur:0.75, vol:0.035, atk:0.001}, {t:'tone', wave:'sine', f:1764, dur:0.75, vol:0.015, atk:0.001},
               {t:'tone', wave:'sine', f:2653, dur:0.5, vol:0.02, atk:0.001}, {t:'tone', wave:'sine', f:3520, dur:0.3, vol:0.012, atk:0.001}]
 };
@@ -4587,7 +4766,7 @@ function runGachaTransaction(kind){
     dupTickets:gotTickets, newCount:newCount, balance:g.currency, tickets:g.tickets, newTitle:newTitle
   };
 }
-// Self-check of the tables: rates add up to 100%, 42 items in the right numbers, every item a skin with a look
+// Self-check of the tables: rates add up to 100%, 77 items in the right numbers, every item a skin with a look
 // for its slot, sensible そば札 numbers, something to draw. If anything is off, the pull and exchange buttons stay
 // disabled rather than working from a broken table.
 function checkGachaTables(){
@@ -5777,7 +5956,7 @@ function drawServingBowl(cx, cy){
   ctx.ellipse(cx, cy+32, 100, 26, 0, 0, Math.PI*2);
   ctx.fill();
 }
-var BOWL_BOX = {x:-136, y:-4, w:272, h:146};      // the sprite's area round the bowl's (cx, cy)
+var BOWL_BOX = {x:-146, y:-4, w:292, h:146};      // the sprite's area round the bowl's (cx, cy)
 function bowlSeed(b){ return (hashStr(String(b.id || 'bowl')) ^ (b.unique ? SKIN_SESSION_SEED : 0)) >>> 0; }
 function bowlSprite(b, res){
   return skinSprite('bowl|' + b.id + '|' + visualDetail + '|' + bowlSeed(b), BOWL_BOX.w, BOWL_BOX.h, res, function(g){
@@ -5822,6 +6001,48 @@ var BOWL_SHAPES = {
     foot:{y:110, rx:68, ry:9, h:8}, gy:16, lip:4.5
   }
 };
+function donburiHalfW(y){ return 104 - 40*Math.pow(Math.max(0, Math.min(1, (y - 32)/72)), 1.5); }
+BOWL_SHAPES.donburi = {              // a deep 丼: tall walls that narrow a little toward the foot
+  outer:function(g){
+    g.beginPath();
+    g.ellipse(0, 32, 104, 28, 0, Math.PI, 0);
+    for(var y=32; y<=104; y+=2) g.lineTo(donburiHalfW(y), y);
+    g.ellipse(0, 104, 64, 11, 0, 0, Math.PI);
+    for(var y2=104; y2>=32; y2-=2) g.lineTo(-donburiHalfW(y2), y2);
+    g.closePath();
+  },
+  inside:function(x, y){ if(y<34 || y>104 + 11*Math.sqrt(Math.max(0, 1 - Math.pow(x/64, 2)))) return false; return Math.abs(x) < donburiHalfW(Math.min(y, 104))*0.96; },
+  sec:function(s){ var y = 36 + 66*s, rx = donburiHalfW(y); return {cy:y - rx*0.2, rx:rx, ry:rx*0.26}; },
+  band:function(x, y){ return Math.max(0, Math.min(1, (y - 40)/66)); },
+  foot:{y:100, rx:58, ry:9, h:10}, gy:12, lip:3
+};
+function crabR(a){ return 1 + 0.035*Math.sin(a*14) + 0.02*Math.sin(a*5 + 1); }
+BOWL_SHAPES.crab = {                 // 甲羅鉢: a wide shell with a bumpy edge, its legs and claws tucked behind
+  outer:function(g){
+    g.beginPath();
+    for(var i=0;i<=72;i++){ var a = i/72*Math.PI*2, r = crabR(a); if(i) g.lineTo(Math.cos(a)*116*r, 42 + Math.sin(a)*38*r); else g.moveTo(116*r, 42); }
+    g.closePath();
+  },
+  inside:function(x, y){ var u = x/116, v = (y - 42)/38; return u*u + v*v < 0.9; },
+  sec:function(s){ return {cy:34 + 18*s, rx:108 - 40*s, ry:29 - 8*s}; },
+  band:function(x, y){ var u = Math.min(1, Math.abs(x)/101), top = 32 + 27*Math.sqrt(1 - u*u), bot = 42 + 38*Math.sqrt(Math.max(0, 1 - Math.pow(x/116, 2))); return Math.max(0, Math.min(1, (y - top)/Math.max(4, bot - top))); },
+  behind:function(g, b){
+    var dark = mixHex(b.body, '#000000', 0.25);
+    g.strokeStyle = dark; g.lineCap = 'round'; g.lineJoin = 'round';
+    for(var side=-1; side<=1; side+=2){
+      for(var k=0;k<4;k++){                                    // four walking legs on each side
+        var x0 = side*(84 + k*6), y0 = 52 + k*7;
+        g.lineWidth = 6 - k*0.6;
+        g.beginPath(); g.moveTo(x0, y0); g.lineTo(x0 + side*(18 + k*2), y0 - 10 + k*3); g.lineTo(x0 + side*(28 + k*3), y0 + 14 + k*3); g.stroke();
+      }
+      g.fillStyle = b.body;                                    // and a claw
+      g.beginPath(); g.ellipse(side*112, 22, 16, 10, side*0.5, 0, Math.PI*2); g.fill();
+      g.fillStyle = dark;
+      g.beginPath(); g.moveTo(side*120, 14); g.lineTo(side*134, 6); g.lineTo(side*126, 20); g.closePath(); g.fill();
+    }
+  },
+  foot:{y:72, rx:56, ry:9, h:10}, gy:2, lip:3
+};
 // a random point on the visible outer wall (not inside the mouth), or null
 function wallPoint(geo, rnd){
   for(var i=0;i<40;i++){
@@ -5835,6 +6056,7 @@ function paintBowl(g, b, q){
   var pat = BOWL_PATTERNS[b.deco] || BOWL_PATTERNS.plain;
   var rnd = cardRng(bowlSeed(b));
   var grain = skinNum(b.grain, 0)*q.grain, dens = skinNum(b.density, 1)*q.pattern, gloss = skinNum(b.gloss, 0);
+  if(geo.behind) geo.behind(g, b);
   if(b.foot!==false) paintBowlFoot(g, geo, b, pat, rnd);
   geo.outer(g);
   g.fillStyle = b.body;
@@ -5854,6 +6076,7 @@ function paintBowl(g, b, q){
   g.fillStyle = down;
   g.fillRect(-140, 30, 280, 110);
   pat.wall(g, b, geo, rnd, grain, dens);
+  if(b.mark) paintBowlMark(g, geo, b);
   if(gloss>0) paintBowlGloss(g, geo, gloss);
   g.restore();
   geo.outer(g);
@@ -5862,6 +6085,44 @@ function paintBowl(g, b, q){
   g.stroke();
   paintBowlInside(g, b, pat, rnd, gloss);
   paintBowlRim(g, geo, b);
+  if(b.tag) paintBowlTag(g, b.tag);
+}
+// 屋号 or 窯印: one character on the front of the wall, painted on or carved in
+function paintBowlMark(g, geo, b){
+  var p = secPoint(geo, 0.42, 0.62*Math.PI), sz = 15;
+  g.save();
+  g.translate(p.x, p.y);
+  g.scale(1, 0.85);
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.font = '700 ' + sz + 'px ' + CARD_SERIF;
+  if(b.markStyle==='carve'){
+    g.fillStyle = 'rgba(255,230,200,0.25)'; g.fillText(b.mark, 0.6, 0.8);
+    g.fillStyle = b.markColor || 'rgba(0,0,0,0.5)'; g.fillText(b.mark, 0, 0);
+  } else {
+    g.fillStyle = b.markColor || '#1d1311'; g.fillText(b.mark, 0, 0);
+  }
+  g.restore();
+}
+// 越前がにの黄色いタグ: hanging on a string from the front right of the rim
+function paintBowlTag(g, col){
+  var x = 64, y = 54;
+  g.strokeStyle = 'rgba(40,30,20,0.7)'; g.lineWidth = 0.8;
+  g.beginPath(); g.moveTo(x - 4, y - 4); g.quadraticCurveTo(x - 2, y + 2, x, y + 6); g.stroke();
+  g.save();
+  g.translate(x + 2, y + 12);
+  g.rotate(0.18);
+  g.fillStyle = 'rgba(0,0,0,0.25)'; cardRoundRect(g, -7, -6, 16, 22, 3); g.fill();
+  var tg = g.createLinearGradient(-8, -8, 8, 14);
+  tg.addColorStop(0, mixHex(col, '#ffffff', 0.35)); tg.addColorStop(1, col);
+  g.fillStyle = tg; cardRoundRect(g, -8, -8, 16, 22, 3); g.fill();
+  g.strokeStyle = mixHex(col, '#000000', 0.35); g.lineWidth = 0.7; g.stroke();
+  g.fillStyle = '#ffffff'; g.beginPath(); g.arc(0, -4.5, 1.6, 0, Math.PI*2); g.fill();
+  g.fillStyle = '#3a2a10';
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = '700 5.5px ' + CARD_SANS;
+  g.fillText('越前', 0, 3); g.fillText('がに', 0, 9);
+  g.restore();
 }
 // 高台: the foot ring under the bowl, with its soft shadow on the table
 function paintBowlFoot(g, geo, b, pat, rnd){
@@ -6181,6 +6442,116 @@ var BOWL_PATTERNS = {
       chinkinScroll(g, geo, rnd, b.ink[0], dens, 0.75);
     }
   },
+  bands:{                            // 染付の丼: blue and red lines round the wall and a row of small marks between them
+    wall:function(g, b, geo, rnd, grain, dens){
+      var lv = [[0.06, 3, 0], [0.13, 1, 0], [0.62, 1.6, 1], [0.84, 3, 2]];
+      for(var i=0;i<lv.length;i++){ g.strokeStyle = b.ink[lv[i][2] % b.ink.length]; g.lineWidth = lv[i][1]; secArc(g, geo, lv[i][0], 0.02*Math.PI, 0.98*Math.PI); g.stroke(); }
+      var n = Math.round(9 + 5*dens);
+      g.strokeStyle = b.ink[0]; g.lineWidth = 1.1; g.lineCap = 'round';
+      for(var k=0;k<n;k++){                                    // 雷文 like hooks round the middle of the wall
+        var a = (0.08 + 0.84*(k + 0.5)/n)*Math.PI, p = secPoint(geo, 0.38, a), s = 4.5;
+        g.beginPath(); g.moveTo(p.x - s, p.y + s*0.6); g.lineTo(p.x - s, p.y - s*0.6); g.lineTo(p.x + s, p.y - s*0.6); g.lineTo(p.x + s, p.y + s*0.2); g.lineTo(p.x - s*0.2, p.y + s*0.2); g.stroke();
+      }
+      bowlGrains(g, geo, rnd, Math.round(30*grain), ['#c9c0b0'], 0.4, 0.9, 0.6);
+    }
+  },
+  claw:{                             // 爪痕: three gold scratches carved into black lacquer, as if a raptor's claws had raked it
+    wall:function(g, b, geo, rnd, grain, dens){
+      BOWL_PATTERNS.lacquer.wall(g, b, geo, rnd, grain, dens);
+      var sets = [[-0.1, 1], [0.32, 0.7]];
+      for(var s=0; s<sets.length; s++){
+        for(var k=0;k<3;k++){
+          var a0 = (0.3 + sets[s][0] + k*0.06)*Math.PI, p0 = secPoint(geo, 0.3, a0), p1 = secPoint(geo, 0.98, a0 + 0.1*Math.PI);
+          var mx = (p0.x + p1.x)/2 + 6, my = (p0.y + p1.y)/2;
+          g.lineCap = 'round';
+          g.strokeStyle = 'rgba(0,0,0,0.7)'; g.lineWidth = 2.6*sets[s][1];
+          g.beginPath(); g.moveTo(p0.x + 0.4, p0.y + 0.8); g.quadraticCurveTo(mx + 0.4, my + 0.8, p1.x + 0.4, p1.y + 0.8); g.stroke();
+          var gr = g.createLinearGradient(p0.x, p0.y, p1.x, p1.y);
+          gr.addColorStop(0, rgbaHex(b.ink[0], 0)); gr.addColorStop(0.25, b.ink[0]); gr.addColorStop(0.7, b.ink[1]); gr.addColorStop(1, rgbaHex(b.ink[0], 0));
+          g.strokeStyle = gr; g.lineWidth = 1.6*sets[s][1];
+          g.beginPath(); g.moveTo(p0.x, p0.y); g.quadraticCurveTo(mx, my, p1.x, p1.y); g.stroke();
+        }
+      }
+    }
+  },
+  phoenix:{                          // 金蒔絵の鳳凰: a gold phoenix with long tail plumes on deep vermilion lacquer, gold dust round it
+    wall:function(g, b, geo, rnd, grain, dens){
+      BOWL_PATTERNS.lacquer.wall(g, b, geo, rnd, grain, dens);
+      bowlGrains(g, geo, rnd, Math.round(260*grain), [b.ink[0], b.ink[1]], 0.4, 0.9, 0.8);
+      var c = secPoint(geo, 0.66, 0.5*Math.PI);      // low on the front, where the wall shows under the noodles
+      g.save();
+      g.translate(c.x + 4, c.y + 3);
+      g.scale(0.62, 0.5);
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      for(var t=0;t<3;t++){                                    // the tail: three long plumes, each ending in an eye
+        var ty = -2 + t*3.4, ex = -58 - t*6, ey = ty + 4 - t*2;
+        g.strokeStyle = b.ink[t===1 ? 1 : 0]; g.lineWidth = 2.2 - t*0.3;
+        g.beginPath(); g.moveTo(-6, 0); g.bezierCurveTo(-22, ty - 10, -40, ty + 10, ex, ey); g.stroke();
+        g.fillStyle = b.ink[0]; g.beginPath(); g.ellipse(ex, ey, 4, 2.6, 0.3, 0, Math.PI*2); g.fill();
+        g.fillStyle = b.body; g.beginPath(); g.arc(ex, ey, 1.2, 0, Math.PI*2); g.fill();
+      }
+      g.fillStyle = b.ink[0];                                    // body, neck and crested head
+      g.beginPath(); g.ellipse(0, 0, 10, 5, -0.2, 0, Math.PI*2); g.fill();
+      g.strokeStyle = b.ink[0]; g.lineWidth = 2.4;
+      g.beginPath(); g.moveTo(6, -2); g.quadraticCurveTo(12, -10, 18, -12); g.stroke();
+      g.beginPath(); g.arc(19, -12.5, 2.6, 0, Math.PI*2); g.fill();
+      g.beginPath(); g.moveTo(21, -12.5); g.lineTo(26, -11.5); g.lineTo(21, -11); g.closePath(); g.fill();
+      g.lineWidth = 0.8;
+      g.beginPath(); g.moveTo(18, -15); g.quadraticCurveTo(16, -20, 12, -21); g.moveTo(19, -15); g.quadraticCurveTo(19, -21, 16, -23); g.stroke();
+      for(var w=0; w<5; w++){                                    // the wing raised over the back
+        g.strokeStyle = b.ink[w%2 ? 1 : 0]; g.lineWidth = 1.6;
+        g.beginPath(); g.moveTo(-2 + w*1.5, -3); g.quadraticCurveTo(-6 + w*3, -16 - w, -16 + w*6, -22 + w*0.6); g.stroke();
+      }
+      g.fillStyle = b.body; g.beginPath(); g.arc(20, -13, 0.7, 0, Math.PI*2); g.fill();
+      g.restore();
+      chinkinScroll(g, geo, rnd, b.ink[2], dens*0.5, 0.5);
+    }
+  },
+  fossil:{                           // 化石発掘椀: a raptor's skeleton raised in relief on rough old Echizen clay
+    wall:function(g, b, geo, rnd, grain, dens){
+      bowlBlobs(g, geo, rnd, Math.round(14*dens), [b.ink[2], b.ink[3]], 16, 38, 0.2, 0.4);
+      bowlGrains(g, geo, rnd, Math.round(220*grain), ['#2a1b10', '#b08e68'], 0.5, 1.4, 0.55);
+      var c = secPoint(geo, 0.66, 0.52*Math.PI);
+      g.save();
+      g.translate(c.x, c.y + 2);
+      g.scale(0.85, 0.55);
+      function bone(path, w){                                   // each bone: a shadow, the bone, a light edge (浮き彫り)
+        g.lineCap = 'round'; g.lineJoin = 'round';
+        g.strokeStyle = 'rgba(30,18,8,0.55)'; g.lineWidth = w + 1; g.save(); g.translate(0.8, 1.2); path(); g.stroke(); g.restore();
+        g.strokeStyle = b.ink[0]; g.lineWidth = w; path(); g.stroke();
+        g.strokeStyle = 'rgba(255,248,230,0.5)'; g.lineWidth = w*0.35; g.save(); g.translate(-0.4, -0.5); path(); g.stroke(); g.restore();
+      }
+      bone(function(){ g.beginPath(); g.moveTo(-46, -2); g.bezierCurveTo(-30, -9, -10, -10, 10, -6); g.quadraticCurveTo(22, -4, 30, -12); }, 2.2);   // spine and neck
+      for(var v=0; v<10; v++){ var vx = -40 + v*6, vy = -5 - Math.sin((v + 1)/11*Math.PI)*4; bone(function(){ g.beginPath(); g.moveTo(vx, vy - 2.4); g.lineTo(vx, vy + 0.4); }, 1.3); }
+      for(var r=0; r<5; r++){ var rx = -6 + r*4.4; bone(function(){ g.beginPath(); g.moveTo(rx, -8); g.quadraticCurveTo(rx - 3, -1, rx - 1, 4); }, 1.2); }   // ribs
+      bone(function(){ g.beginPath(); g.moveTo(30, -12); g.lineTo(42, -14); g.lineTo(44, -10); g.lineTo(34, -8); g.closePath(); }, 1.6);   // skull
+      g.fillStyle = 'rgba(30,18,8,0.7)'; g.beginPath(); g.arc(36, -11.6, 1.1, 0, Math.PI*2); g.fill();
+      bone(function(){ g.beginPath(); g.moveTo(-14, -6); g.lineTo(-18, 4); g.lineTo(-12, 12); g.lineTo(-16, 14); }, 1.8);   // hind leg
+      bone(function(){ g.beginPath(); g.moveTo(14, -6); g.lineTo(18, 0); g.lineTo(23, -1); }, 1.3);                          // arm and its big claw
+      bone(function(){ g.beginPath(); g.moveTo(23, -1); g.quadraticCurveTo(27, 1, 26, 5); }, 1.1);
+      g.restore();
+    }
+  },
+  crabshell:{                        // 甲羅: the red shell, its bumps lit from above, the grooves and a paler underside
+    wall:function(g, b, geo, rnd, grain, dens){
+      bowlBlobs(g, geo, rnd, Math.round(12*dens), [b.ink[0], b.ink[1]], 16, 36, 0.25, 0.45);
+      var n = Math.round(90*dens);
+      for(var i=0;i<n;i++){
+        var p = wallPoint(geo, rnd);
+        if(!p) continue;
+        var r = 1.2 + rnd()*2.2;
+        g.fillStyle = rgbaHex(b.ink[1], 0.5); g.beginPath(); g.arc(p.x + 0.5, p.y + 0.7, r, 0, Math.PI*2); g.fill();
+        g.fillStyle = rgbaHex(b.ink[2], 0.75); g.beginPath(); g.arc(p.x, p.y, r*0.8, 0, Math.PI*2); g.fill();
+      }
+      g.strokeStyle = rgbaHex(b.ink[1], 0.7); g.lineWidth = 1.4;    // the H-shaped grooves of the shell
+      var l = secPoint(geo, 0.2, 0.36*Math.PI), r2 = secPoint(geo, 0.2, 0.64*Math.PI), m = secPoint(geo, 0.6, 0.5*Math.PI);
+      g.beginPath(); g.moveTo(l.x, l.y); g.quadraticCurveTo(m.x - 20, m.y - 4, m.x, m.y); g.quadraticCurveTo(m.x + 20, m.y - 4, r2.x, r2.y); g.stroke();
+      var under = g.createLinearGradient(0, 60 + geo.gy, 0, 84);
+      under.addColorStop(0, 'rgba(244,200,150,0)'); under.addColorStop(1, 'rgba(244,200,150,0.35)');
+      g.fillStyle = under; g.fillRect(-130, 60, 260, 30);
+      bowlGrains(g, geo, rnd, Math.round(40*grain), ['#ffffff'], 0.4, 0.9, 0.5);
+    }
+  },
   makie:{                            // 蒔絵沈金: gold dust scattered in clouds, carved gold lines and gold plum blossoms
     wall:function(g, b, geo, rnd, grain, dens){
       BOWL_PATTERNS.lacquer.wall(g, b, geo, rnd, grain, dens);
@@ -6281,13 +6652,16 @@ var TOOL_SHAPES = {
   kiri:  {outline:function(g){ g.beginPath(); g.moveTo(0, 2); g.lineTo(38, 2); g.lineTo(38, -42); g.lineTo(0, -42); g.closePath(); },
           edge:function(g){ g.moveTo(0, 2); g.lineTo(38, 2); }, tip:[33, 0.5]},
   sickle:{outline:function(g){ g.beginPath(); g.moveTo(0, -33); g.lineTo(24, -33); g.bezierCurveTo(44, -33, 58, -20, 60, 8); g.bezierCurveTo(52, -6, 40, -6, 26, -1); g.lineTo(0, 2); g.closePath(); },
-          edge:function(g){ g.moveTo(60, 8); g.bezierCurveTo(52, -6, 40, -6, 26, -1); g.lineTo(0, 2); }, tip:[55, 0]}
+          edge:function(g){ g.moveTo(60, 8); g.bezierCurveTo(52, -6, 40, -6, 26, -1); g.lineTo(0, 2); }, tip:[55, 0]},
+  kani:  {outline:function(g){ g.beginPath(); g.moveTo(0, -33); g.lineTo(28, -33); g.quadraticCurveTo(42, -26, 48, -4); g.quadraticCurveTo(40, 1, 30, 2); g.lineTo(0, 2); g.closePath(); },
+          edge:function(g){ g.moveTo(0, 2); g.lineTo(30, 2); g.quadraticCurveTo(40, 1, 48, -4); }, tip:[44, -1]}
 };
 // the 刃紋 line for a straight blade: notare waves, a nearly straight line, or small repeated rounds (gunome)
 var HAMON_LINES = {
   wave:    function(x){ return -8 + 1.8*Math.sin(x*0.42 + 0.5); },
   straight:function(x){ return -7.5 + 0.35*Math.sin(x*0.3); },
-  fine:    function(x){ return -9 + 1.7*Math.abs(Math.sin(x*0.62)) - 0.4*Math.sin(x*1.9); }
+  fine:    function(x){ return -9 + 1.7*Math.abs(Math.sin(x*0.62)) - 0.4*Math.sin(x*1.9); },
+  midare:  function(x){ return -9 + 1.6*Math.sin(x*0.5) + 1.1*Math.sin(x*1.3 + 1) + 0.7*Math.abs(Math.sin(x*2.1)); }
 };
 function paintTool(g, tk, q){
   var shape = TOOL_SHAPES[tk.shape] || TOOL_SHAPES.kiri, dens = skinNum(tk.density, 1)*q.pattern, gloss = skinNum(tk.gloss, 0.5);
@@ -6306,6 +6680,7 @@ function paintTool(g, tk, q){
     g.beginPath(); g.moveTo(-4, y); g.bezierCurveTo(16, y + (rnd() - 0.5)*3, 34, y + (rnd() - 0.5)*3, 64, y + (rnd() - 0.5)*2); g.stroke();
   }
   if(tk.deco==='tsuchime') paintTsuchime(g, dens);
+  if(tk.deco==='flow') paintFlowGrain(g, dens);
   paintHagane(g, tk, shape);
   var lg = g.createLinearGradient(2, -42, 30, 6);              // a band of light across the blade
   lg.addColorStop(0, 'rgba(255,255,255,0)');
@@ -6333,7 +6708,11 @@ function paintTool(g, tk, q){
   g.lineWidth = 0.6;
   g.beginPath(); shape.edge(g); g.stroke();
   g.restore();
-  if(tk.mei){ g.fillStyle = tk.mei; g.fillRect(28, -27, 4, 6); g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(28.8, -26, 0.8, 4); }   // 銘
+  if(tk.mei && tk.meiShape==='hammer'){                         // 刻印: a small excavation hammer
+    g.strokeStyle = tk.mei; g.lineWidth = 1.2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(25, -18); g.lineTo(31, -27); g.stroke();
+    g.lineWidth = 2.2; g.beginPath(); g.moveTo(28, -29); g.lineTo(34.5, -25); g.stroke();
+  } else if(tk.mei){ g.fillStyle = tk.mei; g.fillRect(28, -27, 4, 6); g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(28.8, -26, 0.8, 4); }   // 銘
   paintToolHandle(g, tk);
 }
 function paintHagane(g, tk, shape){
@@ -6381,7 +6760,35 @@ function paintTsuchime(g, dens){
     }
   }
 }
+// 流れる地紋: wavy layers of folded steel running along the blade, light and dark in turn
+function paintFlowGrain(g, dens){
+  var n = Math.round(9*dens);
+  for(var i=0;i<n;i++){
+    var y0 = -40 + i*(30/n);
+    g.strokeStyle = i%2 ? 'rgba(255,255,255,0.32)' : 'rgba(30,40,46,0.22)';
+    g.lineWidth = 0.9;
+    g.beginPath();
+    for(var x=-2; x<=60; x+=2){ var y = y0 + 2.2*Math.sin(x*0.16 + i*0.9) + 1.2*Math.sin(x*0.41 + i); if(x>-2) g.lineTo(x, y); else g.moveTo(x, y); }
+    g.stroke();
+  }
+}
+// a handle shaped like a fossil bone: knobbly joints, cracks and darker specks
+function paintBoneHandle(g, tk){
+  g.fillStyle = tk.handle;
+  g.beginPath();
+  g.moveTo(5, -40.5); g.quadraticCurveTo(3, -44, 7, -43.5); g.lineTo(31, -43.5); g.quadraticCurveTo(35.5, -44, 34, -40.5);
+  g.lineTo(34, -35.5); g.quadraticCurveTo(35.5, -32, 31, -32.5); g.lineTo(7, -32.5); g.quadraticCurveTo(3, -32, 5, -35.5);
+  g.closePath(); g.fill();
+  g.strokeStyle = 'rgba(80,60,30,0.6)'; g.lineWidth = 0.6; g.stroke();
+  g.strokeStyle = 'rgba(70,50,25,0.55)'; g.lineWidth = 0.5;
+  g.beginPath(); g.moveTo(12, -43); g.lineTo(13.5, -39); g.lineTo(12.5, -36); g.moveTo(22, -33); g.lineTo(23, -37); g.lineTo(25, -38.5); g.stroke();
+  var sp = [[9,-38],[16,-41],[19,-35.5],[27,-40],[30,-36]];
+  g.fillStyle = 'rgba(90,70,40,0.45)';
+  for(var i=0;i<sp.length;i++){ g.beginPath(); g.arc(sp[i][0], sp[i][1], 0.7, 0, Math.PI*2); g.fill(); }
+  g.fillStyle = 'rgba(255,250,235,0.35)'; g.fillRect(7, -42.6, 24, 1);
+}
 function paintToolHandle(g, tk){
+  if(tk.handleStyle==='bone'){ paintBoneHandle(g, tk); return; }
   g.fillStyle = tk.handle;
   cardRoundRect(g, 4, -42, 30, 9, 2);
   g.fill();
@@ -6491,6 +6898,83 @@ var BIT_SHAPES = {
     c.beginPath(); c.arc(-3.6*s, 0, 0.45*s, 0, Math.PI*2); c.arc(-1.2*s, -0.1*s, 0.35*s, 0, Math.PI*2); c.fill();
   }
 };
+BIT_SHAPES.footprint = function(c, s, col){   // 恐竜の足跡: three toes and the pad
+  c.fillStyle = col;
+  c.beginPath(); c.ellipse(0, 1.6*s, 2.2*s, 1.8*s, 0, 0, Math.PI*2); c.fill();
+  for(var i=-1;i<=1;i++){ c.save(); c.rotate(i*0.5); c.beginPath(); c.ellipse(0, -2.6*s, 0.9*s, 2.4*s, 0, 0, Math.PI*2); c.fill(); c.restore(); }
+};
+BIT_SHAPES.bone = function(c, s, col){        // 化石の骨: a shaft with knobbly ends
+  c.fillStyle = col;
+  c.fillRect(-3.4*s, -0.8*s, 6.8*s, 1.6*s);
+  var e = [[-3.6,-1],[-3.6,1],[3.6,-1],[3.6,1]];
+  for(var i=0;i<e.length;i++){ c.beginPath(); c.arc(e[i][0]*s, e[i][1]*s, 1.2*s, 0, Math.PI*2); c.fill(); }
+  c.strokeStyle = 'rgba(90,70,40,0.5)'; c.lineWidth = 0.4*s;
+  c.beginPath(); c.moveTo(-1*s, -0.4*s); c.lineTo(0.6*s, 0.5*s); c.stroke();
+};
+BIT_SHAPES.chip = function(c, s, col){        // 地層のかけら: a chip of rock with its layers
+  c.save();
+  c.beginPath(); c.moveTo(-3.6*s, -2*s); c.lineTo(3*s, -2.6*s); c.lineTo(3.8*s, 2*s); c.lineTo(-3*s, 2.6*s); c.closePath();
+  c.fillStyle = col; c.fill(); c.clip();
+  c.fillStyle = mixHex(col, '#000000', 0.25); c.fillRect(-4*s, -0.6*s, 8*s, 1*s);
+  c.fillStyle = mixHex(col, '#ffffff', 0.25); c.fillRect(-4*s, 1.2*s, 8*s, 0.8*s);
+  c.restore();
+};
+BIT_SHAPES.tag = function(c, s, col){         // 越前がにの黄色いタグ
+  c.fillStyle = col; cardRoundRect(c, -2.6*s, -3.6*s, 5.2*s, 7.2*s, 1*s); c.fill();
+  c.strokeStyle = mixHex(col, '#000000', 0.35); c.lineWidth = 0.4*s; c.stroke();
+  c.fillStyle = '#ffffff'; c.beginPath(); c.arc(0, -2.2*s, 0.6*s, 0, Math.PI*2); c.fill();
+  c.fillStyle = 'rgba(60,40,10,0.6)'; c.fillRect(-1.6*s, -0.4*s, 3.2*s, 0.5*s); c.fillRect(-1.6*s, 0.8*s, 3.2*s, 0.5*s); c.fillRect(-1.6*s, 2*s, 2.2*s, 0.5*s);
+};
+BIT_SHAPES.shard = function(c, s, col){       // 光のかけら: a thin bright sliver
+  c.fillStyle = col;
+  c.beginPath(); c.moveTo(-5*s, 0.8*s); c.lineTo(5*s, -0.6*s); c.lineTo(-3*s, -0.9*s); c.closePath(); c.fill();
+};
+BIT_SHAPES.scale = function(c, s, col){       // 松笠のうろこ: a round scale with a sheen
+  c.fillStyle = col;
+  c.beginPath(); c.arc(0, 0, 3*s, Math.PI*1.05, Math.PI*1.95); c.lineTo(0, 2.4*s); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(255,255,255,0.75)'; c.lineWidth = 0.6*s;
+  c.beginPath(); c.arc(0, 0, 2*s, Math.PI*1.2, Math.PI*1.6); c.stroke();
+};
+BIT_SHAPES.powder = function(c, s, col){      // 羽二重の粉: a soft dot of white powder
+  var r = 2.6*s, g = c.createRadialGradient(0, 0, 0, 0, 0, r);
+  g.addColorStop(0, rgbaHex(col, 0.95)); g.addColorStop(1, rgbaHex(col, 0));
+  c.fillStyle = g; c.beginPath(); c.arc(0, 0, r, 0, Math.PI*2); c.fill();
+};
+BIT_SHAPES.bubble = function(c, s, col){      // カニの泡: a pearly bubble with a highlight
+  c.fillStyle = rgbaHex(col, 0.25); c.beginPath(); c.arc(0, 0, 2.8*s, 0, Math.PI*2); c.fill();
+  c.strokeStyle = rgbaHex(col, 0.9); c.lineWidth = 0.6*s; c.stroke();
+  c.fillStyle = '#ffffff'; c.beginPath(); c.arc(-1*s, -1*s, 0.7*s, 0, Math.PI*2); c.fill();
+};
+BIT_SHAPES.taro = function(c, s, col){        // さといも: a round tuber with its rings
+  c.fillStyle = col; c.beginPath(); c.ellipse(0, 0, 3*s, 2.4*s, 0, 0, Math.PI*2); c.fill();
+  c.strokeStyle = mixHex(col, '#000000', 0.35); c.lineWidth = 0.4*s;
+  for(var i=-1;i<=1;i++){ c.beginPath(); c.ellipse(i*1.1*s, 0, 0.5*s, 2.2*s, 0, 0, Math.PI*2); c.stroke(); }
+  c.fillStyle = 'rgba(255,255,255,0.35)'; c.beginPath(); c.ellipse(-1*s, -1*s, 1*s, 0.5*s, -0.3, 0, Math.PI*2); c.fill();
+};
+BIT_SHAPES.fry = function(c, s, col){         // 揚げのかけら: golden fried skin with small blisters
+  c.fillStyle = col; cardRoundRect(c, -3.6*s, -2.4*s, 7.2*s, 4.8*s, 1.4*s); c.fill();
+  c.fillStyle = mixHex(col, '#7a4a10', 0.4);
+  var d = [[-2,-1],[0.5,-1.2],[2.2,0.2],[-0.8,1],[1.2,1.3]];
+  for(var i=0;i<d.length;i++){ c.beginPath(); c.arc(d[i][0]*s, d[i][1]*s, 0.45*s, 0, Math.PI*2); c.fill(); }
+  c.fillStyle = 'rgba(255,240,200,0.5)'; c.fillRect(-2.8*s, -2*s, 4*s, 0.5*s);
+};
+BIT_SHAPES.amber = function(c, s, col){       // 琥珀色の粒: a rounded gem lit from inside
+  var g = c.createRadialGradient(-0.6*s, -0.6*s, 0, 0, 0, 3*s);
+  g.addColorStop(0, mixHex(col, '#ffffff', 0.5)); g.addColorStop(1, col);
+  c.fillStyle = g; c.beginPath(); c.ellipse(0, 0, 3*s, 2.4*s, 0.4, 0, Math.PI*2); c.fill();
+};
+BIT_SHAPES.drop = function(c, s, col){        // 蜜のしずく
+  c.fillStyle = col;
+  c.beginPath(); c.moveTo(0, -3.4*s); c.quadraticCurveTo(2.8*s, 0.4*s, 0, 2.6*s); c.quadraticCurveTo(-2.8*s, 0.4*s, 0, -3.4*s); c.fill();
+  c.fillStyle = 'rgba(255,255,255,0.6)'; c.beginPath(); c.arc(-0.7*s, 0.4*s, 0.6*s, 0, Math.PI*2); c.fill();
+};
+// a 演出's bits may mix shapes (shape: ['bone','chip']): the i-th bit's shape name and drawing
+function bitShapeName(ek, i){
+  var list = Array.isArray(ek.shape) ? ek.shape : [ek.shape];
+  var n = list[i % list.length];
+  return Object.prototype.hasOwnProperty.call(BIT_SHAPES, n) ? n : 'strip';
+}
+function bitShapeOf(ek, i){ return BIT_SHAPES[bitShapeName(ek, i)]; }
 // a sparkle: an eight-pointed star, or a long four-pointed glint with a glow
 function drawSparkShape(c, x, y, s, col, kind){
   if(kind==='glint'){
@@ -6558,17 +7042,24 @@ function drawCutBits(cx, cy, fx, ek){
   var rnd = cardRng(fx.seed), just = fx.rating==='JUST', t = fx.t;
   var n = Math.min(CUT_BITS_MAX, Math.round((just ? 11 : 6)*fc.parts));
   var mot = fc.still ? 0 : fc.motion, grav = skinNum(ek.grav, 1), spin = skinNum(ek.spin, 1);
-  var shape = BIT_SHAPES[ek.shape] || BIT_SHAPES.strip, cols = (ek.bits && ek.bits.length) ? ek.bits : CONFETTI_COLS;
+  var cols = (ek.bits && ek.bits.length) ? ek.bits : CONFETTI_COLS;
   var fade = Math.max(0, 1 - t/400);
   if(fade<=0) return;
   for(var i=0;i<n;i++){
     var ang = rnd()*Math.PI*2, sp = 0.05 + rnd()*0.07, d = (fc.still ? 22 : 8 + sp*t*mot), rot0 = rnd()*6.28, sz = (just ? 0.95 : 0.75)*(0.8 + rnd()*0.4);
-    var sway = Math.sin(t*0.012 + rot0)*3*(1 - grav)*mot;
+    var sway = Math.sin(t*0.012 + rot0)*3*(1 - grav)*mot, bx, by;
+    if(ek.rise){                                     // bubbles well up from below the cut instead of bursting out
+      bx = cx + Math.cos(ang)*14 + sway;
+      by = cy + 18 - (fc.still ? 16 + i*2 : (0.04 + sp)*t*mot*1.2);
+    } else {
+      bx = cx + Math.cos(ang)*d + sway;
+      by = cy + Math.sin(ang)*d + 0.00012*t*t*grav*mot;
+    }
     ctx.globalAlpha = fade;
     ctx.save();
-    ctx.translate(cx + Math.cos(ang)*d + sway, cy + Math.sin(ang)*d + 0.00012*t*t*grav*mot);
+    ctx.translate(bx, by);
     ctx.rotate(rot0 + t*0.01*spin*mot);
-    shape(ctx, sz, cols[i % cols.length]);
+    bitShapeOf(ek, i)(ctx, sz, cols[i % cols.length]);
     ctx.restore();
   }
   if(just){
@@ -6580,6 +7071,123 @@ function drawCutBits(cx, cy, fx, ek){
     }
   }
   ctx.globalAlpha = 1;
+}
+// The extras of a 演出 round a cut: a glow, an aura or steam on any cut, and on a JUST! its rays and its big moment
+// over the lane (quake / tag / claw / slice). The big ones are left out on 控えめ; with reduced motion they stand still.
+// top / h / w = the lane's area; force = draw everything (the 図鑑 picture).
+function drawSkinOverlay(c, cx, cy, fx, ek, top, h, w, force){
+  var fc = fxConf(), just = fx.rating==='JUST', still = fc.still && !force;
+  var t = still ? Math.min(fx.t, 160) : fx.t, fade = Math.max(0, 1 - fx.t/400);
+  if(fade<=0) return;
+  var r, g;
+  if(ek.glow){                                     // a soft light where the cut landed
+    r = 22 + t/7;
+    g = c.createRadialGradient(cx, cy, 0, cx, cy, r);
+    g.addColorStop(0, rgbaHex(ek.glow, 0.55*fade)); g.addColorStop(1, rgbaHex(ek.glow, 0));
+    c.fillStyle = g; c.beginPath(); c.arc(cx, cy, r, 0, Math.PI*2); c.fill();
+  }
+  if(ek.aura){                                     // a thick, soft, sticky-looking ring
+    r = 16 + t/9;
+    g = c.createRadialGradient(cx, cy, r*0.5, cx, cy, r*1.6);
+    g.addColorStop(0, rgbaHex(ek.aura, 0)); g.addColorStop(0.5, rgbaHex(ek.aura, 0.6*fade)); g.addColorStop(1, rgbaHex(ek.aura, 0));
+    c.fillStyle = g; c.beginPath(); c.arc(cx, cy, r*1.6, 0, Math.PI*2); c.fill();
+  }
+  if(ek.steam){                                    // warm steam rising from the cut
+    c.lineCap = 'round';
+    for(var k=0;k<3;k++){
+      var sx = cx - 8 + k*8, rise = still ? 18 : 6 + t*0.06, sw = Math.sin(t*0.01 + k*2)*4;
+      c.strokeStyle = 'rgba(255,250,240,' + (0.5*fade).toFixed(3) + ')';
+      c.lineWidth = 2.4 - k*0.4;
+      c.beginPath(); c.moveTo(sx, cy - 6); c.bezierCurveTo(sx + sw, cy - 6 - rise*0.4, sx - sw, cy - 6 - rise*0.7, sx + sw*0.5, cy - 6 - rise); c.stroke();
+    }
+  }
+  if(!just || !(fc.rays || force)) return;
+  var p = Math.min(1, t/120);                      // how far the moment has played (it lands fast, then fades)
+  if(ek.rays){
+    c.save(); c.translate(cx, cy); c.rotate(t*0.002);
+    for(var i=0;i<12;i++){
+      c.rotate(Math.PI/6);
+      g = c.createLinearGradient(0, 0, 60 + t/4, 0);
+      g.addColorStop(0, rgbaHex(ek.just, 0.55*fade)); g.addColorStop(1, rgbaHex(ek.just, 0));
+      c.fillStyle = g;
+      c.beginPath(); c.moveTo(6, -1.5); c.lineTo(60 + t/4, -5); c.lineTo(60 + t/4, 5); c.lineTo(6, 1.5); c.closePath(); c.fill();
+    }
+    c.restore();
+  }
+  c.save();
+  c.globalAlpha = fade;
+  if(ek.overlay==='quake'){                        // 咆哮: jagged shock rings and dust kicked up from the board
+    c.strokeStyle = ek.just; c.lineJoin = 'round';
+    for(var q=0;q<3;q++){
+      var rr = 14 + t*0.22 + q*12;
+      c.lineWidth = 2.4 - q*0.6;
+      c.beginPath();
+      for(var a=0;a<=24;a++){ var an = a/24*Math.PI*2, j = rr + (a%2 ? -3 : 3); if(a) c.lineTo(cx + Math.cos(an)*j, cy + Math.sin(an)*j*0.7); else c.moveTo(cx + j, cy); }
+      c.stroke();
+    }
+  } else if(ek.overlay==='tag'){                   // 黄タグのカットイン: the tag sweeps in along the top of the lane
+    var tw = Math.min(150, w*0.5), tx = w - p*(w - cx + tw*0.3) , ty = top + 4;
+    c.fillStyle = 'rgba(0,0,0,0.25)'; cardRoundRect(c, tx + 3, ty + 3, tw, 26, 5); c.fill();
+    g = c.createLinearGradient(tx, ty, tx + tw, ty + 26);
+    g.addColorStop(0, '#fff3a0'); g.addColorStop(0.5, ek.bits[0] || '#f2d22e'); g.addColorStop(1, '#d9a816');
+    c.fillStyle = g; cardRoundRect(c, tx, ty, tw, 26, 5); c.fill();
+    c.strokeStyle = '#8a6a10'; c.lineWidth = 1; c.stroke();
+    c.fillStyle = '#ffffff'; c.beginPath(); c.arc(tx + 12, ty + 13, 3.4, 0, Math.PI*2); c.fill();
+    c.fillStyle = '#3a2a08'; c.textAlign = 'left'; c.textBaseline = 'middle';
+    c.font = '900 14px ' + CARD_SANS;
+    c.fillText('越前がに', tx + 22, ty + 13.5);
+  } else if(ek.overlay==='claw'){                  // ラプトルの斬撃: three claw marks tearing across the lane
+    c.lineCap = 'round';
+    for(var s3=0;s3<3;s3++){
+      var x0 = cx + 46 + s3*14, y0 = top - 4, x1 = cx - 34 + s3*14, y1 = top + h + 4;
+      var ex = x0 + (x1 - x0)*p, ey = y0 + (y1 - y0)*p;
+      c.strokeStyle = rgbaHex(ek.just, 0.35); c.lineWidth = 7;
+      c.beginPath(); c.moveTo(x0, y0); c.lineTo(ex, ey); c.stroke();
+      c.strokeStyle = '#ffffff'; c.lineWidth = 2.2;
+      c.beginPath(); c.moveTo(x0, y0); c.lineTo(ex, ey); c.stroke();
+    }
+  } else if(ek.overlay==='slice'){                 // 和風スライス: straight cuts and the square they leave
+    var sz = 26 + t*0.04;
+    c.strokeStyle = ek.just; c.lineWidth = 1.4;
+    c.beginPath();
+    c.moveTo(cx - 70*p, cy); c.lineTo(cx + 70*p, cy);
+    c.moveTo(cx, cy - Math.min(h/2 + 6, 70*p)); c.lineTo(cx, cy + Math.min(h/2 + 6, 70*p));
+    c.stroke();
+    c.save(); c.translate(cx, cy); c.rotate(Math.PI/4*p);
+    c.strokeStyle = ek.ring; c.lineWidth = 2;
+    c.strokeRect(-sz/2, -sz/2, sz, sz);
+    c.restore();
+  }
+  c.restore();
+}
+function drawNoodleAura(cx, cy, col, k){
+  if(k<=0) return;
+  var t = lookTime(performance.now()), pulse = 0.85 + 0.15*Math.sin(t*2.4);
+  ctx.save();
+  ctx.translate(cx, cy + 20);
+  ctx.scale(1, 0.42);
+  var g = ctx.createRadialGradient(0, 0, 50, 0, 0, 118*pulse);
+  g.addColorStop(0, rgbaHex(col, 0));
+  g.addColorStop(0.55, rgbaHex(col, 0.42*k));
+  g.addColorStop(1, rgbaHex(col, 0));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(0, 0, 118*pulse, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+// how far the play area is shaken by the newest JUST! of a 演出 that shakes (none on 控えめ or with reduced motion)
+function skinShake(){
+  var ek = skinPart('effect');
+  if(!ek || !ek.shake) return null;
+  var fc = fxConf();
+  if(fc.still || !fc.rays || !fc.motion) return null;
+  for(var i=state.cutFx.length-1; i>=0; i--){
+    var fx = state.cutFx[i];
+    if(fx.rating!=='JUST') continue;
+    if(fx.t>=240) return null;
+    var amp = ek.shake*(1 - fx.t/240)*fc.motion;
+    return {x:Math.sin(fx.t*0.9)*amp, y:Math.cos(fx.t*1.3)*amp*0.6};
+  }
+  return null;
 }
 
 // --- 背景: the item's picture from ART when it has one, otherwise a scene drawn in code, laid behind the play area ---
@@ -6703,6 +7311,9 @@ function sceneLight(g, W, H, kind){
   } else if(kind==='mist'){
     L = g.createLinearGradient(0, 0, 0, H);
     L.addColorStop(0, 'rgba(236,241,236,0.26)'); L.addColorStop(0.5, 'rgba(236,241,236,0.06)'); L.addColorStop(1, 'rgba(40,52,45,0.14)');
+  } else if(kind==='night'){
+    L = g.createRadialGradient(W*0.5, H*0.45, M*0.2, W*0.5, H*0.45, M*0.9);
+    L.addColorStop(0, 'rgba(20,30,60,0)'); L.addColorStop(1, 'rgba(8,10,24,0.35)');
   } else if(kind==='interior'){
     L = g.createLinearGradient(0, 0, W, H*0.7);
     L.addColorStop(0, 'rgba(255,228,170,0.26)'); L.addColorStop(0.55, 'rgba(255,228,170,0)'); L.addColorStop(1, 'rgba(40,24,10,0.22)');
@@ -7670,6 +8281,325 @@ var BG_SCENES = {
   }
 };
 
+// 追加の背景: the same base (paintBgBase) and helpers; each keeps its subjects above and below the lane.
+// a cherry tree's crown: overlapping pink puffs, lit on top
+function sceneSakura(g, x, y, r, seed, q){
+  var p = seededList(seed, 6 + Math.round(8*q.pattern), function(rr){ return {a:rr(), d:rr(), s:rr()}; });
+  for(var i=0;i<p.length;i++){
+    var px = x + Math.cos(p[i].a*6.28)*r*p[i].d, py = y + Math.sin(p[i].a*6.28)*r*0.6*p[i].d, pr = r*(0.32 + p[i].s*0.25);
+    g.fillStyle = ['#f4c4d2','#f8d6e0','#eeb0c4','#fbe4ea'][i % 4];
+    g.beginPath(); g.arc(px, py, pr, 0, Math.PI*2); g.fill();
+  }
+  g.fillStyle = 'rgba(255,255,255,0.3)';
+  g.beginPath(); g.arc(x - r*0.2, y - r*0.3, r*0.35, 0, Math.PI*2); g.fill();
+}
+// a crab of the market, with its yellow tag
+function sceneCrab(g, x, y, s, tagged){
+  g.strokeStyle = '#b83a22'; g.lineWidth = Math.max(1, 1.6*s); g.lineCap = 'round';
+  for(var side=-1; side<=1; side+=2) for(var k=0;k<4;k++){
+    g.beginPath(); g.moveTo(x + side*6*s, y + (k - 1.5)*2.4*s); g.lineTo(x + side*(13 + k)*s, y + (k - 2)*3*s); g.lineTo(x + side*(17 + k)*s, y + (k - 1)*3.6*s); g.stroke();
+  }
+  g.fillStyle = '#d24a2a';
+  g.beginPath(); g.ellipse(x, y, 8*s, 6.4*s, 0, 0, Math.PI*2); g.fill();
+  g.fillStyle = 'rgba(255,200,160,0.35)';
+  g.beginPath(); g.ellipse(x - 2*s, y - 2*s, 4*s, 2.4*s, 0, 0, Math.PI*2); g.fill();
+  if(tagged){
+    g.fillStyle = '#f2d22e'; g.fillRect(x + 3*s, y + 2*s, 4.5*s, 6*s);
+    g.strokeStyle = '#8a6a10'; g.lineWidth = 0.5; g.strokeRect(x + 3*s, y + 2*s, 4.5*s, 6*s);
+  }
+}
+// stars in a night sky
+function sceneStars(g, seed, n, W, h){
+  var st = seededList(seed, n, function(r){ return {x:r(), y:r(), s:r()}; });
+  for(var i=0;i<st.length;i++){ g.fillStyle = 'rgba(255,250,230,' + (0.35 + st[i].s*0.6).toFixed(3) + ')'; g.fillRect(st[i].x*W, st[i].y*h, 0.8 + st[i].s, 0.8 + st[i].s); }
+}
+// a dinosaur's silhouette: a long-necked giant, or a small raptor (sceneDino)
+function sceneSauropod(g, x, y, s, color){
+  g.save(); g.translate(x, y); g.scale(s, s);
+  g.fillStyle = color;
+  g.beginPath();
+  g.moveTo(-60, -30); g.quadraticCurveTo(-90, -28, -120, -12);
+  g.quadraticCurveTo(-90, -38, -58, -44);
+  g.quadraticCurveTo(-20, -62, 30, -54);
+  g.quadraticCurveTo(52, -60, 70, -100); g.quadraticCurveTo(76, -116, 90, -116); g.quadraticCurveTo(100, -114, 96, -108);
+  g.quadraticCurveTo(84, -106, 80, -96); g.quadraticCurveTo(70, -60, 52, -36);
+  g.quadraticCurveTo(30, -24, -60, -30);
+  g.closePath(); g.fill();
+  g.fillRect(-48, -34, 12, 34); g.fillRect(-30, -34, 12, 34); g.fillRect(20, -34, 12, 34); g.fillRect(36, -34, 12, 34);
+  g.restore();
+}
+BG_SCENES.kehi = function(g, W, H, b, q){       // 気比の松原: white sand, green pines and the blue sea of Tsuruga
+  sceneSky(g, W, H, [[0,'#9cc8e4'],[0.45,'#e4eff2'],[1,'#e4eff2']]);
+  sceneCloud(g, W*0.3, H*0.1, W*0.12);
+  sceneRidge(g, W, H, H*0.47, H*0.03, 3.2, 0.6, '#97aab6');
+  var sea = g.createLinearGradient(0, H*0.48, 0, H*0.64);
+  sea.addColorStop(0, '#4f8fb2'); sea.addColorStop(1, '#7cb8cc');
+  g.fillStyle = sea; g.fillRect(0, H*0.48, W, H*0.16);
+  g.strokeStyle = 'rgba(255,255,255,0.7)'; g.lineWidth = 1.4;
+  for(var w=0; w<4; w++){ var wy = H*(0.6 + w*0.012); g.beginPath(); g.moveTo(0, wy); for(var x=0;x<=W;x+=8) g.lineTo(x, wy + Math.sin(x*0.08 + w)*1.4); g.stroke(); }
+  var sand = g.createLinearGradient(0, H*0.63, 0, H);
+  sand.addColorStop(0, '#f4efe2'); sand.addColorStop(1, '#e2d7bd');
+  g.fillStyle = sand; g.fillRect(0, H*0.63, W, H*0.37);
+  sceneDots(g, 202, Math.round(160*q.grain) + 20, 0, H*0.64, W, H*0.36, 0.4, 1.1, ['#cbbf9f','#ffffff'], 0.6);
+  var pines = seededList(31, 6 + Math.round(6*q.pattern), function(r){ return {x:r(), s:r()}; });
+  pines.sort(function(a, b2){ return a.s - b2.s; });
+  for(var i=0;i<pines.length;i++){
+    var py = H*(0.66 + pines[i].s*0.3), sz = Math.min(W, H)*(0.1 + pines[i].s*0.14);
+    sceneShadow(g, pines[i].x*W + sz*0.3, py, sz*0.5, sz*0.08, 0.3);
+    scenePine(g, pines[i].x*W, py, sz);
+  }
+  g.save(); g.translate(W, 0); g.scale(-1, 1); scenePine(g, W*0.02, H*0.3, Math.min(W, H)*0.32); g.restore();   // branches framing the top
+  scenePine(g, W*0.02, H*0.26, Math.min(W, H)*0.26);
+};
+BG_SCENES.digNight = function(g, W, H, b, q){   // 発掘現場の地層ナイト: floodlit layers of rock and a skeleton in them, at night
+  sceneSky(g, W, H, [[0,'#141a2e'],[0.45,'#242a40'],[1,'#2a2420']]);
+  sceneStars(g, 71, Math.round(60*q.pattern) + 10, W, H*0.4);
+  sceneRidge(g, W, H, H*0.28, H*0.03, 3.4, 1.1, '#1c2030');
+  var poles = [W*0.18, W*0.82];
+  for(var p=0;p<poles.length;p++){                                // the floodlights and their beams onto the cliff
+    var px = poles[p];
+    var beam = g.createLinearGradient(px, H*0.1, W*0.5, H*0.8);
+    beam.addColorStop(0, 'rgba(255,240,190,0.35)'); beam.addColorStop(1, 'rgba(255,240,190,0)');
+    g.fillStyle = beam;
+    g.beginPath(); g.moveTo(px - 4, H*0.12); g.lineTo(px + 4, H*0.12); g.lineTo(W*(0.5 + (p ? 0.3 : -0.3)), H); g.lineTo(W*(0.5 + (p ? -0.2 : 0.2)), H); g.closePath(); g.fill();
+    g.fillStyle = '#3a3a40'; g.fillRect(px - 1.5, H*0.12, 3, H*0.36);
+    g.fillStyle = '#fff6d0'; g.fillRect(px - 8, H*0.1, 16, 5);
+    var halo = g.createRadialGradient(px, H*0.11, 0, px, H*0.11, 26);
+    halo.addColorStop(0, 'rgba(255,246,208,0.8)'); halo.addColorStop(1, 'rgba(255,246,208,0)');
+    g.fillStyle = halo; g.fillRect(px - 26, H*0.11 - 26, 52, 52);
+  }
+  var layers = ['#8a6a4a','#a8825a','#6e5238','#b8946a','#7a5c40','#9a7650','#5e4630'];
+  var top = H*0.48;
+  for(var l=0; l<layers.length; l++){                              // the strata, gently tilted
+    var y0 = top + l*(H - top)/layers.length;
+    g.fillStyle = layers[l];
+    g.beginPath(); g.moveTo(0, y0 + 6); for(var x=0;x<=W;x+=10) g.lineTo(x, y0 + 6 - x*0.03 + Math.sin(x*0.05 + l)*2); g.lineTo(W, H); g.lineTo(0, H); g.closePath(); g.fill();
+  }
+  sceneDots(g, 72, Math.round(120*q.grain) + 20, 0, top, W, H - top, 0.5, 1.4, ['#3e2c1c','#d8c09a'], 0.5);
+  var cx = W*0.5, cy = H*0.74, s = Math.min(W, H)/340;
+  g.lineCap = 'round';
+  function fb(path, w){ g.strokeStyle = 'rgba(30,20,10,0.6)'; g.lineWidth = (w + 1.4)*s; path(); g.stroke(); g.strokeStyle = '#efe2c4'; g.lineWidth = w*s; path(); g.stroke(); }
+  fb(function(){ g.beginPath(); g.moveTo(cx - 90*s, cy + 10*s); g.bezierCurveTo(cx - 40*s, cy - 20*s, cx + 10*s, cy - 18*s, cx + 50*s, cy - 6*s); g.quadraticCurveTo(cx + 70*s, cy, cx + 80*s, cy - 22*s); }, 3);
+  for(var v=0; v<8; v++){ var rx = cx - 20*s + v*7*s; fb(function(){ g.beginPath(); g.moveTo(rx, cy - 14*s); g.quadraticCurveTo(rx - 6*s, cy, rx - 2*s, cy + 12*s); }, 1.6); }
+  fb(function(){ g.beginPath(); g.moveTo(cx + 78*s, cy - 22*s); g.lineTo(cx + 100*s, cy - 26*s); g.lineTo(cx + 102*s, cy - 16*s); g.lineTo(cx + 84*s, cy - 14*s); g.closePath(); }, 2);
+  fb(function(){ g.beginPath(); g.moveTo(cx - 10*s, cy - 10*s); g.lineTo(cx - 18*s, cy + 16*s); g.lineTo(cx - 8*s, cy + 30*s); }, 2.4);
+  g.strokeStyle = 'rgba(255,240,200,0.45)'; g.lineWidth = 0.8;   // the dig's string grid
+  for(var gx=0; gx<=4; gx++){ g.beginPath(); g.moveTo(W*(0.2 + gx*0.15), H*0.6); g.lineTo(W*(0.2 + gx*0.15), H*0.92); g.stroke(); }
+  for(var gy=0; gy<=3; gy++){ g.beginPath(); g.moveTo(W*0.2, H*(0.6 + gy*0.107)); g.lineTo(W*0.8, H*(0.6 + gy*0.107)); g.stroke(); }
+  g.fillStyle = '#5a6a7a'; g.fillRect(W*0.84, H*0.88, W*0.08, H*0.05);   // a bucket and a brush
+  g.fillStyle = '#c8a050'; g.fillRect(W*0.1, H*0.9, W*0.08, H*0.008);
+};
+BG_SCENES.isaribi = function(g, W, H, b, q){    // 越前海岸・冬の漁火: boats' lights on the winter sea at night, snow falling
+  sceneSky(g, W, H, [[0,'#0e1428'],[0.5,'#1e2a44'],[1,'#141c30']]);
+  sceneStars(g, 81, Math.round(50*q.pattern) + 10, W, H*0.35);
+  var moon = g.createRadialGradient(W*0.78, H*0.1, 0, W*0.78, H*0.1, H*0.08);
+  moon.addColorStop(0, 'rgba(255,250,230,1)'); moon.addColorStop(0.25, 'rgba(255,250,230,0.9)'); moon.addColorStop(1, 'rgba(255,250,230,0)');
+  g.fillStyle = moon; g.fillRect(W*0.78 - H*0.08, H*0.02, H*0.16, H*0.16);
+  var hz = H*0.5;
+  var sea = g.createLinearGradient(0, hz, 0, H);
+  sea.addColorStop(0, '#1c2c48'); sea.addColorStop(1, '#0c1424');
+  g.fillStyle = sea; g.fillRect(0, hz, W, H - hz);
+  var boats = seededList(83, 6 + Math.round(8*q.pattern), function(r){ return {x:r(), y:r(), s:r()}; });
+  for(var i=0;i<boats.length;i++){                                   // the boats' lights and their long reflections
+    var bx = boats[i].x*W, by = hz + 3 + boats[i].y*H*0.12, r = 1.6 + boats[i].y*2.6;
+    var glow = g.createRadialGradient(bx, by, 0, bx, by, r*5);
+    glow.addColorStop(0, 'rgba(255,236,170,0.9)'); glow.addColorStop(0.3, 'rgba(255,220,140,0.4)'); glow.addColorStop(1, 'rgba(255,220,140,0)');
+    g.fillStyle = glow; g.fillRect(bx - r*5, by - r*5, r*10, r*10);
+    g.fillStyle = 'rgba(255,224,150,0.35)';
+    for(var k=1;k<6;k++) g.fillRect(bx - r*(1 - k*0.12), by + r*1.5 + k*r*1.6, r*2*(1 - k*0.12), r*0.5);
+    g.fillStyle = '#0a0e18'; g.fillRect(bx - r*2.4, by + r*0.6, r*4.8, r*0.9);
+  }
+  g.fillStyle = '#1a1c24';                                             // the rocky shore with snow on it
+  g.beginPath(); g.moveTo(0, H*0.82); g.quadraticCurveTo(W*0.2, H*0.74, W*0.42, H*0.86); g.quadraticCurveTo(W*0.7, H*0.8, W, H*0.88); g.lineTo(W, H); g.lineTo(0, H); g.closePath(); g.fill();
+  g.fillStyle = 'rgba(236,240,248,0.85)';
+  g.beginPath(); g.moveTo(0, H*0.82); g.quadraticCurveTo(W*0.2, H*0.74, W*0.42, H*0.86); g.quadraticCurveTo(W*0.2, H*0.77, 0, H*0.84); g.closePath(); g.fill();
+  g.beginPath(); g.moveTo(W*0.42, H*0.86); g.quadraticCurveTo(W*0.7, H*0.8, W, H*0.88); g.lineTo(W, H*0.895); g.quadraticCurveTo(W*0.7, H*0.82, W*0.42, H*0.87); g.closePath(); g.fill();
+  sceneDots(g, 84, Math.round(60*q.pattern) + 10, 0, 0, W, H, 0.5, 1.3, ['#ffffff'], 0.6);   // snow
+};
+BG_SCENES.mikata = function(g, W, H, b, q){     // 三方五湖: the five lakes, each its own blue, seen from the summit
+  sceneSky(g, W, H, [[0,'#a8cfe8'],[0.4,'#e6f0f2'],[1,'#e6f0f2']]);
+  sceneCloud(g, W*0.7, H*0.08, W*0.12);
+  var sea = g.createLinearGradient(0, H*0.16, 0, H*0.3);           // 若狭湾 far beyond
+  sea.addColorStop(0, '#7aa8c4'); sea.addColorStop(1, '#5a8eb0');
+  g.fillStyle = sea; g.fillRect(0, H*0.17, W, H*0.13);
+  sceneRidge(g, W, H, H*0.3, H*0.02, 4.4, 0.4, '#7e9a78');
+  g.fillStyle = '#6f9068'; g.fillRect(0, H*0.47, W, H*0.53);
+  var lakes = [                                                      // 三方湖・水月湖・菅湖・久々子湖・日向湖
+    {x:0.2, y:0.62, rx:0.16, ry:0.05, c:'#6aa0a8'}, {x:0.5, y:0.6, rx:0.2, ry:0.06, c:'#2f6a8a'},
+    {x:0.36, y:0.72, rx:0.1, ry:0.035, c:'#4a8a8c'}, {x:0.74, y:0.54, rx:0.12, ry:0.035, c:'#8ab8b0'}, {x:0.86, y:0.66, rx:0.09, ry:0.04, c:'#1f4f78'}];
+  for(var i=0;i<lakes.length;i++){
+    var L = lakes[i];
+    g.fillStyle = L.c;
+    g.beginPath();
+    for(var a=0;a<=40;a++){ var an = a/40*Math.PI*2, r = 1 + 0.12*Math.sin(an*3 + i) + 0.06*Math.sin(an*7 + i*2); if(a) g.lineTo(W*(L.x + Math.cos(an)*L.rx*r), H*(L.y + Math.sin(an)*L.ry*r)); else g.moveTo(W*(L.x + L.rx*r), H*L.y); }
+    g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 1;
+    g.beginPath(); g.ellipse(W*L.x, H*(L.y - L.ry*0.3), W*L.rx*0.5, H*L.ry*0.2, 0, Math.PI*1.1, Math.PI*1.9); g.stroke();
+  }
+  sceneTrees(g, 93, 8 + Math.round(10*q.pattern), -W*0.05, W*1.05, H*0.8, Math.min(W, H)*0.03, ['#4f7a48','#5d8a52','#45703f']);
+  g.fillStyle = '#b8b0a0'; g.fillRect(0, H*0.86, W, H*0.14);           // the summit terrace and its railing
+  g.fillStyle = 'rgba(0,0,0,0.15)'; g.fillRect(0, H*0.86, W, 3);
+  g.strokeStyle = '#6a5040'; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(0, H*0.84); g.lineTo(W, H*0.84); g.stroke();
+  for(var r2=0; r2<=10; r2++){ g.beginPath(); g.moveTo(W*r2/10, H*0.84); g.lineTo(W*r2/10, H*0.88); g.stroke(); }
+};
+BG_SCENES.asuwa = function(g, W, H, b, q){      // 足羽川の桜並木: a tunnel of cherry blossom over the river
+  sceneSky(g, W, H, [[0,'#cfe2f0'],[0.5,'#f3eef0'],[1,'#f3eef0']]);
+  var vx = W*0.5, vy = H*0.46;
+  var crowns = seededList(41, 10 + Math.round(10*q.pattern), function(r){ return {x:r(), d:r()}; });
+  crowns.sort(function(a, b2){ return a.d - b2.d; });
+  for(var i=0;i<crowns.length;i++){                                   // the canopy, smaller toward the far end
+    var d = crowns[i].d, side = crowns[i].x<0.5 ? -1 : 1;
+    var x = vx + side*(W*0.06 + d*W*0.5) + (crowns[i].x - 0.5)*W*0.2, y = vy - H*0.12 - d*H*0.3, r = Math.min(W, H)*(0.04 + d*0.12);
+    g.strokeStyle = '#4a3428'; g.lineWidth = Math.max(1, r*0.12);
+    g.beginPath(); g.moveTo(x, y + r*0.5); g.lineTo(x + side*r*0.1, vy - H*0.02 + d*H*0.06); g.stroke();
+    sceneSakura(g, x, y, r, 400 + i, q);
+  }
+  var bank = g.createLinearGradient(0, vy, 0, H);
+  bank.addColorStop(0, '#9fbf8a'); bank.addColorStop(1, '#6f9a5c');
+  g.fillStyle = bank; g.fillRect(0, vy, W, H - vy);
+  var river = g.createLinearGradient(0, vy, 0, H);
+  river.addColorStop(0, '#b8d4e0'); river.addColorStop(1, '#6a9ab4');
+  g.fillStyle = river;
+  g.beginPath(); g.moveTo(vx - W*0.02, vy); g.lineTo(vx + W*0.02, vy); g.lineTo(W*0.78, H); g.lineTo(W*0.22, H); g.closePath(); g.fill();
+  g.fillStyle = 'rgba(248,200,214,0.4)';                               // the canopy mirrored in the water
+  g.beginPath(); g.moveTo(vx - W*0.02, vy); g.lineTo(vx + W*0.02, vy); g.lineTo(W*0.6, H*0.7); g.lineTo(W*0.4, H*0.7); g.closePath(); g.fill();
+  g.fillStyle = '#d8c8b0';                                             // the riverside paths
+  g.beginPath(); g.moveTo(vx - W*0.04, vy); g.lineTo(vx - W*0.02, vy); g.lineTo(W*0.2, H); g.lineTo(W*0.08, H); g.closePath(); g.fill();
+  g.beginPath(); g.moveTo(vx + W*0.02, vy); g.lineTo(vx + W*0.04, vy); g.lineTo(W*0.92, H); g.lineTo(W*0.8, H); g.closePath(); g.fill();
+  for(var t=0;t<6;t++){ var tx = t<3 ? W*(0.05 + t*0.06) : W*(0.95 - (t - 3)*0.06), ty = H*(0.96 - (t%3)*0.06); sceneSakura(g, tx, ty - Math.min(W, H)*0.12, Math.min(W, H)*0.1, 500 + t, q); }
+  sceneDots(g, 43, Math.round(80*q.pattern) + 10, 0, H*0.3, W, H*0.7, 0.8, 1.8, ['#f8c8d4','#ffffff','#f4b4c4'], 0.85);   // falling petals
+};
+BG_SCENES.auction = function(g, W, H, b, q){    // 三国港の競り市: the market hall at dawn, rows of crabs with yellow tags
+  sceneSky(g, W, H, [[0,'#3a4a58'],[0.4,'#6a7884'],[1,'#8a96a0']]);
+  var dawn = g.createLinearGradient(0, H*0.3, 0, H*0.47);              // the harbour at dawn beyond the open side
+  dawn.addColorStop(0, '#f2b48a'); dawn.addColorStop(1, '#f8d8b0');
+  g.fillStyle = dawn; g.fillRect(0, H*0.3, W, H*0.17);
+  g.fillStyle = '#4a5a68'; g.fillRect(0, H*0.4, W, H*0.07);
+  g.strokeStyle = '#2a3440'; g.lineWidth = 3;                           // the roof trusses
+  for(var i=0;i<5;i++){ var x = W*(0.1 + i*0.2); g.beginPath(); g.moveTo(x - W*0.1, H*0.02); g.lineTo(x, H*0.12); g.lineTo(x + W*0.1, H*0.02); g.stroke(); }
+  g.fillStyle = '#2a3440'; g.fillRect(0, H*0.12, W, 4); g.fillRect(0, 0, W, H*0.02);
+  for(var l=0;l<4;l++){                                                // hanging lamps
+    var lx = W*(0.18 + l*0.22);
+    g.strokeStyle = '#1e242c'; g.lineWidth = 1; g.beginPath(); g.moveTo(lx, H*0.12); g.lineTo(lx, H*0.19); g.stroke();
+    g.fillStyle = '#e8e2d0'; g.beginPath(); g.moveTo(lx - 8, H*0.2); g.lineTo(lx + 8, H*0.2); g.lineTo(lx + 4, H*0.19); g.lineTo(lx - 4, H*0.19); g.closePath(); g.fill();
+    var lg = g.createRadialGradient(lx, H*0.21, 0, lx, H*0.21, 30);
+    lg.addColorStop(0, 'rgba(255,244,210,0.6)'); lg.addColorStop(1, 'rgba(255,244,210,0)');
+    g.fillStyle = lg; g.fillRect(lx - 30, H*0.21 - 30, 60, 60);
+  }
+  g.fillStyle = '#f4efe2'; g.fillRect(W*0.32, H*0.23, W*0.36, H*0.05);   // the hall's sign
+  g.strokeStyle = '#2a3440'; g.lineWidth = 1.5; g.strokeRect(W*0.32, H*0.23, W*0.36, H*0.05);
+  g.fillStyle = '#1e242c'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = '700 ' + Math.max(10, Math.round(H*0.03)) + 'px ' + CARD_SERIF;
+  g.fillText('三国港 競り場', W*0.5, H*0.256);
+  var fl = g.createLinearGradient(0, H*0.47, 0, H);                       // the wet concrete floor
+  fl.addColorStop(0, '#8a96a0'); fl.addColorStop(1, '#5a6670');
+  g.fillStyle = fl; g.fillRect(0, H*0.47, W, H*0.53);
+  g.fillStyle = 'rgba(255,220,180,0.18)'; g.fillRect(0, H*0.47, W, H*0.05);
+  var s = Math.min(W, H)/340, rows = [[0.58, 0.7], [0.72, 0.85], [0.88, 1.05]];
+  for(var r=0;r<rows.length;r++){                                        // trays of crabs, row by row
+    var ry = H*rows[r][0], sc = s*rows[r][1], n = 4 + r;
+    for(var k=0;k<n;k++){
+      var tx = W*(k + 0.5)/n, tw = W/n*0.86;
+      g.fillStyle = 'rgba(0,0,0,0.2)'; g.fillRect(tx - tw/2 + 3, ry - 12*sc + 4, tw, 26*sc);
+      g.fillStyle = '#e8ecee'; g.fillRect(tx - tw/2, ry - 12*sc, tw, 26*sc);
+      g.strokeStyle = '#3a6aa8'; g.lineWidth = 1; g.strokeRect(tx - tw/2, ry - 12*sc, tw, 26*sc);
+      var m = Math.max(1, Math.round(tw/(26*sc)));
+      for(var c=0;c<m;c++) sceneCrab(g, tx - tw/2 + tw*(c + 0.5)/m, ry, sc, true);
+    }
+  }
+};
+BG_SCENES.oshima = function(g, W, H, b, q){     // 雄島: the vermilion bridge to the wooded island over a misty Sea of Japan
+  sceneSky(g, W, H, [[0,'#8aa4b4'],[0.45,'#d8e0e0'],[1,'#d8e0e0']]);
+  sceneHaze(g, W, H*0.05, H*0.3, '236,240,240', 0.5);
+  var hz = H*0.47;
+  var sea = g.createLinearGradient(0, hz, 0, H);
+  sea.addColorStop(0, '#5e8494'); sea.addColorStop(1, '#2c4a5a');
+  g.fillStyle = sea; g.fillRect(0, hz, W, H - hz);
+  g.strokeStyle = 'rgba(255,255,255,0.4)'; g.lineWidth = 1;
+  var wv = seededList(91, Math.round(24*q.pattern), function(r){ return {x:r(), y:r(), l:r()}; });
+  for(var i=0;i<wv.length;i++){ var wx = wv[i].x*W, wy = hz + 6 + wv[i].y*(H - hz - 10), wl = 8 + wv[i].l*14; g.beginPath(); g.moveTo(wx, wy); g.quadraticCurveTo(wx + wl/2, wy - 2.5, wx + wl, wy); g.stroke(); }
+  var ix = W*0.64, iy = H*0.6, iw = W*0.56, ih = H*0.13;                // the island, its rocky skirt and its forest
+  g.fillStyle = '#3a3634';
+  g.beginPath(); g.ellipse(ix, iy + ih*0.6, iw*0.55, ih*0.5, 0, Math.PI, 0); g.fill();
+  g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 1;
+  for(var c=0;c<14;c++){ var cx2 = ix - iw*0.5 + c*iw/14; g.beginPath(); g.moveTo(cx2, iy + ih*0.4); g.lineTo(cx2, iy + ih*0.6); g.stroke(); }
+  sceneTrees(g, 95, 10 + Math.round(10*q.pattern), ix - iw*0.48, ix + iw*0.48, iy + ih*0.3, Math.min(W, H)*0.05, ['#24402e','#2e4a36','#1e3626']);
+  g.fillStyle = '#b8453a'; g.fillRect(ix - iw*0.05, iy - ih*0.5, 3, ih*0.4); g.fillRect(ix + iw*0.02, iy - ih*0.5, 3, ih*0.4);   // a small torii in the trees
+  g.fillRect(ix - iw*0.07, iy - ih*0.55, iw*0.12, 3);
+  g.strokeStyle = '#c0392b'; g.lineWidth = 4;                            // 雄島橋, from the shore to the island
+  g.beginPath(); g.moveTo(-W*0.05, H*0.9); g.quadraticCurveTo(W*0.25, H*0.72, ix - iw*0.42, iy + ih*0.5); g.stroke();
+  g.lineWidth = 1.4;
+  g.beginPath(); g.moveTo(-W*0.05, H*0.88); g.quadraticCurveTo(W*0.25, H*0.7, ix - iw*0.42, iy + ih*0.42); g.stroke();
+  for(var p=0;p<14;p++){ var tt = p/13, bx = (1 - tt)*(1 - tt)*(-W*0.05) + 2*(1 - tt)*tt*W*0.25 + tt*tt*(ix - iw*0.42), by = (1 - tt)*(1 - tt)*H*0.9 + 2*(1 - tt)*tt*H*0.72 + tt*tt*(iy + ih*0.5); g.fillStyle = '#9a2e22'; g.fillRect(bx - 1, by, 2, H*0.06*(1 - tt*0.5)); }
+  g.fillStyle = '#4a4440';                                               // the dark rocks of the near shore
+  g.beginPath(); g.moveTo(0, H*0.86); g.lineTo(W*0.14, H*0.9); g.lineTo(W*0.3, H); g.lineTo(0, H); g.closePath(); g.fill();
+  sceneHaze(g, W, H*0.5, H*0.62, '230,236,236', 0.35);
+};
+BG_SCENES.heisenji = function(g, W, H, b, q){   // 平泉寺白山神社: great cedars, a stone path and a carpet of moss
+  sceneSky(g, W, H, [[0,'#c4d4c4'],[0.5,'#dfe6d8'],[1,'#c8d6b4']]);
+  var trunks = seededList(207, 10 + Math.round(10*q.pattern), function(r){ return {x:r(), d:r()}; });
+  trunks.sort(function(a, b2){ return a.d - b2.d; });
+  for(var i=0;i<trunks.length;i++){                                    // cedar trunks, pale far away and dark near by
+    var d = trunks[i].d, tw = W*(0.012 + d*0.05), tx = trunks[i].x*W;
+    g.fillStyle = mixHex('#a8b4a4', '#3e2a1c', d);
+    g.fillRect(tx - tw/2, 0, tw, H*(0.5 + d*0.4));
+    g.fillStyle = 'rgba(255,240,210,' + (0.12 + d*0.1).toFixed(3) + ')';
+    g.fillRect(tx - tw/2, 0, tw*0.25, H*(0.5 + d*0.4));
+  }
+  var canopy = g.createLinearGradient(0, 0, 0, H*0.16);
+  canopy.addColorStop(0, 'rgba(40,64,44,0.95)'); canopy.addColorStop(1, 'rgba(40,64,44,0)');
+  g.fillStyle = canopy; g.fillRect(0, 0, W, H*0.16);
+  g.fillStyle = 'rgba(255,250,225,0.18)';                                // light falling through the trees
+  for(var s=0;s<3;s++){ var x0 = W*(0.2 + s*0.25); g.beginPath(); g.moveTo(x0, 0); g.lineTo(x0 + W*0.06, 0); g.lineTo(x0 + W*0.2, H); g.lineTo(x0 + W*0.1, H); g.closePath(); g.fill(); }
+  var tx2 = W*0.5, ty = H*0.27, ts = Math.min(W, H)/340;                 // a stone torii in the distance
+  g.fillStyle = '#9a9a90';
+  g.fillRect(tx2 - 22*ts, ty - 30*ts, 4*ts, 30*ts); g.fillRect(tx2 + 18*ts, ty - 30*ts, 4*ts, 30*ts);
+  g.fillRect(tx2 - 30*ts, ty - 34*ts, 60*ts, 5*ts); g.fillRect(tx2 - 26*ts, ty - 26*ts, 52*ts, 3*ts);
+  var moss = g.createLinearGradient(0, H*0.46, 0, H);
+  moss.addColorStop(0, '#8fae5a'); moss.addColorStop(1, '#4f7a2e');
+  g.fillStyle = moss; g.fillRect(0, H*0.46, W, H*0.54);
+  for(var m=0;m<5;m++){ g.fillStyle = 'rgba(200,230,140,0.25)'; g.beginPath(); g.ellipse(W*(0.1 + m*0.2), H*(0.58 + (m%2)*0.1), W*0.12, H*0.03, 0, Math.PI, 0); g.fill(); }   // soft mounds
+  sceneDots(g, 208, Math.round(260*q.grain) + 30, 0, H*0.46, W, H*0.54, 0.5, 1.5, ['#b8d878','#6a9a3a','#d4e8a0'], 0.6);
+  g.fillStyle = '#a8a69a';                                               // the stone path toward the shrine
+  for(var p=0;p<8;p++){
+    var y0 = H*(0.48 + p*0.065), half = W*(0.03 + p*0.018);
+    g.fillStyle = p%2 ? '#a8a69a' : '#9c9a8e';
+    g.beginPath(); g.moveTo(W*0.5 - half, y0); g.lineTo(W*0.5 + half, y0); g.lineTo(W*0.5 + half*1.15, y0 + H*0.055); g.lineTo(W*0.5 - half*1.15, y0 + H*0.055); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(110,150,60,0.6)'; g.fillRect(W*0.5 - half*1.15, y0 + H*0.05, half*2.3, H*0.006);
+  }
+  sceneCedar(g, W*0.04, H*1.02, H*0.7, W*0.22, '#22402a');
+  sceneCedar(g, W*0.97, H*1.02, H*0.75, W*0.22, '#1e3a26');
+};
+BG_SCENES.dinoForest = function(g, W, H, b, q){ // 太古の勝山: a fern forest of the Early Cretaceous and the giants walking in it
+  sceneSky(g, W, H, [[0,'#e8b88a'],[0.35,'#f2d8b0'],[1,'#d8c49a']]);
+  g.fillStyle = '#9a7a6a';                                               // a smoking volcano far away
+  g.beginPath(); g.moveTo(W*0.55, H*0.3); g.lineTo(W*0.72, H*0.12); g.lineTo(W*0.78, H*0.12); g.lineTo(W*0.98, H*0.3); g.closePath(); g.fill();
+  sceneCloud(g, W*0.76, H*0.08, W*0.08, 'rgba(120,100,90,0.5)');
+  sceneCloud(g, W*0.82, H*0.03, W*0.1, 'rgba(120,100,90,0.35)');
+  sceneRidge(g, W, H, H*0.3, H*0.02, 3.8, 1.4, '#8a8a6a');
+  var s = Math.min(W/340, H/460);
+  sceneSauropod(g, W*0.38, H*0.3, s*0.9, '#5a5040');                       // the long-necked giant on the horizon
+  sceneSauropod(g, W*0.12, H*0.3, s*0.5, '#7a6e58');
+  sceneHaze(g, W, H*0.2, H*0.32, '242,216,176', 0.5);
+  var conifers = seededList(311, 6 + Math.round(6*q.pattern), function(r){ return {x:r(), h:r()}; });
+  for(var i=0;i<conifers.length;i++) sceneCedar(g, conifers[i].x*W, H*0.3, H*(0.1 + conifers[i].h*0.1), W*0.08, '#4a5a3a');
+  var gr = g.createLinearGradient(0, H*0.47, 0, H);
+  gr.addColorStop(0, '#7a8a4a'); gr.addColorStop(1, '#3e5228');
+  g.fillStyle = gr; g.fillRect(0, H*0.47, W, H*0.53);
+  var ferns = seededList(312, 10 + Math.round(12*q.pattern), function(r){ return {x:r(), y:r()}; });
+  ferns.sort(function(a, b2){ return a.y - b2.y; });
+  for(var f=0; f<ferns.length; f++) sceneFern(g, ferns[f].x*W, H*(0.55 + ferns[f].y*0.42), Math.min(W, H)*(0.04 + ferns[f].y*0.08));
+  var tf = [[0.08,0.98],[0.9,0.96]];                                       // tree ferns in the front
+  for(var t=0;t<tf.length;t++){
+    var x = W*tf[t][0], y = H*tf[t][1], sz = Math.min(W, H)*0.18;
+    g.fillStyle = '#4a3a28'; g.fillRect(x - 3, y - sz, 6, sz);
+    g.strokeStyle = '#2e4a24'; g.lineWidth = 3; g.lineCap = 'round';
+    for(var k=-3;k<=3;k++){ var a = -Math.PI/2 + k*0.45; g.beginPath(); g.moveTo(x, y - sz); g.quadraticCurveTo(x + Math.cos(a)*sz*0.6, y - sz + Math.sin(a)*sz*0.5, x + Math.cos(a)*sz*0.9, y - sz + Math.sin(a)*sz*0.2 + sz*0.25); g.stroke(); }
+  }
+  sceneDino(g, W*0.62, H*0.9, s*1.2, '#3e3428');
+};
+
 // --- result: the equipped title beside 段位, what was equipped, and the effect colour on the score panel ---
 function showEquipOnResult(){
   try{
@@ -8320,6 +9250,7 @@ function drawKkLane(laneW){
   var ek = skinPart('effect'), fx = {t:110, rating:'JUST', seed:4242};
   if(ek){
     guardedSkinDraw('effect', function(){ drawSkinRing(ctx, jx, y + h/2, fx, ek); });
+    guardedSkinDraw('effect', function(){ drawSkinOverlay(ctx, jx, y + h/2, fx, ek, y, h, laneW, true); });
     guardedSkinDraw('effect', function(){ drawCutBits(jx, y + h/2, fx, ek); });
     return;
   }
@@ -8363,7 +9294,7 @@ function kkParticles(bx, by, sc){
   var cols = (ek && ek.bits && ek.bits.length) ? ek.bits : CONFETTI_COLS, spark = ek ? skinSparkColor(ek) : '#f5b82e';
   for(i=0;i<KK_BITS.length;i++){
     out.push({kind:'confetti', x:bx + KK_BITS[i][0]*98*sc, y:by + KK_BITS[i][1]*44*sc, vx:0, vy:0, g:0, rot:KK_BITS[i][2], vr:0,
-              size:3.2, col:cols[i % cols.length], age:400, life:100000, shape:ek ? ek.shape : null});
+              size:3.2, col:cols[i % cols.length], age:400, life:100000, shape:ek ? bitShapeName(ek, i) : null});
   }
   for(i=0;i<KK_SPARKS.length;i++){
     out.push({kind:'spark', x:bx + KK_SPARKS[i][0]*98*sc, y:by + KK_SPARKS[i][1]*44*sc, vx:0, vy:0, g:0, rot:0, vr:0,
@@ -8478,8 +9409,8 @@ var THUMB_SLOTS = {
     thumbTable(g, S, S*(jar ? 0.8 : 0.72));
     withCanvas(g, S, S, THUMB_RES, {bowl:look}, function(){
       safeDraw(function(){
-        ctx.translate(S*0.5, S*(jar ? 0.2 : 0.26));
-        ctx.scale(sc, sc*1.45);                                // seen a little more from the side, so the wall shows
+        ctx.translate(S*0.5, S*(jar ? 0.14 : 0.2));
+        ctx.scale(sc, sc*(jar ? 1.45 : 1.75));                 // seen a little more from the side, so the wall shows
         drawServingBowl(0, 0);
         drawTsuyuPool(0, 0, 0.7, detailConf());
       });
@@ -8565,13 +9496,14 @@ var THUMB_SLOTS = {
   effect:function(g, it, S){                                   // its ring and a burst of its bits round a pile of them
     var look = skinLook('effect', it.id);
     if(!look) return;
-    var shape = BIT_SHAPES[look.shape] || BIT_SHAPES.strip, cols = look.bits && look.bits.length ? look.bits : CONFETTI_COLS;
+    var cols = look.bits && look.bits.length ? look.bits : CONFETTI_COLS;
+    drawSkinOverlay(g, S*0.5, S*0.5, {t:150, rating:'JUST'}, look, S*0.3, S*0.4, S, true);
     drawSkinRing(g, S*0.5, S*0.5, {t:140, rating:'JUST'}, look);
     var rnd = cardRng(hashStr(it.id));
     for(var i=0;i<12;i++){
       var a = i/12*Math.PI*2 + rnd()*0.3, d = S*(0.33 + rnd()*0.08);
       g.save(); g.translate(S*0.5 + Math.cos(a)*d, S*0.5 + Math.sin(a)*d); g.rotate(rnd()*6.28);
-      shape(g, 0.9 + rnd()*0.3, cols[i % cols.length]);
+      bitShapeOf(look, i)(g, 0.9 + rnd()*0.3, cols[i % cols.length]);
       g.restore();
     }
     var pile = [[-0.1,0.06,0.4],[0.1,0.05,-0.5],[0,-0.06,0.1],[-0.02,0.12,1.2]];
@@ -8579,7 +9511,7 @@ var THUMB_SLOTS = {
       g.save(); g.translate(S*(0.5 + pile[k][0]), S*(0.5 + pile[k][1])); g.rotate(pile[k][2]);
       g.fillStyle = 'rgba(20,14,8,0.18)';
       g.beginPath(); g.ellipse(1.5, 3, 14, 6, 0, 0, Math.PI*2); g.fill();
-      shape(g, 2.6, cols[k % cols.length]);
+      bitShapeOf(look, k)(g, 2.6, cols[k % cols.length]);
       g.restore();
     }
     var spk = [[0.24,0.22],[0.78,0.3],[0.7,0.8]], sc = skinSparkColor(look);
@@ -8859,7 +9791,9 @@ function render(){
   if(state.mode==='hana') drawFlowerField(performance.now());
   else if(state.mode==='shinsoba') drawShinsobaLook(performance.now());
   if(state.phase==='playing'){
-    drawLane();
+    var shake = skinShake();                       // 着せ替えの演出: a JUST! can shake the play area (looks only)
+    if(shake){ ctx.save(); ctx.translate(shake.x, shake.y); drawLane(); ctx.restore(); }
+    else drawLane();
   } else if(state.phase==='serving'){
     drawServing();
   }
@@ -9009,7 +9943,10 @@ function drawLane(){
     var fx = state.cutFx[f];
     if(ek && fx.rating!=='DEMO'){
       guardedSkinDraw('effect', function(){ drawSkinRing(ctx, jx, y+h/2, fx, ek); });
-      if(f>=state.cutFx.length - CUT_FX_RECENT) guardedSkinDraw('effect', function(){ drawCutBits(jx, y+h/2, fx, ek); });   // only the newest cuts throw bits
+      if(f>=state.cutFx.length - CUT_FX_RECENT){                // only the newest cuts throw bits and show their extras
+        guardedSkinDraw('effect', function(){ drawSkinOverlay(ctx, jx, y+h/2, fx, ek, y, h, W, false); });
+        guardedSkinDraw('effect', function(){ drawCutBits(jx, y+h/2, fx, ek); });
+      }
       if(!skinFailed.effect) continue;
     }
     var a = 1-fx.t/400;
@@ -10179,7 +11116,9 @@ function startReactionFx(s){
     var p = {kind:'confetti', x:cx + (Math.random() - 0.5)*40, y:cy + 4, vx:(Math.random() - 0.5)*320, vy:-(260 + Math.random()*230),
              g:640*grav, rot:Math.random()*6, vr:(Math.random() - 0.5)*14*spin, size:2.5 + Math.random()*2.5,
              col:confCols[i % confCols.length], age:-Math.random()*120, life:1100 + Math.random()*450,
-             shape:ek ? ek.shape : null, sw:(ek && grav<1) ? 40*(1 - grav) : 0};   // light bits (花かつお, 和紙) flutter as they fall
+             shape:ek ? bitShapeName(ek, i) : null, sw:(ek && grav<1) ? 40*(1 - grav) : 0};   // light bits (花かつお, 和紙) flutter as they fall
+    if(ek && ek.rise){ p.x = cx + (Math.random() - 0.5)*220; p.y = cy + 90 + Math.random()*40; p.vx = (Math.random() - 0.5)*30; p.vy = -(120 + Math.random()*160); p.g = -30; }   // bubbles well up
+    else if(ek && grav<0){ p.vx *= 0.4; p.vy = -(60 + Math.random()*90); p.g = 120*grav; }   // fossil dust drifts upward
     if(fc.still){ p.x = cx + (Math.random() - 0.5)*200; p.y = cy - 70 + Math.random()*90; p.vx = p.vy = p.g = p.vr = 0; }
     serveFx.push(p);
   }
@@ -10373,6 +11312,8 @@ function drawServing(){
     else safeDraw(heap);
     var set = toppingLayout(pieces, conf);
     safeDraw(function(){ drawToppings(set, cx, cy, clock); });
+    var ekAura = skinPart('effect');                 // 着せ替えの演出: a soft white aura wrapping the served noodles
+    if(ekAura && ekAura.aura) guardedSkinDraw('effect', function(){ drawNoodleAura(cx, cy, ekAura.aura, Math.min(1, clock/500)); });
     var steamK = nsk ? Math.min(1, aromaK*skinNum(nsk.steam, 1)) : aromaK;   // 着せ替えの麺: how readily the steam shows (looks only)
     if(poured && aromaK>0 && conf.steam) safeDraw(function(){ drawAromaSteam(cx, cy, steamK*Math.min(1, (s.stage==='pour' ? s.t : 300)/300), conf.steam); });
   }
