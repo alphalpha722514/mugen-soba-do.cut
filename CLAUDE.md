@@ -21,8 +21,10 @@
 
 ## Web公開（GitHub Pages）
 - `main` のリポジトリ直下を GitHub Pages で公開する（公開URL: https://alphalpha722514.github.io/mugen-soba-do.cut/ ）。ゲームは `index.html` だけで動く。
-- `<head>` には SEO・OGP・iOS/Android 用のメタタグと、アイコン（SVG・PNG をデータURIで埋め込み）、マニフェストを作る小さなスクリプトがある。マニフェストは http(s) で開いたときだけ作る。
+- `<head>` には SEO・OGP・iOS/Android 用のメタタグと、アイコン（SVG・PNG をデータURIで埋め込み）、マニフェストをつなぐ小さなスクリプトがある。マニフェストは http(s) で開いたときだけつなぐ（file:// でエラーを出さないため）。
 - 例外として置いてよい公開用ファイル: `og-image.jpg`（SNS共有カードの画像。ゲームは読まない。`node tools/og/build.mjs` で作り直す）と `.nojekyll`。
+- Google Play（PWABuilder / TWA）用に置いてよいファイル: `manifest.webmanifest` と `icons/`（`node tools/pwa/build.mjs` で、favicon の SVG から作り直す）、`privacy.html`（プライバシーポリシー。集める情報を変えたら必ず直す）。
+- 同期サーバーのコードは `tools/sync-server/worker.js`（Cloudflare の Worker「soba-sync」に貼って公開する）。ゲームの同期の仕組みを変えたら、こちらも合わせて直す。
 - `googlef4f1cd7b25710dc9.html` は Google Search Console の所有権確認用。消すと確認が外れるので残す。
 - 公開URLを変えたら `canonical`・`og:url`・`og:image`・`twitter:image` を合わせて直す。
 

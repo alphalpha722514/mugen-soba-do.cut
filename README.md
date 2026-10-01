@@ -11,3 +11,5 @@
 - リポジトリの Settings → Pages で「Deploy from a branch」を選び、Branch を `main`・フォルダを `/ (root)` にして保存します。数分で上の URL に公開されます。
 - `index.html` だけで動きます。`og-image.jpg` は SNS で URL を共有したときに出る画像、`.nojekyll` は GitHub Pages にファイルをそのまま配信させるための空ファイルです。
 - 公開する URL を変えたときは、`index.html` の `canonical`・`og:url`・`og:image`・`twitter:image` の URL も書き換えてください。
+- プライバシーポリシー: https://alphalpha722514.github.io/mugen-soba-do.cut/privacy.html
+- Google Play 用のマニフェストとアイコン（`manifest.webmanifest`・`icons/`）は `node tools/pwa/build.mjs` で作ります。同期サーバー（Cloudflare Workers）のコードは `tools/sync-server/worker.js` です。
