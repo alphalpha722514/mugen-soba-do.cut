@@ -19,6 +19,12 @@
 - 効果音は `settings.sound.soundOn`（🔊／🔇）の設定を必ず守る。
 - 画面の文言は日本語。スマホ（幅360px）でも横にはみ出さないようにする。
 
+## Web公開（GitHub Pages）
+- `main` のリポジトリ直下を GitHub Pages で公開する（公開URL: https://alphalpha722514.github.io/mugen-soba-do.cut/ ）。ゲームは `index.html` だけで動く。
+- `<head>` には SEO・OGP・iOS/Android 用のメタタグと、アイコン（SVG・PNG をデータURIで埋め込み）、マニフェストを作る小さなスクリプトがある。マニフェストは http(s) で開いたときだけ作る。
+- 例外として置いてよい公開用ファイル: `og-image.jpg`（SNS共有カードの画像。ゲームは読まない。`node tools/og/build.mjs` で作り直す）と `.nojekyll`。
+- 公開URLを変えたら `canonical`・`og:url`・`og:image`・`twitter:image` を合わせて直す。
+
 ## 変更後の確認
 - ブラウザで `index.html` を開き、ホーム → 修行開始 → 5杯出してリザルトまで遊べること。
 - ガチャ・図鑑・交換所・着せ替え・遊び方・マイページの画面が開けること。

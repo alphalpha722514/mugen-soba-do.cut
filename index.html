@@ -3,7 +3,74 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>無限そば道・斬</title>
+<title>無限そば道・斬 - 越前そば切り本格アクションゲーム</title>
+<meta name="description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム77種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
+<!-- スマホ: ホーム画面に追加したときの見た目（アプリ名・ステータスバー・テーマ色） -->
+<meta name="theme-color" content="#e7e0cd" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#181310" media="(prefers-color-scheme: dark)" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="そば道・斬" />
+<meta name="application-name" content="そば道・斬" />
+<meta name="format-detection" content="telephone=no" />
+<link rel="canonical" href="https://alphalpha722514.github.io/mugen-soba-do.cut/" />
+<!-- アイコン: そばの器（ファイルを増やさないよう、ページの中に埋め込み） -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%231f3f4a%22/%3E%3Cpath d=%22M42 9 L22 33%22 stroke=%22%23e8c46a%22 stroke-width=%223%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M50 12 L27 34%22 stroke=%22%23e8c46a%22 stroke-width=%223%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M10 32 H54 C54 46 45 54 32 54 C19 54 10 46 10 32 Z%22 fill=%22%23a24d2b%22/%3E%3Cpath d=%22M10 32 H54 C54 34 53.5 36 52.8 38 H11.2 C10.5 36 10 34 10 32 Z%22 fill=%22%237a3720%22/%3E%3Cellipse cx=%2232%22 cy=%2232%22 rx=%2222%22 ry=%225%22 fill=%22%232c241a%22/%3E%3Cpath d=%22M15 31 Q22 27 29 31 T43 31 T50 30%22 fill=%22none%22 stroke=%22%23e7e0cd%22 stroke-width=%222.2%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M16 33.5 Q24 30 31 33.5 T47 33%22 fill=%22none%22 stroke=%22%23d9cfb4%22 stroke-width=%222%22 stroke-linecap=%22round%22/%3E%3Crect x=%2224%22 y=%2254%22 width=%2216%22 height=%223%22 rx=%221.5%22 fill=%22%237a3720%22/%3E%3C/svg%3E" />
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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" />
+<!-- 検索と SNS 共有（X・LINE など）のカード。画像は og-image.jpg（tools/og/build.mjs で作る） -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="無限そば道・斬" />
+<meta property="og:title" content="無限そば道・斬 - 越前そば切り本格アクションゲーム" />
+<meta property="og:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム77種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
+<meta property="og:url" content="https://alphalpha722514.github.io/mugen-soba-do.cut/" />
+<meta property="og:image" content="https://alphalpha722514.github.io/mugen-soba-do.cut/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="無限そば道・斬 ～蕎麦切り修行～ そば畑を背にした越前そばの器" />
+<meta property="og:locale" content="ja_JP" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="無限そば道・斬 - 越前そば切り本格アクションゲーム" />
+<meta name="twitter:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム77種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
+<meta name="twitter:image" content="https://alphalpha722514.github.io/mugen-soba-do.cut/og-image.jpg" />
+<script>
+// ホーム画面に追加（PWA）: マニフェストとアイコンをこのページの中で作る（ファイルを増やさない）。
+// http(s) で開いたときだけ。うまく作れない環境では何もしない（ゲームはそのまま遊べる）。
+(function(){
+  try{
+    if(!/^https?:$/.test(location.protocol)) return;
+    var src = document.querySelector('link[rel="icon"]'), img = new Image();
+    if(!src) return;
+    img.onload = function(){
+      try{
+        var icons = [];
+        [192, 512].forEach(function(n){
+          var c = document.createElement('canvas');
+          c.width = c.height = n;
+          var g = c.getContext('2d');
+          g.fillStyle = '#1f3f4a';
+          g.fillRect(0, 0, n, n);
+          g.drawImage(img, 0, 0, n, n);
+          var url = c.toDataURL('image/png');
+          icons.push({src:url, sizes:n + 'x' + n, type:'image/png', purpose:'any'});
+          if(n===512) icons.push({src:url, sizes:'512x512', type:'image/png', purpose:'maskable'});
+        });
+        var start = new URL('./index.html', location.href).href;
+        var manifest = {
+          name:'無限そば道・斬', short_name:'そば道・斬', description:document.querySelector('meta[name="description"]').content,
+          lang:'ja', id:start, start_url:start, scope:new URL('./', location.href).href, display:'standalone',
+          background_color:'#e7e0cd', theme_color:'#e7e0cd', icons:icons
+        };
+        var link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+        document.head.appendChild(link);
+      }catch(e){}
+    };
+    img.src = src.href;
+  }catch(e){}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -106,8 +173,11 @@
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 [hidden]{display:none !important;}
+/* スマホ: ダブルタップでの拡大と引っ張り更新を止め、横向きで文字が勝手に大きくならないように */
+html{touch-action:manipulation;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
 body{
-  min-height:100vh;
+  min-height:100vh;min-height:100dvh;
   background-color:var(--bg);
   background-image:linear-gradient(160deg,var(--bg),var(--bg2));
   color:var(--ink);
@@ -117,11 +187,13 @@ body{
   overscroll-behavior:none;
 }
 #app{
-  width:100%;max-width:520px;min-height:100vh;
+  width:100%;max-width:520px;min-height:100vh;min-height:100dvh;
   padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
   display:flex;flex-direction:column;position:relative;
 }
 .screen{display:none;flex:1;flex-direction:column;align-items:center;}
+/* 修行中: 長押しの選択・メニュー、ピンチでの拡大をしない（縦のスクロールだけ残す） */
+#screen-game{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:pan-y;}
 .screen.active{display:flex;}
 .vh{position:absolute !important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 
@@ -788,10 +860,11 @@ body{
 .zcard-cat{font-size:.6rem;line-height:1.3;color:var(--ink-soft);}
 .zcard.is-locked{border-top-style:dashed;}
 .zcard.is-locked .zcard-name{color:var(--ink-soft);font-weight:700;}
-.zmodal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;}
+.zmodal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;
+  padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));}
 .zmodal-backdrop{position:absolute;inset:0;background:rgba(20,14,8,0.55);}
 .zmodal-card{
-  position:relative;width:100%;max-width:340px;max-height:calc(100vh - 32px);overflow:auto;
+  position:relative;width:100%;max-width:340px;max-height:calc(100vh - 32px);max-height:calc(100dvh - max(16px,env(safe-area-inset-top)) - max(16px,env(safe-area-inset-bottom)));overflow:auto;
   display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;text-align:center;
   background:var(--card);color:var(--ink);border:1px solid var(--line);border-top:4px solid var(--rc,var(--line));border-radius:16px;
   box-shadow:0 10px 30px var(--shadow);
@@ -3507,6 +3580,11 @@ document.getElementById('screen-game').addEventListener('pointerdown', function(
   // while a bowl is being served, the 🔊 button only switches the sound (it does not skip the show)
   if(state.phase==='serving' && state.serving && state.serving.stage!=='spice' && e.target && e.target.closest && e.target.closest('.sound-toggle')) return;
   onCut();
+});
+// 修行の画面では、長押しのメニュー（画像の保存など）と iPhone のピンチ拡大を出さない
+document.getElementById('screen-game').addEventListener('contextmenu', function(e){ e.preventDefault(); });
+document.addEventListener('gesturestart', function(e){
+  if(screens.game.classList.contains('active')) e.preventDefault();
 });
 window.addEventListener('keydown', function(e){
   if(e.code!=='Space') return;
