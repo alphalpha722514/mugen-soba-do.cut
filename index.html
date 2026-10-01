@@ -805,6 +805,67 @@ body{
 .zm-desc.is-locked{color:var(--ink-soft);}
 .zm-odds{margin:0;font-size:.7rem;line-height:1.5;color:var(--ink-soft);}
 .zmodal button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px;}
+/* ---------- マイページ: profile, 2×2 records, account and sync; the 称号 picker ---------- */
+.caret-right{transform:rotate(-90deg);}
+.mypage{gap:10px;}
+.mp-profile,.mp-account{padding:12px var(--pad-x);display:flex;flex-direction:column;gap:8px;min-width:0;}
+.mp-who{display:flex;align-items:center;gap:12px;min-width:0;}
+.mp-avatar{flex:0 0 auto;display:grid;place-items:center;width:52px;height:52px;border-radius:50%;
+  font-family:var(--font-display);font-size:1.5rem;color:var(--card);background:var(--accent-ink);}
+.mp-names{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1;}
+.mp-name-row{margin:0;display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;min-width:0;}
+.mp-name{font-weight:900;font-size:1.12rem;overflow-wrap:anywhere;min-width:0;}
+.mp-icon-btn{font:inherit;font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);cursor:pointer;}
+.mp-title-badge{
+  align-self:flex-start;max-width:100%;display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px 8px;
+  font:inherit;font-size:.82rem;padding:5px 12px 5px 6px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--accent2-ink);background:var(--sel);color:var(--ink);
+}
+.mp-title-label{font-size:.66rem;font-weight:900;padding:1px 8px;border-radius:999px;background:var(--accent2-ink);color:var(--card);}
+.mp-title-name{font-weight:900;overflow-wrap:anywhere;}
+.mp-title-change{font-size:.66rem;color:var(--ink-soft);}
+.mp-h{margin:0;font-size:.82rem;font-weight:900;letter-spacing:.06em;color:var(--accent-ink);}
+.mp-stats{display:flex;flex-direction:column;gap:8px;}
+.mp-grid{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.mp-cell{min-width:0;padding:10px 12px;border-radius:var(--radius);background:var(--card);border:1px solid var(--line);box-shadow:var(--card-shadow);}
+.mp-cell dt{font-size:.7rem;color:var(--ink-soft);}
+.mp-cell dd{margin:2px 0 0;font-size:1.25rem;font-weight:900;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;}
+.mp-cell dd small{font-size:.7rem;font-weight:700;color:var(--ink-soft);}
+.mp-titles-line{margin:0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px;font-size:.78rem;font-weight:700;}
+.mp-status{margin:0;font-weight:900;font-size:.9rem;overflow-wrap:anywhere;}
+.mp-sync{margin:0;font-size:.76rem;color:var(--ink-soft);}
+.mp-auth,.mp-name-form{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:var(--radius);background:var(--muted-fill);}
+.mp-label{font-size:.7rem;font-weight:700;color:var(--ink-soft);}
+.mp-input{width:100%;min-width:0;font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);color:var(--ink);}
+.mp-input:focus-visible{outline:2px solid var(--accent-ink);outline-offset:1px;}
+.mp-row{display:flex;align-items:center;gap:6px;min-width:0;}
+.mp-row .mp-input{flex:1;}
+.mp-row-wrap{flex-wrap:wrap;}
+.btn-primary{background:var(--btn-bg);color:var(--btn-ink);border-color:var(--btn-edge);}
+.btn-small:disabled{opacity:.5;cursor:not-allowed;}
+.mp-msg{margin:0;min-height:1.2em;font-size:.76rem;font-weight:700;color:var(--ok);}
+.mp-msg.is-error{color:var(--accent2-ink);}
+.mp-note{margin:0;font-size:.68rem;line-height:1.6;color:var(--ink-soft);}
+.mypage button:focus-visible,.tm-card button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px;}
+.tm-card{max-width:420px;align-items:stretch;text-align:left;}
+.tm-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.tm-now{margin:0;font-size:.78rem;color:var(--ink-soft);}
+.tm-list{display:flex;flex-direction:column;gap:10px;}
+.tm-cat{margin:0;font-size:.78rem;font-weight:900;color:var(--accent-ink);border-bottom:1px solid var(--line);padding-bottom:3px;}
+.tm-items{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;}
+.tm-item{display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);min-width:0;}
+.tm-item.is-locked{background:var(--muted-fill);border-style:dashed;}
+.tm-item.is-on{border-color:var(--accent2-ink);box-shadow:inset 0 0 0 1px var(--accent2-ink);}
+.tm-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.tm-name{font-weight:900;font-size:.86rem;overflow-wrap:anywhere;}
+.tm-item.is-locked .tm-name{color:var(--ink-soft);}
+.tm-cond{font-size:.66rem;color:var(--ink-soft);}
+.tm-bar{height:4px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:3px;}
+.tm-bar > i{display:block;height:100%;background:var(--accent2-ink);}
+.tm-item .btn-small{flex:0 0 auto;padding:5px 10px;}
+.title-guide{display:flex;flex-direction:column;gap:6px;}
+.tg-h{margin:6px 0 0;font-size:.82rem;color:var(--accent-ink);}
+.tg-note{margin:0;font-size:.7rem;color:var(--ink-soft);}
 /* ---------- 着せ替え（装備） ---------- */
 .equip-panel{padding:var(--pad-y) var(--pad-x);display:flex;flex-direction:column;gap:7px;}
 .equip-list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:6px 12px;}
@@ -909,23 +970,12 @@ body{
         <h1 id="home-title" class="game-title">無限そば道・斬</h1>
         <p class="subtitle">〜 蕎麦切り修行 〜</p>
       </div>
-      <button id="rank-badge" class="rank-badge" type="button" aria-expanded="false" aria-controls="rank-panel">
-        <span class="rank-badge-label">段位</span>
-        <span id="rank-name" class="rank-badge-name">見習い</span>
-        <svg class="caret" viewBox="0 0 10 6" aria-hidden="true" focusable="false"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <button id="rank-badge" class="rank-badge" type="button" aria-label="マイページを開く">
+        <span class="rank-badge-label">マイページ</span>
+        <span id="rank-name" class="rank-badge-name">そば入門</span>
+        <svg class="caret caret-right" viewBox="0 0 10 6" aria-hidden="true" focusable="false"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </header>
-
-    <div id="rank-panel" class="rank-panel card" hidden>
-      <div class="rank-panel-top">
-        <span id="rank-panel-name" class="rank-panel-name">見習い</span>
-        <span id="rank-next" class="rank-next"></span>
-      </div>
-      <div id="rank-progress" class="progress" role="progressbar" aria-label="次の段位までの進み具合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-        <div id="rank-progress-fill" class="progress-fill"></div>
-      </div>
-      <p class="rank-panel-note">すべてのそば粉とお客さんの自己ベストの合計（いま<span id="rank-total" class="gnum">0</span>点）で昇段します。</p>
-    </div>
 
     <section class="challenge" aria-labelledby="challenge-label">
       <div class="challenge-top">
@@ -1091,11 +1141,11 @@ body{
           <label class="fx-check"><input id="fx-particles" type="checkbox" checked> 紙吹雪やキラキラを出す</label>
           <p class="save-note">1杯出したあとの演出の強さです（得点や満足度は変わりません）。演出は画面をタップすると飛ばせます。</p>
         </div>
-        <p class="save-note">記録はこの端末のブラウザ内にのみ保存されます。端末やブラウザを変えると引き継がれません。</p>
+        <p class="save-note">記録はこの端末のブラウザ内に保存されます。マイページでログインすると、クラウドにも写しを保存して同期します。</p>
         <div class="clear-row">
           <button id="btn-clear" class="btn-small btn-danger" type="button">記録を消す</button>
           <div id="clear-confirm" class="clear-confirm" hidden>
-            <p class="clear-q">自己ベスト・限定ベスト・段位・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備は残ります）。</p>
+            <p class="clear-q">自己ベスト・限定ベスト・累計スコアなどの戦績・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備・獲得した称号・名前は残ります）。</p>
             <div class="clear-actions">
               <button id="btn-clear-yes" class="btn-small btn-danger-solid" type="button">消す</button>
               <button id="btn-clear-no" class="btn-small" type="button">やめる</button>
@@ -1124,7 +1174,7 @@ body{
       <button class="toc-chip" type="button" data-goto="g-play">あそびかた</button>
       <button class="toc-chip" type="button" data-goto="g-flour">そば粉</button>
       <button class="toc-chip" type="button" data-goto="g-cust">お客さん</button>
-      <button class="toc-chip" type="button" data-goto="g-rank">段位・称号</button>
+      <button class="toc-chip" type="button" data-goto="g-rank">称号</button>
       <button class="toc-chip" type="button" data-goto="g-daily">チャレンジ</button>
       <button class="toc-chip" type="button" data-goto="g-season">期間限定</button>
       <button class="toc-chip" type="button" data-goto="g-rec">記録</button>
@@ -1246,11 +1296,10 @@ body{
     </section>
 
     <section id="g-rank" class="gsec" aria-labelledby="g-rank-h">
-      <h3 id="g-rank-h" tabindex="-1">段位と称号</h3>
-      <p class="gnote"><b>段位</b>　そば粉3種×お客さん4人＝12通りの自己ベストを合計した点数で上がります。自己ベストは下がらないので、記録を消さない限り段位も下がりません。期間限定モードの限定ベストは合計に入りません。</p>
-      <ol id="rank-ladder" class="ladder" aria-label="段位の順番"></ol>
-      <p class="gnote"><b>称号</b>　その1回の得点で決まり、リザルトに出ます。</p>
-      <ol id="title-list" class="ladder ladder-titles" aria-label="称号の順番"></ol>
+      <h3 id="g-rank-h" tabindex="-1">称号</h3>
+      <p class="gnote">4つの系統の称号があり、条件を満たすと獲得します。獲得した称号はなくならず（「記録を消す」でも残ります）、マイページで好きな1つを身につけられます。身につけた称号は名前と一緒に、リザルトと共有画像に出ます。期間限定モードの得点は称号の記録に入りません。</p>
+      <div id="title-guide" class="title-guide"></div>
+      <p class="gnote"><b>今回の腕前</b>　リザルトの「今回の腕前」は、その1回の得点が届いた「一撃の腕前」の称号の名前です。</p>
     </section>
 
     <section id="g-daily" class="gsec" aria-labelledby="g-daily-h">
@@ -1288,7 +1337,7 @@ body{
       <ul class="gpoints">
         <li><b>そば畑の農家</b>そばの花モードだけに来るお客さん。短い間と長い間がはっきりしたリズムで、PERFECT ±70ms／切れる範囲 ±300ms、満足度の厳しさは1.0です。</li>
         <li><b>新そばの条件</b>得点はそば粉の係数にさらに×1.5。判定の幅は4/5（十割ならさらに3/4）。香りはどのそば粉でも貯まり（最大+60%）、PERFECT以上のときだけ増えて、MISSで0に戻ります。</li>
-        <li><b>記録</b>結果はモード×お客さんごとの「限定ベスト」にだけ記録されます。通常の自己ベスト・段位・本日のチャレンジ・満足度の記録には入りません。</li>
+        <li><b>記録</b>結果はモード×お客さんごとの「限定ベスト」にだけ記録されます。通常の自己ベスト・称号の記録・本日のチャレンジ・満足度の記録には入りません。</li>
       </ul>
       <p class="gnote"><b>期間の決め方</b>　この端末の日付（ローカル時刻）で判定しています。期間外のモードは押せず、「◯月◯日頃に開放」と表示されます。日付が読み取れないときは期間外として扱います。</p>
       <p class="gnote gnote-soft">季節の目安：福井では秋そばが主流で、10月下旬〜11月上旬に収穫されます。そばの花は9〜10月に咲きます。</p>
@@ -1296,11 +1345,12 @@ body{
 
     <section id="g-rec" class="gsec" aria-labelledby="g-rec-h">
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
-      <p class="rec-callout">記録はこの端末のブラウザ内にのみ保存されます。端末やブラウザを変えると引き継がれません。</p>
+      <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、段位、満足度の最高値、最大コンボ、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、描画の細かさ、お客さんの反応の演出。</li>
-        <li><b>引っ越し</b>ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
-        <li><b>リセット</b>「記録を消す」で自己ベストや段位などが初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備はそのまま）。</li>
+        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、描画の細かさ、お客さんの反応の演出。</li>
+        <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
+        <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、コインとそば札は多いほう、図鑑・アイテム・称号は両方を合わせたものになります。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。</li>
+        <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前はそのまま）。</li>
         <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。</li>
         <li><b>ガチャと図鑑</b>ホームの「ガチャを引く」で、コインを使って越前・福井にちなんだアイテムを引けます（1回500・10連4,500）。確率はガチャ画面にいつも表示しています（天井はありません）。被ったアイテムは「そば札」に変わり、「交換所」でまだ持っていないアイテムと交換できます。集めたアイテムは「図鑑」で見られ、「着せ替え」で器・麺・包丁・背景・演出の色・効果音・称号を着せ替えられます（見た目と音だけで、得点や判定は変わりません）。</li>
       </ul>
@@ -1469,11 +1519,72 @@ body{
     <p class="tap-hint">タップ / スペースキーでカット!</p>
   </section>
 
+  <section id="screen-mypage" class="screen guide mypage" aria-labelledby="mypage-title">
+    <div class="guide-bar">
+      <h2 id="mypage-title" class="guide-title" tabindex="-1">マイページ</h2>
+      <button id="btn-mypage-back" class="btn-small" type="button">ホームへ戻る</button>
+    </div>
+    <section class="mp-profile card" aria-label="プロフィール">
+      <div class="mp-who">
+        <span id="mp-avatar" class="mp-avatar" aria-hidden="true">職</span>
+        <div class="mp-names">
+          <p class="mp-name-row"><span id="mp-name" class="mp-name">ななしの職人</span>
+            <button id="mp-name-edit" class="mp-icon-btn" type="button" aria-label="名前を変える" title="名前を変える">✎ 変更</button></p>
+          <button id="mp-title-btn" class="mp-title-badge" type="button" aria-haspopup="dialog">
+            <span class="mp-title-label">称号</span><span id="mp-title-name" class="mp-title-name">称号なし</span><span class="mp-title-change">付け替え</span>
+          </button>
+        </div>
+      </div>
+      <form id="mp-name-form" class="mp-name-form" hidden>
+        <label for="mp-name-input" class="mp-label">名前（12文字まで・リザルトの共有画像に出ます）</label>
+        <div class="mp-row">
+          <input id="mp-name-input" class="mp-input" type="text" maxlength="12" autocomplete="nickname" enterkeyhint="done">
+          <button id="mp-name-save" class="btn-small btn-primary" type="submit">保存</button>
+          <button id="mp-name-cancel" class="btn-small" type="button">やめる</button>
+        </div>
+      </form>
+    </section>
+    <section class="mp-stats" aria-labelledby="mp-stats-h">
+      <h3 id="mp-stats-h" class="mp-h">戦績</h3>
+      <dl class="mp-grid">
+        <div class="mp-cell"><dt>1回の最高スコア</dt><dd id="mp-high">0</dd></div>
+        <div class="mp-cell"><dt>累計スコア</dt><dd id="mp-total">0</dd></div>
+        <div class="mp-cell"><dt>最長コンボ</dt><dd id="mp-combo">0</dd></div>
+        <div class="mp-cell"><dt>図鑑収集率</dt><dd id="mp-collect">0%</dd></div>
+      </dl>
+      <p class="mp-titles-line"><span id="mp-title-count">獲得した称号 0 / 0</span>
+        <button id="mp-title-list" class="btn-small" type="button" aria-haspopup="dialog">称号の一覧</button></p>
+    </section>
+    <section class="mp-account card" aria-labelledby="mp-account-h">
+      <h3 id="mp-account-h" class="mp-h">アカウントと同期</h3>
+      <p id="mp-status" class="mp-status">未ログイン（この端末に保存）</p>
+      <p id="mp-sync" class="mp-sync">未同期</p>
+      <form id="mp-auth" class="mp-auth" hidden>
+        <label for="mp-user" class="mp-label">ユーザー名（3〜16文字・英数字・かな・漢字・_ -）</label>
+        <input id="mp-user" class="mp-input" type="text" maxlength="16" autocomplete="username" autocapitalize="off" spellcheck="false">
+        <label for="mp-pass" class="mp-label">パスワード（6文字以上）</label>
+        <input id="mp-pass" class="mp-input" type="password" maxlength="64" autocomplete="current-password">
+        <div class="mp-row mp-row-wrap">
+          <button id="mp-register" class="btn-small btn-primary" type="button">アカウント作成</button>
+          <button id="mp-login" class="btn-small btn-primary" type="submit">ログイン</button>
+          <button id="mp-auth-cancel" class="btn-small" type="button">やめる</button>
+        </div>
+      </form>
+      <div class="mp-row mp-row-wrap">
+        <button id="mp-open-auth" class="btn-small btn-primary" type="button">アカウント作成 / ログイン</button>
+        <button id="mp-sync-now" class="btn-small" type="button">今すぐ同期</button>
+        <button id="mp-logout" class="btn-small" type="button">ログアウト</button>
+      </div>
+      <p id="mp-msg" class="mp-msg" role="status" aria-live="polite"></p>
+      <p id="mp-cloud-note" class="mp-note"></p>
+    </section>
+  </section>
+
   <section id="screen-result" class="screen">
     <h2 class="result-title">修行終了!</h2>
     <p id="result-mode" class="result-mode" hidden></p>
-    <div class="result-rank" id="result-rank">称号: ―</div>
-    <p id="result-rankup" class="new-best-badge">⬆ 昇段しました!</p>
+    <div class="result-rank" id="result-rank">今回の腕前: ―</div>
+    <p id="result-rankup" class="new-best-badge"></p>
     <p id="result-newbest" class="new-best-badge">🎉 自己ベスト更新!</p>
     <p id="result-dailyclear" class="new-best-badge">📅 本日のチャレンジ達成!</p>
     <p id="result-satisfaction-best" class="new-best-badge">😊 満足度ベスト更新!</p>
@@ -1482,7 +1593,7 @@ body{
       <p><span id="result-best-label" class="rs-label">自己ベスト</span> <span id="result-best">0</span></p>
       <p>そば粉 <span id="result-style">二八</span></p>
       <p>お客さん <span id="result-cust">―</span></p>
-      <p>段位 <span class="dan-cell"><span id="result-title-chip" class="equip-title-chip" hidden></span><span id="result-dan-name">見習い</span></span></p>
+      <p>称号 <span class="dan-cell"><span id="result-title-chip" class="equip-title-chip" hidden></span><span id="result-dan-name">なし</span></span></p>
       <p>満足させたお客さん <span id="result-customers">0人</span></p>
       <p>最大コンボ <span id="result-combo">0</span></p>
       <p>最大倍率 <span id="result-multiplier">x1.0</span></p>
@@ -1502,7 +1613,7 @@ body{
       <p id="share-msg" class="share-msg" role="status" aria-live="polite"></p>
       <button id="btn-download-image" class="btn-link" type="button" hidden>画像ファイルとしてダウンロード</button>
       <figure id="share-preview" class="share-preview" hidden>
-        <img id="share-preview-img" width="1080" height="1350" alt="結果カードの画像（得点・お客さん・そば粉・満足度・最大コンボ・最大倍率・段位・称号・日付）">
+        <img id="share-preview-img" width="1080" height="1350" alt="結果カードの画像（称号と名前・得点・お客さん・そば粉・満足度・最大コンボ・最大倍率・今回の腕前・累計スコア・日付）">
         <figcaption>うまく保存できないときは、この画像を長押し（スマホ）か右クリック（パソコン）して保存できます。</figcaption>
       </figure>
     </div>
@@ -1535,6 +1646,18 @@ body{
         <button id="xm-equip" class="btn-small zm-equip" type="button" hidden>装備する</button>
         <button id="xm-cancel" class="btn-small" type="button">やめる</button>
       </div>
+    </div>
+  </div>
+  <div id="tmodal" class="zmodal" hidden>
+    <div class="zmodal-backdrop" data-tclose="1"></div>
+    <div id="tm-card" class="zmodal-card tm-card" role="dialog" aria-modal="true" aria-labelledby="tm-h">
+      <div class="tm-top">
+        <h3 id="tm-h" class="zm-name" tabindex="-1">称号</h3>
+        <button id="tm-close" class="btn-small" type="button">閉じる</button>
+      </div>
+      <p id="tm-now" class="tm-now"></p>
+      <div id="tm-list" class="tm-list"></div>
+      <p id="tm-msg" class="mp-msg" role="status" aria-live="polite"></p>
     </div>
   </div>
 
@@ -1780,12 +1903,6 @@ function seasonState(modeId, today){
   st.open = v >= mode.from.m*100 + mode.from.d && v <= mode.to.m*100 + mode.to.d;
   return st;
 }
-var RANKS = [
-  {min:0,name:'そば見習い'},
-  {min:1500,name:'そば職人'},
-  {min:3200,name:'そば名人'},
-  {min:5400,name:'越前そばの伝説'}
-];
 
 // ---------- DOM ----------
 var screens = {
@@ -1796,7 +1913,8 @@ var screens = {
   gacha: document.getElementById('screen-gacha'),
   zukan: document.getElementById('screen-zukan'),
   exchange: document.getElementById('screen-exchange'),
-  kisekae: document.getElementById('screen-kisekae')
+  kisekae: document.getElementById('screen-kisekae'),
+  mypage: document.getElementById('screen-mypage')
 };
 var canvas = document.getElementById('game-canvas');
 var ctx = canvas.getContext('2d');
@@ -1831,7 +1949,6 @@ var summaryCust = document.getElementById('summary-cust');
 var btnStart = document.getElementById('btn-start');
 var startHint = document.getElementById('start-hint');
 var rankBadge = document.getElementById('rank-badge');
-var rankPanel = document.getElementById('rank-panel');
 var btnHowto = document.getElementById('btn-howto');
 var btnHowtoBack = document.getElementById('btn-howto-back');
 var btnHowtoHome = document.getElementById('btn-howto-home');
@@ -1842,8 +1959,7 @@ var helpFlour = document.getElementById('help-flour');
 var helpCust = document.getElementById('help-cust');
 var guideTitle = document.getElementById('guide-title');
 var tocChips = document.querySelectorAll('.toc-chip');
-var rankLadder = document.getElementById('rank-ladder');
-var titleList = document.getElementById('title-list');
+var titleGuide = document.getElementById('title-guide');
 var btnRestart = document.getElementById('btn-restart');
 var btnClear = document.getElementById('btn-clear');
 var btnExport = document.getElementById('btn-export');
@@ -1862,13 +1978,8 @@ var resultBest = document.getElementById('result-best');
 var resultNewBest = document.getElementById('result-newbest');
 var tierBestEls = document.querySelectorAll('.tier-best');
 var elRankName = document.getElementById('rank-name');
-var elRankNext = document.getElementById('rank-next');
 var elDailyDesc = document.getElementById('daily-desc');
 var elDailyStatus = document.getElementById('daily-status');
-var elRankPanelName = document.getElementById('rank-panel-name');
-var elRankProgress = document.getElementById('rank-progress');
-var elRankProgressFill = document.getElementById('rank-progress-fill');
-var elRankTotal = document.getElementById('rank-total');
 var satBestEls = document.querySelectorAll('.sat-best');
 var resultDanName = document.getElementById('result-dan-name');
 var resultStyle = document.getElementById('result-style');
@@ -1893,7 +2004,7 @@ var coinStatus = document.getElementById('coin-status');
 
 // ---------- Persistent Store (robust localStorage layer) ----------
 var STORE_KEY = 'echizenSoba.v1';
-var SCHEMA_VERSION = 10;   // 6 → 10: adds gacha (そば猪口コイン); older saves are carried over by coerceStore
+var SCHEMA_VERSION = 11;   // 10 → 11: 段位 becomes 称号 (stats, profile, gacha.equippedTitle); older saves are carried over by coerceStore
 var LEGACY_KEYS = ['soba-dojo-bests','bestScores','soba-best','sobaBests'];
 // settings.visual.detail: how finely the bowl is drawn. Looks only; the schema stays 10 and saves without it get 'standard'.
 var VISUAL_DETAILS = ['high','standard','low'];
@@ -1902,16 +2013,6 @@ var DEFAULT_VISUAL_DETAIL = 'standard';
 var EFFECT_LEVELS = ['high','standard','low'];
 var DEFAULT_EFFECT_LEVEL = 'standard';
 
-var RANK_LEVELS = [
-  {min:0,     name:'見習い'},
-  {min:1000,  name:'麺打ち'},
-  {min:2400,  name:'一人前'},
-  {min:4900,  name:'板前'},
-  {min:8600,  name:'目利き'},
-  {min:13500, name:'名人'},
-  {min:19600, name:'達人'},
-  {min:25700, name:'そば道皆伝'}
-];
 var DAILY_TIERS = ['beginner','lover','regular','enthusiast'];
 var DAILY_THRESHOLDS = [400,600,800,1000,1200];
 
@@ -2170,6 +2271,121 @@ function gachaOwnedCount(g, rarity){
   return n;
 }
 
+// ---------- 称号: four ladders, each climbed by its own record (they replace the old 段位) ----------
+// Every title lives in TITLES_DATA. need = {key, min}: the title is earned when the record `key` reaches `min`.
+// Earned titles are kept in store.gacha.titles (with the 図鑑 completion title), so they are never lost, even when
+// the play records are cleared. One earned title can be worn: store.gacha.equippedTitle.
+// Records (store.stats unless noted): totalScore (the sum of every normal game's score), highScore (the best single
+// game), maxCombo, bestJustRate (the best JUST! rate in one game, %), perfectClears (games where every judgement was
+// JUST!), owned / collectPct (items in the 図鑑, from store.gacha.owned). Limited-time modes keep only their own
+// bests, so they do not count here either.
+var TITLE_CATS = [
+  {id:'total',   label:'累計スコア', note:'通常モードで遊んだ得点の合計で昇格します。'},
+  {id:'best',    label:'一撃の腕前', note:'1回の修行の最高得点で昇格します。'},
+  {id:'skill',   label:'技の冴え',   note:'コンボとJUST!の正確さで獲得します。'},
+  {id:'collect', label:'収集',       note:'図鑑に集めたアイテムで獲得します。'}
+];
+var TITLES_DATA = [
+  {id:'t_nyumon',     cat:'total',   name:'そば入門',           need:{key:'totalScore', min:0}},
+  {id:'t_aikouka',    cat:'total',   name:'そば愛好家',         need:{key:'totalScore', min:10000}},
+  {id:'t_dan1',       cat:'total',   name:'越前初段',           need:{key:'totalScore', min:30000}},
+  {id:'t_dan2',       cat:'total',   name:'越前二段',           need:{key:'totalScore', min:60000}},
+  {id:'t_dan3',       cat:'total',   name:'越前三段',           need:{key:'totalScore', min:100000}},
+  {id:'t_dan4',       cat:'total',   name:'越前四段',           need:{key:'totalScore', min:150000}},
+  {id:'t_dan5',       cat:'total',   name:'越前五段',           need:{key:'totalScore', min:220000}},
+  {id:'t_dan10',      cat:'total',   name:'越前十段',           need:{key:'totalScore', min:400000}},
+  {id:'t_meijin',     cat:'total',   name:'越前蕎麦名人',       need:{key:'totalScore', min:700000}},
+  {id:'t_eisei',      cat:'total',   name:'永世蕎麦神', reading:'えいせいそばしん', need:{key:'totalScore', min:1200000}, top:true},
+  {id:'b_minarai',    cat:'best',    name:'見習い打ち',         need:{key:'highScore', min:1500}},
+  {id:'b_ichininmae', cat:'best',    name:'一人前のそば職人',   need:{key:'highScore', min:4000}},
+  {id:'b_gokui',      cat:'best',    name:'蕎麦切り極意',       need:{key:'highScore', min:8000}},
+  {id:'b_tenka',      cat:'best',    name:'天下無双の打ち手',   need:{key:'highScore', min:14000}, top:true},
+  {id:'s_antei',      cat:'skill',   name:'安定の手腕',         need:{key:'maxCombo', min:10}},
+  {id:'s_seimitsu',   cat:'skill',   name:'精密無比',           need:{key:'bestJustRate', min:70}},
+  {id:'s_shinsoku',   cat:'skill',   name:'神速の連撃',         need:{key:'maxCombo', min:30}},
+  {id:'s_kamiwaza',   cat:'skill',   name:'神業の目利き',       need:{key:'perfectClears', min:1}, top:true},
+  {id:'c_mania',      cat:'collect', name:'アイテムマニア',     need:{key:'owned', min:10}},
+  {id:'c_collector',  cat:'collect', name:'アイテムコレクター', need:{key:'owned', min:30}},
+  {id:'c_freak',      cat:'collect', name:'図鑑フリーク',       need:{key:'collectPct', min:80}},
+  {id:'c_complete',   cat:'collect', name:'越前図鑑コンプリート', need:{key:'collectPct', min:100}, top:true}
+];
+var TITLE_BY_ID = {};
+(function(){ for(var i=0;i<TITLES_DATA.length;i++) TITLE_BY_ID[TITLES_DATA[i].id] = TITLES_DATA[i]; })();
+// The old 段位 (schema 10 and before, from the sum of the 12 自己ベスト) and the title each one becomes on the move to
+// schema 11: the same rank or higher, with every title below it in the ladder.
+var LEGACY_DAN_MINS = [0, 1000, 2400, 4900, 8600, 13500, 19600, 25700];   // 見習い・麺打ち・一人前・板前・目利き・名人・達人・そば道皆伝
+var DAN_TO_TITLE = ['t_nyumon', 't_aikouka', 't_dan1', 't_dan2', 't_dan3', 't_dan5', 't_dan10', 't_meijin'];
+function legacyDanIndex(bestTotal){
+  var idx = 0;
+  for(var i=0;i<LEGACY_DAN_MINS.length;i++){ if(bestTotal>=LEGACY_DAN_MINS[i]) idx = i; }
+  return idx;
+}
+function titleNeedText(t){
+  var n = t.need, v = fmtPoints(n.min);
+  switch(n.key){
+    case 'totalScore':    return n.min>0 ? '累計スコア ' + v + '点' : 'はじめから';
+    case 'highScore':     return '1回の得点 ' + v + '点';
+    case 'maxCombo':      return '最大' + v + 'コンボ';
+    case 'bestJustRate':  return '1回の修行でJUST!率' + v + '%以上';
+    case 'perfectClears': return 'すべての判定をJUST!で修行を終える';
+    case 'owned':         return 'アイテムを' + v + '種集める';
+    case 'collectPct':    return '図鑑を' + v + '%集める';
+  }
+  return '';
+}
+// the records the titles are judged on, all whole numbers
+function titleMetrics(store){
+  var st = store.stats || {}, g = store.gacha;
+  var owned = g ? gachaOwnedCount(g) : 0, total = GACHA_CATALOG.length;
+  return {
+    totalScore:st.totalScore || 0, highScore:st.highScore || 0, maxCombo:st.maxCombo || 0,
+    bestJustRate:st.bestJustRate || 0, perfectClears:st.perfectClears || 0,
+    owned:owned, collectPct:total ? Math.floor(owned*100/total) : 0
+  };
+}
+// Adds every title whose record has been reached; returns the ids that were new. Titles are never taken away.
+function evaluateTitles(store){
+  var g = store && store.gacha;
+  if(!g || !Array.isArray(g.titles)) return [];
+  var m = titleMetrics(store), got = [];
+  for(var i=0;i<TITLES_DATA.length;i++){
+    var t = TITLES_DATA[i];
+    if(g.titles.indexOf(t.id)<0 && (m[t.need.key] || 0)>=t.need.min){ g.titles.push(t.id); got.push(t.id); }
+  }
+  return got;
+}
+// 今回の腕前: the highest 一撃 title a single score reaches (shown on the result and its card)
+function playTierName(score){
+  var name = '修行中';
+  for(var i=0;i<TITLES_DATA.length;i++){
+    var t = TITLES_DATA[i];
+    if(t.cat==='best' && score>=t.need.min) name = t.name;
+  }
+  return name;
+}
+// The move to schema 11: the old 段位 becomes titles (the same rank or higher), the 累計スコア starts from the old
+// sum of bests (never less than what was played), the best single game from the bests, and a player who wore no
+// title wears the one their 段位 became. Nothing else in the save changes.
+function migrateToTitles(out, obj){
+  var bestTotal = Math.max(sumBests(out.bests), clampInt(isPlainObj(obj.rank) ? obj.rank.bestTotal : 0, 0, 1e9));
+  var dan = legacyDanIndex(bestTotal);
+  if(typeof obj.danRank==='number') dan = Math.max(dan, clampInt(obj.danRank, 0, DAN_TO_TITLE.length - 1));
+  if(isPlainObj(obj.stats) && typeof obj.stats.dan==='number') dan = Math.max(dan, clampInt(obj.stats.dan, 0, DAN_TO_TITLE.length - 1));
+  var g = out.gacha, target = TITLE_BY_ID[DAN_TO_TITLE[dan]];
+  for(var i=0;i<TITLES_DATA.length;i++){
+    var t = TITLES_DATA[i];
+    if(t.cat==='total' && t.need.min<=target.need.min && g.titles.indexOf(t.id)<0) g.titles.push(t.id);
+  }
+  var best = 0;
+  for(var s in out.bests){
+    if(!Object.prototype.hasOwnProperty.call(out.bests, s)) continue;
+    for(var k in out.bests[s]){ if(Object.prototype.hasOwnProperty.call(out.bests[s], k)) best = Math.max(best, out.bests[s][k]); }
+  }
+  out.stats.totalScore = Math.max(out.stats.totalScore, bestTotal);
+  out.stats.highScore = Math.max(out.stats.highScore, best);
+  if(!g.equippedTitle) g.equippedTitle = target.id;
+}
+
 // ---------- 着せ替え（装備）: what each equippable item changes — looks and sounds only, never scores or judging ----------
 // Every catalog item whose applyTo is a slot has an entry in that slot's table below. The equipped ids live in
 // store.gacha.equipped. An id that is unknown, not owned or meant for another slot is ignored, and anything
@@ -2182,7 +2398,7 @@ var EQUIP_SLOT_NOTES = {
   bg:'プレイ画面の背景が変わります（ARTに画像があればその画像）。',
   effect:'切ったときの輪と紙吹雪、お客さんが喜んだときのキラキラと紙吹雪の色が変わります。',
   sound:'効果音が加わります。',
-  title:'リザルトの段位の横に表示されます。'
+  title:'マイページ・リザルト・共有画像に、名前と一緒に表示されます。'
 };
 // item-specific notes (shown in the 図鑑 detail view instead of the slot's note)
 var SKIN_NOTES = {
@@ -2391,7 +2607,8 @@ function defaultGacha(){
     stats:{totalPulls:0},
     dailyEarned:{date:'', amount:0, challenge:false},   // today's coins (shown only) and whether today's challenge bonus was paid
     history:[],
-    titles:[]      // titles earned in the 図鑑 (soba_hitosuji for a full set); older saves simply start with []
+    titles:[],     // every 称号 earned (TITLES_DATA, and soba_hitosuji for a full 図鑑); never taken away
+    equippedTitle:null   // the 称号 being worn (schema 11; equipped.title is kept as a copy of it)
   };
 }
 function isPlainObj(v){ return !!v && typeof v==='object' && !Array.isArray(v); }
@@ -2432,12 +2649,25 @@ function sanitizeGacha(raw){
     for(var j=0;j<h.length;j++){ if(typeof h[j]==='string' || isPlainObj(h[j])) out.history.push(h[j]); }
   }
   if(Array.isArray(g.titles)){
-    for(var t=0;t<g.titles.length && out.titles.length<50;t++){
+    for(var t=0;t<g.titles.length && out.titles.length<100;t++){
       var tid = g.titles[t];
       if(typeof tid==='string' && tid.length>0 && tid.length<=64 && out.titles.indexOf(tid)<0) out.titles.push(tid);
     }
   }
+  // the worn 称号: schema 11 keeps it in equippedTitle; an older save had it in equipped.title
+  var et = (typeof g.equippedTitle==='string' && g.equippedTitle.length>0 && g.equippedTitle.length<=64) ? g.equippedTitle : out.equipped.title;
+  out.equippedTitle = et || null;
+  out.equipped.title = out.equippedTitle;
   return out;
+}
+// profile: the name shown on the マイページ and the result card (no other personal data is kept)
+var PROFILE_NAME_MAX = 12;
+function cleanProfileName(v){
+  if(typeof v!=='string') return '';
+  return v.replace(/[\u0000-\u001f\u007f<>]/g, '').trim().slice(0, PROFILE_NAME_MAX);
+}
+function sanitizeProfile(raw){
+  return {name:cleanProfileName(isPlainObj(raw) ? raw.name : '')};
 }
 // settings: kept exactly as saved if a save carries it (settings.sound, settings.visual, and anything else)
 function sanitizeSettings(raw){
@@ -2488,17 +2718,6 @@ function sumBests(bests){
   }
   return total;
 }
-function computeRankIndex(bestTotal){
-  var idx = 0;
-  for(var i=0;i<RANK_LEVELS.length;i++){ if(bestTotal>=RANK_LEVELS[i].min){ idx=i; } }
-  return idx;
-}
-function nextRankInfo(bestTotal){
-  var idx = computeRankIndex(bestTotal);
-  if(idx>=RANK_LEVELS.length-1){ return null; }
-  var next = RANK_LEVELS[idx+1];
-  return {name:next.name, remaining:next.min-bestTotal};
-}
 
 function todayStr(){
   var d = new Date();
@@ -2534,7 +2753,10 @@ function ensureDailyFresh(store){
 }
 
 function defaultStore(){
-  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, rank:{bestTotal:0}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha(), settings:defaultSettings() };
+  var g = defaultGacha();
+  g.titles = ['t_nyumon'];                        // everyone starts as そば入門, wearing it
+  g.equippedTitle = g.equipped.title = 't_nyumon';
+  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, daily:null, stats:sanitizeStats(null), lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:g, settings:defaultSettings(), profile:sanitizeProfile(null) };
 }
 
 function sanitizeFlatBests(raw){
@@ -2575,12 +2797,18 @@ function sanitizeDaily(raw){
   }
   return null;
 }
+var STAT_MAX = 1e12;
+// play records (schema 11 adds everything after maxCombo; a missing or broken number becomes 0)
 function sanitizeStats(raw){
-  var maxCombo = 0;
-  if(raw && typeof raw==='object' && typeof raw.maxCombo==='number' && isFinite(raw.maxCombo) && raw.maxCombo>=0){
-    maxCombo = raw.maxCombo;
-  }
-  return {maxCombo:maxCombo};
+  var r = isPlainObj(raw) ? raw : {};
+  return {
+    maxCombo:clampInt(r.maxCombo, 0, 100000),
+    totalScore:clampInt(r.totalScore, 0, STAT_MAX),     // the sum of every normal game's score
+    highScore:clampInt(r.highScore, 0, STAT_MAX),       // the best single normal game
+    plays:clampInt(r.plays, 0, STAT_MAX),
+    bestJustRate:clampInt(r.bestJustRate, 0, 100),      // the best JUST! rate in one game (%)
+    perfectClears:clampInt(r.perfectClears, 0, STAT_MAX)   // games where every judgement was JUST!
+  };
 }
 function sanitizeSatisfaction(raw){
   var out = {};
@@ -2619,7 +2847,6 @@ function coerceStore(obj){
     schema:SCHEMA_VERSION,
     updatedAt:updatedAt,
     bests:bests,
-    rank:{bestTotal:sumBests(bests)},
     daily:sanitizeDaily(obj.daily),
     stats:sanitizeStats(obj.stats),
     lastStyle:lastStyle,
@@ -2629,6 +2856,9 @@ function coerceStore(obj){
     gacha:sanitizeGacha(obj.gacha)
   };
   out.settings = withEffectsDefaults(withVisualDefaults(sanitizeSettings(obj.settings)));   // visual / effects get their defaults when missing
+  out.profile = sanitizeProfile(obj.profile);
+  if(!(typeof obj.schema==='number' && obj.schema>=11)) migrateToTitles(out, obj);   // 段位 → 称号 (schema 10 and before)
+  evaluateTitles(out);
   return out;
 }
 
@@ -2654,7 +2884,7 @@ function attemptMigration(){
   if(!any) return null;
   var bests = {};
   if(Object.keys(merged).length){ bests[DEFAULT_STYLE] = merged; }
-  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:bests, rank:{bestTotal:sumBests(bests)}, daily:null, stats:{maxCombo:0}, lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:defaultGacha(), settings:defaultSettings() };
+  return coerceStore({bests:bests});   // a save from before schemas: its bests, and the 段位 they reach as titles
 }
 
 function loadStore(){
@@ -2710,15 +2940,21 @@ function backupBeforeUpgrade(raw){
 
 function saveStoreObj(store){
   store.updatedAt = Date.now();
-  store.rank = { bestTotal: sumBests(store.bests) };
-  return writeRawLS(STORE_KEY, JSON.stringify(store));
+  if(store.gacha){
+    if(store.gacha.equipped) store.gacha.equipped.title = store.gacha.equippedTitle || null;   // the copy older code reads
+    evaluateTitles(store);                         // e.g. a pull that fills the 図鑑 earns its title at once
+  }
+  var ok = writeRawLS(STORE_KEY, JSON.stringify(store));
+  if(ok && typeof SyncManager!=='undefined') SyncManager.request();   // logged in: the cloud copy follows (debounced)
+  return ok;
 }
 
 function clearAllBests(){
   var keep = loadStore();
   var fresh = defaultStore();
-  fresh.gacha = keep.gacha;                          // coins are not play records: they stay
+  fresh.gacha = keep.gacha;                          // coins, そば札, the 図鑑 and earned 称号 are not play records: they stay
   if(keep.settings) fresh.settings = keep.settings;
+  fresh.profile = keep.profile;
   ensureDailyFresh(fresh);
   saveStoreObj(fresh);
   renderBests();
@@ -2774,6 +3010,21 @@ function checkDailyClear(tierKey, score){
   return false;
 }
 
+// One finished normal game into the 称号 records; returns the titles it earned.
+function recordPlay(score, maxCombo, justCount, noteCount){
+  var store = loadStore(), st = store.stats;
+  st.totalScore = Math.min(STAT_MAX, st.totalScore + Math.max(0, Math.floor(score)));
+  st.highScore = Math.max(st.highScore, Math.floor(score));
+  st.maxCombo = Math.max(st.maxCombo, maxCombo);
+  st.plays = Math.min(STAT_MAX, st.plays + 1);
+  if(noteCount>0){
+    st.bestJustRate = Math.max(st.bestJustRate, Math.floor(justCount*100/noteCount));
+    if(justCount===noteCount) st.perfectClears = Math.min(STAT_MAX, st.perfectClears + 1);
+  }
+  var got = evaluateTitles(store);
+  saveStoreObj(store);
+  return got;
+}
 function recordMaxCombo(combo){
   var store = loadStore();
   if(combo>store.stats.maxCombo){
@@ -2842,23 +3093,8 @@ function applyStyleSelection(style, persist){
 }
 function renderRankAndDaily(){
   var store = loadStore();
-  var total = store.rank.bestTotal;
-  var idx = computeRankIndex(total);
-  var cur = RANK_LEVELS[idx];
-  elRankName.textContent = cur.name;
-  elRankPanelName.textContent = cur.name;
-  elRankTotal.textContent = total;
-  var next = nextRankInfo(total);
-  var pct = 100;
-  if(next){
-    pct = Math.round((total-cur.min)/(RANK_LEVELS[idx+1].min-cur.min)*100);
-    pct = Math.max(0, Math.min(100, pct));
-    elRankNext.textContent = '次の「'+next.name+'」まであと'+next.remaining+'点';
-  } else {
-    elRankNext.textContent = '最高段位に到達';
-  }
-  elRankProgressFill.style.width = pct+'%';
-  elRankProgress.setAttribute('aria-valuenow', String(pct));
+  var worn = equippedTitleName(store.gacha);          // the home badge: the worn 称号, and it opens the マイページ
+  elRankName.textContent = worn || '称号なし';
 
   var cond = parseConditionId(store.daily.conditionId);
   var ch = CHARACTERS[cond.tier];
@@ -3030,37 +3266,46 @@ function chooseMode(modeId){
 // ---------- How-to page (UI only) ----------
 var guideOpener = null;
 function fmtPoints(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
-function buildLadder(listEl, levels){
-  // Built from the same tables the game uses, so the order and thresholds always match.
-  listEl.textContent = '';
-  for(var i=0;i<levels.length;i++){
-    var li = document.createElement('li');
-    var nm = document.createElement('span');
-    nm.className = 'ld-name';
-    nm.textContent = levels[i].name;
-    var mn = document.createElement('span');
-    mn.className = 'ld-min';
-    mn.textContent = fmtPoints(levels[i].min)+'点〜';
-    li.appendChild(nm);
-    li.appendChild(mn);
-    listEl.appendChild(li);
-  }
-}
+// The 称号 lists in the how-to, built from TITLES_DATA so the names and conditions always match the game;
+// the titles already earned are marked.
 function renderGuide(){
-  var idx = computeRankIndex(loadStore().rank.bestTotal);
-  var items = rankLadder.children;
-  for(var i=0;i<items.length;i++){
-    var cur = (i===idx);
-    items[i].classList.toggle('is-current', cur);
-    var tag = items[i].querySelector('.ld-now');
-    if(cur && !tag){
-      tag = document.createElement('span');
-      tag.className = 'ld-now';
-      tag.textContent = 'いま';
-      items[i].appendChild(tag);
+  var g = loadStore().gacha;
+  titleGuide.textContent = '';
+  for(var c=0;c<TITLE_CATS.length;c++){
+    var cat = TITLE_CATS[c];
+    var h4 = document.createElement('h4');
+    h4.className = 'tg-h';
+    h4.textContent = cat.label;
+    var note = document.createElement('p');
+    note.className = 'tg-note';
+    note.textContent = cat.note;
+    var ol = document.createElement('ol');
+    ol.className = 'ladder ladder-titles';
+    ol.setAttribute('aria-label', cat.label + 'の称号');
+    for(var i=0;i<TITLES_DATA.length;i++){
+      var t = TITLES_DATA[i];
+      if(t.cat!==cat.id) continue;
+      var li = document.createElement('li');
+      var nm = document.createElement('span');
+      nm.className = 'ld-name';
+      nm.textContent = t.name + (t.top ? '（最高峰）' : '');
+      var mn = document.createElement('span');
+      mn.className = 'ld-min';
+      mn.textContent = titleNeedText(t);
+      li.appendChild(nm);
+      li.appendChild(mn);
+      if(g.titles.indexOf(t.id)>=0){
+        li.classList.add('is-current');
+        var tag = document.createElement('span');
+        tag.className = 'ld-now';
+        tag.textContent = '獲得';
+        li.appendChild(tag);
+      }
+      ol.appendChild(li);
     }
-    if(!cur && tag){ tag.parentNode.removeChild(tag); }
-    if(cur){ items[i].setAttribute('aria-current', 'step'); } else { items[i].removeAttribute('aria-current'); }
+    titleGuide.appendChild(h4);
+    titleGuide.appendChild(note);
+    titleGuide.appendChild(ol);
   }
 }
 function markGuideFocus(tableId, col){
@@ -3092,8 +3337,6 @@ function closeGuide(){
 }
 
 fillHomeCards();
-buildLadder(rankLadder, RANK_LEVELS);
-buildLadder(titleList, RANKS);
 applyStyleSelection(loadStore().lastStyle || DEFAULT_STYLE, false);
 renderRankAndDaily();
 renderHome();
@@ -3155,6 +3398,7 @@ function freshState(){
     spiceFlash:0,
     cutZoneWidth:20,
     cutFx:[],
+    justCount:0, hitCount:0, missCount:0,   // judgements of this game, for the 称号 records only (never the score)
     knifeChop:0,
     lastCutThickness:MIN_THICK,
     pendingServe:false,
@@ -3295,11 +3539,7 @@ btnStart.addEventListener('click', function(){
   if(pendingStyle!==home.style) applyStyleSelection(home.style, false);
   startGame(home.tier, home.mode);
 });
-rankBadge.addEventListener('click', function(){
-  var willOpen = rankPanel.hidden;
-  rankPanel.hidden = !willOpen;
-  rankBadge.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-});
+rankBadge.addEventListener('click', function(){ openMypage(rankBadge); });
 btnHowto.addEventListener('click', function(){ openGuide(null, null, null, btnHowto); });
 // ? beside each step: open the how-to at that comparison, highlighting what is currently chosen
 helpFlour.addEventListener('click', function(){ openGuide('g-flour', 'flour-table', home.style, helpFlour); });
@@ -3413,15 +3653,20 @@ function readResultForCard(){
     satisfaction: resultSatisfaction.textContent,
     combo: resultCombo.textContent,
     multiplier: resultMultiplier.textContent,
-    dan: resultDanName.textContent,
-    title: (resultRank.textContent || '').replace(/^称号[:：]\s*/, ''),
+    tier: (resultRank.textContent || '').replace(/^今回の腕前[:：]\s*/, ''),
+    total: fmtPoints(loadStore().stats.totalScore) + '点',
     newBest: resultNewBest.classList.contains('show'),
-    equipTitle: (resultTitleChip && !resultTitleChip.hidden) ? resultTitleChip.textContent : '',
+    who: cardIdentity(),
     mode: resultMode.hidden ? '' : resultMode.textContent,
     date: cardInfo.date || new Date()
   };
 }
 
+// [装着称号] ユーザー名 for the card: the worn title (or none) and the profile name (or a stand-in)
+function cardIdentity(){
+  var store = loadStore();
+  return {title:equippedTitleName(store.gacha), name:store.profile.name || DEFAULT_PLAYER_NAME};
+}
 function formatCardDate(d){
   if(!isFinite(d.getTime())) return '';
   return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
@@ -3524,7 +3769,8 @@ function drawCardBackground(ctx){
   ctx.strokeRect(42, 42, CARD_W - 84, CARD_H - 84);
 }
 
-function drawCardHeader(ctx, y, mode){
+var CARD_WHO_H = 82;          // the 〔称号〕 名前 line under the subtitle
+function drawCardHeader(ctx, y, mode, who){
   var cx = CARD_W / 2;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
@@ -3534,6 +3780,10 @@ function drawCardHeader(ctx, y, mode){
   ctx.fillStyle = CARD_COL.label;
   ctx.font = cardFont('700', 42, CARD_SERIF);
   ctx.fillText('〜 蕎麦切り修行 〜', cx, y + (mode ? 152 : 160));
+  if(who){
+    drawCardWho(ctx, cx, y + (mode ? 152 : 160) + 72, who);
+    y += CARD_WHO_H;
+  }
   if(mode){
     // a limited-time mode is named on a green pill instead of the plain rule
     fitFont(ctx, mode, 560, 32, 22, '700', CARD_SANS);
@@ -3559,6 +3809,36 @@ function drawCardHeader(ctx, y, mode){
   ctx.fill();
 }
 
+// 〔装着称号〕 ユーザー名: the title on a green seal, the name beside it, the pair centred and shrunk to fit
+function drawCardWho(ctx, cx, baseline, who){
+  var name = who.name, title = who.title, gap = 22, padX = 26, size = 44;
+  var tw = 0, nw = 0;
+  for(;;){
+    ctx.font = cardFont('700', size - 6, CARD_SANS);
+    tw = title ? ctx.measureText(title).width + padX*2 : 0;
+    ctx.font = cardFont('700', size, CARD_SERIF);
+    nw = ctx.measureText(name).width;
+    if(tw + (title ? gap : 0) + nw <= 860 || size<=26) break;
+    size -= 2;
+  }
+  var x = cx - (tw + (title ? gap : 0) + nw)/2;
+  if(title){
+    var ph = size + 18;
+    cardRoundRect(ctx, x, baseline - size + 2 - 10, tw, ph, ph/2);
+    ctx.fillStyle = CARD_COL.green;
+    ctx.fill();
+    ctx.fillStyle = CARD_COL.onGreen;
+    ctx.textAlign = 'center';
+    ctx.font = cardFont('700', size - 6, CARD_SANS);
+    ctx.fillText(title, x + tw/2, baseline - 4);
+    x += tw + gap;
+  }
+  ctx.fillStyle = CARD_COL.ink;
+  ctx.textAlign = 'left';
+  ctx.font = cardFont('700', size, CARD_SERIF);
+  ctx.fillText(name, x, baseline);
+  ctx.textAlign = 'center';
+}
 function drawHero(ctx, x, y, w, h, d){
   drawPanel(ctx, x, y, w, h, 30);
   var off = Math.max(0, (h - 262) / 2);
@@ -3624,7 +3904,7 @@ function drawAromaStrip(ctx, x, y, w, h, value){
   ctx.textBaseline = 'alphabetic';
 }
 
-function drawRankPlaque(ctx, x, y, w, h, dan, title, equipTitle){
+function drawRankPlaque(ctx, x, y, w, h, left, right){
   cardRoundRect(ctx, x, y, w, h, 18);
   var g = ctx.createLinearGradient(0, y, 0, y + h);
   g.addColorStop(0, CARD_COL.wood);
@@ -3653,11 +3933,11 @@ function drawRankPlaque(ctx, x, y, w, h, dan, title, equipTitle){
   ctx.lineTo(x + w / 2, y + h - 24);
   ctx.lineWidth = 2;
   ctx.stroke();
-  drawPlaqueColumn(ctx, x, y, w / 2, h, '段位', dan, equipTitle);
-  drawPlaqueColumn(ctx, x + w / 2, y, w / 2, h, '称号', title);
+  drawPlaqueColumn(ctx, x, y, w / 2, h, '今回の腕前', left);
+  drawPlaqueColumn(ctx, x + w / 2, y, w / 2, h, '累計スコア', right);
 }
 function drawPlaqueColumn(ctx, x, y, w, h, label, value, sub){
-  // sub: the equipped 称号, written small under the 段位 (the plaque is taller then)
+  // sub: a small line under the value (the plaque is taller then)
   var cx = x + w / 2, off = (h - (sub ? 164 : 132)) / 2;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
@@ -3751,14 +4031,14 @@ function drawResultCard(canvas, d){
 
   var X0 = 92, W = CARD_W - 184, TOP = 76, BOTTOM = CARD_H - 76;
   var showAroma = d.hasAroma && Number(d.aroma) > 0;   // 香りボーナス: 挽きぐるみ only, when one was earned
-  var H = {header:d.mode ? 222 : 190, hero:270, row1:164, row2:164, aroma:showAroma ? 92 : 0, plaque:d.equipTitle ? 164 : 132, footer:50};
+  var H = {header:(d.mode ? 222 : 190) + (d.who ? CARD_WHO_H : 0), hero:270, row1:164, row2:164, aroma:showAroma ? 92 : 0, plaque:132, footer:50};
   var gaps = showAroma ? 6 : 5;
   var used = H.header + H.hero + H.row1 + H.row2 + H.aroma + H.plaque + H.footer;
   var gap = Math.min(36, (BOTTOM - TOP - used) / gaps);
   H.hero += Math.max(0, BOTTOM - TOP - used - gap * gaps);
 
   var y = TOP;
-  drawCardHeader(ctx, y, d.mode);
+  drawCardHeader(ctx, y, d.mode, d.who);
   y += H.header + gap;
   var heroTop = y;
   drawHero(ctx, X0, y, W, H.hero, d);
@@ -3776,11 +4056,11 @@ function drawResultCard(canvas, d){
     drawAromaStrip(ctx, X0, y, W, H.aroma, d.aroma);
     y += H.aroma + gap;
   }
-  drawRankPlaque(ctx, X0, y, W, H.plaque, d.dan, d.title, d.equipTitle);
+  drawRankPlaque(ctx, X0, y, W, H.plaque, d.tier, d.total);
   y += H.plaque + gap;
   var dateText = formatCardDate(d.date);
   if(dateText) drawCardFooter(ctx, y, dateText);
-  if(d.newBest) drawBestStamp(ctx, X0 + W - 108, heroTop + 22, 112);
+  if(d.newBest) drawBestStamp(ctx, X0 + W - 108, heroTop + (d.who ? 64 : 22), 112);   // below the name line
 }
 
 function dataURLToBlob(url){
@@ -4196,6 +4476,8 @@ function registerHit(err){
   var pointsWithoutAroma = Math.round(points * multiplier * (isJust?2:1) * styleMult * 1);
   state.score += finalPoints;
   state.aromaScoreTotal += (finalPoints - pointsWithoutAroma);
+  state.hitCount++;
+  if(isJust) state.justCount++;
 
   if(state.styleConf.hasAroma && (!state.styleConf.aromaNeedsPerfect || rating==='PERFECT')){
     var beforeAroma = state.aromaBonus;
@@ -4220,6 +4502,7 @@ function registerHit(err){
 }
 
 function onMiss(){
+  state.missCount++;
   state.combo = 0;
   if(state.styleConf.missPenalty){
     state.score = Math.max(0, state.score - state.styleConf.missPenalty);
@@ -4346,6 +4629,13 @@ function advanceRoundAfterServing(){
   startRound();
 }
 
+// 新しい称号: the titles this game earned, by name, on the result
+function showNewTitles(ids){
+  var names = [];
+  for(var i=0;i<ids.length;i++) names.push('「' + titleDisplayName(ids[i]) + '」');
+  resultRankUp.textContent = names.length ? ('🏅 新しい称号' + names.join('') + 'を獲得!') : '';
+  resultRankUp.classList.toggle('show', names.length>0);
+}
 function endGame(){
   state.phase = 'result';
   resultScore.textContent = state.score;
@@ -4361,26 +4651,22 @@ function endGame(){
   var isNewSatisfactionBest = recordSatisfaction(state.tier, satisfactionAvg);
   resultSatisfactionBest.classList.toggle('show', isNewSatisfactionBest);
   recordMaxCombo(state.maxCombo);
+  // 称号の記録: the score, combo and JUST! rate of this game (read only; nothing here changes the score)
+  var newTitles = recordPlay(state.score, state.maxCombo, state.justCount, state.hitCount + state.missCount);
 
-  var rankBeforeIdx = computeRankIndex(loadStore().rank.bestTotal);
   var isNewBest = saveBest(state.style, state.tier, state.score);
   var dailyJustCleared = checkDailyClear(state.tier, state.score);
   var storeAfter = loadStore();
-  var rankAfterIdx = computeRankIndex(storeAfter.rank.bestTotal);
-  var rankedUp = rankAfterIdx>rankBeforeIdx;
 
   var styleBests = storeAfter.bests[state.style] || {};
   resultBest.textContent = styleBests[state.tier] || state.score;
-  resultDanName.textContent = RANK_LEVELS[rankAfterIdx].name;
   resultNewBest.classList.toggle('show', isNewBest);
-  resultRankUp.classList.toggle('show', rankedUp);
+  showNewTitles(newTitles);
   resultDailyClear.classList.toggle('show', dailyJustCleared);
   renderBests();
   renderRankAndDaily();
 
-  var rank = RANKS[0].name;
-  for(var i=0;i<RANKS.length;i++){ if(state.score>=RANKS[i].min) rank = RANKS[i].name; }
-  resultRank.textContent = '称号: ' + rank;
+  resultRank.textContent = '今回の腕前: ' + playTierName(state.score);
   showCoinsForGame(dailyJustCleared);
   showEquipOnResult();
   showScreen('result');
@@ -4430,16 +4716,13 @@ function endSeasonalGame(){
   var store = loadStore();
   var slot = store.seasonal[state.mode] || {};
   resultBest.textContent = Object.prototype.hasOwnProperty.call(slot, state.tier) ? slot[state.tier] : state.score;
-  resultDanName.textContent = RANK_LEVELS[computeRankIndex(store.rank.bestTotal)].name;
   resultNewBest.classList.toggle('show', isNewBest);
-  resultRankUp.classList.remove('show');
+  showNewTitles([]);
   resultDailyClear.classList.remove('show');
   resultSatisfactionBest.classList.remove('show');
   renderBests();
   renderRankAndDaily();
-  var rank = RANKS[0].name;
-  for(var i=0;i<RANKS.length;i++){ if(state.score>=RANKS[i].min) rank = RANKS[i].name; }
-  resultRank.textContent = '称号: ' + rank;
+  resultRank.textContent = '今回の腕前: ' + playTierName(state.score);
   showCoinsForGame(false);   // limited modes earn coins too (no daily challenge there)
   showEquipOnResult();
   showScreen('result');
@@ -5751,18 +6034,19 @@ var skinFailed = {};          // a slot whose drawing threw once goes back to th
 function equipAllowed(g, slot, id){
   try{
     if(typeof id!=='string' || GACHA_SLOTS.indexOf(slot)<0) return false;
-    if(slot==='title' && Object.prototype.hasOwnProperty.call(GACHA_TITLES, id)) return g.titles.indexOf(id)>=0;
+    if(slot==='title' && (Object.prototype.hasOwnProperty.call(GACHA_TITLES, id) || Object.prototype.hasOwnProperty.call(TITLE_BY_ID, id))) return g.titles.indexOf(id)>=0;
     var it = gachaItem(id);
     return !!(it && it.applyTo===slot && g.owned.indexOf(id)>=0);
   }catch(e){ return false; }
 }
 function titleDisplayName(id){
+  if(Object.prototype.hasOwnProperty.call(TITLE_BY_ID, id)) return TITLE_BY_ID[id].name;
   if(Object.prototype.hasOwnProperty.call(GACHA_TITLES, id)) return GACHA_TITLES[id].name;
   var it = gachaItem(id);
   return it ? it.name : '';
 }
 function equippedTitleName(g){
-  var id = (g && g.equipped) ? g.equipped.title : null;
+  var id = g ? g.equippedTitle : null;
   return equipAllowed(g, 'title', id) ? titleDisplayName(id) : '';
 }
 function validEquipped(g){
@@ -5806,6 +6090,7 @@ function setEquipped(slot, id){
   var store = loadStore(), g = store.gacha;
   if(id!==null && !equipAllowed(g, slot, id)) return {ok:false, reason:'invalid'};
   g.equipped[slot] = id;
+  if(slot==='title') g.equippedTitle = id;          // the worn 称号 (equipped.title is its copy)
   if(!saveStoreObj(store)) return {ok:false, reason:'save'};
   return {ok:true};
 }
@@ -8605,8 +8890,8 @@ function showEquipOnResult(){
   try{
     var sk = state.skin || {};
     var tname = sk.title ? sk.title.name : '';
-    resultTitleChip.hidden = !tname;
-    resultTitleChip.textContent = tname;
+    resultTitleChip.hidden = true;                   // the worn 称号 has its own row now
+    resultDanName.textContent = tname || 'なし';
     var names = [];
     for(var i=0;i<GACHA_SLOTS.length;i++){
       var slot = GACHA_SLOTS[i];
@@ -9032,13 +9317,16 @@ function slotChoices(g, slot){
     for(var t in GACHA_TITLES){
       if(Object.prototype.hasOwnProperty.call(GACHA_TITLES, t) && g.titles.indexOf(t)>=0) out.push({id:t, name:GACHA_TITLES[t].name, item:null});
     }
+    for(var k=0;k<TITLES_DATA.length;k++){
+      if(g.titles.indexOf(TITLES_DATA[k].id)>=0) out.push({id:TITLES_DATA[k].id, name:TITLES_DATA[k].name, item:null});
+    }
   }
   return out;
 }
 function slotTotal(slot){
   var n = 0;
   for(var i=0;i<GACHA_CATALOG.length;i++) if(GACHA_CATALOG[i].applyTo===slot) n++;
-  return slot==='title' ? n + Object.keys(GACHA_TITLES).length : n;
+  return slot==='title' ? n + Object.keys(GACHA_TITLES).length + TITLES_DATA.length : n;
 }
 function renderKisekae(){
   var g = loadStore().gacha, eq = validEquipped(g), i;
@@ -9619,6 +9907,533 @@ var SOUND_ICONS = {
     for(var n=0;n<3;n++){ g.beginPath(); g.moveTo(-4 + n*3, -18); g.bezierCurveTo(-2 + n*3, -28, 6 + n*3, -30, 10 + n*3, -40); g.stroke(); }
   }
 };
+
+// ---------- アカウントとクラウド同期（ローカルファースト） ----------
+// The game always plays from localStorage (echizenSoba.v1), logged in or not. Logging in adds a copy in the cloud:
+// at login the two are merged (the better of each), and whenever the save is written afterwards — the end of a
+// game, a pull, an exchange, a change of settings — and on 「今すぐ同期」, the merged save is sent up again.
+// Only a user name and a SHA-256 hash of the password leave the form; no e-mail address or other personal data.
+// SyncManager reaches the cloud through an adapter with four calls (register, login, load, save), each returning a
+// Promise of {ok:true, …} or {ok:false, error}. A real backend (a REST API, Supabase, Firestore …) goes in by
+// writing one adapter and pointing SYNC_CONFIG at it; until then the stand-in cloud lives in this browser.
+var DEFAULT_PLAYER_NAME = 'ななしの職人';
+var ACCOUNT_KEY = STORE_KEY + '.account';          // this device's login: {user, token, adapter, lastSync}
+var MOCK_CLOUD_KEY = 'echizenSoba.mockCloud';      // the stand-in cloud (no server is set up)
+var SYNC_CONFIG = {adapter:'mock', endpoint:''};   // {adapter:'rest', endpoint:'https://…'} for a real server
+var SYNC_DEBOUNCE_MS = 1500;
+
+// --- SHA-256: Web Crypto when the browser has it, otherwise the same digest worked out in plain JavaScript ---
+function sha256Fallback(text){
+  var K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,
+    0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,
+    0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,
+    0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  var bytes = unescape(encodeURIComponent(text)), m = [], i;
+  for(i=0;i<bytes.length;i++) m.push(bytes.charCodeAt(i));
+  var bitLen = m.length*8;
+  m.push(0x80);
+  while(m.length%64!==56) m.push(0);
+  for(i=7;i>=0;i--) m.push(i>=4 ? 0 : (bitLen >>> (i*8)) & 255);
+  var H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19], w = new Array(64);
+  function rotr(x, n){ return (x >>> n) | (x << (32 - n)); }
+  for(var off=0; off<m.length; off+=64){
+    for(i=0;i<16;i++) w[i] = (m[off+i*4]<<24) | (m[off+i*4+1]<<16) | (m[off+i*4+2]<<8) | m[off+i*4+3];
+    for(i=16;i<64;i++){
+      var s0 = rotr(w[i-15],7) ^ rotr(w[i-15],18) ^ (w[i-15]>>>3), s1 = rotr(w[i-2],17) ^ rotr(w[i-2],19) ^ (w[i-2]>>>10);
+      w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0;
+    }
+    var a=H[0], b=H[1], c=H[2], d=H[3], e=H[4], f=H[5], g=H[6], hh=H[7];
+    for(i=0;i<64;i++){
+      var S1 = rotr(e,6) ^ rotr(e,11) ^ rotr(e,25), ch = (e & f) ^ (~e & g), t1 = (hh + S1 + ch + K[i] + w[i]) | 0;
+      var S0 = rotr(a,2) ^ rotr(a,13) ^ rotr(a,22), mj = (a & b) ^ (a & c) ^ (b & c), t2 = (S0 + mj) | 0;
+      hh = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    H[0]=(H[0]+a)|0; H[1]=(H[1]+b)|0; H[2]=(H[2]+c)|0; H[3]=(H[3]+d)|0; H[4]=(H[4]+e)|0; H[5]=(H[5]+f)|0; H[6]=(H[6]+g)|0; H[7]=(H[7]+hh)|0;
+  }
+  var out = '';
+  for(i=0;i<8;i++) out += ('00000000' + (H[i] >>> 0).toString(16)).slice(-8);
+  return out;
+}
+function sha256Hex(text){
+  try{
+    if(window.crypto && window.crypto.subtle && typeof TextEncoder==='function'){
+      return window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function(buf){
+        var v = new Uint8Array(buf), s = '';
+        for(var i=0;i<v.length;i++) s += ('0' + v[i].toString(16)).slice(-2);
+        return s;
+      }, function(){ return sha256Fallback(text); });
+    }
+  }catch(e){}
+  return Promise.resolve(sha256Fallback(text));
+}
+// the password never leaves as typed: it is salted with the user name and hashed on this device
+function passwordHash(user, pass){ return sha256Hex('mugen-soba-do:' + user.toLowerCase() + ':' + pass); }
+function newToken(){
+  var s = '';
+  try{
+    var a = new Uint8Array(16);
+    window.crypto.getRandomValues(a);
+    for(var i=0;i<a.length;i++) s += ('0' + a[i].toString(16)).slice(-2);
+  }catch(e){ s = String(Date.now()) + String(Math.random()).slice(2); }
+  return s;
+}
+
+// --- adapters ---
+// 疑似クラウド: the cloud, played by a separate key in this browser (with a short delay, like a network)
+var MockCloudAdapter = {
+  id:'mock',
+  label:'この端末の疑似クラウド（サーバー未設定）',
+  read:function(){ try{ var o = JSON.parse(readRawLS(MOCK_CLOUD_KEY) || '{}'); return isPlainObj(o) && isPlainObj(o.users) ? o : {users:{}}; }catch(e){ return {users:{}}; } },
+  later:function(fn){ return new Promise(function(res){ setTimeout(function(){ try{ res(fn()); }catch(e){ res({ok:false, error:'storage'}); } }, 250); }); },
+  user:function(db, name, token){ var u = db.users[String(name).toLowerCase()]; return (u && (token===undefined || u.token===token)) ? u : null; },
+  register:function(name, hash){
+    var self = this;
+    return this.later(function(){
+      var db = self.read(), k = name.toLowerCase();
+      if(db.users[k]) return {ok:false, error:'taken'};
+      var token = newToken();
+      db.users[k] = {name:name, hash:hash, token:token, data:null, updatedAt:0};
+      return writeRawLS(MOCK_CLOUD_KEY, JSON.stringify(db)) ? {ok:true, user:name, token:token} : {ok:false, error:'storage'};
+    });
+  },
+  login:function(name, hash){
+    var self = this;
+    return this.later(function(){
+      var db = self.read(), u = self.user(db, name);
+      if(!u || u.hash!==hash) return {ok:false, error:'auth'};
+      u.token = newToken();
+      return writeRawLS(MOCK_CLOUD_KEY, JSON.stringify(db)) ? {ok:true, user:u.name, token:u.token} : {ok:false, error:'storage'};
+    });
+  },
+  load:function(name, token){
+    var self = this;
+    return this.later(function(){
+      var u = self.user(self.read(), name, token);
+      return u ? {ok:true, data:u.data, updatedAt:u.updatedAt} : {ok:false, error:'session'};
+    });
+  },
+  save:function(name, token, data){
+    var self = this;
+    return this.later(function(){
+      var db = self.read(), u = self.user(db, name, token);
+      if(!u) return {ok:false, error:'session'};
+      u.data = data;
+      u.updatedAt = Date.now();
+      return writeRawLS(MOCK_CLOUD_KEY, JSON.stringify(db)) ? {ok:true, updatedAt:u.updatedAt} : {ok:false, error:'storage'};
+    });
+  }
+};
+// 汎用 REST: POST /register and /login {user, hash} → {ok, user, token}; GET /save → {ok, data, updatedAt};
+// PUT /save {data} → {ok, updatedAt}. The token goes as "Authorization: Bearer …".
+var RestAdapter = {
+  id:'rest',
+  label:'クラウド',
+  call:function(path, method, body, token){
+    if(!SYNC_CONFIG.endpoint || typeof fetch!=='function') return Promise.resolve({ok:false, error:'offline'});
+    var headers = {'Content-Type':'application/json'};
+    if(token) headers.Authorization = 'Bearer ' + token;
+    return fetch(SYNC_CONFIG.endpoint.replace(/\/+$/, '') + path, {method:method, headers:headers, body:body ? JSON.stringify(body) : undefined})
+      .then(function(r){
+        return r.json().then(function(j){ return (r.ok && isPlainObj(j)) ? j : {ok:false, error:(isPlainObj(j) && j.error) || ('http' + r.status)}; },
+                             function(){ return {ok:false, error:'http' + r.status}; });
+      }, function(){ return {ok:false, error:'offline'}; });
+  },
+  register:function(name, hash){ return this.call('/register', 'POST', {user:name, hash:hash}); },
+  login:function(name, hash){ return this.call('/login', 'POST', {user:name, hash:hash}); },
+  load:function(name, token){ return this.call('/save', 'GET', null, token); },
+  save:function(name, token, data){ return this.call('/save', 'PUT', {data:data}, token); }
+};
+
+// --- マージ: the better of this device and the cloud ---
+// scores, combos and every running total: the larger; coins and そば札: the more; the 図鑑, items and earned titles:
+// both together. Settings stay this device's own (they are preferences of the screen in hand).
+function mergeMaxMap(a, b){
+  var out = {}, k;
+  for(k in a){ if(Object.prototype.hasOwnProperty.call(a, k)) out[k] = a[k]; }
+  for(k in b){ if(Object.prototype.hasOwnProperty.call(b, k) && !(out[k]>=b[k])) out[k] = b[k]; }
+  return out;
+}
+function mergeMaxNested(a, b){
+  var out = {}, k;
+  for(k in a){ if(Object.prototype.hasOwnProperty.call(a, k)) out[k] = mergeMaxMap(a[k], {}); }
+  for(k in b){ if(Object.prototype.hasOwnProperty.call(b, k)) out[k] = mergeMaxMap(out[k] || {}, b[k]); }
+  return out;
+}
+function unionList(a, b){
+  var out = a.slice();
+  for(var i=0;i<b.length;i++) if(out.indexOf(b[i])<0) out.push(b[i]);
+  return out;
+}
+function mergeStores(localRaw, cloudRaw){
+  var L = coerceStore(localRaw);
+  if(!isPlainObj(cloudRaw)) return L;
+  var C = coerceStore(cloudRaw), out = coerceStore(localRaw), k;
+  out.bests = mergeMaxNested(L.bests, C.bests);
+  out.seasonal = mergeMaxNested(L.seasonal, C.seasonal);
+  out.satisfaction = mergeMaxMap(L.satisfaction, C.satisfaction);
+  for(k in out.stats){ if(Object.prototype.hasOwnProperty.call(out.stats, k)) out.stats[k] = Math.max(L.stats[k], C.stats[k]); }
+  if(L.daily && C.daily && L.daily.date===C.daily.date) out.daily.cleared = L.daily.cleared || C.daily.cleared;
+  else if(C.daily && (!L.daily || C.daily.date>L.daily.date)) out.daily = C.daily;
+  if(!out.lastPlayedSeasonal) out.lastPlayedSeasonal = C.lastPlayedSeasonal;
+  var g = out.gacha, lg = L.gacha, cg = C.gacha;
+  g.currency = Math.max(lg.currency, cg.currency);
+  g.tickets = Math.max(lg.tickets, cg.tickets);
+  g.owned = unionList(lg.owned, cg.owned);
+  g.titles = unionList(lg.titles, cg.titles);
+  g.stats.totalPulls = Math.max(lg.stats.totalPulls, cg.stats.totalPulls);
+  if(lg.dailyEarned.date===cg.dailyEarned.date){
+    g.dailyEarned.amount = Math.max(lg.dailyEarned.amount, cg.dailyEarned.amount);
+    g.dailyEarned.challenge = lg.dailyEarned.challenge || cg.dailyEarned.challenge;
+  } else if(cg.dailyEarned.date>lg.dailyEarned.date) g.dailyEarned = cg.dailyEarned;
+  if(!g.history.length) g.history = cg.history;
+  for(k in g.equipped){ if(Object.prototype.hasOwnProperty.call(g.equipped, k) && !g.equipped[k]) g.equipped[k] = cg.equipped[k]; }
+  if(!g.equippedTitle) g.equippedTitle = cg.equippedTitle;
+  if(!out.profile.name) out.profile.name = C.profile.name;
+  evaluateTitles(out);
+  return out;
+}
+
+// --- SyncManager ---
+var SYNC_ERRORS = {
+  taken:'そのユーザー名はすでに使われています。別の名前にしてください。',
+  auth:'ユーザー名かパスワードが違います。',
+  session:'ログインの有効期限が切れました。もう一度ログインしてください。',
+  offline:'クラウドにつながりませんでした。通信できる状態で、もう一度試してください。',
+  storage:'保存できませんでした。ブラウザの保存容量や設定を確かめてください。',
+  nologin:'ログインしていません。',
+  user:'ユーザー名は3〜16文字の英数字・かな・漢字・_ - で入力してください。',
+  pass:'パスワードは6文字以上で入力してください。'
+};
+var USER_RE = /^[A-Za-z0-9_\-ぁ-ゖァ-ヺー一-鿿々]{3,16}$/;
+var SyncManager = {
+  adapter:(SYNC_CONFIG.adapter==='rest' && SYNC_CONFIG.endpoint) ? RestAdapter : MockCloudAdapter,
+  busy:null, timer:0, applying:false, lastError:'', listeners:[],
+  account:function(){
+    try{
+      var a = JSON.parse(readRawLS(ACCOUNT_KEY) || 'null');
+      if(isPlainObj(a) && typeof a.user==='string' && typeof a.token==='string' && a.adapter===this.adapter.id){
+        return {user:a.user, token:a.token, adapter:a.adapter, lastSync:clampInt(a.lastSync, 0, 1e15)};
+      }
+    }catch(e){}
+    return null;
+  },
+  isLoggedIn:function(){ return !!this.account(); },
+  setAccount:function(a){ if(a) writeRawLS(ACCOUNT_KEY, JSON.stringify(a)); else removeRawLS(ACCOUNT_KEY); this.notify(); },
+  onChange:function(fn){ this.listeners.push(fn); },
+  notify:function(){ for(var i=0;i<this.listeners.length;i++){ try{ this.listeners[i](); }catch(e){} } },
+  check:function(user, pass){
+    if(!USER_RE.test(user)) return 'user';
+    if(typeof pass!=='string' || pass.length<6) return 'pass';
+    return '';
+  },
+  // register or log in, then merge this device's save with the cloud's at once
+  enter:function(kind, user, pass){
+    var self = this, bad = this.check(user, pass);
+    if(bad) return Promise.resolve({ok:false, error:bad});
+    return passwordHash(user, pass).then(function(hash){
+      return kind==='register' ? self.adapter.register(user, hash) : self.adapter.login(user, hash);
+    }).then(function(res){
+      if(!res || !res.ok) return {ok:false, error:(res && res.error) || 'offline'};
+      self.setAccount({user:res.user || user, token:res.token, adapter:self.adapter.id, lastSync:0});
+      return self.syncNow().then(function(r){
+        var store = loadStore();                    // no name on this device or in the cloud: the user name becomes it
+        if(r.ok && !store.profile.name){ store.profile.name = cleanProfileName(res.user || user); saveStoreObj(store); }
+        return r;
+      });
+    }, function(){ return {ok:false, error:'offline'}; });
+  },
+  logout:function(){
+    if(this.timer){ clearTimeout(this.timer); this.timer = 0; }
+    this.setAccount(null);                        // the save on this device stays as it is
+  },
+  // a save was written: send it up a moment later (only while logged in; never for the sync's own write)
+  request:function(){
+    if(this.applying || !this.isLoggedIn()) return;
+    var self = this;
+    if(this.timer) clearTimeout(this.timer);
+    this.timer = setTimeout(function(){ self.timer = 0; self.syncNow(); }, SYNC_DEBOUNCE_MS);
+  },
+  syncNow:function(){
+    var self = this, acc = this.account();
+    if(!acc) return Promise.resolve({ok:false, error:'nologin'});
+    if(this.busy) return this.busy;
+    this.notify();
+    this.busy = this.adapter.load(acc.user, acc.token).then(function(res){
+      if(!res || !res.ok) return {ok:false, error:(res && res.error) || 'offline'};
+      var merged = mergeStores(loadStore(), res.data);
+      self.applying = true;
+      saveStoreObj(merged);                       // this device first: the game never waits for the network
+      self.applying = false;
+      return self.adapter.save(acc.user, acc.token, merged).then(function(r2){
+        if(!r2 || !r2.ok) return {ok:false, error:(r2 && r2.error) || 'offline'};
+        var a = self.account();
+        if(a){ a.lastSync = Date.now(); writeRawLS(ACCOUNT_KEY, JSON.stringify(a)); }
+        return {ok:true};
+      });
+    }, function(){ return {ok:false, error:'offline'}; }).then(function(r){
+      self.busy = null;
+      self.applying = false;
+      self.lastError = r.ok ? '' : r.error;
+      if(r.error==='session') self.setAccount(null);
+      self.notify();
+      return r;
+    });
+    this.notify();
+    return this.busy;
+  }
+};
+function syncErrorText(code){ return SYNC_ERRORS[code] || 'うまくいきませんでした。もう一度試してください。'; }
+function agoText(t){
+  if(!t) return '未同期';
+  var s = Math.max(0, Math.floor((Date.now() - t)/1000));
+  if(s<60) return '最終同期: たった今';
+  if(s<3600) return '最終同期: ' + Math.floor(s/60) + '分前';
+  if(s<86400) return '最終同期: ' + Math.floor(s/3600) + '時間前';
+  return '最終同期: ' + Math.floor(s/86400) + '日前';
+}
+
+// ---------- マイページ: the name, the worn 称号, the four records, and the account ----------
+var mpEls = {};
+['mypage-title','btn-mypage-back','mp-avatar','mp-name','mp-name-edit','mp-title-btn','mp-title-name','mp-name-form','mp-name-input',
+ 'mp-name-cancel','mp-high','mp-total','mp-combo','mp-collect','mp-title-count','mp-title-list','mp-status','mp-sync','mp-auth','mp-user',
+ 'mp-pass','mp-register','mp-login','mp-auth-cancel','mp-open-auth','mp-sync-now','mp-logout','mp-msg','mp-cloud-note',
+ 'tmodal','tm-h','tm-close','tm-now','tm-list','tm-msg'].forEach(function(id){ mpEls[id] = document.getElementById(id); });
+var mypageOpener = null, tmOpener = null, mpTick = 0;
+function openMypage(opener){
+  mypageOpener = opener || null;
+  setMpMsg('');
+  mpEls['mp-name-form'].hidden = true;
+  mpEls['mp-auth'].hidden = true;
+  renderMypage();
+  showScreen('mypage');
+  focusEl(mpEls['mypage-title']);
+  if(!mpTick) mpTick = setInterval(function(){ if(screens.mypage.classList.contains('active')) renderMypageAccount(); }, 30000);   // 「○分前」 keeps up
+}
+function closeMypage(){
+  closeTitleModal();
+  showScreen('title');
+  renderHome();
+  renderRankAndDaily();
+  focusEl(mypageOpener || rankBadge);
+}
+function setMpMsg(text, isError){
+  mpEls['mp-msg'].textContent = text || '';
+  mpEls['mp-msg'].classList.toggle('is-error', !!isError);
+}
+function renderMypage(){
+  var store = loadStore(), g = store.gacha, st = store.stats, m = titleMetrics(store);
+  var name = store.profile.name || DEFAULT_PLAYER_NAME;
+  mpEls['mp-name'].textContent = name;
+  mpEls['mp-avatar'].textContent = name.charAt(0);
+  var worn = equippedTitleName(g);
+  mpEls['mp-title-name'].textContent = worn || '称号なし';
+  mpEls['mp-title-btn'].setAttribute('aria-label', '称号（いまは「' + (worn || 'なし') + '」）。押すと付け替えられます');
+  mpEls['mp-high'].textContent = fmtPoints(st.highScore);
+  mpEls['mp-total'].textContent = fmtPoints(st.totalScore);
+  mpEls['mp-combo'].textContent = fmtPoints(st.maxCombo);
+  mpEls['mp-collect'].textContent = '';
+  mpEls['mp-collect'].appendChild(document.createTextNode(m.collectPct + '%'));
+  var sm = document.createElement('small');
+  sm.textContent = ' / ' + m.owned + '種';
+  mpEls['mp-collect'].appendChild(sm);
+  var got = 0, all = TITLES_DATA.length;
+  for(var i=0;i<TITLES_DATA.length;i++) if(g.titles.indexOf(TITLES_DATA[i].id)>=0) got++;
+  mpEls['mp-title-count'].textContent = '獲得した称号 ' + got + ' / ' + all;
+  renderMypageAccount();
+}
+function renderMypageAccount(){
+  var acc = SyncManager.account(), busy = !!SyncManager.busy;
+  mpEls['mp-status'].textContent = acc ? ('ログイン中：' + acc.user) : '未ログイン（この端末に保存）';
+  mpEls['mp-sync'].textContent = busy ? '同期しています…' : (acc ? agoText(acc.lastSync) : '未同期（ログインすると同期できます）');
+  mpEls['mp-open-auth'].hidden = !!acc;
+  mpEls['mp-sync-now'].hidden = !acc;
+  mpEls['mp-logout'].hidden = !acc;
+  mpEls['mp-sync-now'].disabled = busy;
+  mpEls['mp-register'].disabled = busy;
+  mpEls['mp-login'].disabled = busy;
+  if(acc) mpEls['mp-auth'].hidden = true;
+  mpEls['mp-cloud-note'].textContent = '保存先：' + SyncManager.adapter.label + '。' +
+    (SyncManager.adapter.id==='mock' ? 'いまはこのブラウザの中に別枠で保存しています。サーバーを用意して設定すると、ほかの端末とも同期できます。' : '');
+}
+SyncManager.onChange(function(){
+  if(screens.mypage && screens.mypage.classList.contains('active')) renderMypageAccount();
+});
+
+// 名前
+mpEls['mp-name-edit'].addEventListener('click', function(){
+  var store = loadStore();
+  mpEls['mp-name-form'].hidden = false;
+  mpEls['mp-name-input'].value = store.profile.name;
+  mpEls['mp-name-input'].placeholder = DEFAULT_PLAYER_NAME;
+  mpEls['mp-name-input'].focus();
+});
+mpEls['mp-name-cancel'].addEventListener('click', function(){ mpEls['mp-name-form'].hidden = true; focusEl(mpEls['mp-name-edit']); });
+mpEls['mp-name-form'].addEventListener('submit', function(e){
+  e.preventDefault();
+  var store = loadStore();
+  store.profile.name = cleanProfileName(mpEls['mp-name-input'].value);
+  if(!saveStoreObj(store)){ setMpMsg('保存できませんでした。', true); return; }
+  mpEls['mp-name-form'].hidden = true;
+  renderMypage();
+  setMpMsg(store.profile.name ? '名前を「' + store.profile.name + '」にしました。' : '名前を消しました（「' + DEFAULT_PLAYER_NAME + '」と表示します）。');
+  focusEl(mpEls['mp-name-edit']);
+});
+
+// アカウント
+mpEls['mp-open-auth'].addEventListener('click', function(){
+  mpEls['mp-auth'].hidden = false;
+  setMpMsg('');
+  mpEls['mp-user'].focus();
+});
+mpEls['mp-auth-cancel'].addEventListener('click', function(){
+  mpEls['mp-auth'].hidden = true;
+  mpEls['mp-pass'].value = '';
+  focusEl(mpEls['mp-open-auth']);
+});
+function runAuth(kind){
+  var user = mpEls['mp-user'].value.trim(), pass = mpEls['mp-pass'].value;
+  setMpMsg(kind==='register' ? 'アカウントを作っています…' : 'ログインしています…');
+  SyncManager.enter(kind, user, pass).then(function(r){
+    mpEls['mp-pass'].value = '';                 // the password is never kept
+    if(r.ok){
+      mpEls['mp-auth'].hidden = true;
+      renderMypage();
+      setMpMsg(kind==='register' ? 'アカウントを作り、この端末の記録をクラウドに保存しました。' : 'ログインして、この端末とクラウドの記録をまとめました。');
+      focusEl(mpEls['mp-sync-now']);
+    } else {
+      renderMypageAccount();
+      setMpMsg(syncErrorText(r.error), true);
+    }
+  });
+}
+mpEls['mp-register'].addEventListener('click', function(){ runAuth('register'); });
+mpEls['mp-auth'].addEventListener('submit', function(e){ e.preventDefault(); runAuth('login'); });
+mpEls['mp-sync-now'].addEventListener('click', function(){
+  setMpMsg('同期しています…');
+  SyncManager.syncNow().then(function(r){
+    renderMypage();
+    setMpMsg(r.ok ? '同期しました。' : syncErrorText(r.error), !r.ok);
+  });
+});
+mpEls['mp-logout'].addEventListener('click', function(){
+  SyncManager.logout();
+  renderMypage();
+  setMpMsg('ログアウトしました。この端末の記録はそのまま残っています。');
+  focusEl(mpEls['mp-open-auth']);
+});
+mpEls['btn-mypage-back'].addEventListener('click', closeMypage);
+
+// 称号の付け替え: every title by its ladder; earned ones can be worn, the others show what is still needed
+function openTitleModal(opener){
+  tmOpener = opener || null;
+  mpEls['tm-msg'].textContent = '';
+  renderTitleModal();
+  mpEls['tmodal'].hidden = false;
+  focusEl(mpEls['tm-h']);
+}
+function closeTitleModal(){
+  if(mpEls['tmodal'].hidden) return;
+  mpEls['tmodal'].hidden = true;
+  if(tmOpener) focusEl(tmOpener);
+}
+function wearTitle(id){
+  var res = setEquipped('title', id);
+  if(!res.ok){ mpEls['tm-msg'].textContent = '付け替えられませんでした。'; return; }
+  mpEls['tm-msg'].textContent = id ? ('「' + titleDisplayName(id) + '」を身につけました。') : '称号を外しました。';
+  renderTitleModal();
+  renderMypage();
+}
+function titleRow(id, name, cond, earned, worn, progress){
+  var li = document.createElement('li');
+  li.className = 'tm-item' + (earned ? '' : ' is-locked') + (worn ? ' is-on' : '');
+  var tx = document.createElement('div');
+  tx.className = 'tm-text';
+  var nm = document.createElement('span');
+  nm.className = 'tm-name';
+  nm.textContent = earned ? name : name;
+  var cd = document.createElement('span');
+  cd.className = 'tm-cond';
+  cd.textContent = (earned ? '獲得済み・' : '条件：') + cond;
+  tx.appendChild(nm);
+  tx.appendChild(cd);
+  if(!earned && progress!==null){
+    var bar = document.createElement('div');
+    bar.className = 'tm-bar';
+    bar.setAttribute('role', 'progressbar');
+    bar.setAttribute('aria-label', name + 'までの進み具合');
+    bar.setAttribute('aria-valuemin', '0');
+    bar.setAttribute('aria-valuemax', '100');
+    bar.setAttribute('aria-valuenow', String(progress));
+    var fill = document.createElement('i');
+    fill.style.width = progress + '%';
+    bar.appendChild(fill);
+    tx.appendChild(bar);
+  }
+  li.appendChild(tx);
+  if(earned){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn-small' + (worn ? '' : ' btn-primary');
+    b.textContent = worn ? '外す' : '身につける';
+    b.setAttribute('aria-label', '「' + name + '」を' + (worn ? '外す' : '身につける'));
+    b.addEventListener('click', function(){ wearTitle(worn ? null : id); });
+    li.appendChild(b);
+  }
+  return li;
+}
+function renderTitleModal(){
+  var store = loadStore(), g = store.gacha, m = titleMetrics(store), worn = g.equippedTitle;
+  var wornName = equippedTitleName(g);
+  mpEls['tm-now'].textContent = wornName ? ('いま身につけている称号：' + wornName) : 'いまは称号を身につけていません。';
+  var list = mpEls['tm-list'];
+  list.textContent = '';
+  for(var c=0;c<TITLE_CATS.length;c++){
+    var cat = TITLE_CATS[c];
+    var h = document.createElement('h4');
+    h.className = 'tm-cat';
+    h.textContent = cat.label;
+    var ul = document.createElement('ul');
+    ul.className = 'tm-items';
+    for(var i=0;i<TITLES_DATA.length;i++){
+      var t = TITLES_DATA[i];
+      if(t.cat!==cat.id) continue;
+      var earned = g.titles.indexOf(t.id)>=0;
+      var cur = m[t.need.key] || 0, pct = t.need.min>0 ? Math.max(0, Math.min(99, Math.floor(cur*100/t.need.min))) : 0;
+      ul.appendChild(titleRow(t.id, t.name + (t.top ? '（最高峰）' : ''), titleNeedText(t), earned, worn===t.id, earned ? null : pct));
+    }
+    list.appendChild(h);
+    list.appendChild(ul);
+  }
+  // 特別な称号: the 図鑑 completion title and the のれん item, when they are held
+  var extra = slotChoices(g, 'title').filter(function(ch){ return !Object.prototype.hasOwnProperty.call(TITLE_BY_ID, ch.id); });
+  if(extra.length){
+    var hx = document.createElement('h4');
+    hx.className = 'tm-cat';
+    hx.textContent = '特別な称号';
+    var ux = document.createElement('ul');
+    ux.className = 'tm-items';
+    for(var x=0;x<extra.length;x++) ux.appendChild(titleRow(extra[x].id, extra[x].name, extra[x].item ? '図鑑のアイテム' : '図鑑をすべて集める', true, worn===extra[x].id, null));
+    list.appendChild(hx);
+    list.appendChild(ux);
+  }
+}
+mpEls['mp-title-btn'].addEventListener('click', function(){ openTitleModal(mpEls['mp-title-btn']); });
+mpEls['mp-title-list'].addEventListener('click', function(){ openTitleModal(mpEls['mp-title-list']); });
+mpEls['tm-close'].addEventListener('click', closeTitleModal);
+mpEls['tmodal'].addEventListener('click', function(e){ if(e.target && e.target.getAttribute && e.target.getAttribute('data-tclose')) closeTitleModal(); });
+document.addEventListener('keydown', function(e){
+  if(mpEls['tmodal'].hidden) return;
+  if(e.key==='Escape'){ e.preventDefault(); closeTitleModal(); return; }
+  if(e.key==='Tab'){                                 // keep the focus inside the picker
+    var f = mpEls['tmodal'].querySelectorAll('button');
+    if(!f.length) return;
+    var first = f[0], last = f[f.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  }
+});
 
 // ---------- 交換所・着せ替え: open from home, the gacha, the 図鑑 or each other; 戻る goes back where they came from ----------
 var subFrom = {exchange:null, kisekae:null};
