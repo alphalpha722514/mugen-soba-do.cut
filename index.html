@@ -826,6 +826,17 @@ body{
 .daily-btn.is-done .daily-sub{color:var(--ok);}
 @media (hover:hover){ .daily-btn:hover,.collect-btn:hover{border-color:var(--accent-ink);} }
 .help-opts{flex-wrap:wrap;}
+/* home: リズム修行・斬 */
+.zan-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;padding:10px var(--pad-x);border-left:4px solid var(--accent2-ink);}
+.zan-main{flex:1 1 200px;min-width:0;}
+.zan-h{margin:0;display:flex;align-items:center;gap:8px;font-size:.92rem;font-weight:900;}
+.zan-seal{display:grid;place-items:center;width:1.7em;height:1.7em;border-radius:6px;background:var(--accent2-ink);color:var(--card);font-family:var(--font-display);font-size:1rem;}
+.zan-sub{margin:3px 0 0;font-size:.7rem;line-height:1.55;color:var(--ink-soft);}
+.zan-best{display:inline-block;margin-left:6px;font-weight:900;color:var(--ink);}
+.zan-btn{flex:0 0 auto;}
+/* result of 斬: its own numbers in place of the bowl's */
+#screen-result.is-zan .result-stats:not(.zan-stats),#screen-result.is-zan #btn-save-image,#screen-result.is-zan #result-equip{display:none;}
+.zan-stats[hidden]{display:none;}
 .bgm-opts{flex-wrap:wrap;align-items:center;}
 .bgm-vol{display:flex;align-items:center;gap:8px;flex:1 1 160px;min-width:0;font-size:.78rem;font-weight:700;}
 .bgm-vol input{flex:1 1 auto;min-width:0;accent-color:var(--accent-ink);}
@@ -1382,6 +1393,14 @@ body{
       </button>
     </section>
 
+    <section class="zan-row card" aria-labelledby="zan-row-h">
+      <div class="zan-main">
+        <h2 id="zan-row-h" class="zan-h"><span class="zan-seal" aria-hidden="true">斬</span>リズム修行・斬</h2>
+        <p class="zan-sub">BGMの拍に合わせて切る、ミリ秒判定のリズムモード（BPM 120・約80秒）。<span id="zan-best" class="zan-best">自己ベスト —</span></p>
+      </div>
+      <button id="btn-zan" class="btn-small btn-primary zan-btn" type="button">斬モードで遊ぶ</button>
+    </section>
+
     <div class="howto-row">
       <button id="btn-howto" class="link-btn" type="button">遊び方を見る</button>
       <p class="howto-oneline">師匠のお手本と同じリズムでタップ。ピタリほど細い麺になる。</p>
@@ -1432,7 +1451,7 @@ body{
         <div class="clear-row">
           <button id="btn-clear" class="btn-small btn-danger" type="button">記録を消す</button>
           <div id="clear-confirm" class="clear-confirm" hidden>
-            <p class="clear-q">自己ベスト・限定ベスト・累計スコアなどの戦績・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備・獲得した称号・名前・クイズの成績は残ります）。ログイン中は、クラウドとほかの端末の戦績も消えます。</p>
+            <p class="clear-q">自己ベスト・限定ベスト・リズム修行・斬のベスト・累計スコアなどの戦績・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備・獲得した称号・名前・クイズの成績は残ります）。ログイン中は、クラウドとほかの端末の戦績も消えます。</p>
             <div class="clear-actions">
               <button id="btn-clear-yes" class="btn-small btn-danger-solid" type="button">消す</button>
               <button id="btn-clear-no" class="btn-small" type="button">やめる</button>
@@ -1634,11 +1653,12 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、BGMのオン・オフと音量、描画の細かさ、お客さんの反応の演出、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
+        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、リズム修行・斬の自己ベストと完成度、効果音のオン・オフ、BGMのオン・オフと音量、描画の細かさ、お客さんの反応の演出、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
         <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。ホームやリザルトの「友達に共有」で共有すると、1日1回+200（共有ボーナス）。</li>
+        <li><b>リズム修行・斬</b>ホームの「斬モードで遊ぶ」で、BGM（♩=120）の拍にぴったり合わせて切るリズムモードを遊べます。判定は音の時計で測り、ずれ±35ms以内がPerfect、±80ms以内がOK、それより外か見逃しがMissです。ふつうに切る「通常切り」、長押しで溜めて「斬」の拍で離す「タメ切り」、細い麺を8分・16分で刻む「フィーバー」、裏拍に来る薬味を切る「薬味切り」の4種類があり、Perfectの音はその小節の和音にそろいます。得点と自己ベストは修行とは別に記録され、修行の自己ベスト・累計スコア・称号には入りません（そば猪口コインはもらえます）。</li>
         <li><b>BGM</b>ホーム・修行・リザルト・ガチャで、場面ごとの和風の音楽が流れます（音声ファイルは使わず、ブラウザの中で合成しています）。修行中はコンボが10・20・30・40と続くたびに、三味線・篠笛・締太鼓・箏が1つずつ重なります。「記録と設定」で、効果音とは別にオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</li>
         <li><b>今日のクイズ</b>ホームの「今日のクイズ」で、越前そばと福井にちなんだ4択クイズが1日3問出ます（問題は日付で決まり、その日はみんな同じ3問）。1問正解ごとにそば札1枚、3問とも正解するとさらに2枚。全問正解で称号「越前通」、通算30問正解で称号「そば博士」がもらえます。</li>
         <li><b>限定アイテム</b>ガチャや交換所には出ない4種のアイテムが、修行やクイズの実績（最大30コンボ・累計スコア50,000点・修行30回・クイズ通算10問正解）で解放されます。図鑑の「限定」に、まだのものは「？？？」と解放の条件が出ます。</li>
@@ -1789,7 +1809,7 @@ body{
     <div class="hud">
       <div class="hud-item"><span>得点</span><span id="hud-score">0</span></div>
       <div class="hud-item"><span>コンボ</span><span id="hud-combo">0</span></div>
-      <div class="hud-item"><span>客数</span><span id="hud-customers">1/5</span></div>
+      <div class="hud-item"><span id="hud-third-label">客数</span><span id="hud-customers">1/5</span></div>
     </div>
     <div id="aroma-gauge-wrap" class="aroma-gauge-wrap">
       <div class="aroma-gauge-label"><span id="aroma-label">香り</span><span id="aroma-value">0</span></div>
@@ -1808,7 +1828,7 @@ body{
       <p id="serve-sr" class="vh" role="status"></p>
       <button id="btn-sound-toggle" class="sound-toggle">🔊</button>
     </div>
-    <p class="tap-hint">タップ / スペースキーでカット!</p>
+    <p id="tap-hint" class="tap-hint">タップ / スペースキーでカット!</p>
   </section>
 
   <section id="screen-mypage" class="screen guide mypage" aria-labelledby="mypage-title">
@@ -1927,6 +1947,16 @@ body{
       <p>最大倍率 <span id="result-multiplier">x1.0</span></p>
       <p>香りボーナス <span id="result-aroma">0</span></p>
       <p>お客さんの満足度 <span id="result-satisfaction">0</span></p>
+    </div>
+    <div id="zan-stats" class="result-stats zan-stats" hidden>
+      <p>得点 <span id="zan-r-score">0</span></p>
+      <p>自己ベスト <span id="zan-r-best">0</span></p>
+      <p>Perfect <span id="zan-r-perfect">0</span></p>
+      <p>OK <span id="zan-r-ok">0</span></p>
+      <p>Miss <span id="zan-r-miss">0</span></p>
+      <p>最大コンボ <span id="zan-r-combo">0</span></p>
+      <p>完成度 <span id="zan-r-acc">0%</span></p>
+      <p>平均のずれ <span id="zan-r-err">±0ms</span></p>
     </div>
     <p id="result-equip" class="result-equip" hidden></p>
     <section id="coin-box" class="coin-box" aria-label="そば猪口コイン" hidden>
@@ -3326,6 +3356,12 @@ function sanitizeBadges(raw){
   var b = isPlainObj(raw) ? raw : {};
   return {quiz:b.quiz!==false, zukan:b.zukan===true, kisekae:b.kisekae===true};
 }
+// zan: リズム修行・斬's own record (its best score and best 完成度, and how many songs played)
+var ZAN_GRADE_NAMES = ['並','上','特上','極上'];
+function sanitizeZan(raw){
+  var z = isPlainObj(raw) ? raw : {};
+  return {best:clampInt(z.best, 0, STAT_MAX), plays:clampInt(z.plays, 0, STAT_MAX), bestGrade:ZAN_GRADE_NAMES.indexOf(z.bestGrade)>=0 ? z.bestGrade : ''};
+}
 function sanitizeRewards(raw){
   var r = isPlainObj(raw) ? raw : {};
   return {unlockedItems:sanitizeIdList(r.unlockedItems, 200), unlockedTitles:sanitizeIdList(r.unlockedTitles, 200)};
@@ -3391,7 +3427,7 @@ function defaultStore(){
   g.titles = ['t_nyumon'];                        // everyone starts as そば入門, wearing it
   g.equippedTitle = g.equipped.title = 't_nyumon';
   return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, daily:null, stats:sanitizeStats(null), lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:g, settings:defaultSettings(), profile:sanitizeProfile(null), recordsClearedAt:0,
-           quiz:sanitizeQuiz(null), badges:sanitizeBadges(null), rewards:sanitizeRewards(null) };
+           quiz:sanitizeQuiz(null), badges:sanitizeBadges(null), rewards:sanitizeRewards(null), zan:sanitizeZan(null) };
 }
 
 function sanitizeFlatBests(raw){
@@ -3497,6 +3533,7 @@ function coerceStore(obj){
   out.quiz = sanitizeQuiz(obj.quiz);
   out.badges = sanitizeBadges(obj.badges);
   out.rewards = sanitizeRewards(obj.rewards);
+  out.zan = sanitizeZan(obj.zan);
   out.recordsClearedAt = clampInt(obj.recordsClearedAt, 0, 1e15);   // when 「記録を消す」 was last used while logged in (0: never)
   if(!(typeof obj.schema==='number' && obj.schema>=11)) migrateToTitles(out, obj);   // 段位 → 称号 (schema 10 and before)
   evaluateTitles(out);
@@ -3604,7 +3641,7 @@ function clearAllBests(){
   fresh.profile = keep.profile;
   fresh.quiz = keep.quiz;                            // the quiz, the red dots and what the rewards gave are not play records either
   fresh.badges = keep.badges;
-  fresh.rewards = keep.rewards;
+  fresh.rewards = keep.rewards;                      // (リズム修行・斬's best is a play record: it is cleared with the rest)
   // logged in: the clear is stamped so the next sync clears the cloud's records too, instead of merging them back
   fresh.recordsClearedAt = SyncManager.isLoggedIn() ? Date.now() : keep.recordsClearedAt;
   ensureDailyFresh(fresh);
@@ -4149,6 +4186,10 @@ function onCut(){
 }
 document.getElementById('screen-game').addEventListener('pointerdown', function(e){
   e.preventDefault();
+  if(state.phase==='zan'){                          // リズム修行・斬: judged on the song's clock (its own rules)
+    if(!(e.target && e.target.closest && e.target.closest('.sound-toggle'))) zanPress(e);
+    return;
+  }
   // while a bowl is being served, the 🔊 button only switches the sound (it does not skip the show)
   if(state.phase==='serving' && state.serving && state.serving.stage!=='spice' && e.target && e.target.closest && e.target.closest('.sound-toggle')) return;
   onCut();
@@ -4193,6 +4234,7 @@ document.addEventListener('touchend', function(e){
 });
 window.addEventListener('keydown', function(e){
   if(e.code!=='Space') return;
+  if(state.phase==='zan'){ e.preventDefault(); if(!e.repeat) zanPress(e); return; }
   // Space cuts only while a game is running; on menus it keeps activating the focused button.
   if(state.phase!=='playing' && state.phase!=='serving') return;
   e.preventDefault();
@@ -4934,6 +4976,9 @@ function startGame(tierKey, modeId){
   state.hitWindowMs = tier.hitWindowMs * styleConf.timingMult;
   state.boardWidth = tier.boardWidth;
   aromaGaugeWrap.classList.toggle('locked', !styleConf.hasAroma);
+  aromaGaugeWrap.hidden = false;                 // (リズム修行・斬 hides it)
+  document.getElementById('hud-third-label').textContent = '客数';
+  document.getElementById('tap-hint').textContent = 'タップ / スペースキーでカット!';
   aromaGaugeFill.style.width = '0%';
   aromaValueEl.textContent = '0';
   applyModeLook(mode);
@@ -4982,6 +5027,7 @@ function saveSoundPref(on){
     saveStoreObj(store);
   }catch(e){}
   bgmSync();                                   // 🔇 stops the music at once; 🔊 lets it play again
+  zanSoundChanged();
 }
 var audioEnabled = loadSoundPref();
 btnSoundToggle.textContent = audioEnabled ? '🔊' : '🔇';
@@ -5399,6 +5445,8 @@ function endGame(){
   var satisfactionAvg = state.satisfactionRounds ? Math.round(state.satisfactionSum/state.satisfactionRounds) : 0;
   resultSatisfaction.textContent = satisfactionAvg;
   setResultMode(state.mode);
+  screens.result.classList.remove('is-zan');       // the bowl's numbers (not those of リズム修行・斬)
+  document.getElementById('zan-stats').hidden = true;
   if(isSeasonalMode(state.mode)){ endSeasonalGame(); return; }   // limited modes keep only their own record
   var isNewSatisfactionBest = recordSatisfaction(state.tier, satisfactionAvg);
   resultSatisfactionBest.classList.toggle('show', isNewSatisfactionBest);
@@ -5623,13 +5671,13 @@ function awardCoins(parts){
   saveStoreObj(store);
   return {parts:parts, total:total, granted:granted, full:granted<total, challengeRepeat:challengeRepeat, balance:g.currency, today:g.dailyEarned.amount};
 }
-function renderCoinResult(r){
+function renderCoinResult(r, satLabel){
   var p = r.parts;
   coinGain.textContent = '+' + fmtPoints(r.granted) + '🪙';
   var items = [
     '修行 ' + p.base,
     '得点 ' + p.scorePart + '（' + fmtPoints(p.score) + '点×' + (p.rate10/10).toFixed(1) + '÷' + COIN_SCORE_STEP + (p.scorePart>=COIN_SCORE_MAX ? '・上限' + COIN_SCORE_MAX : '') + '）',
-    '満足度 ' + p.satPart + '（' + p.sat + '÷' + COIN_SAT_DIV + '）'
+    (satLabel || '満足度') + ' ' + p.satPart + '（' + p.sat + '÷' + COIN_SAT_DIV + '）'
   ];
   if(p.challenge) items.push('本日のチャレンジ達成 ' + p.challenge);
   coinBreakdown.textContent = '（' + items.join(' ＋ ') + '）';
@@ -5950,6 +5998,7 @@ function renderCollectRow(){
   zukanEl.textContent = gachaOwnedCount(g) + '/' + GACHA_CATALOG.length;
   renderHomeBadges();
   renderHomeBg();
+  renderZanHome();
   if(titleEl){
     var has = g.titles.indexOf(GACHA_COMPLETE_TITLE)>=0, worn = equippedTitleName(g);
     titleEl.hidden = !(has || worn);
@@ -11206,6 +11255,7 @@ function mergeStores(localRaw, cloudRaw){
     var R = L.recordsClearedAt>C.recordsClearedAt ? L : C;
     out.bests = R.bests; out.seasonal = R.seasonal; out.satisfaction = R.satisfaction; out.stats = R.stats;
     out.daily = R.daily; out.lastPlayedSeasonal = R.lastPlayedSeasonal; out.recordsClearedAt = R.recordsClearedAt;
+    out.zan = R.zan;
   } else {
     out.bests = mergeMaxNested(L.bests, C.bests);
     out.seasonal = mergeMaxNested(L.seasonal, C.seasonal);
@@ -11238,6 +11288,11 @@ function mergeStores(localRaw, cloudRaw){
   out.quiz.perfectDays = Math.max(lq.perfectDays, cq.perfectDays);
   out.rewards.unlockedItems = unionList(L.rewards.unlockedItems, C.rewards.unlockedItems);
   out.rewards.unlockedTitles = unionList(L.rewards.unlockedTitles, C.rewards.unlockedTitles);
+  if(L.recordsClearedAt===C.recordsClearedAt){       // リズム修行・斬: the larger best, the better 完成度
+    out.zan.best = Math.max(L.zan.best, C.zan.best);
+    out.zan.plays = Math.max(L.zan.plays, C.zan.plays);
+    if(ZAN_GRADE_NAMES.indexOf(C.zan.bestGrade) > ZAN_GRADE_NAMES.indexOf(out.zan.bestGrade)) out.zan.bestGrade = C.zan.bestGrade;
+  }
   // seen the guide on either device: seen; the 共有ボーナス: the later day it was paid (so it is paid once a day)
   if(C.settings.onboarding.done) out.settings.onboarding.done = true;
   if(C.settings.lastShareDate>out.settings.lastShareDate) out.settings.lastShareDate = C.settings.lastShareDate;
@@ -11807,6 +11862,7 @@ function render(){
   drawEquippedBg();   // 着せ替え: the equipped background (nothing is drawn when none is equipped)
   if(state.mode==='hana') drawFlowerField(performance.now());
   else if(state.mode==='shinsoba') drawShinsobaLook(performance.now());
+  if(state.phase==='zan'){ drawZan(); return; }
   if(state.phase==='playing'){
     var shake = skinShake();                       // 着せ替えの演出: a JUST! can shake the play area (looks only)
     if(shake){ ctx.save(); ctx.translate(shake.x, shake.y); drawLane(); ctx.restore(); }
@@ -11840,7 +11896,7 @@ function drawKomaitaAndKnife(jx, y, h){
   var wave = Math.sin(Math.min(progress,1)*Math.PI);
   var thick = state.lastCutThickness || MIN_THICK;
   var slideOffset = wave * (thick*1.5+6);
-  var liftY = wave*16;
+  var liftY = wave*16 + (state.zanLift || 0);   // 斬: the knife rises before a cut (予兆)
   var edgeX = jx + slideOffset;
   var boardW = state.boardWidth || 74;
 
@@ -13346,6 +13402,8 @@ function loop(ts){
   lastTs = ts;
   if(state.phase==='playing' || state.phase==='serving'){
     update(dt, ts);
+  } else if(state.phase==='zan'){
+    zanUpdate(dt);
   }
   render();
   requestAnimationFrame(loop);
@@ -14068,6 +14126,7 @@ var BGM_SCENES = {
   }}
 };
 function bgmSceneFor(screen){
+  if(screen==='game' && state && state.phase==='zan') return null;   // 斬 plays its own song, locked to its chart
   if(screen==='game') return 'play';
   if(screen==='result') return 'result';
   if(screen==='gacha') return 'gacha';
@@ -14207,9 +14266,10 @@ var resultSkipBtn = document.getElementById('result-skip'), bestFlashEl = docume
 var RC = {running:false, raf:0, items:[], idx:0, t0:0, lastTick:0, best:false, celebrated:false, after:null, timer:0};
 function easeOutExpo(p){ return p>=1 ? 1 : 1 - Math.pow(2, -10*p); }
 function resultCountCalm(){ var fc = fxConf(); return fc.still || effectsPref.level==='low'; }
-function startResultCount(isNewBest, after){
+function startResultCount(isNewBest, after, ids){
   finishResultCount(true);
-  var defs = [[resultScore, 1150], [resultCombo, 620], [resultSatisfaction, 620], [resultAroma, 620]];
+  var defs = ids ? ids.map(function(d){ return [document.getElementById(d[0]), d[1]]; })
+                 : [[resultScore, 1150], [resultCombo, 620], [resultSatisfaction, 620], [resultAroma, 620]];
   RC.items = [];
   for(var i=0;i<defs.length;i++){
     var el = defs[i][0], to = parseInt(String(el.textContent).replace(/[^0-9]/g, ''), 10);
@@ -14334,6 +14394,630 @@ resultSkipBtn.addEventListener('click', function(){ finishResultCount(); focusEl
 document.addEventListener('keydown', function(e){
   if(RC.running && (e.key==='Escape' || e.key==='Enter' || e.key===' ')){ finishResultCount(); if(e.key==='Escape') e.preventDefault(); }
 });
+
+// ---------- リズム修行・斬: a song at BPM 120 and its chart, judged on the audio clock ----------
+// A separate mode with its own score and best (store.zan). The 修行's judging, score, records and titles are not
+// touched by anything here. Time is "song time": seconds since beat 0, read from what the speakers are playing now
+// (AudioContext.getOutputTimestamp, so the output latency is taken out), and an input is placed on that clock by its
+// own event timestamp, so a slow frame never moves a judgement. With no sound (🔇) the same clock runs on
+// performance.now(). Every note sits on the beat grid (whole, half and quarter beats) of the music.
+var ZAN_BPM = 120, ZAN_SPB = 60/ZAN_BPM;
+var ZAN_PERFECT = 0.035, ZAN_OK = 0.080, ZAN_GUARD = 0.12;   // seconds: Perfect ±35ms, OK ±80ms, a press further than ±120ms is a whiff
+var ZAN_LATE_GRACE = 0.06;        // a passed note is called a Miss only this much after its OK window closes, so a tap
+                                  // made in time but delivered a frame late is still judged (by its own timestamp)
+var ZAN_TRAVEL = 1.25;            // seconds a note takes from the right edge to the knife
+var ZAN_LEAD = 1.0;               // seconds before beat 0 when the song starts
+var ZAN_END_BEAT = 156;
+var ZAN_POINTS = {tap:[100,50], accent:[150,75], rush:[60,30], head:[50,25], tail:[300,150]};   // [Perfect, OK]
+var ZAN_SECTIONS = [
+  {from:0,   key:'ready',  label:'構え',     caption:'ヨー…'},
+  {from:8,   key:'call',   label:'お手本',   caption:'師匠のお手本 → あなたの番'},
+  {from:40,  key:'kizami', label:'刻み',     caption:'薬味は裏拍で「パパンッ」'},
+  {from:72,  key:'tame',   label:'タメ切り', caption:'押したまま溜めて、4拍目で離す！'},
+  {from:104, key:'fever',  label:'フィーバー', caption:'トトトトト！'},
+  {from:136, key:'final',  label:'仕上げ',   caption:'最後の大タメ！'}
+];
+var ZAN_CHORDS = [[62,64,69],[67,71,74],[69,71,76],[64,67,71]];   // the bar's chord (陽音階): D・G・A・Em, every 4 bars
+var ZAN_GRADES = [['極上',95,true],['特上',85,false],['上',70,false],['並',0,false]];   // [name, 完成度 %, no Miss needed]
+var ZAN_WORDS = ['一閃！','極上！','斬！'];
+function zanSectionAt(b){
+  var s = ZAN_SECTIONS[0];
+  for(var i=0;i<ZAN_SECTIONS.length;i++) if(b>=ZAN_SECTIONS[i].from) s = ZAN_SECTIONS[i];
+  return s;
+}
+// the chart: {b (beat), type: demo | tap | accent | rush | hold, len (hold, beats)}
+function zanChart(){
+  var notes = [], i, j;
+  function add(b, type, len){ notes.push({b:b, t:b*ZAN_SPB, type:type, len:len || 0, judged:false, headDone:false}); }
+  // お手本 → あなたの番 (call & response): the master cuts a bar, you cut the same bar back
+  var calls = [[0,1,2,3],[0,1,1.5,2,3],[0,0.5,1,2,3],[0,1,2,2.5,3.5]];
+  for(i=0;i<4;i++) for(j=0;j<calls[i].length;j++){ add(8 + i*8 + calls[i][j], 'demo'); add(12 + i*8 + calls[i][j], 'tap'); }
+  // 刻み: four on the beat, and the 薬味 on the off-beats (「パパンッ」 = 2.5・3)
+  var kz = [[[0,1,2,3],[1.5]], [[0,1,2,3],[3.5]], [[0,1,2],[2.5,3]], [[0,1,2,3],[0.5,2.5]],
+            [[0,1,2,3],[1.5,3.5]], [[0,2],[1,1.5,2.5,3]], [[0,1,2],[2.5,3]], [[0,1,2,3],[3.5]]];
+  for(i=0;i<8;i++){
+    for(j=0;j<kz[i][0].length;j++) add(40 + i*4 + kz[i][0][j], 'tap');
+    for(j=0;j<kz[i][1].length;j++) add(40 + i*4 + kz[i][1][j], 'accent');
+  }
+  // タメ切り: hold for three beats, let go on the fourth; then a bar of cuts
+  for(i=0;i<8;i++){
+    var bar = 72 + i*4;
+    if(i % 2===0) add(bar, 'hold', 3);
+    else if(i===7){ add(bar, 'tap'); add(bar + 1, 'tap'); add(bar + 2, 'tap'); add(bar + 3.5, 'accent'); }
+    else for(j=0;j<4;j++) add(bar + j, 'tap');
+  }
+  // フィーバー: eighths and sixteenths of fine noodles, with the 薬味 between
+  for(i=0;i<8;i++){
+    var fb = 104 + i*4, k = i % 4;
+    if(k<2){ for(j=0;j<8;j++) add(fb + j*0.5, 'rush'); }
+    else if(k===2){ for(j=0;j<4;j++) add(fb + j, 'tap'); add(fb + 1.5, 'accent'); add(fb + 3.5, 'accent'); }
+    else if(i<7){ add(fb, 'tap'); for(j=0;j<5;j++) add(fb + 2 + j*0.25, 'rush'); }        // トトトトト
+    else { for(j=0;j<8;j++) add(fb + j*0.25, 'rush'); add(fb + 3, 'tap'); }
+  }
+  // 仕上げ: four cuts, the big hold (7 beats), and the last 「ジャン」
+  for(j=0;j<4;j++) add(136 + j, 'tap');
+  add(144, 'hold', 7);
+  add(152, 'tap');
+  notes.sort(function(a, c){ return a.t - c.t; });
+  return notes;
+}
+var zan = null;
+// the song time the player hears now (seconds since beat 0)
+function zanHeardCtx(ac){
+  try{
+    if(ac.getOutputTimestamp){
+      var ts = ac.getOutputTimestamp();
+      if(ts && ts.contextTime>0 && ts.performanceTime>0) return ts.contextTime + (performance.now() - ts.performanceTime)/1000;
+    }
+  }catch(e){}
+  return ac.currentTime - (ac.outputLatency || ac.baseLatency || 0);
+}
+function zanNow(){
+  if(zan.ac && zan.ac.state==='running') return zanHeardCtx(zan.ac) - zan.t0;
+  return (performance.now() - zan.p0)/1000;
+}
+// an input's own moment on the song clock (the event's timestamp, not the frame that handled it)
+function zanEventTime(e){
+  var lag = 0;
+  if(e && typeof e.timeStamp==='number' && e.timeStamp>0){ lag = (performance.now() - e.timeStamp)/1000; if(!(lag>=0 && lag<0.25)) lag = 0; }
+  return zanNow() - lag;
+}
+// sound on (again): bring the audio clock in line with where the song is now
+function zanEnsureAudio(){
+  if(!zan || !audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{ if(ac.state!=='running') ac.resume(); }catch(e){}
+  if(zan.ac===ac && zan.aligned) return;
+  if(ac.state!=='running') return;
+  var songNow = zan.ac && zan.aligned ? zanNow() : (performance.now() - zan.p0)/1000;
+  zan.ac = ac;
+  zan.t0 = zanHeardCtx(ac) - songNow;
+  zan.aligned = true;
+  zan.schedBeat = Math.max(zan.schedBeat, Math.ceil(songNow*4/ZAN_SPB)/4);
+  if(!zan.bus || zan.bus.context!==ac){
+    zan.bus = ac.createGain();
+    zan.bus.connect(ac.destination);
+  }
+  zanBusLevel();
+}
+function zanBusLevel(){
+  if(!zan || !zan.bus) return;
+  var now = zan.bus.context.currentTime, lvl = (audioEnabled && bgmPref.on) ? bgmPref.vol*BGM_LEVEL : 0;
+  zan.bus.gain.cancelScheduledValues(now);
+  zan.bus.gain.setValueAtTime(lvl, now);
+}
+
+// --- the backing: drums, a pad and the master's taps, booked on the beat grid a moment ahead ---
+function zanCtxAt(songT){ return zan.t0 + songT; }
+function zanKakegoe(ac, out, t, word, vol){         // 合いの手: a breathy 「ハッ！」 or 「ソレ！」
+  if(word==='ha'){
+    bgmNoise(ac, bgmEnv(ac, out, t, 0.004, 0.13, vol*0.8), t, 0.13, 'bandpass', 1300, 2);
+    bgmOsc(ac, bgmEnv(ac, out, t, 0.006, 0.1, vol), 'triangle', 520, t, 0.1, 300);
+  } else {
+    bgmNoise(ac, bgmEnv(ac, out, t, 0.003, 0.06, vol*0.6), t, 0.06, 'highpass', 4200);
+    bgmOsc(ac, bgmEnv(ac, out, t + 0.05, 0.008, 0.11, vol), 'triangle', 392, t + 0.05, 0.11, 330);
+    bgmOsc(ac, bgmEnv(ac, out, t + 0.17, 0.008, 0.16, vol), 'triangle', 330, t + 0.17, 0.16, 294);
+  }
+}
+function zanClap(ac, out, t, vol){
+  for(var i=0;i<3;i++) bgmNoise(ac, bgmEnv(ac, out, t + i*0.011, 0.001, 0.07, vol), t + i*0.011, 0.07, 'bandpass', 1500, 1.2);
+}
+function zanScheduleStep(ac, q){                    // q: the step in sixteenths since beat 0
+  var b = q/4, songT = b*ZAN_SPB, t = zanCtxAt(songT), out = zan.bus;
+  if(t < ac.currentTime) return;
+  var sec = zanSectionAt(b), inBeat = b % 1, bar = Math.floor(b/4), beatInBar = Math.floor(b) % 4;
+  var chord = ZAN_CHORDS[bar % 4], combo = zan.combo, music = bgmPref.on;
+  // the master's taps (お手本) are sound effects: they follow 🔊 even with the music off
+  for(var i=zan.demoIdx;i<zan.notes.length && zan.notes[i].t<=songT + 1e-6;i++){
+    var n = zan.notes[i];
+    if(n.type==='demo' && Math.abs(n.t - songT)<1e-6){ for(var v=0;v<DEMO_TAP_VOICES.length;v++){ var dv = DEMO_TAP_VOICES[v]; if(dv.t==='tone') sfxToneVoice(ac, dv, t - ac.currentTime, 1); else sfxNoiseVoice(ac, dv, t - ac.currentTime, 1); } }
+    zan.demoIdx = i + 1;
+  }
+  if(!music){                                       // music off: a soft wood click on each beat keeps the time
+    if(inBeat===0 && b<ZAN_END_BEAT) gachaTone(ac, beatInBar===0 ? 1568 : 1175, t - ac.currentTime, 0.04, 'sine', 0.04);
+    return;
+  }
+  if(b>=ZAN_END_BEAT) return;
+  if(sec.key==='ready'){
+    if(b===0) bgmFlute(ac, out, 67, t, 1.2, 0.05);   // 「ヨー」
+    if(b>=4 && inBeat===0) bgmKane(ac, out, t, 0.03);
+    if(b===7) zanKakegoe(ac, out, t, 'ha', 0.06);
+    return;
+  }
+  var q4 = q % 16;
+  // the ground: 大太鼓 on 1 and 3, 締太鼓 on the off-eighths, the chord at the bar
+  if(q4===0) bgmTaiko(ac, out, t, 0.2);
+  if(q4===8 && sec.key!=='tame') bgmTaiko(ac, out, t, 0.13);
+  if(q % 4===2) bgmShime(ac, out, t, sec.key==='fever' ? 0.06 : 0.04);
+  if(q4===0) bgmPad(ac, out, chord.map(function(m){ return m - 12; }), t, ZAN_SPB*4.2, 0.016);
+  if(sec.key==='kizami' && q % 2===0) bgmShamisen(ac, out, chord[(q/2) % 3] - 12, t, 0.04);
+  if(sec.key==='fever'){
+    if(q % 2===1) bgmShime(ac, out, t, 0.025);
+    if(q4===0 || q4===6 || q4===12) bgmFlute(ac, out, chord[(bar + q4) % 3] + 12, t, ZAN_SPB*0.9, 0.035);
+  }
+  if(sec.key==='final' && q4===0) for(var c=0;c<chord.length;c++) bgmKoto(ac, out, chord[c], t + c*0.03, 0.04, 1.6);
+  // コンボで重なる: 10 和太鼓の裏打ち, 20 手拍子, 30 「ハッ！」「ソレ！」
+  if(combo>=10 && q % 4===2) bgmTaiko(ac, out, t, 0.07);
+  if(combo>=20 && (q4===4 || q4===12)) zanClap(ac, out, t, 0.06);
+  if(combo>=30 && q4===0 && bar % 2===0) zanKakegoe(ac, out, t, 'ha', 0.07);
+  if(combo>=30 && q4===8 && bar % 2===1) zanKakegoe(ac, out, t, 'sore', 0.06);
+}
+function zanSchedTick(){
+  if(!zan || zan.ended) return;
+  if(!audioEnabled){ return; }
+  zanEnsureAudio();
+  var ac = zan.ac;
+  if(!ac || ac.state!=='running' || !zan.aligned) return;
+  var horizon = zanNow() + 0.35, guard = 0;
+  while(zan.schedBeat*ZAN_SPB < horizon && guard++ < 32){
+    try{ zanScheduleStep(ac, Math.round(zan.schedBeat*4)); }catch(e){}
+    zan.schedBeat += 0.25;
+  }
+}
+
+// --- the cuts' sounds: they are the snare and hi-hat of the song; a Perfect sings a note of the bar's chord ---
+function zanHitSound(rating, kind, songT){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended') ac.resume();
+    var chord = ZAN_CHORDS[Math.floor(Math.max(0, songT)/ZAN_SPB/4) % 4];
+    var note = chord[zan.combo % 3] + 12*(Math.floor(zan.combo/3) % 2);
+    if(rating==='PERFECT'){
+      sfxNoiseVoice(ac, {filter:'bandpass', f:5200, f2:1300, q:1.1, dur:0.06, vol:0.13, atk:0.001}, 0);   // ズバッ
+      if(kind==='accent'){
+        sfxNoiseVoice(ac, {filter:'highpass', f:7000, dur:0.05, vol:0.08, atk:0.001}, 0);              // チャッ (hi-hat)
+        gachaTone(ac, mtof(note + 12), 0, 0.22, 'sine', 0.07);
+      } else if(kind==='tail'){
+        gachaTone(ac, 110, 0, 0.5, 'sine', 0.2, 46);                                                   // ドン
+        sfxNoiseVoice(ac, {filter:'bandpass', f:3000, f2:700, q:0.8, dur:0.22, vol:0.14, atk:0.002}, 0);
+        for(var c=0;c<chord.length;c++) gachaTone(ac, mtof(chord[c] + 12), 0.01*c, 0.6, 'triangle', 0.05);
+      } else {
+        gachaTone(ac, 230, 0, 0.06, 'triangle', 0.09, 170);                                            // トンッ (snare body)
+        gachaTone(ac, mtof(note + (kind==='rush' ? 12 : 0)), 0, kind==='rush' ? 0.14 : 0.32, 'triangle', 0.08);
+      }
+    } else if(rating==='OK'){
+      sfxNoiseVoice(ac, {filter:'lowpass', f:700, f2:250, dur:0.09, vol:0.11, atk:0.002}, 0);          // ドスッ
+      gachaTone(ac, 150, 0, 0.1, 'sine', 0.1, 90);
+    } else {
+      gachaTone(ac, 170, 0, 0.18, 'triangle', 0.16, 105);                                              // バコン！
+      sfxNoiseVoice(ac, {filter:'lowpass', f:1000, f2:220, dur:0.14, vol:0.14, atk:0.002}, 0);
+      gachaTone(ac, 330, 0.05, 0.25, 'sine', 0.05, 160);
+    }
+  }catch(e){}
+}
+// ずっこけ: the music stops dead for 0.15 s after a Miss
+function zanStumble(){
+  if(!zan || !zan.bus) return;
+  try{
+    var g = zan.bus.gain, now = zan.bus.context.currentTime, lvl = (audioEnabled && bgmPref.on) ? bgmPref.vol*BGM_LEVEL : 0;
+    g.cancelScheduledValues(now);
+    g.setValueAtTime(0, now);
+    g.setValueAtTime(0, now + 0.15);
+    g.linearRampToValueAtTime(lvl, now + 0.2);
+  }catch(e){}
+}
+// the hold's charge: a 締太鼓 roll that swells until the release beat (stopped at once if let go)
+function zanChargeStart(note){
+  zanChargeStop();
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  var now = zanNow(), end = note.t + note.len*ZAN_SPB, nodes = [];
+  try{
+    for(var st=Math.ceil(now/(ZAN_SPB/4))*(ZAN_SPB/4); st<end - 0.02; st+=ZAN_SPB/4){
+      var at = zan.ac ? zanCtxAt(st) - ac.currentTime : st - now, k = Math.max(0, Math.min(1, (st - note.t)/(end - note.t)));
+      if(at<0) continue;
+      var n = sfxNoiseVoice(ac, {filter:'bandpass', f:2000 + 1800*k, q:2, dur:0.05, vol:0.025 + 0.07*k, atk:0.001}, at);
+      if(n) nodes.push(n);
+    }
+  }catch(e){}
+  zan.charge = nodes;
+}
+function zanChargeStop(){
+  if(!zan || !zan.charge) return;
+  for(var i=0;i<zan.charge.length;i++){ try{ zan.charge[i].stop(); }catch(e){} try{ zan.charge[i].disconnect(); }catch(e){} }
+  zan.charge = null;
+}
+
+// --- input ---
+function zanTarget(n, part){ return part==='tail' ? n.t + n.len*ZAN_SPB : n.t; }
+function zanCandidates(){
+  var out = [];
+  for(var i=zan.firstOpen;i<zan.notes.length;i++){
+    var n = zan.notes[i];
+    if(n.type==='demo' || n.judged) continue;
+    if(n.t - zanNow() > ZAN_GUARD + 0.5) break;
+    if(n.type==='hold'){
+      if(!n.headDone) out.push([n, 'head']);
+      else if(zan.holding!==n) out.push([n, 'tail']);   // not held: the release beat can still be cut (一撃)
+    } else out.push([n, 'note']);
+  }
+  return out;
+}
+function zanPress(e){
+  if(!zan || zan.ended) return;
+  zanEnsureAudio();
+  var t = zanEventTime(e), list = zanCandidates(), best = null, bestErr = 1e9;
+  for(var i=0;i<list.length;i++){
+    var err = t - zanTarget(list[i][0], list[i][1]);
+    if(Math.abs(err) < Math.abs(bestErr)){ bestErr = err; best = list[i]; }
+  }
+  if(!best || Math.abs(bestErr) > ZAN_GUARD){ zan.whiff = 160; return; }   // a swing at nothing: no penalty
+  var n = best[0], part = best[1];
+  if(Math.abs(bestErr) > ZAN_OK){ zanMiss(n, part, t); return; }
+  zanHit(n, part, bestErr);
+  if(part==='head'){ zan.holding = n; zanChargeStart(n); }
+}
+function zanRelease(e){
+  if(!zan || zan.ended || !zan.holding) return;
+  var n = zan.holding, t = zanEventTime(e), err = t - zanTarget(n, 'tail');
+  zan.holding = null;
+  zanChargeStop();
+  if(Math.abs(err) <= ZAN_OK) zanHit(n, 'tail', err);
+  // let go too soon: the release beat is still open — a tap on it cuts it (一撃)
+}
+
+// --- judging ---
+function zanKind(n, part){ return n.type==='hold' ? part : n.type; }
+function zanHit(n, part, err){
+  var ae = Math.abs(err), rating = ae<=ZAN_PERFECT ? 'PERFECT' : 'OK', kind = zanKind(n, part), songT = zanTarget(n, part);
+  if(part==='head') n.headDone = true;
+  else n.judged = true;
+  zan.combo++;
+  zan.maxCombo = Math.max(zan.maxCombo, zan.combo);
+  var mult = 1 + Math.min(1, Math.floor(zan.combo/10)*0.1);   // ×1.0 → ×2.0 over 100 in a row
+  zan.score += Math.round(ZAN_POINTS[kind][rating==='PERFECT' ? 0 : 1]*mult);
+  if(rating==='PERFECT') zan.perfect++; else zan.ok++;
+  zan.errs.push(err*1000);
+  // the look of the cut (only the look): the knife, the ring, the noodle's width
+  state.knifeChop = 140;
+  state.lastCutThickness = MIN_THICK + Math.min(1, ae/ZAN_OK)*(MAX_THICK - MIN_THICK)*0.7;
+  state.cutFx.push({t:0, rating:rating==='PERFECT' ? 'JUST' : 'PERFECT'});
+  showPopup(rating==='PERFECT' ? 'PERFECT' : 'OK');
+  zanHitSound(rating, kind, songT);
+  if(rating==='PERFECT') zanPerfectFx(kind);
+  zanHud();
+}
+function zanMiss(n, part, t){
+  if(part==='head') n.headDone = true;
+  else n.judged = true;
+  if(zan.holding===n){ zan.holding = null; zanChargeStop(); }
+  zan.combo = 0;
+  zan.miss++;
+  zan.slump = 260;                                   // the board tips (ずっこけ)
+  showPopup('MISS');
+  zanHitSound('MISS', zanKind(n, part), t || zanTarget(n, part));
+  zanStumble();
+  zanHud();
+}
+
+// --- juice: hit stop, brush strokes, the flash of the blade and flour in the air (looks only) ---
+function zanPerfectFx(kind){
+  var calm = motionCalm(), now = performance.now();
+  if(!calm && !fxConf().still) zan.hitstopUntil = now + (kind==='tail' ? 45 : 28);   // 1〜2 frames of stillness
+  var word = kind==='tail' ? '一刀両断！' : kind==='accent' ? 'パンッ！' : ZAN_WORDS[zan.wordIdx++ % ZAN_WORDS.length];
+  if(kind!=='rush' || zan.combo % 8===0){
+    if(zan.texts.length>3) zan.texts.shift();
+    zan.texts.push({word:word, age:0, big:kind==='tail', rot:(Math.random() - 0.5)*0.24, x:0.5 + (Math.random() - 0.5)*0.3});
+  }
+  zan.flashes.push({age:0, big:kind==='tail'});
+  if(effectsPref.particlesOn && !fxConf().still){
+    var n = calm ? 4 : (kind==='tail' ? 26 : kind==='rush' ? 5 : 12);
+    for(var i=0;i<n && zan.parts.length<140;i++){
+      var a = -Math.PI*0.5 + (Math.random() - 0.5)*Math.PI*1.4, sp = 60 + Math.random()*170;
+      zan.parts.push({x:judgeX(), y:laneY() + laneH()*0.5, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, age:0, life:420 + Math.random()*380, r:1 + Math.random()*2.2});
+    }
+  }
+}
+function zanHud(){
+  elScore.textContent = fmtPoints(zan.score);
+  elCombo.textContent = String(zan.combo);
+  var sec = zanSectionAt(Math.max(0, zan.lastBeat));
+  elCustomers.textContent = sec.label;
+}
+
+// --- start, frame, end ---
+function startZan(){
+  stopDemoTaps();
+  finishResultCount(true);
+  state = freshState();
+  resetServeShow();
+  state.skin = resolveSkin();
+  skinFailed = {};
+  prewarmSkin();
+  state.mode = 'normal';
+  state.tier = 'beginner';
+  state.style = DEFAULT_STYLE;
+  state.styleConf = STYLES[DEFAULT_STYLE];
+  state.phase = 'zan';
+  zan = {notes:zanChart(), firstOpen:0, demoIdx:0, schedBeat:-ZAN_LEAD/ZAN_SPB, ac:null, aligned:false, t0:0,
+         p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
+         holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
+         lastBeat:-1, ended:false, timer:0, captionKey:''};
+  zan.schedBeat = Math.ceil(zan.schedBeat*4)/4;
+  aromaGaugeWrap.hidden = true;
+  document.getElementById('hud-third-label').textContent = '区間';
+  document.getElementById('tap-hint').textContent = 'タップで切る・「斬」は長押しで溜めて、その拍で離す';
+  applyModeLook('normal');
+  modeTag.hidden = false;
+  modeTag.textContent = '斬・♩=' + ZAN_BPM;
+  showScreen('game');                               // the usual music fades out; the song of 斬 takes over
+  resize();
+  zanEnsureAudio();
+  zan.timer = setInterval(zanSchedTick, 25);
+  zanSchedTick();
+  zanHud();
+  lastTs = 0;
+  if(!loopStarted){ loopStarted = true; requestAnimationFrame(loop); }
+}
+function zanUpdate(dt){
+  if(!zan || zan.ended) return;
+  var now = zanNow();
+  zan.lastBeat = now/ZAN_SPB;
+  // the master's cuts (お手本), the misses that went by, the hold let go too late
+  for(var i=zan.firstOpen;i<zan.notes.length;i++){
+    var n = zan.notes[i];
+    if(n.t > now + 0.2) break;
+    if(n.judged) continue;
+    if(n.type==='demo'){ if(now>=n.t){ n.judged = true; state.knifeChop = 140; state.lastCutThickness = MIN_THICK + 2; state.cutFx.push({t:0, rating:'DEMO'}); } continue; }
+    if(n.type==='hold'){
+      if(!n.headDone && now > n.t + ZAN_OK + ZAN_LATE_GRACE) zanMiss(n, 'head', n.t);
+      var tail = zanTarget(n, 'tail');
+      if(now > tail + ZAN_OK + ZAN_LATE_GRACE){ zanMiss(n, 'tail', tail); }
+      continue;
+    }
+    if(now > n.t + ZAN_OK + ZAN_LATE_GRACE) zanMiss(n, 'note', n.t);
+  }
+  while(zan.firstOpen<zan.notes.length && zan.notes[zan.firstOpen].judged) zan.firstOpen++;
+  // the section's caption
+  var sec = zanSectionAt(Math.max(0, zan.lastBeat));
+  if(sec.key!==zan.captionKey && zan.lastBeat>-1){
+    zan.captionKey = sec.key;
+    elCaption.textContent = sec.caption;
+    elCaption.classList.add('show');
+    state.captionHideAt = performance.now() + 1800;
+    zanHud();
+  }
+  if(state.captionHideAt && performance.now()>=state.captionHideAt){ elCaption.classList.remove('show'); state.captionHideAt = null; }
+  if(state.knifeChop>0) state.knifeChop -= dt;
+  for(var k=0;k<state.cutFx.length;k++) state.cutFx[k].t += dt;
+  state.cutFx = state.cutFx.filter(function(fx){ return fx.t<400; });
+  if(zan.slump>0) zan.slump -= dt;
+  if(zan.whiff>0) zan.whiff -= dt;
+  if(now >= ZAN_END_BEAT*ZAN_SPB) finishZan();
+}
+function zanGrade(acc, miss){
+  for(var i=0;i<ZAN_GRADES.length;i++){ var g = ZAN_GRADES[i]; if(acc>=g[1] && (!g[2] || miss===0)) return g[0]; }
+  return '並';
+}
+function finishZan(){
+  if(!zan || zan.ended) return;
+  zan.ended = true;
+  if(zan.timer){ clearInterval(zan.timer); zan.timer = 0; }
+  zanChargeStop();
+  if(zan.bus){ var bus = zan.bus; try{ var nw = bus.context.currentTime; bus.gain.cancelScheduledValues(nw); bus.gain.setValueAtTime(bus.gain.value, nw); bus.gain.linearRampToValueAtTime(0, nw + 1.2); }catch(e){} setTimeout(function(){ try{ bus.disconnect(); }catch(e){} }, 1600); }
+  elCaption.classList.remove('show');
+  var total = 0;
+  for(var i=0;i<zan.notes.length;i++){ var n = zan.notes[i]; if(n.type==='demo') continue; total += n.type==='hold' ? 2 : 1; }
+  var acc = total ? Math.round((zan.perfect + zan.ok*0.5)*100/total) : 0;
+  var sum = 0;
+  for(var j=0;j<zan.errs.length;j++) sum += Math.abs(zan.errs[j]);
+  var avgErr = zan.errs.length ? Math.round(sum/zan.errs.length) : 0;
+  var grade = zanGrade(acc, zan.miss);
+  var isNewBest = false, store = loadStore();
+  store.zan.plays = Math.min(STAT_MAX, store.zan.plays + 1);
+  if(zan.score > store.zan.best){ store.zan.best = zan.score; isNewBest = true; }
+  if(zanGradeRank(grade) > zanGradeRank(store.zan.bestGrade)) store.zan.bestGrade = grade;
+  saveStoreObj(store);
+  state.phase = 'result';
+  screens.result.classList.add('is-zan');
+  document.getElementById('zan-stats').hidden = false;
+  resultMode.hidden = false;
+  resultMode.textContent = 'リズム修行・斬（♩=' + ZAN_BPM + '）';
+  resultRank.textContent = '完成度: ' + grade + (grade==='極上' ? '蕎麦' : '');
+  showNewTitles([]);
+  resultNewBest.classList.toggle('show', isNewBest);
+  resultDailyClear.classList.remove('show');
+  resultSatisfactionBest.classList.remove('show');
+  var set = function(id, v){ document.getElementById(id).textContent = v; };
+  set('zan-r-score', String(zan.score)); set('zan-r-best', String(store.zan.best)); set('zan-r-perfect', String(zan.perfect));
+  set('zan-r-ok', String(zan.ok)); set('zan-r-miss', String(zan.miss)); set('zan-r-combo', String(zan.maxCombo));
+  set('zan-r-acc', acc + '%'); set('zan-r-err', '±' + avgErr + 'ms');
+  try{ renderCoinResult(awardCoins(coinParts(zan.score, 'beginner', acc, false)), '完成度'); }catch(e){ coinBox.hidden = true; }
+  showScreen('result');
+  startResultCount(isNewBest, null, [['zan-r-score', 1150], ['zan-r-combo', 620], ['zan-r-perfect', 620], ['zan-r-acc', 620]]);
+  renderZanHome();
+}
+function zanGradeRank(g){ for(var i=0;i<ZAN_GRADES.length;i++) if(ZAN_GRADES[i][0]===g) return ZAN_GRADES.length - i; return 0; }
+function renderZanHome(){
+  var el = document.getElementById('zan-best');
+  if(!el) return;
+  try{
+    var z = loadStore().zan;
+    el.textContent = z.best>0 ? ('自己ベスト ' + fmtPoints(z.best) + (z.bestGrade ? '・完成度 ' + z.bestGrade : '')) : '自己ベスト —';
+  }catch(e){}
+}
+
+// --- drawing ---
+function zanDrawBrush(c, text, x, y, size, rot, alpha){
+  c.save();
+  c.globalAlpha = alpha;
+  c.translate(x, y);
+  c.rotate(rot);
+  c.font = '400 ' + Math.round(size) + 'px "Yuji Syuku","Hiragino Mincho ProN","Yu Mincho",serif';
+  c.textAlign = 'center';
+  c.textBaseline = 'middle';
+  c.lineJoin = 'round';
+  c.lineWidth = Math.max(3, size*0.14);
+  c.strokeStyle = 'rgba(255,250,236,0.95)';
+  c.strokeText(text, 0, 0);
+  c.fillStyle = '#7a1f14';
+  c.fillText(text, 0, 0);
+  c.restore();
+}
+function drawZan(){
+  var calm = motionCalm(), still = fxConf().still, nowP = performance.now();
+  var songT = zanNow();
+  if(nowP < zan.hitstopUntil) songT = zan.frozenT;   // ヒットストップ: the picture holds still (the music and the judging never do)
+  else zan.frozenT = songT;
+  var y = laneY(), h = laneH(), jx = judgeX();
+  var beat = songT/ZAN_SPB, ph = beat>=0 ? beat - Math.floor(beat) : 1;
+  var bounce = still ? 0 : (calm ? 0.6 : 2)*Math.exp(-ph*7);   // 1拍ごとのバウンス
+  var tilt = zan.slump>0 && !still ? Math.sin((260 - zan.slump)/260*Math.PI)*0.03 : 0;
+  ctx.save();
+  ctx.translate(0, -bounce);
+  if(tilt){ ctx.translate(jx, y + h); ctx.rotate(tilt); ctx.translate(-jx, -(y + h)); }
+  // the board and the dough
+  ctx.fillStyle = COLORS.board;
+  ctx.fillRect(0, y - 6, W, h + 12);
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0, y, W, h); ctx.clip();
+  var nsk = skinPart('noodle');
+  ctx.fillStyle = nsk ? nsk.dough : COLORS.dough;
+  ctx.fillRect(0, y, W, h);
+  var pxs = (W - jx)/ZAN_TRAVEL;
+  // the beat grid moving with the notes (bar lines stronger)
+  for(var gb=Math.ceil(beat); gb<beat + ZAN_TRAVEL/ZAN_SPB + 1; gb++){
+    if(gb<0) continue;
+    var gx = jx + (gb*ZAN_SPB - songT)*pxs;
+    ctx.fillStyle = gb % 4===0 ? 'rgba(255,248,230,0.28)' : 'rgba(255,248,230,0.12)';
+    ctx.fillRect(gx - (gb % 4===0 ? 1.5 : 0.75), y, gb % 4===0 ? 3 : 1.5, h);
+  }
+  // the Perfect zone at the knife
+  ctx.fillStyle = 'rgba(255,224,158,0.35)';
+  ctx.fillRect(jx - ZAN_OK*pxs, y, ZAN_OK*pxs*2, h);
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillRect(jx - ZAN_PERFECT*pxs, y, ZAN_PERFECT*pxs*2, h);
+  // the notes
+  var nextIn = 9;
+  for(var i=zan.firstOpen;i<zan.notes.length;i++){
+    var n = zan.notes[i];
+    if(n.t - songT > ZAN_TRAVEL + 0.2) break;
+    if(n.judged && n.type!=='hold') continue;
+    var nx = jx + (n.t - songT)*pxs;
+    if(n.type==='hold'){
+      if(n.judged) continue;
+      var tx = jx + (zanTarget(n, 'tail') - songT)*pxs, held = zan.holding===n;
+      var x0 = Math.max(n.headDone ? jx : nx, -10), x1 = Math.min(tx, W + 10);
+      ctx.fillStyle = held ? 'rgba(122,31,20,0.55)' : 'rgba(60,40,22,0.42)';
+      ctx.fillRect(x0, y + 3, Math.max(0, x1 - x0), h - 6);
+      if(held){ var k = Math.max(0, Math.min(1, (songT - n.t)/(n.len*ZAN_SPB))); ctx.fillStyle = 'rgba(255,214,120,' + (0.25 + 0.45*k).toFixed(2) + ')'; ctx.fillRect(jx, y + h*0.38, Math.max(0, tx - jx), h*0.24); }
+      if(!n.headDone){ ctx.fillStyle = COLORS.accent2; ctx.fillRect(nx - 4, y - 4, 8, h + 8); }
+      if(tx<W + 30){ ctx.fillStyle = '#7a1f14'; ctx.fillRect(tx - 5, y - 6, 10, h + 12); ctx.fillStyle = '#fff4dc'; ctx.font = '700 ' + Math.round(h*0.42) + 'px "Yuji Syuku",serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('斬', tx, y + h/2); }
+      if(!n.headDone || held) nextIn = Math.min(nextIn, (held ? zanTarget(n, 'tail') : n.t) - songT);
+      continue;
+    }
+    if(nx<-20 || nx>W + 20) continue;
+    if(n.type==='demo'){ ctx.fillStyle = '#c9a24a'; ctx.fillRect(nx - 3, y - 4, 6, h + 8); continue; }
+    if(n.type==='rush'){ ctx.fillStyle = '#e6c25a'; ctx.fillRect(nx - 1.5, y + 2, 3, h - 4); }
+    else if(n.type==='accent'){
+      ctx.fillStyle = COLORS.accent2; ctx.beginPath(); ctx.moveTo(nx - 6, y - 8); ctx.lineTo(nx + 6, y - 8); ctx.lineTo(nx, y + 2); ctx.closePath(); ctx.fill();
+      var kinds = ['#4f9a31', '#8fc46a', '#f4f1e6'], col = kinds[Math.round(n.b*2) % 3];   // ねぎ・わさび・大根おろし
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(nx, y + h*0.5, h*0.2, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = 'rgba(40,30,15,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+    } else { ctx.fillStyle = COLORS.accent2; ctx.fillRect(nx - 3, y - 4, 6, h + 8); }
+    nextIn = Math.min(nextIn, n.t - songT);
+  }
+  ctx.restore();
+  // the master shows the rhythm in the call bars
+  var sec = zanSectionAt(Math.max(0, beat));
+  if(sec.key==='call' && Math.floor((beat - 8)/4) % 2===0) drawMaster(jx - 40, y);
+  // 予兆: the knife rises in the beat before a cut (higher while a hold is charging)
+  state.zanLift = zan.holding ? 22 : (nextIn<ZAN_SPB && nextIn>0 && !still ? (1 - nextIn/ZAN_SPB)*10 : 0);
+  drawKomaitaAndKnife(jx, y, h);
+  state.zanLift = 0;
+  // rings of the cuts
+  for(var f=0;f<state.cutFx.length;f++){
+    var fx = state.cutFx[f], a = 1 - fx.t/400;
+    ctx.globalAlpha = Math.max(a, 0);
+    ctx.strokeStyle = fx.rating==='DEMO' ? '#c9a24a' : fx.rating==='JUST' ? '#ffd54a' : COLORS.accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(jx, y + h/2, 10 + fx.t/6, 0, Math.PI*2); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  ctx.restore();
+  zanDrawFx(jx, y, h);
+  // the song's progress, along the top
+  var prog = Math.max(0, Math.min(1, songT/(ZAN_END_BEAT*ZAN_SPB)));
+  ctx.fillStyle = 'rgba(40,30,15,0.12)'; ctx.fillRect(0, 0, W, 3);
+  ctx.fillStyle = COLORS.accent2; ctx.fillRect(0, 0, W*prog, 3);
+}
+function zanDrawFx(jx, y, h){
+  var dt = Math.min(50, Math.max(0, performance.now() - (zan.fxLast || performance.now())));
+  zan.fxLast = performance.now();
+  var i;
+  // 閃光: a diagonal flash of the blade
+  for(i=zan.flashes.length - 1;i>=0;i--){
+    var fl = zan.flashes[i]; fl.age += dt;
+    var life = fl.big ? 260 : 140;
+    if(fl.age>life){ zan.flashes.splice(i, 1); continue; }
+    var k = fl.age/life, len = (fl.big ? 1.4 : 0.9)*Math.max(W, H)*0.5;
+    ctx.save();
+    ctx.globalAlpha = (1 - k)*0.9;
+    ctx.translate(jx, y + h/2);
+    ctx.rotate(-0.5);
+    var gr = ctx.createLinearGradient(-len, 0, len, 0);
+    gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.5, 'rgba(255,252,236,1)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gr;
+    ctx.fillRect(-len, -(fl.big ? 3 : 1.5), len*2, fl.big ? 6 : 3);
+    ctx.restore();
+  }
+  // 蕎麦粉: flour in the air
+  ctx.fillStyle = '#efe4c8';
+  for(i=zan.parts.length - 1;i>=0;i--){
+    var p = zan.parts[i]; p.age += dt;
+    if(p.age>p.life){ zan.parts.splice(i, 1); continue; }
+    p.vy += 380*dt/1000; p.x += p.vx*dt/1000; p.y += p.vy*dt/1000;
+    ctx.globalAlpha = 1 - p.age/p.life;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // 筆文字
+  for(i=zan.texts.length - 1;i>=0;i--){
+    var tx = zan.texts[i]; tx.age += dt;
+    var tl = tx.big ? 900 : 560;
+    if(tx.age>tl){ zan.texts.splice(i, 1); continue; }
+    var q = tx.age/tl, pop = q<0.18 ? 0.6 + q/0.18*0.55 : 1.15 - Math.min(0.15, (q - 0.18)*0.3);
+    var size = Math.min(W*0.2, (tx.big ? 64 : 42))*pop;
+    zanDrawBrush(ctx, tx.word, W*tx.x, H*(tx.big ? 0.62 : 0.66), size, tx.rot, q<0.75 ? 1 : (1 - q)/0.25);
+  }
+}
+// the in-game music of 斬 is its own; the usual BGM steps aside while it plays
+function zanSoundChanged(){
+  if(!zan || zan.ended) return;
+  if(!audioEnabled){ zanChargeStop(); if(zan.bus){ try{ var nw = zan.bus.context.currentTime; zan.bus.gain.cancelScheduledValues(nw); zan.bus.gain.setValueAtTime(0, nw); }catch(e){} } return; }
+  zanEnsureAudio();
+  zanBusLevel();
+}
+document.getElementById('btn-zan').addEventListener('click', function(){ wakeAudio(); startZan(); });
+document.getElementById('screen-game').addEventListener('pointerup', function(e){ if(state.phase==='zan') zanRelease(e); });
+document.getElementById('screen-game').addEventListener('pointercancel', function(e){ if(state.phase==='zan') zanRelease(e); });
+window.addEventListener('keyup', function(e){ if(e.code==='Space' && state.phase==='zan'){ e.preventDefault(); zanRelease(e); } });
+window.addEventListener('pagehide', function(){ if(zan && !zan.ended){ zanChargeStop(); } });
+renderZanHome();
 })();
 </script>
 </body>
