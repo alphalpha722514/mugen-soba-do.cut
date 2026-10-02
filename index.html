@@ -1636,7 +1636,7 @@ body{
       <ul class="gpoints">
         <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、BGMのオン・オフと音量、描画の細かさ、お客さんの反応の演出、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
-        <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、コインとそば札は多いほう、図鑑・アイテム・称号は両方を合わせたものになります。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
+        <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
         <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。ホームやリザルトの「友達に共有」で共有すると、1日1回+200（共有ボーナス）。</li>
         <li><b>BGM</b>ホーム・修行・リザルト・ガチャで、場面ごとの和風の音楽が流れます（音声ファイルは使わず、ブラウザの中で合成しています）。修行中はコンボが10・20・30・40と続くたびに、三味線・篠笛・締太鼓・箏が1つずつ重なります。「記録と設定」で、効果音とは別にオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</li>
@@ -3124,8 +3124,77 @@ function defaultGacha(){
     dailyEarned:{date:'', amount:0, challenge:false},   // today's coins (shown only) and whether today's challenge bonus was paid
     history:[],
     titles:[],     // every 称号 earned (TITLES_DATA, and soba_hitosuji for a full 図鑑); never taken away
-    equippedTitle:null   // the 称号 being worn (schema 11; equipped.title is kept as a copy of it)
+    equippedTitle:null,  // the 称号 being worn (schema 11; equipped.title is kept as a copy of it)
+    ledger:{coins:emptyLedger(0), tickets:emptyLedger(0)}   // the wallet's book, so a sync never undoes spending (below)
   };
+}
+// ---- コインとそば札の帳簿 ----
+// A sync must not take "the larger balance": a pull spends coins on this device while the cloud still holds the
+// old, larger number, and the spent coins would come back. Instead each device keeps how much it has added (e) and
+// spent (s), under its own id, on top of a shared starting balance (base: the balance when the book was opened).
+// The balance is base + all added − all spent. Merging two saves takes the larger base and, for every device, the
+// larger added and spent totals — they only ever grow, so nothing is counted twice and nothing is lost.
+// The device id is a random word kept in echizenSoba.v1.device; it goes to the cloud only as a key of the book and says
+// nothing about the player or the device.
+var DEVICE_KEY = STORE_KEY + '.device';
+var LEDGER_MAX = 1e12, LEDGER_MAX_DEVICES = 50;
+var deviceIdCache = null;
+function deviceId(){
+  if(deviceIdCache) return deviceIdCache;
+  var id = readRawLS(DEVICE_KEY);
+  if(!(typeof id==='string' && /^[a-z0-9]{6,16}$/.test(id))){
+    id = (Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-6)).replace(/[^a-z0-9]/g, '').slice(0, 16);
+    if(id.length<6) id = ('dev' + id + '000000').slice(0, 8);
+    writeRawLS(DEVICE_KEY, id);
+  }
+  deviceIdCache = id;
+  return id;
+}
+function emptyLedger(base){ return {base:base, e:{}, s:{}}; }
+function sanitizeLedgerSide(raw){
+  var out = {}, n = 0;
+  if(isPlainObj(raw)){
+    for(var k in raw){
+      if(!Object.prototype.hasOwnProperty.call(raw, k) || !/^[a-z0-9]{1,16}$/.test(k) || n>=LEDGER_MAX_DEVICES) continue;
+      out[k] = clampInt(raw[k], 0, LEDGER_MAX);
+      n++;
+    }
+  }
+  return out;
+}
+// a book read from a save; a save without one opens it with its balance as the base
+function sanitizeLedger(raw, balance){
+  if(!isPlainObj(raw)) return emptyLedger(balance);
+  return {base:clampInt(raw.base, 0, LEDGER_MAX), e:sanitizeLedgerSide(raw.e), s:sanitizeLedgerSide(raw.s)};
+}
+function ledgerBalance(L){
+  var v = L.base, k;
+  for(k in L.e) if(Object.prototype.hasOwnProperty.call(L.e, k)) v += L.e[k];
+  for(k in L.s) if(Object.prototype.hasOwnProperty.call(L.s, k)) v -= L.s[k];
+  return v;
+}
+function mergeLedgerSide(a, b){
+  var out = {}, k;
+  for(k in a) if(Object.prototype.hasOwnProperty.call(a, k)) out[k] = a[k];
+  for(k in b) if(Object.prototype.hasOwnProperty.call(b, k)) out[k] = Math.max(out[k] || 0, b[k]);
+  return out;
+}
+function mergeLedger(a, b){ return {base:Math.max(a.base, b.base), e:mergeLedgerSide(a.e, b.e), s:mergeLedgerSide(a.s, b.s)}; }
+// On every save: whatever the coins and そば札 moved since the last save goes into this device's book.
+function recordWalletDelta(store){
+  var g = store && store.gacha;
+  if(!g || !g.ledger) return;
+  var prev = null;
+  try{ prev = JSON.parse(readRawLS(STORE_KEY) || 'null'); }catch(e){ prev = null; }
+  var pg = isPlainObj(prev) && isPlainObj(prev.gacha) ? prev.gacha : null;
+  if(!pg) return;
+  var pairs = [['currency', 'coins', COIN_MAX], ['tickets', 'tickets', TICKET_MAX]], dev = deviceId();
+  for(var i=0;i<pairs.length;i++){
+    var d = g[pairs[i][0]] - clampInt(pg[pairs[i][0]], 0, pairs[i][2]), L = g.ledger[pairs[i][1]];
+    if(!d || !L) continue;
+    var side = d>0 ? L.e : L.s;
+    side[dev] = Math.min(LEDGER_MAX, (side[dev] || 0) + Math.abs(d));
+  }
 }
 function isPlainObj(v){ return !!v && typeof v==='object' && !Array.isArray(v); }
 // any broken number (NaN, text, negative, huge) becomes a safe whole number inside [lo, hi]
@@ -3174,6 +3243,8 @@ function sanitizeGacha(raw){
   var et = (typeof g.equippedTitle==='string' && g.equippedTitle.length>0 && g.equippedTitle.length<=64) ? g.equippedTitle : out.equipped.title;
   out.equippedTitle = et || null;
   out.equipped.title = out.equippedTitle;
+  var lg = isPlainObj(g.ledger) ? g.ledger : {};
+  out.ledger = {coins:sanitizeLedger(lg.coins, out.currency), tickets:sanitizeLedger(lg.tickets, out.tickets)};
   return out;
 }
 // profile: the name shown on the マイページ and the result card (no other personal data is kept)
@@ -3515,6 +3586,7 @@ function backupBeforeUpgrade(raw){
 
 function saveStoreObj(store){
   store.updatedAt = Date.now();
+  if(!(typeof SyncManager!=='undefined' && SyncManager.applying)) recordWalletDelta(store);   // coins / そば札 into this device's book
   if(store.gacha){
     if(store.gacha.equipped) store.gacha.equipped.title = store.gacha.equippedTitle || null;   // the copy older code reads
     evaluateTitles(store);                         // e.g. a pull that fills the 図鑑 earns its title at once
@@ -3570,6 +3642,8 @@ function importStoreString(text){
       }
     }
   }
+  // the wallet's book stays this device's own: the restored coins and そば札 go in as a change made here
+  coerced.gacha.ledger = loadStore().gacha.ledger;
   ensureDailyFresh(coerced);
   saveStoreObj(coerced);
   renderBests();
@@ -11142,8 +11216,10 @@ function mergeStores(localRaw, cloudRaw){
     if(!out.lastPlayedSeasonal) out.lastPlayedSeasonal = C.lastPlayedSeasonal;
   }
   var g = out.gacha, lg = L.gacha, cg = C.gacha;
-  g.currency = Math.max(lg.currency, cg.currency);
-  g.tickets = Math.max(lg.tickets, cg.tickets);
+  // coins and そば札: from the joined books (never "the larger balance", which would undo spending)
+  g.ledger = {coins:mergeLedger(lg.ledger.coins, cg.ledger.coins), tickets:mergeLedger(lg.ledger.tickets, cg.ledger.tickets)};
+  g.currency = Math.max(0, Math.min(COIN_MAX, ledgerBalance(g.ledger.coins)));
+  g.tickets = Math.max(0, Math.min(TICKET_MAX, ledgerBalance(g.ledger.tickets)));
   g.owned = unionList(lg.owned, cg.owned);
   g.titles = unionList(lg.titles, cg.titles);
   g.stats.totalPulls = Math.max(lg.stats.totalPulls, cg.stats.totalPulls);
