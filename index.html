@@ -3732,10 +3732,11 @@ document.getElementById('screen-game').addEventListener('pointerdown', function(
 document.getElementById('screen-game').addEventListener('contextmenu', function(e){ e.preventDefault(); });
 // ---------- ダブルタップ拡大の防止（スマホ） ----------
 // iPhone の Safari は viewport や touch-action だけでは、素早い2回目のタップで画面を拡大することがある。前のタップから
-// DOUBLE_TAP_MS 以内に指を離したら、そのタップのブラウザ標準の動き（拡大）を止める。止めるとそのタップのクリックも
+// DOUBLE_TAP_MS 以内に指を離したら、そのタップのブラウザ標準の動き（拡大）を止める。修行の画面ではリズムに合わせて
+// 0.3〜0.5秒おきに叩くので、間隔によらず毎回止める（iPhone のダブルタップの判定はそれより長いことがある）。止めるとそのタップのクリックも
 // 出なくなるので、指がほとんど動いていなければ、触れた要素のクリックをここで代わりに起こす（連打してもボタンが反応する）。
 // 文字を入れる欄は止めない（フォーカスや入力を邪魔しない）。切る操作は pointerdown なので、ここの影響を受けない。
-var DOUBLE_TAP_MS = 300;
+var DOUBLE_TAP_MS = 500;
 var tapGuard = {lastEnd:0, x:0, y:0, moved:false};
 function isTextEntry(el){ return !!(el && el.closest && el.closest('input, textarea, select, [contenteditable="true"]')); }
 document.addEventListener('touchstart', function(e){
@@ -3750,7 +3751,8 @@ document.addEventListener('touchmove', function(e){
 document.addEventListener('touchend', function(e){
   var now = Date.now(), quick = now - tapGuard.lastEnd <= DOUBLE_TAP_MS;
   tapGuard.lastEnd = now;
-  if(!quick || !e.cancelable || isTextEntry(e.target)) return;
+  var inGame = !!(e.target && e.target.closest && e.target.closest('#screen-game'));
+  if(!(quick || inGame) || !e.cancelable || isTextEntry(e.target)) return;
   e.preventDefault();
   if(tapGuard.moved || (e.touches && e.touches.length)) return;
   var el = e.target && e.target.nodeType===1 ? e.target : (e.target && e.target.parentElement);
