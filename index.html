@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>無限そば道・斬 - 越前そば切り本格アクションゲーム</title>
-<meta name="description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム77種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
+<meta name="description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム82種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
 <!-- スマホ: ホーム画面に追加したときの見た目（アプリ名・ステータスバー・テーマ色） -->
 <meta name="theme-color" content="#e7e0cd" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#181310" media="(prefers-color-scheme: dark)" />
@@ -22,7 +22,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="無限そば道・斬" />
 <meta property="og:title" content="無限そば道・斬 - 越前そば切り本格アクションゲーム" />
-<meta property="og:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム77種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
+<meta property="og:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム82種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
 <meta property="og:url" content="https://alphalpha722514.github.io/mugen-soba-do.cut/" />
 <meta property="og:image" content="https://alphalpha722514.github.io/mugen-soba-do.cut/og-image.jpg" />
 <meta property="og:image:width" content="1200" />
@@ -31,7 +31,7 @@
 <meta property="og:locale" content="ja_JP" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="無限そば道・斬 - 越前そば切り本格アクションゲーム" />
-<meta name="twitter:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム77種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
+<meta name="twitter:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム82種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
 <meta name="twitter:image" content="https://alphalpha722514.github.io/mugen-soba-do.cut/og-image.jpg" />
 <script>
 // ホーム画面に追加（PWA）: manifest.webmanifest と icons/ は tools/pwa/build.mjs で作る。
@@ -589,6 +589,48 @@ body{
 }
 #game-canvas{width:100%;height:100%;display:block;}
 
+/* 切った瞬間の演出（見た目だけ）: 飛び出すオノマトペ、JUST!の弾み、10コンボごとの花吹雪 */
+.impact-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2;}
+.onomato{
+  position:absolute;left:50%;top:60%;white-space:nowrap;opacity:0;
+  font-family:'Zen Maru Gothic',sans-serif;font-weight:900;font-size:1.45rem;line-height:1;letter-spacing:.03em;
+  color:#fff7e6;text-shadow:2px 2px 0 #5c3a12,-1px -1px 0 #5c3a12,1px -1px 0 #5c3a12,-1px 1px 0 #5c3a12,0 3px 8px rgba(0,0,0,.35);
+  transform:translate(-50%,-50%) rotate(var(--rot,0deg));
+}
+.onomato.r-just{font-size:2.05rem;color:#ffd54a;text-shadow:2px 2px 0 #7a3a00,-1px -1px 0 #7a3a00,1px -1px 0 #7a3a00,-1px 1px 0 #7a3a00,0 0 14px rgba(255,190,40,.85);}
+.onomato.r-perfect{font-size:1.7rem;color:#e9fbff;text-shadow:2px 2px 0 #1f5f74,-1px -1px 0 #1f5f74,1px -1px 0 #1f5f74,-1px 1px 0 #1f5f74,0 0 10px rgba(120,220,255,.6);}
+.onomato.r-good{color:#ffe0c2;text-shadow:2px 2px 0 #8a3a1c,-1px -1px 0 #8a3a1c,1px -1px 0 #8a3a1c,-1px 1px 0 #8a3a1c;}
+.onomato.r-ok{font-size:1.2rem;}
+.onomato.r-miss{font-size:1.35rem;color:#d9d2e6;text-shadow:2px 2px 0 #4a4060,-1px -1px 0 #4a4060,1px -1px 0 #4a4060,-1px 1px 0 #4a4060;}
+.onomato.go{animation:onomatoPop .62s cubic-bezier(.2,1.5,.4,1) both;}
+.onomato.r-miss.go{animation:onomatoFlop .7s ease-in both;}
+@keyframes onomatoPop{
+  0%{opacity:0;transform:translate(-50%,-30%) scale(.35) rotate(var(--rot,0deg));}
+  22%{opacity:1;transform:translate(-50%,-90%) scale(1.18) rotate(var(--rot,0deg));}
+  50%{opacity:1;transform:translate(-50%,-100%) scale(1) rotate(var(--rot,0deg));}
+  100%{opacity:0;transform:translate(-50%,-150%) scale(.96) rotate(var(--rot,0deg));}
+}
+@keyframes onomatoFlop{                                         /* MISS: it sags and slides down (拍子抜け) */
+  0%{opacity:0;transform:translate(-50%,-60%) scale(1.05) rotate(0deg);}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-4deg);}
+  100%{opacity:0;transform:translate(-50%,10%) scale(.92,.8) rotate(8deg);}
+}
+.canvas-wrap.just-bounce{animation:justBounce .16s ease-out;}
+@keyframes justBounce{0%{transform:scale(1);}35%{transform:scale(1.035);}100%{transform:scale(1);}}
+.flurry{position:absolute;left:0;top:0;width:9px;height:6px;border-radius:70% 0 70% 0;background:#f6b6c8;opacity:0;animation:flurryFly 1s ease-out forwards;}
+.flurry.alt{background:#fbd3de;}
+.flurry.spark{width:auto;height:auto;background:none;border-radius:0;color:#ffd54a;font-size:15px;line-height:1;text-shadow:0 0 6px rgba(255,200,60,.9);}
+@keyframes flurryFly{
+  0%{opacity:0;transform:translate(0,0) rotate(0deg) scale(.6);}
+  15%{opacity:1;}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--spin)) scale(1);}
+}
+@keyframes onomatoFade{0%{opacity:0;}20%{opacity:1;}100%{opacity:0;}}
+@media (prefers-reduced-motion:reduce){
+  .onomato.go,.onomato.r-miss.go{animation:onomatoFade .6s ease-out both;}
+  .canvas-wrap.just-bounce{animation:none;}
+  .flurry{display:none;}
+}
 .popup{
   position:absolute;top:36%;left:50%;transform:translate(-50%,-50%) scale(.6);
   font-family:'Yuji Syuku',serif;font-size:1.9rem;font-weight:700;
@@ -1160,7 +1202,7 @@ body{
       </div>
       <div class="collect-actions">
         <button id="btn-gacha" class="btn-small collect-btn" type="button">ガチャを引く</button>
-        <button id="btn-zukan" class="btn-small collect-btn" type="button">図鑑 <span id="home-zukan">0/77</span></button>
+        <button id="btn-zukan" class="btn-small collect-btn" type="button">図鑑 <span id="home-zukan">0/82</span></button>
         <button id="btn-exchange" class="btn-small collect-btn" type="button">交換所</button>
         <button id="btn-kisekae" class="btn-small collect-btn" type="button">着せ替え</button>
       </div>
@@ -1470,8 +1512,8 @@ body{
       <button id="btn-zukan-back" class="btn-small" type="button">戻る</button>
     </div>
     <div class="zukan-sum card">
-      <p class="zs-row"><span class="zs-label">集めた数</span><span id="zukan-count" class="zs-count">0 / 77</span></p>
-      <div id="zukan-progress" class="progress" role="progressbar" aria-label="図鑑の集まり具合" aria-valuemin="0" aria-valuemax="77" aria-valuenow="0">
+      <p class="zs-row"><span class="zs-label">集めた数</span><span id="zukan-count" class="zs-count">0 / 82</span></p>
+      <div id="zukan-progress" class="progress" role="progressbar" aria-label="図鑑の集まり具合" aria-valuemin="0" aria-valuemax="82" aria-valuenow="0">
         <div id="zukan-progress-fill" class="progress-fill"></div>
       </div>
       <p id="zukan-rarity-counts" class="zs-rar"></p>
@@ -1561,6 +1603,7 @@ body{
     </div>
     <div class="canvas-wrap">
       <canvas id="game-canvas"></canvas>
+      <div id="impact-layer" class="impact-layer" aria-hidden="true"></div>
       <div id="mode-tag" class="mode-tag" hidden></div>
       <div id="popup" class="popup"></div>
       <div id="aroma-popup" class="aroma-popup"></div>
@@ -1760,6 +1803,11 @@ const ART = {
   "yokokan_garden": "",
   "echizen_cape": "",
   "forging_hammer_sound": "",
+  "ryusen_crash_sound": "",
+  "dino_beat_sound": "",
+  "mochi_poyo_sound": "",
+  "retro8bit_sound": "",
+  "eisei_orchestra_sound": "",
   "crab_chopstick_rest": "",
   // 特上
   "wakasa_lacquer_bowl": "",
@@ -2098,7 +2146,7 @@ var COIN_RATE10 = {beginner:10, lover:12, regular:15, enthusiast:20, farmer:12};
 var TICKET_MAX = 9999999;
 var GACHA_SLOTS = ['bowl','noodle','tool','bg','effect','sound','title'];
 
-// ---------- そば猪口ガチャ: the 77-item catalog and the draw rules ----------
+// ---------- そば猪口ガチャ: the 82-item catalog and the draw rules ----------
 // Each item is {id, name, rarity, category, applyTo, desc}.
 //   rarity:  'nami' 並 / 'jo' 上 / 'tokujo' 特上 / 'kiwami' 極み
 //   applyTo: the equip slot it dresses (one of GACHA_SLOTS). Every prize is a look or a sound — nothing changes play.
@@ -2108,14 +2156,14 @@ var GACHA_SLOTS = ['bowl','noodle','tool','bg','effect','sound','title'];
 // そば札 buy any item not owned yet (exchange = the price in そば札).
 var GACHA_RARITY_ORDER = ['nami','jo','tokujo','kiwami'];
 var GACHA_RARITIES = {
-  nami:  {label:'並',   rate:6000, dupTickets:1,  exchange:10,  count:16},
-  jo:    {label:'上',   rate:2500, dupTickets:3,  exchange:30,  count:24},
-  tokujo:{label:'特上', rate:1200, dupTickets:10, exchange:80,  count:21},
-  kiwami:{label:'極み', rate:300,  dupTickets:25, exchange:200, count:16}
+  nami:  {label:'並',   rate:6000, dupTickets:1,  exchange:10,  count:13},
+  jo:    {label:'上',   rate:2500, dupTickets:3,  exchange:30,  count:25},
+  tokujo:{label:'特上', rate:1200, dupTickets:10, exchange:80,  count:26},
+  kiwami:{label:'極み', rate:300,  dupTickets:25, exchange:200, count:18}
 };
 var GACHA_RATE_TOTAL = 10000;   // rates are in hundredths of a percent: 6000 = 60.00% (they must add up to 100%)
 var GACHA_TEN_MIN_INDEX = 1;    // GACHA_RARITY_ORDER index of 上: the 10連's sure slot is 上以上 = 上 + 特上 + 極み
-var GACHA_TOTAL_ITEMS = 77;
+var GACHA_TOTAL_ITEMS = 82;
 var GACHA_PULLS = {
   single:{count:1,  cost:500,  guaranteeMin:0},
   ten:   {count:10, cost:4500, guaranteeMin:GACHA_TEN_MIN_INDEX}   // 10連: the last slot is 上以上 if none came before it
@@ -2127,15 +2175,13 @@ var GACHA_COMPLETE_TITLE = 'soba_hitosuji';
 var GACHA_TITLES = {soba_hitosuji:{name:'そば一筋'}};
 
 var GACHA_CATALOG = [
-  // ---- 並 (16) ----
+  // ---- 並 (13) ----
   {id:'soba_field', name:'そば畑の背景', rarity:'nami', category:'背景', applyTo:'bg',
    desc:'福井県はそばの作付けが全国でも上位の産地。9〜10月には畑一面に白い花が咲く。'},
   {id:'unglazed_bowl', name:'素焼きの椀', rarity:'nami', category:'器', applyTo:'bowl',
    desc:'釉薬をかけずに焼いた素朴な器。土の手ざわりがそのまま残る。'},
   {id:'nihachi_noodle', name:'二八の麺', rarity:'nami', category:'麺', applyTo:'noodle',
    desc:'そば粉8割・小麦粉2割で打つ定番の配合。のど越しがよく、切れにくい。'},
-  {id:'wooden_board', name:'木のまな板', rarity:'nami', category:'まな板音', applyTo:'sound',
-   desc:'木のまな板は刃あたりがやわらかく、トントンと小気味よい音がする。'},
   {id:'washi_noren', name:'越前和紙ののれん', rarity:'nami', category:'のれん', applyTo:'bg',
    desc:'越前和紙は約1500年の歴史があると伝わる。丈夫な紙は、のれんや障子紙にも使われる。'},
   {id:'washi_chopstick_sleeve', name:'越前和紙の箸袋', rarity:'nami', category:'小物', applyTo:'effect',
@@ -2144,12 +2190,6 @@ var GACHA_CATALOG = [
    desc:'越前おろしそばの定番の薬味。細かく刻んだねぎをたっぷりと。'},
   {id:'extra_katsuobushi', name:'花かつお増し', rarity:'nami', category:'薬味', applyTo:'effect',
    desc:'削り節も越前おろしそばに欠かせない。大根おろしの辛みとよく合う。'},
-  {id:'millstone_sound', name:'石臼の挽き音', rarity:'nami', category:'SE', applyTo:'sound',
-   desc:'越前そばは石臼で挽いたそば粉が特長。ゆっくり回す、ゴロゴロという低い音。'},
-  {id:'knife_board_sound', name:'包丁とまな板の音', rarity:'nami', category:'SE', applyTo:'sound',
-   desc:'そば切り包丁で、駒板に沿ってトン、トンと刻んでいく音。'},
-  {id:'slurp_sound', name:'そば猪口をすする音', rarity:'nami', category:'SE', applyTo:'sound',
-   desc:'そば猪口のつゆをすする音。最後はそば湯で割って飲むのも楽しみ。'},
   {id:'habutae_mochi', name:'羽二重餅', rarity:'nami', category:'おまけ', applyTo:'effect',
    desc:'福井を代表する銘菓。絹織物の羽二重のように、なめらかでやわらかい餅菓子。'},
   {id:'mizu_yokan', name:'水ようかん', rarity:'nami', category:'おまけ', applyTo:'effect',
@@ -2160,7 +2200,9 @@ var GACHA_CATALOG = [
    desc:'へしこは、鯖を塩漬けにしてから糠に漬けこみ、じっくり熟成させた若狭の郷土料理。'},
   {id:'tomitsu_kintoki', name:'とみつ金時のほくほく蜜光', rarity:'nami', category:'演出', applyTo:'effect',
    desc:'あわら市の砂地の畑で育つさつまいも、とみつ金時。焼くとほくほくで、蜜のように甘い。'},
-  // ---- 上 (24) ----
+  {id:'knife_board_sound', name:'越前打刃物・伝統のトントン', rarity:'nami', category:'SE', applyTo:'sound',
+   desc:'越前打刃物の包丁が、木のまな板を乾いた音でトン、トンと刻む。シャキッと切れる手ごたえが音にも出る。'},
+  // ---- 上 (25) ----
   {id:'echizen_lacquer_bowl', name:'越前漆器の椀', rarity:'jo', category:'器', applyTo:'bowl',
    desc:'鯖江市の河和田地区を中心に作られる越前漆器。約1500年の歴史があると伝わる。'},
   {id:'echizen_ware_bowl', name:'越前焼の椀', rarity:'jo', category:'器', applyTo:'bowl',
@@ -2181,8 +2223,6 @@ var GACHA_CATALOG = [
    desc:'福井藩主・松平家の別邸の庭園。池のまわりを歩いて眺める回遊式で、国の名勝。'},
   {id:'echizen_cape', name:'越前岬', rarity:'jo', category:'背景', applyTo:'bg',
    desc:'越前海岸は日本水仙の三大群生地のひとつ。岬の斜面には12月下旬〜2月ごろ水仙が咲く。'},
-  {id:'forging_hammer_sound', name:'打刃物の槌音', rarity:'jo', category:'SE', applyTo:'sound',
-   desc:'熱した鋼を槌で打ち鍛える音。越前打刃物では今も手作業の鍛造が受け継がれている。'},
   {id:'crab_chopstick_rest', name:'越前がにの箸置き', rarity:'jo', category:'小物', applyTo:'effect',
    desc:'越前がには福井県で水揚げされるオスのズワイガニ。黄色いタグが目印。'},
   {id:'sauce_katsudon_bowl', name:'福井名物ソースカツ丼風椀', rarity:'jo', category:'器', applyTo:'bowl',
@@ -2209,7 +2249,11 @@ var GACHA_CATALOG = [
    desc:'大野市上庄地区の上庄さといもは、きめが細かく、ねっとりとした強い粘りが特長。'},
   {id:'taniguchiya_age', name:'谷口屋のお揚げ・黄金フリット', rarity:'jo', category:'演出', applyTo:'effect',
    desc:'坂井市丸岡町竹田の谷口屋は、分厚い油揚げで知られる老舗。揚げたての黄金色と、あたたかな湯気。'},
-  // ---- 特上 (21) ----
+  {id:'millstone_sound', name:'お祭り和太鼓', rarity:'jo', category:'SE', applyTo:'sound',
+   desc:'祭り囃子の和太鼓。切るたびにドドン！と腹に響き、JUST!では「ハッ！」と掛け声が入る。'},
+  {id:'wooden_board', name:'越前がにポコポコ', rarity:'jo', category:'SE', applyTo:'sound',
+   desc:'越前がにの甲羅をたたくような、木琴とウッドブロックの軽やかな音。コンボが続くとメロディになる。'},
+  // ---- 特上 (26) ----
   {id:'wakasa_lacquer_bowl', name:'若狭塗の椀', rarity:'tokujo', category:'器', applyTo:'bowl',
    desc:'小浜市の若狭塗。貝殻や卵の殻で模様をつけ、漆を塗り重ねて研ぎ出す。'},
   {id:'agate_chopstick_rest', name:'若狭めのう細工の箸置き', rarity:'tokujo', category:'小物', applyTo:'effect',
@@ -2252,7 +2296,17 @@ var GACHA_CATALOG = [
    desc:'福井の冬の水ようかんは、黒砂糖のこくとつるんとした口当たり。四角く切り分ける包丁さばきを演出に。'},
   {id:'guji_scales', name:'若狭ぐじの松笠うろこ舞い', rarity:'tokujo', category:'演出', applyTo:'effect',
    desc:'若狭ぐじは若狭湾でとれるアカアマダイ。うろこを立てて焼く「松笠焼き」は、パリッとした食感が魅力。'},
-  // ---- 極み (16) ----
+  {id:'ryusen_crash_sound', name:'龍泉クラッシュ', rarity:'tokujo', category:'SE', applyTo:'sound',
+   desc:'研ぎ澄まされた刃と、クリスタルガラスが弾けるような、澄んだ高い金属の音。'},
+  {id:'dino_beat_sound', name:'恐竜ダイナソービート', rarity:'tokujo', category:'SE', applyTo:'sound',
+   desc:'恐竜王国・福井の足音のように、低音がズシンと響くロックドラム。'},
+  {id:'mochi_poyo_sound', name:'羽二重もちモチ音', rarity:'tokujo', category:'SE', applyTo:'sound',
+   desc:'福井銘菓の羽二重餅のように、モチッ、ポヨッと弾む、やわらかくて癖になる音。'},
+  {id:'retro8bit_sound', name:'8bitそばサイバー', rarity:'tokujo', category:'SE', applyTo:'sound',
+   desc:'レトロゲーム風のピコピコ音。コンボが続くと、和音のアルペジオが駆け上がる。'},
+  {id:'slurp_sound', name:'水ようかんツルン', rarity:'tokujo', category:'SE', applyTo:'sound',
+   desc:'冬の福井で親しまれる水ようかん。みずみずしい水の弾ける音と、ツルンとすする音。'},
+  // ---- 極み (18) ----
   {id:'eastern_cliff', name:'東尋坊', rarity:'kiwami', category:'背景', applyTo:'bg',
    desc:'坂井市三国町の海岸に約1km続く断崖。柱状節理の岩が並び、国の天然記念物・名勝。'},
   {id:'wakasa_togidashi_bowl', name:'若狭塗・研ぎ出し極', rarity:'kiwami', category:'器', applyTo:'bowl',
@@ -2284,16 +2338,20 @@ var GACHA_CATALOG = [
   {id:'yellow_tag_aura', name:'ブランド黄タグのオーラ', rarity:'kiwami', category:'演出', applyTo:'effect',
    desc:'越前がにの黄色いタグは、福井県の港に水揚げされた証。その誇りを金色の光で。'},
   {id:'fossil_aura', name:'恐竜の化石オーラ', rarity:'kiwami', category:'演出', applyTo:'effect',
-   desc:'勝山市北谷の地層からは、多くの恐竜化石が見つかっている。太古の骨と地層のかけらが舞う。'}
+   desc:'勝山市北谷の地層からは、多くの恐竜化石が見つかっている。太古の骨と地層のかけらが舞う。'},
+  {id:'forging_hammer_sound', name:'勝山発掘ハンマー', rarity:'kiwami', category:'SE', applyTo:'sound',
+   desc:'恐竜化石の発掘で知られる勝山。槌の打撃音のあとに、宝石のような「キーン」という余韻が残る。'},
+  {id:'eisei_orchestra_sound', name:'永世蕎麦神のオーケストラ', rarity:'kiwami', category:'SE', applyTo:'sound',
+   desc:'琴や鈴の和楽器とシンセが重なり、切るたびに華やかな和音が広がる、最高峰の音。'}
 ];
 // Stand-in pictures while ART is empty: an icon inside a frame in the rarity's colour.
 var GACHA_ICONS = {
-  soba_field:'🌾', unglazed_bowl:'🥣', nihachi_noodle:'🍜', wooden_board:'🎵', washi_noren:'🏮',
-  washi_chopstick_sleeve:'📜', extra_negi:'🌿', extra_katsuobushi:'🐟', millstone_sound:'🌀',
-  knife_board_sound:'🎶', slurp_sound:'😋', habutae_mochi:'🍡', mizu_yokan:'❄️', satsukigase:'🥜',
+  soba_field:'🌾', unglazed_bowl:'🥣', nihachi_noodle:'🍜', wooden_board:'🦀', washi_noren:'🏮',
+  washi_chopstick_sleeve:'📜', extra_negi:'🌿', extra_katsuobushi:'🐟', millstone_sound:'🥁',
+  knife_board_sound:'🔪', slurp_sound:'💧', habutae_mochi:'🍡', mizu_yokan:'❄️', satsukigase:'🥜',
   echizen_lacquer_bowl:'🥣', echizen_ware_bowl:'🍵', echizen_knife:'🔪', echizen_sickle:'🌙',
   juwari_noodle:'🍜', inaka_noodle:'🍜', echizen_tansu:'🗄️', maruoka_castle:'🏯', yokokan_garden:'🌳',
-  echizen_cape:'🌼', forging_hammer_sound:'🔨', crab_chopstick_rest:'🦀',
+  echizen_cape:'🌼', forging_hammer_sound:'💎', crab_chopstick_rest:'🦀',
   wakasa_lacquer_bowl:'🥣', agate_chopstick_rest:'💎', hikigurumi_noodle:'🍜', ichijodani_ruins:'🏘️',
   eiheiji_temple:'🔔', dinosaur_museum:'🦕', shinsoba_noodle:'🌱', chinkin_bowl:'✨', wakasa_chopsticks:'🥢',
   eastern_cliff:'🌊', wakasa_togidashi_bowl:'💠', makie_chinkin_masterpiece:'🌸', tsuchime_blade:'🗡️',
@@ -2305,11 +2363,15 @@ var GACHA_ICONS = {
   kokoshizen_jar_bowl:'🏺', claw_mark_bowl:'🥣', ono_spring_noodle:'💧', kanimiso_gold_noodle:'🍜', dig_hammer_knife:'⛏️',
   mikata_rainbow:'🌈', asuwa_sakura:'🌸', mikuni_auction:'🦀', oshima_island:'🏝️', raptor_slash:'⚡', yokan_slice:'🔲', guji_scales:'🐠',
   phoenix_makie_bowl:'🐦', fukuiraptor_fossil_bowl:'🦴', crab_shell_bowl:'🦀', ryusen_knife:'🗡️', heisenji_moss:'⛩️', dino_forest:'🦕',
-  dino_roar_fx:'🦖', yellow_tag_aura:'🏷️', fossil_aura:'🦴'
+  dino_roar_fx:'🦖', yellow_tag_aura:'🏷️', fossil_aura:'🦴',
+  ryusen_crash_sound:'🔔', dino_beat_sound:'🦖', mochi_poyo_sound:'🍡', retro8bit_sound:'👾', eisei_orchestra_sound:'🎼'
 };
 // Where a long name may wrap on a narrow card (names with 「・」 wrap after it), so a word such as 「めのう」 is never split.
 var GACHA_NAME_LINES = {
-  washi_noren:['越前和紙の','のれん'], knife_board_sound:['包丁と','まな板の音'], slurp_sound:['そば猪口を','すする音'],
+  washi_noren:['越前和紙の','のれん'], knife_board_sound:['越前打刃物・','伝統のトントン'], slurp_sound:['水ようかん','ツルン'],
+  millstone_sound:['お祭り','和太鼓'], wooden_board:['越前がに','ポコポコ'], ryusen_crash_sound:['龍泉','クラッシュ'],
+  dino_beat_sound:['恐竜','ダイナソービート'], mochi_poyo_sound:['羽二重もち','モチ音'], retro8bit_sound:['8bit','そばサイバー'],
+  forging_hammer_sound:['勝山','発掘ハンマー'], eisei_orchestra_sound:['永世蕎麦神の','オーケストラ'],
   echizen_knife:['越前打刃物の','包丁'], crab_chopstick_rest:['越前がにの','箸置き'], agate_chopstick_rest:['若狭めのう','細工の','箸置き'],
   ichijodani_ruins:['一乗谷','朝倉氏遺跡'], dinosaur_museum:['福井県立','恐竜博物館'],
   heshiko_amber:['へしこの','アンバーゴールド'], tomitsu_kintoki:['とみつ金時の','ほくほく蜜光'],
@@ -2461,16 +2523,21 @@ var EQUIP_SLOT_NOTES = {
   tool:'包丁の見た目と、JUST!のときの刃の音が変わります。',
   bg:'プレイ画面の背景が変わります（ARTに画像があればその画像）。',
   effect:'切ったときの輪と紙吹雪、お客さんが喜んだときのキラキラと紙吹雪の色が変わります。',
-  sound:'効果音が加わります。',
+  sound:'切る音などの効果音が変わります（コンボで音階が上がるのはそのまま）。',
   title:'マイページ・リザルト・共有画像に、名前と一緒に表示されます。'
 };
 // item-specific notes (shown in the 図鑑 detail view instead of the slot's note)
 var SKIN_NOTES = {
-  wooden_board:'切るたびに、木のまな板のトンという音が鳴ります。',
-  knife_board_sound:'切るたびに、包丁がまな板に当たるトンという音が鳴ります。',
-  forging_hammer_sound:'切るたびに槌の音が、JUST!では高く澄んだ音が鳴ります。',
-  millstone_sound:'1杯ごとの始まりに、石臼を挽くゴロゴロという音が鳴ります。',
-  slurp_sound:'お客さんが食べるときに、そばをすする音が鳴ります。',
+  knife_board_sound:'切るたびに、包丁とまな板のトン、トンという乾いた音。JUST!では「チン」と澄んだ音が重なります。',
+  millstone_sound:'切るたびに和太鼓が「ドドン」、JUST!では「ハッ！」の掛け声。1杯の始まりと仕上がりにも太鼓が鳴ります。',
+  wooden_board:'切るたびに木琴のような「ポコ」。JUST!では「ポコポコ」と2つ鳴ります。',
+  ryusen_crash_sound:'切るたびに澄んだ金属音。JUST!ではガラスが弾けるような音が重なります。',
+  dino_beat_sound:'切るたびに低いキックが「ズシン」。JUST!ではスネアとシンバルが鳴ります。',
+  mochi_poyo_sound:'切るたびに「モチッ」と弾み、JUST!では「ポヨヨン」と跳ねます。',
+  retro8bit_sound:'切るたびにピコピコの和音が駆け上がり、MISSのときもレトロゲーム風の音になります。',
+  slurp_sound:'切るたびに水の弾ける音。お客さんが食べるときには、ツルンとすする音が鳴ります。',
+  forging_hammer_sound:'切るたびに槌の音。JUST!では宝石のような「キーン」が長く残ります。',
+  eisei_orchestra_sound:'切るたびに琴とシンセの和音。JUST!では鈴が、1杯の仕上がりには華やかなファンファーレが鳴ります。',
   echizen_knife:'刃に波の刃文が入り、JUST!のとき刃がチンと鳴ります。',
   echizen_sickle:'刃先が鎌の形になり、JUST!のときシュッと風を切る音が鳴ります。',
   tsuchime_blade:'刃に鎚目が入り、JUST!のとき刃が長く澄んで鳴ります。',
@@ -2605,43 +2672,132 @@ var SKIN_EFFECTS = {
   yellow_tag_aura:       {ring:'#d9a816', just:'#fff1a8', bits:['#f2d22e','#ffe680','#e0a81a'], shape:'tag', spark:'glint', ringStyle:'double', grav:0.8, spin:0.9, overlay:'tag', rays:true},
   fossil_aura:           {ring:'#a88a5c', just:'#efe2c0', bits:['#e8dcc0','#c9b48a','#8a7a5a','#6e5a40'], shape:['bone','chip'], spark:'glint', ringStyle:'soft', grav:-0.35, spin:0.8, glow:'#e8d8b0'}
 };
-// 音: which game moments get which sound (cut = every successful cut, just = a JUST!, round = each bowl begins,
-// serve = the customer eats). The sounds themselves are recipes in SKIN_SFX; icon = the picture in the 図鑑.
+// 音: which game moments get which sound (cut = every successful cut, just = the 合いの手 just after a JUST!'s cut,
+// round = each bowl begins, finish = the bowl is done and goes out, serve = the customer eats, miss = a MISS).
+// A moment the item leaves out keeps the game's own sound (cutShaki / justPon / finishFanfare / missDrop).
+// The sounds themselves are recipes in SKIN_SFX; icon = the picture in the 図鑑.
 var SKIN_SOUNDS = {
-  wooden_board:        {cut:'woodKnock', icon:'board'},
-  knife_board_sound:   {cut:'boardTon', icon:'knife'},
-  forging_hammer_sound:{cut:'hammerKan', just:'hammerKiin', icon:'hammer'},
-  millstone_sound:     {round:'millstone', icon:'millstone'},
-  slurp_sound:         {serve:'slurp', icon:'choko'}
+  knife_board_sound:    {cut:'tontonCut', just:'tontonJust', icon:'knife'},
+  millstone_sound:      {cut:'taikoCut', just:'taikoJust', round:'taikoRound', finish:'taikoFinish', icon:'taiko'},
+  wooden_board:         {cut:'pokoCut', just:'pokoJust', icon:'crab'},
+  ryusen_crash_sound:   {cut:'crystalCut', just:'crystalJust', icon:'crystal'},
+  dino_beat_sound:      {cut:'dinoKick', just:'dinoJust', icon:'dino'},
+  mochi_poyo_sound:     {cut:'mochiCut', just:'mochiJust', icon:'mochi'},
+  retro8bit_sound:      {cut:'pico8Cut', just:'pico8Just', miss:'pico8Miss', icon:'chip'},
+  slurp_sound:          {cut:'dropCut', just:'dropJust', serve:'slurp', icon:'drop'},
+  forging_hammer_sound: {cut:'hammerKan', just:'gemKiin', icon:'gemhammer'},
+  eisei_orchestra_sound:{cut:'orchCut', just:'orchJust', finish:'orchFinale', icon:'orchestra'}
 };
 // 称号: the item title; the 図鑑 completion title (GACHA_TITLES) can be equipped in the same slot
 var SKIN_TITLES = {soba_hitosuji_noren:{}};
 var SKIN_TABLES = {bowl:SKIN_BOWLS, noodle:SKIN_NOODLES, tool:SKIN_TOOLS, bg:SKIN_BGS, effect:SKIN_EFFECTS, sound:SKIN_SOUNDS, title:SKIN_TITLES};
-// Synthesized sounds (no audio files): tones (sine/triangle partials with their own attack and decay) plus
-// band-limited noise. Each recipe is a list of voices: {t:'tone', wave, f, f2 (glide), dur, vol, at, atk} or
+// Synthesized sounds (no audio files): tones (oscillators with their own attack and decay) plus band-limited noise.
+// Each recipe is a list of voices: {t:'tone', wave, f, f2 (glide), dur, vol, at, atk} or
 // {t:'noise', filter, f, f2 (sweep), q, dur, vol, at, atk, trem (a rolling rumble)}.
-//   木のまな板 = low and dull (a woody body and a soft knock)   包丁とまな板 = a bright tick of steel, then the board
-//   槌音 = ringing metal with inharmonic partials              石臼 = a long low rumble with grit in it
-//   すする = two rising sweeps of air and a small gulp
+// p = how far a voice follows the combo's note (0 = fixed, 1 = the whole scale step): the cut climbs ド・レ・ミ・ソ・ラ
+// as the combo grows, so tapping in time plays a tune. A sharp attack (atk under 2 ms, a click of noise first) gives
+// every cut its 「シャキッ」.
 var SKIN_SFX = {
-  woodKnock: [{t:'tone', wave:'sine', f:200, f2:118, dur:0.16, vol:0.2, atk:0.003}, {t:'tone', wave:'sine', f:470, f2:300, dur:0.05, vol:0.06, atk:0.002},
-              {t:'tone', wave:'triangle', f:96, dur:0.1, vol:0.07, atk:0.004}, {t:'noise', filter:'bandpass', f:1100, q:2.2, dur:0.03, vol:0.07, atk:0.001},
-              {t:'noise', filter:'lowpass', f:500, dur:0.07, vol:0.05, atk:0.002}],
-  boardTon:  [{t:'noise', filter:'highpass', f:5200, dur:0.018, vol:0.07, atk:0.0008}, {t:'tone', wave:'sine', f:3950, dur:0.04, vol:0.022, atk:0.001},
-              {t:'noise', filter:'bandpass', f:2400, q:5, dur:0.045, vol:0.08, atk:0.001}, {t:'tone', wave:'triangle', f:340, f2:220, dur:0.085, vol:0.11, atk:0.002},
-              {t:'tone', wave:'sine', f:150, dur:0.06, vol:0.06, atk:0.002}],
-  hammerKan: [{t:'noise', filter:'highpass', f:3000, dur:0.016, vol:0.08, atk:0.0008}, {t:'tone', wave:'sine', f:140, f2:90, dur:0.07, vol:0.09, atk:0.002},
-              {t:'tone', wave:'triangle', f:1250, dur:0.34, vol:0.05, atk:0.001}, {t:'tone', wave:'sine', f:1873, dur:0.26, vol:0.035, atk:0.001},
-              {t:'tone', wave:'sine', f:2740, dur:0.18, vol:0.022, atk:0.001}, {t:'tone', wave:'sine', f:3720, dur:0.11, vol:0.014, atk:0.001}],
-  hammerKiin:[{t:'noise', filter:'highpass', f:3500, dur:0.022, vol:0.07, atk:0.001}, {t:'tone', wave:'sine', f:2093, dur:0.85, vol:0.045, atk:0.001},
-              {t:'tone', wave:'sine', f:2099, dur:0.85, vol:0.02, atk:0.001}, {t:'tone', wave:'sine', f:3170, dur:0.6, vol:0.026, atk:0.001},
-              {t:'tone', wave:'sine', f:4410, dur:0.38, vol:0.015, atk:0.001}],
-  millstone: [{t:'noise', filter:'lowpass', f:240, dur:1.15, vol:0.22, trem:6, atk:0.12}, {t:'noise', filter:'bandpass', f:130, q:1.4, dur:1.1, vol:0.12, trem:3, atk:0.1},
-              {t:'noise', filter:'bandpass', f:1500, q:3, dur:1.05, vol:0.025, trem:11, atk:0.1}, {t:'tone', wave:'sine', f:58, dur:1.05, vol:0.08, atk:0.1},
-              {t:'tone', wave:'sine', f:87, dur:0.95, vol:0.035, atk:0.12}],
-  slurp:     [{t:'noise', filter:'bandpass', f:700, f2:2700, q:5, dur:0.2, vol:0.13, atk:0.03}, {t:'noise', filter:'bandpass', f:900, f2:3200, q:5.5, dur:0.24, vol:0.12, at:0.25, atk:0.03},
-              {t:'noise', filter:'highpass', f:4200, dur:0.12, vol:0.025, at:0.27, atk:0.04}, {t:'tone', wave:'sine', f:320, f2:620, dur:0.16, vol:0.025, at:0.27, atk:0.03},
-              {t:'noise', filter:'lowpass', f:600, dur:0.08, vol:0.05, at:0.52, atk:0.005}],
+  // --- the game's own sounds (no sound item, or a moment the item leaves out) ---
+  cutShaki:   [{t:'noise', filter:'highpass', f:7500, dur:0.018, vol:0.07, atk:0.0005},                  // シャ: the edge
+               {t:'noise', filter:'bandpass', f:6200, f2:2400, q:1.3, dur:0.07, vol:0.11, atk:0.0008},    // キッ: the cut sweeping down
+               {t:'tone', wave:'triangle', f:523, p:1, dur:0.11, vol:0.075, atk:0.001},                   // the note of the combo
+               {t:'tone', wave:'sine', f:1046, p:1, dur:0.05, vol:0.028, atk:0.001},
+               {t:'tone', wave:'sine', f:190, f2:115, dur:0.06, vol:0.07, atk:0.001}],                    // the board below
+  justPon:    [{t:'noise', filter:'bandpass', f:1900, q:3, dur:0.02, vol:0.08, atk:0.0005},              // 小鼓の「ポン！」
+               {t:'tone', wave:'sine', f:560, f2:290, dur:0.2, vol:0.17, atk:0.0015},
+               {t:'tone', wave:'sine', f:1120, f2:620, dur:0.08, vol:0.04, atk:0.0015},
+               {t:'tone', wave:'sine', f:1568, p:1, dur:0.26, vol:0.04, atk:0.002},                       // and a bright bell on the note
+               {t:'tone', wave:'sine', f:2352, p:1, dur:0.16, vol:0.018, atk:0.002}],
+  finishFanfare:[{t:'tone', wave:'sine', f:135, f2:70, dur:0.34, vol:0.26, atk:0.002},                   // ドン
+               {t:'noise', filter:'lowpass', f:320, dur:0.12, vol:0.15, atk:0.001},
+               {t:'tone', wave:'sine', f:135, f2:70, dur:0.4, vol:0.28, at:0.17, atk:0.002},             // ドン！
+               {t:'noise', filter:'lowpass', f:320, dur:0.12, vol:0.16, at:0.17, atk:0.001},
+               {t:'noise', filter:'bandpass', f:820, f2:1250, q:6, dur:0.36, vol:0.07, at:0.36, atk:0.03},  // イヨォーッ
+               {t:'noise', filter:'bandpass', f:1500, f2:2100, q:7, dur:0.34, vol:0.035, at:0.37, atk:0.03},
+               {t:'tone', wave:'triangle', f:540, f2:760, dur:0.36, vol:0.045, at:0.36, atk:0.04},
+               {t:'noise', filter:'highpass', f:5200, dur:0.75, vol:0.05, at:0.76, atk:0.002},           // シャーン（シンバル）
+               {t:'tone', wave:'sine', f:2637, dur:0.7, vol:0.035, at:0.78, atk:0.001},                  // チャリーン（鈴）
+               {t:'tone', wave:'sine', f:3520, dur:0.55, vol:0.028, at:0.82, atk:0.001},
+               {t:'tone', wave:'sine', f:4186, dur:0.45, vol:0.022, at:0.86, atk:0.001},
+               {t:'noise', filter:'highpass', f:7000, dur:0.35, vol:0.03, at:0.8, atk:0.01, trem:14}],
+  missDrop:   [{t:'tone', wave:'triangle', f:430, f2:85, dur:0.34, vol:0.11, atk:0.002},                 // ズッ…コケ: the pitch falls away
+               {t:'tone', wave:'sine', f:215, f2:52, dur:0.3, vol:0.08, at:0.03, atk:0.002},
+               {t:'noise', filter:'lowpass', f:420, dur:0.09, vol:0.09, at:0.02, atk:0.002}],             // ボタッ
+  // --- 越前打刃物・伝統のトントン: the steel's tick, then the dry wooden board ---
+  tontonCut:  [{t:'noise', filter:'highpass', f:5200, dur:0.018, vol:0.08, atk:0.0006}, {t:'tone', wave:'sine', f:3950, dur:0.04, vol:0.022, atk:0.001},
+               {t:'noise', filter:'bandpass', f:2600, q:5, dur:0.045, vol:0.09, atk:0.001}, {t:'tone', wave:'triangle', f:340, f2:220, p:0.6, dur:0.09, vol:0.13, atk:0.0015},
+               {t:'tone', wave:'sine', f:150, dur:0.06, vol:0.06, atk:0.002}],
+  tontonJust: [{t:'noise', filter:'highpass', f:6000, dur:0.012, vol:0.05, atk:0.0006}, {t:'tone', wave:'sine', f:2637, p:1, dur:0.24, vol:0.05, atk:0.001},
+               {t:'tone', wave:'sine', f:3956, p:1, dur:0.12, vol:0.02, atk:0.001}, {t:'tone', wave:'triangle', f:340, f2:220, p:0.6, dur:0.08, vol:0.1, at:0.06, atk:0.0015}],
+  // --- お祭り和太鼓: ドドン！ and the call 「ハッ！」 ---
+  taikoCut:   [{t:'tone', wave:'sine', f:140, f2:72, p:0.25, dur:0.32, vol:0.27, atk:0.0015}, {t:'noise', filter:'lowpass', f:260, dur:0.1, vol:0.18, atk:0.001},
+               {t:'tone', wave:'triangle', f:280, f2:190, p:0.25, dur:0.08, vol:0.06, atk:0.001}, {t:'noise', filter:'bandpass', f:950, q:1.2, dur:0.025, vol:0.06, atk:0.0005}],
+  taikoJust:  [{t:'tone', wave:'sine', f:150, f2:76, p:0.25, dur:0.3, vol:0.26, atk:0.0015}, {t:'noise', filter:'lowpass', f:280, dur:0.09, vol:0.16, atk:0.001},
+               {t:'noise', filter:'bandpass', f:1100, f2:1700, q:4, dur:0.12, vol:0.11, at:0.09, atk:0.006},   // ハッ！
+               {t:'noise', filter:'bandpass', f:2600, q:6, dur:0.08, vol:0.04, at:0.09, atk:0.006}],
+  taikoRound: [{t:'tone', wave:'sine', f:120, f2:66, dur:0.36, vol:0.24, atk:0.002}, {t:'noise', filter:'lowpass', f:240, dur:0.1, vol:0.14, atk:0.001},
+               {t:'tone', wave:'sine', f:120, f2:66, dur:0.4, vol:0.26, at:0.28, atk:0.002}, {t:'noise', filter:'lowpass', f:240, dur:0.1, vol:0.15, at:0.28, atk:0.001}],
+  taikoFinish:[{t:'tone', wave:'sine', f:130, f2:68, dur:0.3, vol:0.25, atk:0.002}, {t:'tone', wave:'sine', f:130, f2:68, dur:0.3, vol:0.25, at:0.12, atk:0.002},
+               {t:'tone', wave:'sine', f:130, f2:68, dur:0.3, vol:0.25, at:0.24, atk:0.002}, {t:'tone', wave:'sine', f:110, f2:55, dur:0.6, vol:0.3, at:0.42, atk:0.002},
+               {t:'noise', filter:'lowpass', f:300, dur:0.14, vol:0.18, at:0.42, atk:0.001},
+               {t:'noise', filter:'bandpass', f:900, f2:1400, q:5, dur:0.38, vol:0.08, at:0.62, atk:0.03},       // イヨォーッ
+               {t:'noise', filter:'bandpass', f:1600, f2:2200, q:6, dur:0.32, vol:0.035, at:0.63, atk:0.03}],
+  // --- 越前がにポコポコ: a woodblock and a xylophone that play the combo's tune ---
+  pokoCut:    [{t:'tone', wave:'sine', f:880, p:1, dur:0.07, vol:0.17, atk:0.0008}, {t:'tone', wave:'sine', f:2640, p:1, dur:0.03, vol:0.04, atk:0.0008},
+               {t:'noise', filter:'bandpass', f:1600, q:4, dur:0.02, vol:0.07, atk:0.0005}],
+  pokoJust:   [{t:'tone', wave:'sine', f:1175, p:1, dur:0.06, vol:0.13, atk:0.0008}, {t:'tone', wave:'sine', f:1568, p:1, dur:0.09, vol:0.13, at:0.07, atk:0.0008},
+               {t:'noise', filter:'bandpass', f:2000, q:4, dur:0.02, vol:0.06, at:0.07, atk:0.0005}],
+  // --- 龍泉クラッシュ: honed steel that rings, and crystal glass bursting on a JUST! ---
+  crystalCut: [{t:'noise', filter:'highpass', f:7000, dur:0.02, vol:0.07, atk:0.0005}, {t:'tone', wave:'sine', f:2093, p:1, dur:0.36, vol:0.045, atk:0.001},
+               {t:'tone', wave:'sine', f:2097, p:1, dur:0.36, vol:0.02, atk:0.001}, {t:'tone', wave:'sine', f:3136, p:1, dur:0.24, vol:0.026, atk:0.001},
+               {t:'tone', wave:'sine', f:4699, p:0.5, dur:0.14, vol:0.014, atk:0.001}],
+  crystalJust:[{t:'noise', filter:'highpass', f:6000, dur:0.26, vol:0.06, atk:0.001, trem:18},
+               {t:'tone', wave:'sine', f:3520, dur:0.12, vol:0.03, atk:0.0008}, {t:'tone', wave:'sine', f:4186, dur:0.1, vol:0.026, at:0.02, atk:0.0008},
+               {t:'tone', wave:'sine', f:5274, dur:0.09, vol:0.02, at:0.04, atk:0.0008}, {t:'tone', wave:'sine', f:6272, dur:0.18, vol:0.016, at:0.06, atk:0.0008},
+               {t:'tone', wave:'sine', f:4699, dur:0.08, vol:0.02, at:0.09, atk:0.0008}],
+  // --- 恐竜ダイナソービート: a heavy kick, and a snare with a crash on a JUST! ---
+  dinoKick:   [{t:'tone', wave:'sine', f:165, f2:42, p:0.15, dur:0.3, vol:0.32, atk:0.0008}, {t:'noise', filter:'lowpass', f:190, dur:0.08, vol:0.15, atk:0.0008},
+               {t:'tone', wave:'square', f:55, p:0.15, dur:0.09, vol:0.025, atk:0.001}, {t:'noise', filter:'bandpass', f:3200, q:2, dur:0.012, vol:0.05, atk:0.0004}],
+  dinoJust:   [{t:'noise', filter:'bandpass', f:1800, q:0.8, dur:0.16, vol:0.16, atk:0.0008}, {t:'tone', wave:'triangle', f:200, f2:165, dur:0.1, vol:0.08, atk:0.001},
+               {t:'noise', filter:'highpass', f:6000, dur:0.55, vol:0.05, at:0.01, atk:0.002}],
+  // --- 羽二重もちモチ音: a soft bounce up and a little sag ---
+  mochiCut:   [{t:'tone', wave:'sine', f:250, f2:520, p:0.6, dur:0.11, vol:0.17, atk:0.004}, {t:'tone', wave:'sine', f:430, f2:300, p:0.6, dur:0.1, vol:0.09, at:0.075, atk:0.004}],
+  mochiJust:  [{t:'tone', wave:'sine', f:300, f2:640, p:0.6, dur:0.1, vol:0.13, atk:0.004}, {t:'tone', wave:'sine', f:520, f2:360, p:0.6, dur:0.1, vol:0.1, at:0.09, atk:0.004},
+               {t:'tone', wave:'sine', f:460, f2:330, p:0.6, dur:0.09, vol:0.07, at:0.17, atk:0.004}],
+  // --- 8bitそばサイバー: square-wave blips; the cut is a quick major arpeggio on the combo's note ---
+  pico8Cut:   [{t:'tone', wave:'square', f:523, p:1, dur:0.045, vol:0.075, atk:0.0008}, {t:'tone', wave:'square', f:659, p:1, dur:0.045, vol:0.075, at:0.035, atk:0.0008},
+               {t:'tone', wave:'square', f:784, p:1, dur:0.06, vol:0.075, at:0.07, atk:0.0008}],
+  pico8Just:  [{t:'tone', wave:'square', f:1047, p:1, dur:0.04, vol:0.065, atk:0.0008}, {t:'tone', wave:'square', f:1319, p:1, dur:0.04, vol:0.065, at:0.03, atk:0.0008},
+               {t:'tone', wave:'square', f:1568, p:1, dur:0.04, vol:0.065, at:0.06, atk:0.0008}, {t:'tone', wave:'square', f:2093, p:1, dur:0.1, vol:0.065, at:0.09, atk:0.0008},
+               {t:'noise', filter:'highpass', f:6000, dur:0.03, vol:0.03, atk:0.0005}],
+  pico8Miss:  [{t:'tone', wave:'square', f:392, f2:98, dur:0.32, vol:0.08, atk:0.001}, {t:'tone', wave:'square', f:196, f2:65, dur:0.3, vol:0.05, at:0.05, atk:0.001}],
+  // --- 水ようかんツルン: a drop that bloops, a splash and a slap of water ---
+  dropCut:    [{t:'tone', wave:'sine', f:700, f2:1500, p:0.5, dur:0.07, vol:0.15, atk:0.002}, {t:'noise', filter:'bandpass', f:3000, q:2, dur:0.03, vol:0.05, atk:0.0006},
+               {t:'noise', filter:'lowpass', f:900, dur:0.05, vol:0.05, atk:0.001}],
+  dropJust:   [{t:'noise', filter:'bandpass', f:2000, f2:5200, q:1, dur:0.15, vol:0.08, atk:0.001}, {t:'tone', wave:'sine', f:900, f2:2100, p:0.5, dur:0.1, vol:0.11, at:0.03, atk:0.002}],
+  slurp:      [{t:'noise', filter:'bandpass', f:700, f2:2700, q:5, dur:0.2, vol:0.13, atk:0.03}, {t:'noise', filter:'bandpass', f:900, f2:3200, q:5.5, dur:0.24, vol:0.12, at:0.25, atk:0.03},
+               {t:'noise', filter:'highpass', f:4200, dur:0.12, vol:0.025, at:0.27, atk:0.04}, {t:'tone', wave:'sine', f:320, f2:620, dur:0.16, vol:0.025, at:0.27, atk:0.03},
+               {t:'noise', filter:'lowpass', f:600, dur:0.08, vol:0.05, at:0.52, atk:0.005}],
+  // --- 勝山発掘ハンマー: the hammer's blow with a ring like a gem; a JUST! leaves a long 「キーン」 ---
+  hammerKan:  [{t:'noise', filter:'highpass', f:3000, dur:0.016, vol:0.08, atk:0.0008}, {t:'tone', wave:'sine', f:140, f2:90, dur:0.07, vol:0.09, atk:0.002},
+               {t:'tone', wave:'triangle', f:1250, p:0.5, dur:0.34, vol:0.05, atk:0.001}, {t:'tone', wave:'sine', f:1873, p:0.5, dur:0.26, vol:0.035, atk:0.001},
+               {t:'tone', wave:'sine', f:2740, p:0.5, dur:0.18, vol:0.022, atk:0.001}, {t:'tone', wave:'sine', f:3720, p:1, dur:0.3, vol:0.014, atk:0.001}],
+  gemKiin:    [{t:'noise', filter:'highpass', f:3500, dur:0.022, vol:0.07, atk:0.001}, {t:'tone', wave:'sine', f:2093, p:1, dur:0.9, vol:0.045, atk:0.001},
+               {t:'tone', wave:'sine', f:2099, p:1, dur:0.9, vol:0.02, atk:0.001}, {t:'tone', wave:'sine', f:3170, p:1, dur:0.65, vol:0.026, atk:0.001},
+               {t:'tone', wave:'sine', f:4410, p:1, dur:0.42, vol:0.015, atk:0.001}, {t:'tone', wave:'sine', f:6272, dur:0.3, vol:0.008, at:0.04, atk:0.001}],
+  // --- 永世蕎麦神のオーケストラ: a koto's pluck, a soft chord on the combo's note, bells and a grand finale ---
+  orchCut:    [{t:'noise', filter:'highpass', f:6500, dur:0.015, vol:0.05, atk:0.0005}, {t:'tone', wave:'triangle', f:523, p:1, dur:0.42, vol:0.075, atk:0.0015},
+               {t:'tone', wave:'sine', f:1046, p:1, dur:0.22, vol:0.03, atk:0.0015}, {t:'tone', wave:'sine', f:523, p:1, dur:0.5, vol:0.022, atk:0.04},
+               {t:'tone', wave:'sine', f:659, p:1, dur:0.5, vol:0.02, atk:0.04}, {t:'tone', wave:'sine', f:784, p:1, dur:0.5, vol:0.02, atk:0.04}],
+  orchJust:   [{t:'tone', wave:'sine', f:2093, p:1, dur:0.6, vol:0.032, atk:0.001}, {t:'tone', wave:'sine', f:3136, p:1, dur:0.45, vol:0.02, atk:0.001},
+               {t:'noise', filter:'highpass', f:7000, dur:0.22, vol:0.03, atk:0.005, trem:16}, {t:'tone', wave:'sine', f:150, f2:80, dur:0.25, vol:0.14, atk:0.002}],
+  orchFinale: [{t:'tone', wave:'sine', f:130, f2:68, dur:0.35, vol:0.24, atk:0.002}, {t:'tone', wave:'sine', f:130, f2:68, dur:0.4, vol:0.26, at:0.17, atk:0.002},
+               {t:'tone', wave:'triangle', f:523, dur:0.9, vol:0.05, at:0.36, atk:0.02}, {t:'tone', wave:'triangle', f:659, dur:0.9, vol:0.045, at:0.36, atk:0.02},
+               {t:'tone', wave:'triangle', f:784, dur:0.9, vol:0.045, at:0.36, atk:0.02}, {t:'tone', wave:'sine', f:1047, dur:0.9, vol:0.035, at:0.36, atk:0.03},
+               {t:'tone', wave:'sine', f:1568, dur:0.7, vol:0.03, at:0.5, atk:0.01}, {t:'tone', wave:'sine', f:2093, dur:0.8, vol:0.03, at:0.62, atk:0.002},
+               {t:'tone', wave:'sine', f:2637, dur:0.7, vol:0.026, at:0.7, atk:0.002}, {t:'noise', filter:'highpass', f:5200, dur:0.8, vol:0.045, at:0.62, atk:0.004}],
+  // --- the blades' rings (道具 slot) ---
   bladeChin: [{t:'noise', filter:'highpass', f:6000, dur:0.012, vol:0.04, atk:0.0008}, {t:'tone', wave:'sine', f:2637, dur:0.18, vol:0.05, atk:0.001},
               {t:'tone', wave:'sine', f:3956, dur:0.1, vol:0.02, atk:0.001}],
   bladeSwish:[{t:'noise', filter:'bandpass', f:5200, f2:1600, q:1.4, dur:0.17, vol:0.07, atk:0.03}, {t:'noise', filter:'highpass', f:7000, dur:0.09, vol:0.02, atk:0.02}],
@@ -3542,7 +3698,7 @@ function startRound(){
     elCaption.classList.add('show');
     state.captionHideAt = null;
   }
-  equipSfx('round');   // 着せ替え: e.g. the millstone as each bowl begins
+  equipSfx('round');   // 着せ替え: e.g. the 和太鼓's 「ドン、ドン」 as each bowl begins
 }
 
 // ---------- Input ----------
@@ -4497,24 +4653,10 @@ if(fxParticlesEl) fxParticlesEl.addEventListener('change', function(){
 });
 syncEffectsControls();
 
+// the game's own JUST! sound, as heard in play: the cut and the 小鼓's 「ポン！」 (used by 「音を試す」 with nothing worn)
 function playJustSound(){
-  if(!audioEnabled) return;
-  var ctx2 = getAudioCtx();
-  if(!ctx2) return;
-  try{
-    if(ctx2.state==='suspended'){ ctx2.resume(); }
-    var osc = ctx2.createOscillator();
-    var gain = ctx2.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1200, ctx2.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1900, ctx2.currentTime+0.09);
-    gain.gain.setValueAtTime(0.16, ctx2.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime+0.2);
-    osc.connect(gain);
-    gain.connect(ctx2.destination);
-    osc.start();
-    osc.stop(ctx2.currentTime+0.22);
-  }catch(e){}
+  playSfx('cutShaki', 1, 0);
+  playSfx('justPon', 1, JUST_POP_DELAY);
 }
 function playAromaSound(){
   if(!audioEnabled) return;
@@ -4530,7 +4672,7 @@ function playAromaSound(){
     gain.gain.setValueAtTime(0.09, ctx2.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime+0.16);
     osc.connect(gain);
-    gain.connect(ctx2.destination);
+    gain.connect(sfxOut(ctx2));
     osc.start();
     osc.stop(ctx2.currentTime+0.18);
   }catch(e){}
@@ -4561,7 +4703,7 @@ function playSpiceSound(success){
     gain.gain.setValueAtTime(0.13, ctx2.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime+0.2);
     osc.connect(gain);
-    gain.connect(ctx2.destination);
+    gain.connect(sfxOut(ctx2));
     osc.start();
     osc.stop(ctx2.currentTime+0.22);
   }catch(e){}
@@ -4606,8 +4748,8 @@ function registerHit(err){
   state.cutFx.push({t:0, rating: isJust ? 'JUST' : rating});
   state.batch.push({thickness:thickness, points:points, seed:Math.random()});
   showPopup(isJust ? 'JUST!' : rating);
-  if(isJust) playJustSound();
-  equipSfx('cut', isJust);   // 着せ替え: the equipped cutting sound and blade ring (silent when none)
+  playCutSounds(isJust, state.combo);   // the cut on the combo's note (and a JUST!'s 合いの手); 着せ替え changes the sound only
+  cutImpactFx(isJust ? 'JUST' : rating, state.combo);   // オノマトペ, the JUST! bounce, the combo flurry (looks only)
 }
 
 function onMiss(){
@@ -4621,6 +4763,8 @@ function onMiss(){
     showAromaLost();
   }
   showPopup('MISS');
+  playMissSound();
+  cutImpactFx('MISS', 0);
 }
 
 function showPopup(text){
@@ -4631,6 +4775,69 @@ function showPopup(text){
   elPopup.classList.add('show');
 }
 
+// ---------- 切った瞬間の演出（見た目だけ。得点・判定には関係しない） ----------
+// オノマトペ: a word for the cut, popping up beside the board (they alternate sides); the JUST! bounce of the play
+// area; and every 10 in a row, a flurry of 桜 petals and sparkles from both edges. 描画「軽量」, 演出「控えめ」 and
+// prefers-reduced-motion calm the motion (no bounce; the words only fade; no flurry); 紙吹雪オフ turns the flurry off.
+var ONOMATO = {JUST:['ズバッ！','ピッタリ！','極上！'], PERFECT:['シャキッ！','イイネ！'], GOOD:['トントン'], OK:['トン'], MISS:['グニャ…','スカッ']};
+var impactLayer = document.getElementById('impact-layer');
+var playWrap = canvas.parentNode;
+var onomatoPool = [], onomatoNext = 0, onomatoSide = 0;
+function motionCalm(){
+  var fc = fxConf();
+  return fc.still || visualDetail==='low' || effectsPref.level==='low';
+}
+function cutImpactFx(kind, combo){
+  try{
+    showOnomato(kind);
+    if(kind==='JUST') justBounce();
+    if(combo>0 && combo % 10===0) comboFlurry();
+  }catch(e){}
+}
+function showOnomato(kind){
+  var words = ONOMATO[kind];
+  if(!impactLayer || !words) return;
+  if(onomatoPool.length<4){ var sp = document.createElement('span'); impactLayer.appendChild(sp); onomatoPool.push(sp); }
+  var el = onomatoPool[onomatoNext % onomatoPool.length];
+  onomatoNext++;
+  onomatoSide = 1 - onomatoSide;
+  el.className = 'onomato r-' + kind.toLowerCase();
+  el.textContent = words[Math.floor(Math.random()*words.length)];
+  el.style.left = (onomatoSide ? 26 + Math.random()*12 : 62 + Math.random()*12) + '%';
+  el.style.top = (54 + Math.random()*12) + '%';
+  el.style.setProperty('--rot', (Math.random()*16 - 8).toFixed(1) + 'deg');
+  void el.offsetWidth;                              // restart the pop even when the same word comes again
+  el.classList.add('go');
+}
+function justBounce(){
+  if(!playWrap || motionCalm()) return;
+  playWrap.classList.remove('just-bounce');
+  void playWrap.offsetWidth;
+  playWrap.classList.add('just-bounce');
+}
+function comboFlurry(){
+  if(!impactLayer || !effectsPref.particlesOn || fxConf().still) return;
+  if(impactLayer.querySelectorAll('.flurry').length>40) return;
+  var w = impactLayer.clientWidth, h = impactLayer.clientHeight;
+  if(!(w>0 && h>0)) return;
+  var n = (visualDetail==='low' || effectsPref.level==='low') ? 8 : effectsPref.level==='high' ? 22 : 16;
+  for(var i=0;i<n;i++){
+    var left = i % 2===0, el = document.createElement('span');
+    var spark = i % 3===2;
+    el.className = 'flurry' + (spark ? ' spark' : (i % 4===1 ? ' alt' : ''));
+    if(spark) el.textContent = '✦';
+    var x0 = left ? -10 : w + 4, y0 = h*(0.2 + Math.random()*0.6);
+    el.style.left = x0 + 'px';
+    el.style.top = y0 + 'px';
+    el.style.setProperty('--dx', ((left ? 1 : -1)*w*(0.25 + Math.random()*0.3)).toFixed(0) + 'px');
+    el.style.setProperty('--dy', (-h*(0.1 + Math.random()*0.3)).toFixed(0) + 'px');
+    el.style.setProperty('--spin', (Math.random()*540 - 270).toFixed(0) + 'deg');
+    el.style.animationDelay = (Math.random()*0.18).toFixed(2) + 's';
+    impactLayer.appendChild(el);
+    (function(node){ setTimeout(function(){ if(node.parentNode) node.parentNode.removeChild(node); }, 1300); })(el);
+  }
+}
+
 function pickComment(tier){
   var pool = state.character.comments[tier];
   return pool[Math.floor(Math.random()*pool.length)];
@@ -4638,6 +4845,7 @@ function pickComment(tier){
 
 function beginServing(){
   state.phase = 'serving';
+  playFinishSound();   // the bowl's last cut is in: the closing fanfare
   if(state.character.hasSpiceMeter){
     state.serving = {
       stage:'spice', t:0, result:null,
@@ -5158,7 +5366,7 @@ function runGachaTransaction(kind){
     dupTickets:gotTickets, newCount:newCount, balance:g.currency, tickets:g.tickets, newTitle:newTitle
   };
 }
-// Self-check of the tables: rates add up to 100%, 77 items in the right numbers, every item a skin with a look
+// Self-check of the tables: rates add up to 100%, 82 items in the right numbers, every item a skin with a look
 // for its slot, sensible そば札 numbers, something to draw. If anything is off, the pull and exchange buttons stay
 // disabled rather than working from a broken table.
 function checkGachaTables(){
@@ -5497,7 +5705,7 @@ function gachaTone(ac, f, at, dur, type, vol, f2){
   gain.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
   gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   osc.connect(gain);
-  gain.connect(ac.destination);
+  gain.connect(sfxOut(ac));
   osc.start(t0);
   osc.stop(t0 + dur + 0.03);
 }
@@ -6205,6 +6413,20 @@ function setEquipped(slot, id){
 }
 
 // --- ① 音: the game's WebAudio module (getAudioCtx) with tones and filtered noise from SKIN_SFX; silent while 🔇 ---
+// Every sound goes out through one master gain and a compressor, so a burst of fast cuts never clips (音割れ).
+var sfxBus = null;
+function sfxOut(ac){
+  if(sfxBus && sfxBus.ac===ac) return sfxBus.input;
+  try{
+    var input = ac.createGain(), comp = ac.createDynamicsCompressor();
+    input.gain.value = 0.9;
+    comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 6; comp.attack.value = 0.002; comp.release.value = 0.12;
+    input.connect(comp);
+    comp.connect(ac.destination);
+    sfxBus = {ac:ac, input:input};
+    return input;
+  }catch(e){ return ac.destination; }
+}
 var sfxNoise = null;
 function sfxNoiseBuffer(ac){
   if(sfxNoise && sfxNoise.sampleRate===ac.sampleRate) return sfxNoise;
@@ -6215,14 +6437,16 @@ function sfxNoiseBuffer(ac){
   sfxNoise = buf;
   return buf;
 }
-function sfxNoiseVoice(ac, v, at){
-  var t0 = ac.currentTime + at, dur = v.dur;
+// ratio: the combo's note (1 = as written); a voice follows it by its own p (0 = not at all)
+function sfxPitch(v, ratio){ return (ratio>0 && v.p) ? Math.pow(ratio, v.p) : 1; }
+function sfxNoiseVoice(ac, v, at, ratio){
+  var t0 = ac.currentTime + at, dur = v.dur, r = sfxPitch(v, ratio);
   var src = ac.createBufferSource();
   src.buffer = sfxNoiseBuffer(ac);
   var filt = ac.createBiquadFilter();
   filt.type = v.filter || 'bandpass';
-  filt.frequency.setValueAtTime(v.f, t0);
-  if(v.f2) filt.frequency.exponentialRampToValueAtTime(v.f2, t0 + dur);
+  filt.frequency.setValueAtTime(Math.min(v.f*r, 20000), t0);
+  if(v.f2) filt.frequency.exponentialRampToValueAtTime(Math.min(v.f2*r, 20000), t0 + dur);
   if(v.q) filt.Q.setValueAtTime(v.q, t0);
   var gain = ac.createGain();
   gain.gain.setValueAtTime(0.0001, t0);
@@ -6234,49 +6458,73 @@ function sfxNoiseVoice(ac, v, at){
   gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   src.connect(filt);
   filt.connect(gain);
-  gain.connect(ac.destination);
+  gain.connect(sfxOut(ac));
   src.start(t0);
   src.stop(t0 + dur + 0.05);
 }
 // a tone with its own attack (a struck board or metal starts at once; a rumble swells in) and a decay to silence
-function sfxToneVoice(ac, v, at){
+function sfxToneVoice(ac, v, at, ratio){
   var t0 = ac.currentTime + at, dur = v.dur, atk = Math.max(0.0005, Math.min(typeof v.atk==='number' ? v.atk : 0.012, dur*0.4));
-  var osc = ac.createOscillator(), gain = ac.createGain();
+  var osc = ac.createOscillator(), gain = ac.createGain(), r = sfxPitch(v, ratio);
   osc.type = v.wave || 'sine';
-  osc.frequency.setValueAtTime(v.f, t0);
-  if(v.f2) osc.frequency.exponentialRampToValueAtTime(v.f2, t0 + dur*0.8);
+  osc.frequency.setValueAtTime(v.f*r, t0);
+  if(v.f2) osc.frequency.exponentialRampToValueAtTime(v.f2*r, t0 + dur*0.8);
   gain.gain.setValueAtTime(0.0001, t0);
   gain.gain.exponentialRampToValueAtTime(v.vol, t0 + atk);
   gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   osc.connect(gain);
-  gain.connect(ac.destination);
+  gain.connect(sfxOut(ac));
   osc.start(t0);
   osc.stop(t0 + dur + 0.03);
 }
-function playSkinSound(name){
+// plays one recipe: ratio = the combo's note (see p), delay = seconds from now. Nothing at all while 🔇.
+function playSfx(name, ratio, delay){
   if(!audioEnabled || typeof name!=='string' || !Object.prototype.hasOwnProperty.call(SKIN_SFX, name)) return;
   var ac = getAudioCtx();
   if(!ac) return;
   try{
     if(ac.state==='suspended'){ ac.resume(); }
-    var voices = SKIN_SFX[name];
+    var voices = SKIN_SFX[name], r = ratio>0 ? ratio : 1, d = delay>0 ? delay : 0;
     for(var i=0;i<voices.length;i++){
-      var v = voices[i], at = v.at || 0;
-      if(v.t==='tone') sfxToneVoice(ac, v, at);
-      else sfxNoiseVoice(ac, v, at);
+      var v = voices[i], at = (v.at || 0) + d;
+      if(v.t==='tone') sfxToneVoice(ac, v, at, r);
+      else sfxNoiseVoice(ac, v, at, r);
     }
   }catch(e){}
 }
-// event: 'cut' (every successful cut; isJust for a JUST!), 'round' (each bowl begins), 'serve' (the customer eats)
-function equipSfx(event, isJust){
+function playSkinSound(name){ playSfx(name, 1, 0); }
+// コンボの音階: each cut in a row climbs ド・レ・ミ・ソ・ラ (two octaves), then starts again from the bottom
+var COMBO_SCALE = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21];
+function comboPitch(combo){
+  var n = Math.max(1, Math.floor(combo) || 1);
+  return Math.pow(2, COMBO_SCALE[(n - 1) % COMBO_SCALE.length]/12);
+}
+var JUST_POP_DELAY = 0.045;   // JUST!: the cut, then the 合いの手 right on its heels (a double attack)
+// every successful cut: the equipped sound item's cut (or the game's 「シャキッ」) on the combo's note; a JUST! adds
+// the item's 合いの手 (or the game's 小鼓 「ポン！」) and the equipped blade's ring. Looks and sound only.
+function playCutSounds(isJust, combo){
   try{
-    var snd = skinPart('sound'), tool = skinPart('tool');
-    if(event==='cut'){
-      if(snd) playSkinSound(isJust && snd.just ? snd.just : snd.cut);
-      if(isJust && tool) playSkinSound(tool.just);
-    } else if(snd){
-      playSkinSound(snd[event]);
+    var snd = skinPart('sound'), tool = skinPart('tool'), r = comboPitch(combo);
+    playSfx(snd && snd.cut ? snd.cut : 'cutShaki', r, 0);
+    if(isJust){
+      playSfx(snd && snd.just ? snd.just : 'justPon', r, JUST_POP_DELAY);
+      if(tool && tool.just) playSfx(tool.just, 1, 0);
     }
+  }catch(e){}
+}
+// the bowl is done (the last cut): a 和風ファンファーレ, or the sound item's own
+function playFinishSound(){
+  try{ var snd = skinPart('sound'); playSfx(snd && snd.finish ? snd.finish : 'finishFanfare', 1, 0); }catch(e){}
+}
+// a MISS: the pitch drops away (ズッコケ), or the sound item's own
+function playMissSound(){
+  try{ var snd = skinPart('sound'); playSfx(snd && snd.miss ? snd.miss : 'missDrop', 1, 0); }catch(e){}
+}
+// event: 'round' (each bowl begins), 'serve' (the customer eats) — moments only some sound items have
+function equipSfx(event){
+  try{
+    var snd = skinPart('sound');
+    if(snd && snd[event]) playSfx(snd[event], 1, 0);
   }catch(e){}
 }
 function previewEquipSound(it){
@@ -6284,7 +6532,7 @@ function previewEquipSound(it){
     var table = it ? SKIN_TABLES[it.applyTo] : null;
     var look = (table && Object.prototype.hasOwnProperty.call(table, it.id)) ? table[it.id] : null;
     if(!look) return;
-    if(it.applyTo==='sound') playSkinSound(look.cut || look.round || look.serve);
+    if(it.applyTo==='sound') playSkinSound(look.cut || look.round || look.serve || look.finish);
     else if(it.applyTo==='tool') playSkinSound(look.just);
   }catch(e){}
 }
@@ -9558,7 +9806,7 @@ kisekaeTabs.addEventListener('keydown', function(e){
 // 音を試す: the equipped sounds, one after another (silent while 🔇)
 function tryKisekaeSounds(){
   if(!audioEnabled){ setKisekaeMsg('効果音がオフ（🔇）のため鳴りません。右上の🔇で切り替えられます。', true); return; }
-  var sk = resolveSkin(), seq = [], evs = ['cut','just','round','serve'], i;
+  var sk = resolveSkin(), seq = [], evs = ['cut','just','round','finish','serve','miss'], i;
   if(sk.sound) for(i=0;i<evs.length;i++) if(sk.sound[evs[i]]) seq.push(sk.sound[evs[i]]);
   if(sk.tool && sk.tool.just) seq.push(sk.tool.just);
   if(!seq.length){
@@ -9984,36 +10232,123 @@ var SOUND_ICONS = {
     var sp = [[-4,-14],[8,-16],[-12,-12],[2,-20],[14,-11]];
     for(var i=0;i<sp.length;i++) drawSparkShape(g, sp[i][0], sp[i][1], 2.4, '#ffb347', 'star');
   },
-  millstone:function(g, S){                                    // 石臼: two stones and the wooden handle
+  taiko:function(g, S){                                        // お祭り和太鼓: the barrel drum and two bachi
     g.translate(S*0.46, S*0.62);
-    g.fillStyle = 'rgba(30,20,10,0.25)'; g.beginPath(); g.ellipse(2, 16, 32, 6, 0, 0, Math.PI*2); g.fill();
-    for(var k=1;k>=0;k--){
-      var y = k*-12;
-      g.fillStyle = k ? '#9c988e' : '#88847a';
-      g.fillRect(-26, y, 52, 12);
-      g.beginPath(); g.ellipse(0, y + 12, 26, 6, 0, 0, Math.PI); g.fill();
-      g.fillStyle = k ? '#b4b0a6' : '#a09c92';
-      g.beginPath(); g.ellipse(0, y, 26, 6, 0, 0, Math.PI*2); g.fill();
-    }
-    g.fillStyle = '#5c5850'; g.beginPath(); g.ellipse(0, -12, 4, 2, 0, 0, Math.PI*2); g.fill();
-    sceneDots(g, 3, 30, -24, -10, 48, 22, 0.3, 0.8, ['#6f6b62','#c4c0b6'], 0.6);
-    g.fillStyle = '#7a5634'; g.fillRect(18, -26, 4, 16);
-    g.fillStyle = '#e8dcc0';                                   // そば粉 falling from between the stones
-    g.beginPath(); g.ellipse(-20, 14, 10, 3, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = 'rgba(30,20,10,0.25)'; g.beginPath(); g.ellipse(2, 18, 30, 6, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#8a4b22'; g.fillRect(-26, -14, 52, 30);
+    g.fillStyle = '#a65d2c'; g.fillRect(-26, -14, 52, 8);
+    g.fillStyle = '#6d3a19'; g.fillRect(-26, 10, 52, 6);
+    g.fillStyle = '#f1e2c2'; g.beginPath(); g.ellipse(-26, 1, 6, 15, 0, 0, Math.PI*2); g.fill();
+    g.beginPath(); g.ellipse(26, 1, 6, 15, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#3a2412';
+    for(var i=0;i<6;i++){ g.beginPath(); g.arc(-20 + i*8, -11, 1.1, 0, Math.PI*2); g.fill(); g.beginPath(); g.arc(-20 + i*8, 13, 1.1, 0, Math.PI*2); g.fill(); }
+    g.fillStyle = '#c8302c'; g.beginPath(); g.arc(0, 1, 6, 0, Math.PI*2); g.fill();              // 巴 at the centre
+    g.strokeStyle = '#d9b27a'; g.lineWidth = 3; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-6, -22); g.lineTo(10, -40); g.moveTo(8, -20); g.lineTo(26, -34); g.stroke();
   },
-  choko:function(g, S){                                        // そば猪口と、すするそば
-    g.translate(S*0.42, S*0.64);
-    g.fillStyle = 'rgba(30,20,10,0.25)'; g.beginPath(); g.ellipse(2, 14, 24, 5, 0, 0, Math.PI*2); g.fill();
-    g.fillStyle = '#eef0f2';
-    g.beginPath(); g.moveTo(-20, -18); g.lineTo(20, -18); g.lineTo(16, 12); g.lineTo(-16, 12); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(0,0,0,0.08)'; g.beginPath(); g.moveTo(6, -18); g.lineTo(20, -18); g.lineTo(16, 12); g.lineTo(4, 12); g.closePath(); g.fill();
-    g.strokeStyle = '#3f5f8f'; g.lineWidth = 1.4;
-    g.beginPath(); g.moveTo(-19, -10); g.lineTo(19, -10); g.moveTo(-17.5, 2); g.lineTo(17.5, 2); g.stroke();
-    g.lineWidth = 0.8;
-    for(var i=0;i<6;i++){ g.beginPath(); g.moveTo(-15 + i*6, -8); g.quadraticCurveTo(-12 + i*6, -4, -15 + i*6, 0); g.stroke(); }
-    g.fillStyle = '#4a2c16'; g.beginPath(); g.ellipse(0, -18, 20, 4, 0, 0, Math.PI*2); g.fill();
-    g.strokeStyle = '#7d6a4a'; g.lineWidth = 1.6;
-    for(var n=0;n<3;n++){ g.beginPath(); g.moveTo(-4 + n*3, -18); g.bezierCurveTo(-2 + n*3, -28, 6 + n*3, -30, 10 + n*3, -40); g.stroke(); }
+  crab:function(g, S){                                         // 越前がにポコポコ: a woodblock and a crab's claw
+    g.translate(S*0.44, S*0.64);
+    g.fillStyle = 'rgba(30,20,10,0.25)'; g.beginPath(); g.ellipse(2, 12, 30, 6, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#c99b62'; g.beginPath(); g.moveTo(-26, -6); g.quadraticCurveTo(-26, -16, -14, -16); g.lineTo(14, -16); g.quadraticCurveTo(26, -16, 26, -6); g.lineTo(26, 8); g.lineTo(-26, 8); g.closePath(); g.fill();
+    g.fillStyle = '#3a2412'; g.fillRect(-18, -3, 36, 3);
+    g.fillStyle = 'rgba(255,240,210,0.35)'; g.fillRect(-22, -14, 44, 2);
+    g.fillStyle = '#d2452a';                                   // the claw tapping it
+    g.beginPath(); g.ellipse(18, -26, 9, 6, -0.5, 0, Math.PI*2); g.fill();
+    g.beginPath(); g.moveTo(22, -30); g.quadraticCurveTo(34, -40, 30, -24); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(24, -24); g.quadraticCurveTo(36, -24, 30, -16); g.closePath(); g.fill();
+    g.fillStyle = '#f08a5d'; for(var i=0;i<3;i++){ g.beginPath(); g.arc(14 + i*3, -27, 0.9, 0, Math.PI*2); g.fill(); }
+  },
+  crystal:function(g, S){                                      // 龍泉クラッシュ: a blade's tip and bursting glass
+    g.translate(S*0.44, S*0.62);
+    g.fillStyle = 'rgba(30,20,10,0.2)'; g.beginPath(); g.ellipse(2, 16, 28, 5, 0, 0, Math.PI*2); g.fill();
+    var cols = ['#bfe6f5','#8fd0ea','#e6f7ff','#a7dcef'];
+    var shards = [[-14,-4,10,0.3],[4,-10,13,-0.4],[16,6,9,0.9],[-4,10,8,-1.1],[-22,10,6,0.6]];
+    for(var i=0;i<shards.length;i++){
+      var c = shards[i];
+      g.save(); g.translate(c[0], c[1]); g.rotate(c[3]);
+      g.fillStyle = cols[i % cols.length];
+      g.beginPath(); g.moveTo(0, -c[2]); g.lineTo(c[2]*0.55, 0); g.lineTo(0, c[2]*0.8); g.lineTo(-c[2]*0.5, 0); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(255,255,255,0.8)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(0, -c[2]); g.lineTo(0, c[2]*0.8); g.stroke();
+      g.restore();
+    }
+    g.fillStyle = '#c3cacd'; g.beginPath(); g.moveTo(-30, -28); g.lineTo(-2, -12); g.lineTo(-6, -8); g.closePath(); g.fill();   // the blade
+    g.fillStyle = '#5e6c72'; g.fillRect(-36, -32, 8, 4);
+    var sp = [[-2,-20],[12,-22],[22,-6],[-26,0]];
+    for(var k=0;k<sp.length;k++) drawSparkShape(g, sp[k][0], sp[k][1], 2.6, '#ffffff', 'glint');
+  },
+  dino:function(g, S){                                         // 恐竜ダイナソービート: a bass drum with a footprint
+    g.translate(S*0.46, S*0.6);
+    g.fillStyle = 'rgba(30,20,10,0.25)'; g.beginPath(); g.ellipse(2, 24, 28, 5, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#5a6a3a'; g.beginPath(); g.arc(0, 0, 25, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#efe6cf'; g.beginPath(); g.arc(0, 0, 20, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#c9b48a'; for(var i=0;i<8;i++){ var a2 = i*Math.PI/4; g.beginPath(); g.arc(Math.cos(a2)*22.5, Math.sin(a2)*22.5, 1.4, 0, Math.PI*2); g.fill(); }
+    g.fillStyle = '#6e5638';                                   // 3本指の足あと
+    g.beginPath(); g.ellipse(0, 6, 6, 5, 0, 0, Math.PI*2); g.fill();
+    var toes = [[-8,-6,-0.5],[0,-10,0],[8,-6,0.5]];
+    for(var t=0;t<3;t++){ g.save(); g.translate(toes[t][0], toes[t][1]); g.rotate(toes[t][2]); g.beginPath(); g.ellipse(0, 0, 2.6, 6, 0, 0, Math.PI*2); g.fill(); g.restore(); }
+    g.fillStyle = '#9a7a4a'; g.fillRect(-18, 24, 4, 6); g.fillRect(14, 24, 4, 6);
+  },
+  mochi:function(g, S){                                        // 羽二重もちモチ音: two soft mochi bouncing, dusted with powder
+    g.translate(S*0.46, S*0.64);
+    g.fillStyle = 'rgba(30,20,10,0.2)'; g.beginPath(); g.ellipse(0, 12, 30, 5, 0, 0, Math.PI*2); g.fill();
+    var m = [[-12,2,15,9],[12,-10,12,8]];
+    for(var i=0;i<m.length;i++){
+      var gr = g.createRadialGradient(m[i][0] - 4, m[i][1] - 4, 1, m[i][0], m[i][1], m[i][2]);
+      gr.addColorStop(0, '#ffffff'); gr.addColorStop(1, '#eee7d8');
+      g.fillStyle = gr; g.beginPath(); g.ellipse(m[i][0], m[i][1], m[i][2], m[i][3], 0, 0, Math.PI*2); g.fill();
+    }
+    sceneDots(g, 7, 22, -30, -24, 56, 34, 0.4, 1, ['#ffffff','#f4efe4'], 0.9);
+    g.strokeStyle = 'rgba(160,140,110,0.6)'; g.lineWidth = 1.2; g.lineCap = 'round';      // ポヨッ: bounce lines
+    g.beginPath(); g.moveTo(16, -24); g.quadraticCurveTo(12, -30, 8, -24); g.moveTo(24, -22); g.quadraticCurveTo(22, -30, 18, -28); g.stroke();
+  },
+  chip:function(g, S){                                         // 8bitそばサイバー: a bowl of soba in big pixels
+    g.translate(S*0.46, S*0.62);
+    var px = 4, rows = ['..yyyyyyyyy..', '.ywwwwwwwwwy.', 'yybbbbbbbbbyy', '.rrrrrrrrrrr.', '..rrrrrrrrr..', '...rrrrrrr...', '....kkkkk....'];
+    var col = {y:'#f2d22e', w:'#f6f1e4', b:'#6e5638', r:'#c8302c', k:'#3a2412'};
+    for(var y=0;y<rows.length;y++) for(var x=0;x<rows[y].length;x++){
+      var c = rows[y][x];
+      if(col[c]){ g.fillStyle = col[c]; g.fillRect((x - 6.5)*px, (y - 3)*px, px, px); }
+    }
+    g.fillStyle = '#3ad1ff';                                   // ピコッ: square notes
+    g.fillRect(14, -30, 4, 4); g.fillRect(22, -36, 4, 4); g.fillRect(-24, -28, 4, 4);
+    g.fillStyle = '#ff5fd2'; g.fillRect(6, -38, 3, 3); g.fillRect(-14, -36, 3, 3);
+  },
+  drop:function(g, S){                                         // 水ようかんツルン: a slice of 水ようかん and a drop of water
+    g.translate(S*0.46, S*0.64);
+    g.fillStyle = 'rgba(30,20,10,0.25)'; g.beginPath(); g.ellipse(0, 12, 30, 5, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#4a2216'; g.fillRect(-24, -4, 40, 14);
+    g.fillStyle = '#6b3322'; g.beginPath(); g.moveTo(-24, -4); g.lineTo(-18, -10); g.lineTo(22, -10); g.lineTo(16, -4); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.28)'; g.fillRect(-20, -9, 30, 1.5);
+    var dg = g.createLinearGradient(18, -40, 26, -14);
+    dg.addColorStop(0, '#d9f3ff'); dg.addColorStop(1, '#5fb6e6');
+    g.fillStyle = dg; g.beginPath(); g.moveTo(22, -40); g.bezierCurveTo(30, -28, 32, -20, 22, -16); g.bezierCurveTo(12, -20, 14, -28, 22, -40); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.8)'; g.beginPath(); g.ellipse(19, -24, 1.6, 3, -0.3, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#8fd0ea'; var sp = [[-28,-14],[-20,-18],[30,-6],[34,-12]];
+    for(var i=0;i<sp.length;i++){ g.beginPath(); g.arc(sp[i][0], sp[i][1], 1.6, 0, Math.PI*2); g.fill(); }
+  },
+  gemhammer:function(g, S){                                    // 勝山発掘ハンマー: the hammer, and a gem that rings
+    SOUND_ICONS.hammer(g, S);
+    g.translate(-16, -6);
+    g.fillStyle = '#4fd3e8'; g.beginPath(); g.moveTo(0, -10); g.lineTo(7, -4); g.lineTo(0, 6); g.lineTo(-7, -4); g.closePath(); g.fill();
+    g.fillStyle = '#b8f2fb'; g.beginPath(); g.moveTo(0, -10); g.lineTo(7, -4); g.lineTo(0, -4); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.9)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(-7, -4); g.lineTo(7, -4); g.stroke();
+    drawSparkShape(g, 8, -12, 3, '#ffffff', 'glint');
+  },
+  orchestra:function(g, S){                                    // 永世蕎麦神のオーケストラ: a koto, a bell and notes
+    g.translate(S*0.46, S*0.64);
+    g.fillStyle = 'rgba(30,20,10,0.22)'; g.beginPath(); g.ellipse(0, 12, 34, 5, 0, 0, Math.PI*2); g.fill();
+    g.save(); g.rotate(-0.18);
+    g.fillStyle = '#8a5a2b'; g.beginPath(); g.moveTo(-36, -2); g.quadraticCurveTo(0, -10, 36, -2); g.lineTo(36, 6); g.quadraticCurveTo(0, -2, -36, 6); g.closePath(); g.fill();
+    g.strokeStyle = '#f6eed8'; g.lineWidth = 0.6;
+    for(var i=0;i<5;i++){ g.beginPath(); g.moveTo(-34, -1 + i*1.5); g.quadraticCurveTo(0, -9 + i*1.5, 34, -1 + i*1.5); g.stroke(); }
+    g.fillStyle = '#efe2c0'; for(var k=0;k<5;k++) g.fillRect(-20 + k*10, -7 + (k%2)*2, 2, 5);
+    g.restore();
+    g.fillStyle = '#d8b457'; g.beginPath(); g.arc(-20, -22, 7, Math.PI, 0); g.lineTo(-13, -18); g.lineTo(-27, -18); g.closePath(); g.fill();   // the bell
+    g.fillStyle = '#9a7a2a'; g.beginPath(); g.arc(-20, -16, 2, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#7d3f8f';                                   // notes
+    g.beginPath(); g.ellipse(8, -24, 3.2, 2.4, -0.4, 0, Math.PI*2); g.fill(); g.fillRect(10.4, -38, 1.4, 14);
+    g.beginPath(); g.ellipse(20, -30, 3.2, 2.4, -0.4, 0, Math.PI*2); g.fill(); g.fillRect(22.4, -44, 1.4, 14); g.fillRect(10.4, -38, 13.4, 2);
+    drawSparkShape(g, 30, -18, 3, '#ffd27a', 'star');
   }
 };
 
@@ -10764,7 +11099,7 @@ function updateServing(dt){
     }
     if(s.t>=SERVE_POUR_MS){
       s.stage = 'react'; s.t -= SERVE_POUR_MS;
-      equipSfx('serve');   // 着せ替え: e.g. the slurp as the customer eats
+      equipSfx('serve');   // 着せ替え: e.g. the 水ようかん's slurp as the customer eats
     }
   } else if(s.stage==='react'){
     if(!s.said && s.t>=SERVE_SAY_AT){             // ③ 0.3 s after the pour: the reaction, the words, the sound
@@ -11537,7 +11872,7 @@ function playPourSound(ms){
     src.connect(band); band.connect(trem);
     src.connect(low); low.connect(lowGain); lowGain.connect(trem);
     trem.connect(env);
-    env.connect(ac.destination);
+    env.connect(sfxOut(ac));
     src.start(t0);
     src.stop(t0 + dur + 0.02);
     lfo.start(t0);

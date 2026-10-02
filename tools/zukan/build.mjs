@@ -61,7 +61,7 @@ window.__zukanExport = function(){
   var PATTERN = {deco:'模様', shape:'形', hamon:'刃紋', scene:'場面', light:'光', ringStyle:'リングの型', spark:'きらめき',
     grain:'粒', gloss:'艶', density:'模様の密度', speckDensity:'粒の量', husk:'甘皮', jitter:'不揃い', crack:'ヒビ', wet:'みずみずしさ',
     steam:'湯気の乗りやすさ', grav:'落ち方', spin:'回り方', unique:'一点ものの柄'};
-  var SOUND_WHEN = {cut:'切るたび', just:'JUST!のとき', round:'1杯ごとの始まり', serve:'お客さんが食べるとき'};
+  var SOUND_WHEN = {cut:'切るたび（コンボで音階が上がる）', just:'JUST!の合いの手', round:'1杯ごとの始まり', finish:'1杯の仕上がり', serve:'お客さんが食べるとき', miss:'MISSのとき'};
   function isHex(v){ return typeof v==='string' && /^#[0-9a-f]{6}$/i.test(v); }
   function preview(slot, look){
     var w = 360, h = 190, dpr = 2, c = document.createElement('canvas');
@@ -256,6 +256,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-siz
 .empty{margin:0;color:var(--ink-soft);}
 .foot{font-size:.76rem;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:12px;}
 .sheet{position:fixed;inset:0;z-index:10;background:var(--scrim);display:grid;place-items:center;padding:16px;}
+.sheet[hidden]{display:none;}
 .sheet-box{position:relative;width:min(760px,100%);max-height:calc(100% - 8px);overflow:auto;background:var(--paper);color:var(--ink);
   border-radius:16px;border-top:5px solid var(--rc);box-shadow:var(--shadow);padding:20px;display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr);gap:18px 22px;}
 .sheet-close{position:absolute;top:10px;right:10px;font:inherit;font-size:.85rem;font-weight:700;color:var(--ink);background:var(--chip);
