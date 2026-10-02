@@ -836,6 +836,7 @@ body{
 .zan-cbest{font-size:.68rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
 .zan-soon{margin-left:auto;font-size:.62rem;font-weight:700;line-height:1.5;padding:1px 7px;border-radius:999px;background:var(--muted-fill);color:var(--ink-soft);white-space:nowrap;}
 .zan-start{width:100%;}
+.zan-season{margin:0;padding:4px 10px;border-radius:var(--radius);background:color-mix(in srgb,#c9a24a 16%,var(--card));font-size:.7rem;line-height:1.55;font-weight:700;}
 .zan-tools{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;font-size:.72rem;color:var(--ink-soft);}
 /* home: 自由修行 (the older score attack), folded under the main mode */
 .free-mode{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--card-shadow);}
@@ -857,7 +858,7 @@ body{
 .calib-adjust{display:flex;align-items:center;justify-content:center;gap:10px;font-size:.84rem;}
 .calib-adjust b{font-variant-numeric:tabular-nums;}
 /* result of 斬: its own numbers in place of the bowl's */
-#screen-result.is-zan .result-stats:not(.zan-stats),#screen-result.is-zan #btn-save-image,#screen-result.is-zan #result-equip{display:none;}
+#screen-result.is-zan .result-stats:not(.zan-stats),#screen-result.is-zan #result-equip{display:none;}
 .zan-stats[hidden]{display:none;}
 .bgm-opts{flex-wrap:wrap;align-items:center;}
 .bgm-vol{display:flex;align-items:center;gap:8px;flex:1 1 160px;min-width:0;font-size:.78rem;font-weight:700;}
@@ -1120,6 +1121,14 @@ body{
 .mp-cell dt{font-size:.7rem;color:var(--ink-soft);}
 .mp-cell dd{margin:2px 0 0;font-size:1.25rem;font-weight:900;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;}
 .mp-cell dd small{font-size:.7rem;font-weight:700;color:var(--ink-soft);}
+.mp-zan{display:flex;flex-direction:column;gap:6px;}
+.mp-zan-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;}
+.mp-zan-list li{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 10px;padding:8px 12px;border-radius:var(--radius);background:var(--card);border:1px solid var(--line);box-shadow:var(--card-shadow);font-size:.76rem;}
+.mp-zan-list b{font-size:.9rem;font-weight:900;min-width:3.5em;}
+.mp-zan-list .mz-best{font-size:1.05rem;font-weight:900;font-variant-numeric:tabular-nums;}
+.mp-zan-list .mz-sub{color:var(--ink-soft);font-weight:700;}
+.mp-zan-list li.is-soon{opacity:.6;}
+.mp-zan-sum{margin:0;font-size:.72rem;line-height:1.55;color:var(--ink-soft);}
 .mp-titles-line{margin:0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px;font-size:.78rem;font-weight:700;}
 .mp-status{margin:0;font-weight:900;font-size:.9rem;overflow-wrap:anywhere;}
 .mp-sync{margin:0;font-size:.76rem;color:var(--ink-soft);}
@@ -1285,21 +1294,22 @@ body{
           <span class="opt-desc">速いテンポと、緩急のタメ切り。</span>
         </button>
       </div>
+      <p id="zan-season" class="zan-season" hidden></p>
       <button id="btn-zan" class="btn-start zan-start" type="button">斬 修行開始</button>
       <p class="zan-tools"><button id="btn-calib" class="link-btn" type="button">試し切り（ずれ調整）</button><span id="zan-offset-label">ずれ補正 0ms</span></p>
     </section>
 
-    <details id="free-mode" class="free-mode">
-      <summary>自由修行<span class="free-sub">そば粉×お客さんのスコアアタック</span></summary>
-      <div class="free-body">
     <section class="challenge" aria-labelledby="challenge-label">
       <div class="challenge-top">
         <h2 id="challenge-label" class="challenge-label">本日のチャレンジ</h2>
         <span id="daily-status" class="chip chip-todo">未クリア</span>
       </div>
-      <p class="challenge-desc"><span id="daily-desc"></span><span class="challenge-free">そば粉は自由</span><span id="challenge-mode-note" class="challenge-free" hidden>期間限定モードは対象外</span></p>
+      <p class="challenge-desc"><span id="daily-desc"></span><span id="challenge-free" class="challenge-free">どのコースでも</span><span id="challenge-mode-note" class="challenge-free" hidden>期間限定モードは対象外</span></p>
     </section>
 
+    <details id="free-mode" class="free-mode">
+      <summary>自由修行<span class="free-sub">そば粉×お客さんのスコアアタック</span></summary>
+      <div class="free-body">
     <section class="mode-row" aria-labelledby="mode-label">
       <h2 id="mode-label" class="vh">モード（期間限定モードは端末の日付で開きます）</h2>
       <div class="mode-seg" role="group" aria-labelledby="mode-label">
@@ -1518,7 +1528,8 @@ body{
       <button id="btn-howto-back" class="btn-small" type="button">ホームへ戻る</button>
     </div>
     <nav class="guide-toc" aria-label="遊び方の目次">
-      <button class="toc-chip" type="button" data-goto="g-play">あそびかた</button>
+      <button class="toc-chip" type="button" data-goto="g-zan">リズム修行・斬</button>
+      <button class="toc-chip" type="button" data-goto="g-play">自由修行</button>
       <button class="toc-chip" type="button" data-goto="g-flour">そば粉</button>
       <button class="toc-chip" type="button" data-goto="g-cust">お客さん</button>
       <button class="toc-chip" type="button" data-goto="g-rank">称号</button>
@@ -1527,8 +1538,24 @@ body{
       <button class="toc-chip" type="button" data-goto="g-rec">記録</button>
     </nav>
 
+    <section id="g-zan" class="gsec" aria-labelledby="g-zan-h">
+      <h3 id="g-zan-h" tabindex="-1">リズム修行・斬<span class="gsec-sub">メインモード</span></h3>
+      <p class="gsec-lead">BGMの拍にぴったり合わせて蕎麦を切るリズムモードです。最初から最後まで、師匠が1小節お手本を切って見せ（金色の印）、次の小節であなたが同じリズムで切ります（赤い印）。</p>
+      <ul class="gpoints">
+        <li><b>始め方</b>ホームのいちばん上でコースを選び、「斬 修行開始」を押します。いまは二八（初級・♩=110・8分音符まで）。十割（中級・♩=130）と粗挽き（上級・♩=155）は準備中です。1曲は約80〜90秒です。</li>
+        <li><b>切り方</b>タップ（パソコンはスペースキー）で切る「通常切り」と、「斬」の帯を長押しで溜めて「斬」の拍で離す「タメ切り」の2種類。切るのは蕎麦だけです。師匠も、あなたも、包丁をまな板まで切り下ろします。</li>
+        <li><b>判定</b>音の時計で測り、ずれ±35ms以内がPerfect、±80ms以内がOK、それより外か見逃しがMissです。印のないところで空振りしても減点はありません。Perfectの音はその小節の和音にそろいます。</li>
+        <li><b>完成度</b>Perfectは1、OKは0.5として数えた割合で「並・上・特上・極上」が決まります（極上は95%以上かつMissなし）。</li>
+        <li><b>試し切り（ずれ調整）</b>音に対してタップがずれると感じたら、ホームの「試し切り」で「トン」の音に合わせて8回たたくと、ずれを測って判定をそろえます。イヤホンを使うときは、つけたまま測ってください。値はこの端末だけに保存します。</li>
+        <li><b>一時停止</b>遊んでいる途中でほかのアプリに切り替えると止まり、画面をタップすると続きから再開します。</li>
+        <li><b>記録とごほうび</b>得点と自己ベストはコースごとに記録されます。得点・コンボ・Perfect率は自由修行の記録と合わせて称号と限定アイテムの条件になり、そば猪口コインもコースの係数でもらえます。本日のチャレンジも斬で挑戦します。</li>
+        <li><b>季節</b>そばの花・新そばの期間中は、斬の画面も季節の見た目になります（得点や判定は変わりません）。</li>
+      </ul>
+    </section>
+
     <section id="g-play" class="gsec" aria-labelledby="g-play-h">
-      <h3 id="g-play-h" tabindex="-1">あそびかた</h3>
+      <h3 id="g-play-h" tabindex="-1">自由修行のあそびかた<span class="gsec-sub">そば粉×お客さん</span></h3>
+      <p class="gnote">ホームの「自由修行」を開くと遊べる、従来のスコアアタックです。</p>
       <p class="gsec-lead">師匠のお手本と同じリズムで、スペースキーかタップで蕎麦を切ります。ピタリのタイミングほど細い麺、ズレるほど太い麺になります。</p>
       <ol class="flow">
         <li class="flow-card">
@@ -1652,8 +1679,8 @@ body{
     <section id="g-daily" class="gsec" aria-labelledby="g-daily-h">
       <h3 id="g-daily-h" tabindex="-1">本日のチャレンジ</h3>
       <ul class="gpoints">
-        <li><b>日替わり</b>この端末の日付が変わるたびに、お客さん1人と目標点（400〜1,200点）が決まります。</li>
-        <li><b>クリア</b>そのお客さんで目標点以上を取るとクリア。そば粉は自由です。</li>
+        <li><b>日替わり</b>この端末の日付が変わるたびに、リズム修行・斬の目標が1つ決まります（得点・Perfectの回数・コンボ・完成度のどれか）。</li>
+        <li><b>クリア</b>斬で目標に届くとクリア。コースは自由です。クリアするとそば猪口コイン500枚がもらえます（1日1回）。</li>
         <li><b>記録</b>その日の最初のクリアが記録され、ホームのカードが「クリア済み」になります。同じ日は何度でも挑戦できます。</li>
       </ul>
     </section>
@@ -1687,6 +1714,7 @@ body{
         <li><b>記録</b>結果はモード×お客さんごとの「限定ベスト」にだけ記録されます。通常の自己ベスト・称号の記録・本日のチャレンジ・満足度の記録には入りません。</li>
       </ul>
       <p class="gnote"><b>期間の決め方</b>　この端末の日付（ローカル時刻）で判定しています。期間外のモードは押せず、「◯月◯日頃に開放」と表示されます。日付が読み取れないときは期間外として扱います。</p>
+      <p class="gnote">リズム修行・斬は、期間中は画面が季節の見た目になります（そばの花の期間はそば畑、新そばの期間は新そばの色。両方の期間が重なる10月下旬は新そば）。得点や判定は変わりません。</p>
       <p class="gnote gnote-soft">季節の目安：福井では秋そばが主流で、10月下旬〜11月上旬に収穫されます。そばの花は9〜10月に咲きます。</p>
     </section>
 
@@ -1699,7 +1727,6 @@ body{
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
         <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。ホームやリザルトの「友達に共有」で共有すると、1日1回+200（共有ボーナス）。</li>
-        <li><b>リズム修行・斬</b>ホームのいちばん上で、BGMの拍にぴったり合わせて切るリズムモードを遊べます。コースを選んで「斬 修行開始」を押します（いまは二八（初級・♩=110）。十割（中級）と粗挽き（上級）は準備中）。判定は音の時計で測り、ずれ±35ms以内がPerfect、±80ms以内がOK、それより外か見逃しがMissです。最初から最後まで、師匠が1小節お手本を切って見せ（金色の印）、次の小節であなたが同じリズムで切る（赤い印）のくり返しです。切るのは蕎麦だけで、タップで切る「通常切り」と、長押しで溜めて「斬」の拍で離す「タメ切り」の2種類。Perfectの音はその小節の和音にそろいます。得点と自己ベストはコースごとに、修行とは別に記録され、修行の自己ベスト・累計スコア・称号には入りません（そば猪口コインはもらえます）。音に対してタップがずれると感じたら「試し切り（ずれ調整）」で、「トン」の音に合わせて8回たたくと、あなたのずれを測って判定をそろえます（イヤホンを使うときは、つけたまま測ります）。遊んでいる途中でほかのアプリに切り替えると一時停止し、画面をタップすると続きから再開します。そば粉×お客さんで遊ぶ従来の修行は、ホームの「自由修行」を開くと遊べます。</li>
         <li><b>BGM</b>ホーム・修行・リザルト・ガチャで、場面ごとの和風の音楽が流れます（音声ファイルは使わず、ブラウザの中で合成しています）。修行中はコンボが10・20・30・40と続くたびに、三味線・篠笛・締太鼓・箏が1つずつ重なります。「記録と設定」で、効果音とは別にオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</li>
         <li><b>今日のクイズ</b>ホームの「今日のクイズ」で、越前そばと福井にちなんだ4択クイズが1日3問出ます（問題は日付で決まり、その日はみんな同じ3問）。1問正解ごとにそば札1枚、3問とも正解するとさらに2枚。全問正解で称号「越前通」、通算30問正解で称号「そば博士」がもらえます。</li>
         <li><b>限定アイテム</b>ガチャや交換所には出ない4種のアイテムが、修行やクイズの実績（最大30コンボ・累計スコア50,000点・修行30回・クイズ通算10問正解）で解放されます。図鑑の「限定」に、まだのものは「？？？」と解放の条件が出ます。</li>
@@ -1905,8 +1932,14 @@ body{
         <div class="mp-cell"><dt>最長コンボ</dt><dd id="mp-combo">0</dd></div>
         <div class="mp-cell"><dt>図鑑収集率</dt><dd id="mp-collect">0%</dd></div>
       </dl>
+      <p class="mp-zan-sum">最高スコア・累計スコア・最長コンボは、リズム修行・斬と自由修行を合わせた記録です（称号もこの記録で決まります）。</p>
       <p class="mp-titles-line"><span id="mp-title-count">獲得した称号 0 / 0</span>
         <button id="mp-title-list" class="btn-small" type="button" aria-haspopup="dialog">称号の一覧</button></p>
+    </section>
+    <section class="mp-zan" aria-labelledby="mp-zan-h">
+      <h3 id="mp-zan-h" class="mp-h">リズム修行・斬の記録</h3>
+      <ul id="mp-zan-list" class="mp-zan-list"></ul>
+      <p id="mp-zan-sum" class="mp-zan-sum"></p>
     </section>
     <section class="mp-account card" aria-labelledby="mp-account-h">
       <h3 id="mp-account-h" class="mp-h">アカウントと同期</h3>
@@ -2466,7 +2499,7 @@ var STORE_KEY = 'echizenSoba.v1';
 var SCHEMA_VERSION = 12;   // 10 → 11: 段位 becomes 称号 (stats, profile, gacha.equippedTitle); 11 → 12: the daily quiz, red dots,
                            // reward-only items and settings.onboarding / lastShareDate. Older saves are carried over by coerceStore
 var LEGACY_KEYS = ['soba-dojo-bests','bestScores','soba-best','sobaBests'];
-var ONBOARDING_VERSION = 1;   // settings.onboarding.version: the rules guide a player has seen
+var ONBOARDING_VERSION = 2;   // settings.onboarding.version: the rules guide a player has seen (2: リズム修行・斬; a player who saw 1 sees it once more)
 var QUIZ_PER_DAY = 3;         // the daily quiz: three questions a day, the same three for everyone on that date
 var DEFAULT_BGM_VOLUME = 0.4; // settings.sound.bgmVolume when a save has none
 // settings.visual.detail: how finely the bowl is drawn. Looks only; the schema stays 10 and saves without it get 'standard'.
@@ -2476,8 +2509,10 @@ var DEFAULT_VISUAL_DETAIL = 'standard';
 var EFFECT_LEVELS = ['high','standard','low'];
 var DEFAULT_EFFECT_LEVEL = 'standard';
 
-var DAILY_TIERS = ['beginner','lover','regular','enthusiast'];
-var DAILY_THRESHOLDS = [400,600,800,1000,1200];
+// 本日のチャレンジ is played in リズム修行・斬 (any course): one of these, by the date (conditionId 'zan:<kind>:<value>').
+// A challenge saved in the older form ('<tier>:<threshold>', a お客さん and 400〜1,200点 in the 自由修行) still clears
+// there on its own day.
+var ZAN_DAILY = [['score', [4000, 5000, 6000, 7000]], ['perfect', [30, 40, 50, 60]], ['combo', [15, 20, 30, 40]], ['grade', ['上', '特上']]];
 
 // ---------- そば猪口コイン: saved in store.gacha (earned here; spent by the そば猪口ガチャ further below) ----------
 // One finished game pays 120〜220 (about three games for one pull), with no daily limit:
@@ -2773,9 +2808,9 @@ function gachaOwnedCount(g, rarity){
 // JUST!), owned / collectPct (items in the 図鑑, from store.gacha.owned). Limited-time modes keep only their own
 // bests, so they do not count here either.
 var TITLE_CATS = [
-  {id:'total',   label:'累計スコア', note:'通常モードで遊んだ得点の合計で昇格します。'},
-  {id:'best',    label:'一撃の腕前', note:'1回の修行の最高得点で昇格します。'},
-  {id:'skill',   label:'技の冴え',   note:'コンボとJUST!の正確さで獲得します。'},
+  {id:'total',   label:'累計スコア', note:'リズム修行・斬と自由修行（通常モード）で遊んだ得点の合計で昇格します。'},
+  {id:'best',    label:'一撃の腕前', note:'1回の修行（斬・自由修行）の最高得点で昇格します。'},
+  {id:'skill',   label:'技の冴え',   note:'コンボと正確さ（自由修行はJUST!、斬はPerfect）で獲得します。'},
   {id:'collect', label:'収集',       note:'図鑑に集めたアイテムで獲得します。'},
   {id:'quiz',    label:'クイズ',     note:'1日3問の「越前そば＆福井クイズ」で獲得します。'}
 ];
@@ -2822,23 +2857,25 @@ function titleNeedText(t){
     case 'totalScore':    return n.min>0 ? '累計スコア ' + v + '点' : 'はじめから';
     case 'highScore':     return '1回の得点 ' + v + '点';
     case 'maxCombo':      return '最大' + v + 'コンボ';
-    case 'bestJustRate':  return '1回の修行でJUST!率' + v + '%以上';
-    case 'perfectClears': return 'すべての判定をJUST!で修行を終える';
+    case 'bestJustRate':  return '1回の修行でJUST!率（斬はPerfect率）' + v + '%以上';
+    case 'perfectClears': return 'すべての判定をJUST!（斬はPerfect）で修行を終える';
     case 'owned':         return 'アイテムを' + v + '種集める';
     case 'collectPct':    return '図鑑を' + v + '%集める';
     case 'quizPerfect':   return n.min>1 ? ('クイズで3問全問正解を' + v + '日') : 'クイズで3問全問正解する';
     case 'quizTotal':     return 'クイズで通算' + v + '問正解';
-    case 'plays':         return '修行を' + v + '回終える';
+    case 'plays':         return '修行（斬・自由修行）を' + v + '回終える';
   }
   return '';
 }
-// the records the titles are judged on, all whole numbers
+// the records the titles (and the 限定 items) are judged on, all whole numbers: リズム修行・斬 (store.zan) and the
+// 自由修行 (store.stats) together — the sums of both, or the better of the two
 function titleMetrics(store){
-  var st = store.stats || {}, g = store.gacha, q = store.quiz || {};
+  var st = store.stats || {}, g = store.gacha, q = store.quiz || {}, z = store.zan || {};
   var owned = g ? gachaOwnedCount(g) : 0, total = GACHA_CATALOG.length;
   return {
-    totalScore:st.totalScore || 0, highScore:st.highScore || 0, maxCombo:st.maxCombo || 0,
-    bestJustRate:st.bestJustRate || 0, perfectClears:st.perfectClears || 0, plays:st.plays || 0,
+    totalScore:(st.totalScore || 0) + (z.totalScore || 0), highScore:Math.max(st.highScore || 0, z.best || 0),
+    maxCombo:Math.max(st.maxCombo || 0, z.maxCombo || 0), bestJustRate:Math.max(st.bestJustRate || 0, z.bestPerfectRate || 0),
+    perfectClears:(st.perfectClears || 0) + (z.perfectClears || 0), plays:(st.plays || 0) + (z.plays || 0),
     owned:owned, collectPct:total ? Math.floor(owned*100/total) : 0,
     quizTotal:q.totalCorrect || 0, quizPerfect:q.perfectDays || 0
   };
@@ -3424,6 +3461,12 @@ function sanitizeZanRec(raw){
 }
 function sanitizeZan(raw){
   var z = isPlainObj(raw) ? raw : {}, out = sanitizeZanRec(z), cs = isPlainObj(z.courses) ? z.courses : {};
+  // the 称号 records of 斬 (added to those of the 自由修行): the sum of scores, the longest combo, the best Perfect
+  // rate (%) of one song and the songs cut all Perfect
+  out.totalScore = clampInt(z.totalScore, 0, STAT_MAX);
+  out.maxCombo = clampInt(z.maxCombo, 0, STAT_MAX);
+  out.bestPerfectRate = clampInt(z.bestPerfectRate, 0, 100);
+  out.perfectClears = clampInt(z.perfectClears, 0, STAT_MAX);
   out.courses = {};
   for(var i=0;i<ZAN_COURSE_IDS.length;i++) out.courses[ZAN_COURSE_IDS[i]] = sanitizeZanRec(cs[ZAN_COURSE_IDS[i]]);
   out.lastCourse = ZAN_COURSE_IDS.indexOf(z.lastCourse)>=0 ? z.lastCourse : '';
@@ -3470,14 +3513,27 @@ function seedFromDate(dateStr){
   return h;
 }
 function generateDailyCondition(dateStr){
-  var seed = seedFromDate(dateStr);
-  var tier = DAILY_TIERS[seed % DAILY_TIERS.length];
-  var threshold = DAILY_THRESHOLDS[Math.floor(seed/DAILY_TIERS.length) % DAILY_THRESHOLDS.length];
-  return {tier:tier, threshold:threshold, conditionId:tier+':'+threshold};
+  var seed = seedFromDate(dateStr), d = ZAN_DAILY[seed % ZAN_DAILY.length];
+  var value = d[1][Math.floor(seed/ZAN_DAILY.length) % d[1].length];
+  return {zan:true, kind:d[0], value:value, conditionId:'zan:' + d[0] + ':' + value};
 }
 function parseConditionId(conditionId){
   var parts = String(conditionId).split(':');
+  if(parts[0]==='zan') return {zan:true, kind:parts[1], value:parts[1]==='grade' ? parts[2] : parseInt(parts[2], 10)};
   return {tier:parts[0], threshold:parseInt(parts[1],10)};
+}
+function dailyCondText(cond){
+  if(cond.zan){
+    switch(cond.kind){
+      case 'score':   return '斬で' + fmtPoints(cond.value) + '点以上';
+      case 'perfect': return '斬でPerfect ' + cond.value + '回以上';
+      case 'combo':   return '斬で' + cond.value + 'コンボ以上';
+      case 'grade':   return '斬で完成度「' + cond.value + '」以上';
+    }
+    return '斬で1曲遊ぶ';
+  }
+  var ch = CHARACTERS[cond.tier];
+  return (ch ? (ch.icon+' '+ch.name) : cond.tier)+'で'+cond.threshold+'点以上';
 }
 function ensureDailyFresh(store){
   var today = todayStr();
@@ -3759,7 +3815,7 @@ function checkDailyClear(tierKey, score){
   var store = loadStore();
   if(store.daily && !store.daily.cleared){
     var cond = parseConditionId(store.daily.conditionId);
-    if(tierKey===cond.tier && score>=cond.threshold){
+    if(!cond.zan && tierKey===cond.tier && score>=cond.threshold){
       store.daily.cleared = true;
       saveStoreObj(store);
       return true;
@@ -3768,6 +3824,21 @@ function checkDailyClear(tierKey, score){
   return false;
 }
 
+// 斬: does this song clear today's challenge? (r: score, perfect, combo, grade)
+function zanCheckDailyClear(r){
+  var store = loadStore();
+  if(!store.daily || store.daily.cleared) return false;
+  var c = parseConditionId(store.daily.conditionId), ok = false;
+  if(!c.zan) return false;
+  if(c.kind==='score') ok = r.score>=c.value;
+  else if(c.kind==='perfect') ok = r.perfect>=c.value;
+  else if(c.kind==='combo') ok = r.combo>=c.value;
+  else if(c.kind==='grade') ok = zanGradeRank(r.grade)>=zanGradeRank(c.value);
+  if(!ok) return false;
+  store.daily.cleared = true;
+  saveStoreObj(store);
+  return true;
+}
 // One finished normal game into the 称号 records; returns the titles it earned.
 function recordPlay(score, maxCombo, justCount, noteCount){
   var store = loadStore(), st = store.stats;
@@ -3855,8 +3926,9 @@ function renderRankAndDaily(){
   elRankName.textContent = worn || '称号なし';
 
   var cond = parseConditionId(store.daily.conditionId);
-  var ch = CHARACTERS[cond.tier];
-  elDailyDesc.textContent = (ch ? (ch.icon+' '+ch.name) : cond.tier)+'で'+cond.threshold+'点以上';
+  elDailyDesc.textContent = dailyCondText(cond);
+  document.getElementById('challenge-free').textContent = cond.zan ? 'どのコースでも' : '自由修行・そば粉は自由';
+  challengeEl.classList.toggle('is-zan', !!cond.zan);
   var cleared = !!store.daily.cleared;
   elDailyStatus.textContent = cleared ? 'クリア済み' : '未クリア';
   elDailyStatus.className = 'chip ' + (cleared ? 'chip-done' : 'chip-todo');
@@ -4004,8 +4076,9 @@ function renderSeasonUI(){
   modeNote.textContent = home.modeMsg || (m ? m.blurb : (today ? '' : '端末の日付を読み取れないため、期間限定モードは期間外として扱っています。'));
   summaryMode.hidden = !m;
   summaryMode.textContent = m ? m.name : '';
-  challengeEl.classList.toggle('is-off', !!m);
-  challengeModeNote.hidden = !m;
+  var dly = loadStore().daily, dailyOld = !!(dly && !parseConditionId(dly.conditionId).zan);   // (a 自由修行 challenge left from before: not in limited modes)
+  challengeEl.classList.toggle('is-off', !!m && dailyOld);
+  challengeModeNote.hidden = !(m && dailyOld);
   farmerCard.hidden = home.mode!=='hana';
 }
 function setMode(modeId){
@@ -4444,6 +4517,12 @@ function onResultShown(){
 }
 
 function readResultForCard(){
+  if(screens.result.classList.contains('is-zan') && zanLastResult){   // リズム修行・斬's own card
+    var zr = zanLastResult;
+    return {zan:true, score:fmtPoints(zr.score), course:zr.course, grade:zr.grade, perfect:zr.perfect, combo:String(zr.combo), err:zr.err,
+            tier:playTierName(zr.score), total:fmtPoints(titleMetrics(loadStore()).totalScore) + '点',
+            newBest:resultNewBest.classList.contains('show'), who:cardIdentity(), mode:resultMode.textContent, date:cardInfo.date || new Date()};
+  }
   var style = resultStyle.textContent;
   var conf = STYLES[style];
   return {
@@ -4832,7 +4911,7 @@ function drawResultCard(canvas, d){
   drawCardBackground(ctx);
 
   var X0 = 92, W = CARD_W - 184, TOP = 76, BOTTOM = CARD_H - 76;
-  var showAroma = d.hasAroma && Number(d.aroma) > 0;   // 香りボーナス: 挽きぐるみ only, when one was earned
+  var showAroma = !d.zan && d.hasAroma && Number(d.aroma) > 0;   // 香りボーナス: 挽きぐるみ only, when one was earned
   var H = {header:(d.mode ? 222 : 190) + (d.who ? CARD_WHO_H : 0), hero:270, row1:164, row2:164, aroma:showAroma ? 92 : 0, plaque:132, footer:50};
   var gaps = showAroma ? 6 : 5;
   var used = H.header + H.hero + H.row1 + H.row2 + H.aroma + H.plaque + H.footer;
@@ -4845,14 +4924,22 @@ function drawResultCard(canvas, d){
   var heroTop = y;
   drawHero(ctx, X0, y, W, H.hero, d);
   y += H.hero + gap;
-  var w2 = (W - 24) / 2;
+  var w2 = (W - 24) / 2, w3 = (W - 40) / 3;
+  if(d.zan){                                        // リズム修行・斬: the course and its 完成度, then the cuts
+    drawInfoTile(ctx, X0, y, w2, H.row1, 'コース', d.course);
+    drawInfoTile(ctx, X0 + w2 + 24, y, w2, H.row1, '完成度', d.grade);
+    y += H.row1 + gap;
+    drawInfoTile(ctx, X0, y, w3, H.row2, 'Perfect', d.perfect);
+    drawInfoTile(ctx, X0 + w3 + 20, y, w3, H.row2, '最大コンボ', d.combo);
+    drawInfoTile(ctx, X0 + (w3 + 20) * 2, y, w3, H.row2, '平均のずれ', d.err);
+  } else {
   drawInfoTile(ctx, X0, y, w2, H.row1, 'お客さん', d.cust);
   drawInfoTile(ctx, X0 + w2 + 24, y, w2, H.row1, 'そば粉', d.style);
   y += H.row1 + gap;
-  var w3 = (W - 40) / 3;
   drawInfoTile(ctx, X0, y, w3, H.row2, '満足度', d.satisfaction, '/100');
   drawInfoTile(ctx, X0 + w3 + 20, y, w3, H.row2, '最大コンボ', d.combo);
   drawInfoTile(ctx, X0 + (w3 + 20) * 2, y, w3, H.row2, '最大倍率', d.multiplier);
+  }
   y += H.row2 + gap;
   if(showAroma){
     drawAromaStrip(ctx, X0, y, W, H.aroma, d.aroma);
@@ -11364,12 +11451,15 @@ function mergeStores(localRaw, cloudRaw){
       o.bestGrade = ZAN_GRADE_NAMES.indexOf(c.bestGrade) > ZAN_GRADE_NAMES.indexOf(l.bestGrade) ? c.bestGrade : l.bestGrade;
     };
     zanMax(out.zan, L.zan, C.zan);
+    ['totalScore', 'maxCombo', 'bestPerfectRate', 'perfectClears'].forEach(function(k){ out.zan[k] = Math.max(L.zan[k], C.zan[k]); });
     out.zan.courses = {};
     for(var zc=0;zc<ZAN_COURSE_IDS.length;zc++){ var zid = ZAN_COURSE_IDS[zc]; out.zan.courses[zid] = {}; zanMax(out.zan.courses[zid], L.zan.courses[zid], C.zan.courses[zid]); }
     out.zan.lastCourse = L.zan.lastCourse || C.zan.lastCourse;
   }
   // seen the guide on either device: seen; the 共有ボーナス: the later day it was paid (so it is paid once a day)
-  if(C.settings.onboarding.done) out.settings.onboarding.done = true;
+  var obL = out.settings.onboarding, obC = C.settings.onboarding;
+  if(obC.done && (!obL.done || obC.version>obL.version)) out.settings.onboarding = {done:true, version:obC.version};
+  else if(obL.done && obC.done) obL.version = Math.max(obL.version, obC.version);
   if(C.settings.lastShareDate>out.settings.lastShareDate) out.settings.lastShareDate = C.settings.lastShareDate;
   evaluateTitles(out);
   return out;
@@ -11519,16 +11609,17 @@ function setMpMsg(text, isError){
   mpEls['mp-msg'].classList.toggle('is-error', !!isError);
 }
 function renderMypage(){
-  var store = loadStore(), g = store.gacha, st = store.stats, m = titleMetrics(store);
+  var store = loadStore(), g = store.gacha, m = titleMetrics(store);
   var name = store.profile.name || DEFAULT_PLAYER_NAME;
   mpEls['mp-name'].textContent = name;
   mpEls['mp-avatar'].textContent = name.charAt(0);
   var worn = equippedTitleName(g);
   mpEls['mp-title-name'].textContent = worn || '称号なし';
   mpEls['mp-title-btn'].setAttribute('aria-label', '称号（いまは「' + (worn || 'なし') + '」）。押すと付け替えられます');
-  mpEls['mp-high'].textContent = fmtPoints(st.highScore);
-  mpEls['mp-total'].textContent = fmtPoints(st.totalScore);
-  mpEls['mp-combo'].textContent = fmtPoints(st.maxCombo);
+  mpEls['mp-high'].textContent = fmtPoints(m.highScore);      // 斬と自由修行を合わせて (as the titles are judged)
+  mpEls['mp-total'].textContent = fmtPoints(m.totalScore);
+  mpEls['mp-combo'].textContent = fmtPoints(m.maxCombo);
+  renderMypageZan(store.zan);
   mpEls['mp-collect'].textContent = '';
   mpEls['mp-collect'].appendChild(document.createTextNode(m.collectPct + '%'));
   var sm = document.createElement('small');
@@ -11538,6 +11629,24 @@ function renderMypage(){
   for(var i=0;i<TITLES_DATA.length;i++) if(g.titles.indexOf(TITLES_DATA[i].id)>=0) got++;
   mpEls['mp-title-count'].textContent = '獲得した称号 ' + got + ' / ' + all;
   renderMypageAccount();
+}
+// リズム修行・斬 by course (best, 完成度, songs) and over all of them
+function renderMypageZan(z){
+  var list = document.getElementById('mp-zan-list'), sum = document.getElementById('mp-zan-sum');
+  if(!list || !z) return;
+  list.textContent = '';
+  for(var i=0;i<ZAN_COURSES.length;i++){
+    var c = ZAN_COURSES[i], r = z.courses[c.id], li = document.createElement('li'), ok = zanPlayable(c.id);
+    li.classList.toggle('is-soon', !ok);
+    var b = document.createElement('b'); b.textContent = c.name;
+    var best = document.createElement('span'); best.className = 'mz-best'; best.textContent = r.best>0 ? fmtPoints(r.best) + '点' : '—';
+    var sub = document.createElement('span'); sub.className = 'mz-sub';
+    sub.textContent = ok ? (c.level + '・完成度 ' + (r.bestGrade || '—') + '・' + fmtPoints(r.plays) + '回') : (c.level + '・準備中');
+    li.appendChild(b); li.appendChild(best); li.appendChild(sub);
+    list.appendChild(li);
+  }
+  sum.textContent = '全コースで ' + fmtPoints(z.plays) + '曲・最高 ' + fmtPoints(z.best) + '点' + (z.bestGrade ? '・最高の完成度 ' + z.bestGrade : '') +
+    '・累計 ' + fmtPoints(z.totalScore) + '点・最長 ' + fmtPoints(z.maxCombo) + 'コンボ・全Perfect ' + fmtPoints(z.perfectClears) + '曲';
 }
 function renderMypageAccount(){
   var acc = SyncManager.account(), busy = !!SyncManager.busy;
@@ -13918,19 +14027,21 @@ document.getElementById('btn-feedback').addEventListener('click', function(){
 
 // --- はじめてのルール説明 (4 slides) ---
 var OB_SLIDES = [
-  {h:'① 蕎麦を見る・リズムを感じる', t:'まず師匠がお手本で6回切ります。流れてくる金色の印と「トントン」の音で、切るリズムを覚えましょう。',
-   svg:'<svg class="ob-svg" viewBox="0 0 240 110"><rect class="bd2" x="8" y="44" width="224" height="34" rx="4"/><rect class="bd" x="8" y="48" width="224" height="26" rx="3"/><rect class="dg" x="8" y="52" width="60" height="18" rx="2"/>' +
-       '<circle class="gd" cx="96" cy="61" r="6"/><circle class="gd" cx="128" cy="61" r="6"/><circle class="gd" cx="152" cy="61" r="6"/><circle class="gd" cx="186" cy="61" r="6"/><circle class="gd" cx="210" cy="61" r="6"/>' +
-       '<text class="soft" x="150" y="30" font-size="17" text-anchor="middle">トン　トン　トン♪</text></svg>'},
-  {h:'② タイミングよく切る', t:'「あなたの番!」になったら、同じリズムで画面をタップ（パソコンはスペースキー）。赤茶色の印が包丁の線に重なった瞬間なら「JUST!」。ぴったりほど細く美しい麺になります。',
+  {h:'① 師匠のお手本を見て聴く', t:'まず師匠が1小節、お手本を切って見せます。流れてくる金色の印と「トン・トン」の音で、切るリズムを覚えましょう。',
+   svg:'<svg class="ob-svg" viewBox="0 0 240 110"><rect class="bd2" x="8" y="58" width="224" height="34" rx="4"/><rect class="bd" x="8" y="62" width="224" height="26" rx="3"/><rect class="dg" x="8" y="66" width="60" height="18" rx="2"/>' +
+       '<rect class="gd" x="78" y="60" width="6" height="30" rx="1"/><rect class="gd" x="118" y="60" width="6" height="30" rx="1"/><rect class="gd" x="158" y="60" width="6" height="30" rx="1"/><rect class="gd" x="198" y="60" width="6" height="30" rx="1"/>' +
+       '<path d="M16 56 q18 -24 36 0 z" style="fill:#3d5a63"/><circle cx="34" cy="30" r="12" style="fill:#e8c39e"/><rect class="ac" x="22" y="24" width="24" height="5" rx="1"/><path class="stl" d="M50 22 h26 v30 h-26z"/><rect class="ink" x="52" y="22" width="22" height="7" rx="1"/>' +
+       '<text class="soft" x="160" y="36" font-size="17" text-anchor="middle">トン　トン♪</text></svg>'},
+  {h:'② あなたの番：同じリズムで切る', t:'次の小節は「あなたの番」。お手本と同じリズムで画面をタップ（パソコンはスペースキー）。赤い印が包丁に重なった瞬間なら「Perfect」。包丁がまな板まで切り下ろされます。',
    svg:'<svg class="ob-svg" viewBox="0 0 240 110"><rect class="bd2" x="8" y="58" width="224" height="34" rx="4"/><rect class="bd" x="8" y="62" width="224" height="26" rx="3"/><rect class="dg" x="8" y="66" width="70" height="18" rx="2"/>' +
-       '<line class="ln" x1="80" y1="40" x2="80" y2="100"/><circle class="ac" cx="80" cy="75" r="6"/><circle class="ac" cx="140" cy="75" r="6"/><circle class="ac" cx="196" cy="75" r="6"/>' +
-       '<path class="stl" d="M66 14 h30 v34 h-30z"/><rect class="ink" x="66" y="8" width="30" height="8" rx="2"/><text class="ac" x="112" y="40" font-size="22">JUST!</text></svg>'},
-  {h:'③ 提供する', t:'切った麺は器に盛られ、お客さんのもとへ。お客さんごとに好みが違い、満足度が変わります。5人に出したら修行終了です。',
-   svg:'<svg class="ob-svg" viewBox="0 0 240 110"><path class="st" d="M84 30 q6 -10 0 -20 M100 30 q6 -10 0 -20 M116 30 q6 -10 0 -20"/>' +
-       '<ellipse class="br" cx="100" cy="52" rx="52" ry="10"/><path class="nd" d="M62 50 q10 -8 20 0 M80 48 q12 -9 24 1 M102 50 q10 -8 20 -1 M118 51 q8 -6 16 0"/><path class="bl" d="M48 52 Q100 112 152 52 Z"/>' +
-       '<circle class="sk" cx="196" cy="56" r="18"/><circle class="ink" cx="190" cy="52" r="2"/><circle class="ink" cx="202" cy="52" r="2"/><path class="st" d="M188 62 q8 7 16 0"/><text class="ac" x="180" y="100" font-size="15">満足！</text></svg>'},
-  {h:'④ 目指せ極上', t:'得点でそば猪口コインがもらえ、ガチャ・着せ替え・称号が楽しめます。毎日のチャレンジとクイズにも挑戦して、極上の職人を目指しましょう！',
+       '<line class="ln" x1="80" y1="40" x2="80" y2="100"/><rect class="ac" x="77" y="60" width="6" height="30" rx="1"/><rect class="ac" x="137" y="60" width="6" height="30" rx="1"/><rect class="ac" x="193" y="60" width="6" height="30" rx="1"/>' +
+       '<path class="stl" d="M50 40 h30 v34 h-30z"/><rect class="ink" x="52" y="40" width="26" height="8" rx="2"/><text class="ac" x="104" y="36" font-size="22">Perfect</text></svg>'},
+  {h:'③ 長押しでタメ切り', t:'「斬」の帯が来たら、押したまま溜めて、「斬」の拍で離すと一刀両断。タメ切りも、師匠が先にお手本を見せてくれます。',
+   svg:'<svg class="ob-svg" viewBox="0 0 240 110"><rect class="bd2" x="8" y="58" width="224" height="34" rx="4"/><rect class="bd" x="8" y="62" width="224" height="26" rx="3"/><rect class="dg" x="8" y="66" width="70" height="18" rx="2"/>' +
+       '<rect class="ac" x="80" y="68" width="110" height="14" rx="2" opacity=".45"/><rect class="ac" x="77" y="60" width="6" height="30" rx="1"/><rect class="ink" x="186" y="56" width="14" height="38" rx="2"/>' +
+       '<text x="193" y="80" font-size="12" text-anchor="middle" style="fill:#fff4dc">斬</text><path class="stl" d="M50 14 h30 v34 h-30z"/><rect class="ink" x="52" y="14" width="26" height="8" rx="2"/>' +
+       '<text class="soft" x="150" y="36" font-size="16" text-anchor="middle">ぐーっと溜めて…</text></svg>'},
+  {h:'④ 目指せ極上', t:'コースを選んで1曲（約80〜90秒）。完成度「極上」を目指しましょう。そば猪口コインでガチャや着せ替え、称号・本日のチャレンジ・クイズも楽しめます。音とずれると感じたら「試し切り」で合わせられます。',
    svg:'<svg class="ob-svg" viewBox="0 0 240 110"><circle class="gd" cx="120" cy="56" r="40" opacity=".22"/><circle class="gd" cx="120" cy="56" r="28" opacity=".35"/>' +
        '<text class="ink" x="120" y="66" font-size="28" text-anchor="middle">極上</text>' +
        '<path class="gd" d="M44 30 l4 9 10 1 -8 6 3 10 -9 -6 -9 6 3 -10 -8 -6 10 -1z"/><path class="gd" d="M196 64 l3 7 8 1 -6 5 2 8 -7 -5 -7 5 2 -8 -6 -5 8 -1z"/><path class="gd" d="M184 16 l2 5 6 .5 -4.5 3.5 1.5 6 -5 -3.5 -5 3.5 1.5 -6 -4.5 -3.5 6 -.5z"/></svg>'}
@@ -14040,7 +14151,7 @@ renderHome();
 (function(){
   var res = claimRewards();
   var store = loadStore();
-  if(!store.settings.onboarding.done){
+  if(!store.settings.onboarding.done || store.settings.onboarding.version<ONBOARDING_VERSION){
     if(res.items.length || res.titles.length) obPendingRewards = res;
     openOnboarding(null);
   } else showRewards(res, null);
@@ -14578,6 +14689,13 @@ function zanMasterEvents(notes){
   ev.sort(function(a, c){ return a.t - c.t; });
   return ev;
 }
+// the season whose look dresses 斬 today (this device's date): 新そば from its first day, else そばの花, else none
+function zanSeason(){
+  var t = localToday();
+  if(seasonState('shinsoba', t).open) return 'shinsoba';
+  if(seasonState('hana', t).open) return 'hana';
+  return null;
+}
 // whose turn it is at a beat: the knife changes hands a moment before the bar line
 function zanMasterTurn(b){
   var song = zan.song;
@@ -14587,6 +14705,7 @@ function zanMasterTurn(b){
 }
 function zanCallsEnd(){ return zan.song.firstCall + zan.song.calls.length*8; }
 var zan = null;
+var zanLastResult = null;                            // the last song's numbers, for the result card
 // the song time the player hears now (seconds since beat 0)
 function zanHeardCtx(ac){
   try{
@@ -15001,7 +15120,8 @@ function startZan(courseId, backing){
   state.skin = resolveSkin();
   skinFailed = {};
   prewarmSkin();
-  state.mode = 'normal';
+  var season = zanSeason();
+  state.mode = season || 'normal';                  // the season's look (そば畑 / 新そばの色) only: 斬's rules stay the same
   state.tier = 'beginner';
   state.style = DEFAULT_STYLE;
   state.styleConf = STYLES[DEFAULT_STYLE];
@@ -15018,7 +15138,7 @@ function startZan(courseId, backing){
   document.getElementById('tap-hint').textContent = '師匠と同じリズムでタップ・「斬」は長押しで溜めて離す';
   applyModeLook('normal');
   modeTag.hidden = false;
-  modeTag.textContent = '斬・' + course.name + '・♩=' + course.bpm;
+  modeTag.textContent = '斬・' + course.name + '・♩=' + course.bpm + (season ? '・' + SEASONAL_MODES[season].name : '');
   showScreen('game');                               // the usual music fades out; the song of 斬 takes over
   resize();
   zanEnsureAudio();
@@ -15095,6 +15215,13 @@ function finishZan(){
   store.zan.best = Math.max(store.zan.best, zan.score);
   if(zanGradeRank(grade) > zanGradeRank(store.zan.bestGrade)) store.zan.bestGrade = grade;
   store.zan.lastCourse = cid;
+  store.zan.totalScore = Math.min(STAT_MAX, store.zan.totalScore + zan.score);   // 称号の記録 (with the 自由修行's)
+  store.zan.maxCombo = Math.max(store.zan.maxCombo, zan.maxCombo);
+  if(total>0){
+    store.zan.bestPerfectRate = Math.max(store.zan.bestPerfectRate, Math.floor(zan.perfect*100/total));
+    if(zan.perfect===total) store.zan.perfectClears = Math.min(STAT_MAX, store.zan.perfectClears + 1);
+  }
+  var newTitles = evaluateTitles(store);
   saveStoreObj(store);
   state.phase = 'result';
   screens.result.classList.add('is-zan');
@@ -15102,7 +15229,7 @@ function finishZan(){
   resultMode.hidden = false;
   resultMode.textContent = 'リズム修行・斬　' + zan.course.name + '（' + zan.course.level + '・♩=' + zan.course.bpm + '）';
   resultRank.textContent = '完成度: ' + grade + (grade==='極上' ? '蕎麦' : '');
-  showNewTitles([]);
+  showNewTitles(newTitles);
   resultNewBest.classList.toggle('show', isNewBest);
   resultDailyClear.classList.remove('show');
   resultSatisfactionBest.classList.remove('show');
@@ -15110,9 +15237,14 @@ function finishZan(){
   set('zan-r-score', String(zan.score)); set('zan-r-best', String(rec.best)); set('zan-r-perfect', String(zan.perfect));
   set('zan-r-ok', String(zan.ok)); set('zan-r-miss', String(zan.miss)); set('zan-r-combo', String(zan.maxCombo));
   set('zan-r-acc', acc + '%'); set('zan-r-err', '±' + avgErr + 'ms');
-  try{ renderCoinResult(awardCoins(coinParts(zan.score, zan.course.coin, acc, false)), '完成度'); }catch(e){ coinBox.hidden = true; }
+  zanLastResult = {score:zan.score, course:zan.course.name + '・' + zan.course.level, grade:grade, perfect:zan.perfect + '/' + total,
+                   combo:zan.maxCombo, err:'±' + avgErr + 'ms'};
+  var dailyJustCleared = zanCheckDailyClear({score:zan.score, perfect:zan.perfect, combo:zan.maxCombo, grade:grade});
+  resultDailyClear.classList.toggle('show', dailyJustCleared);
+  try{ renderCoinResult(awardCoins(coinParts(zan.score, zan.course.coin, acc, dailyJustCleared)), '完成度'); }catch(e){ coinBox.hidden = true; }
   showScreen('result');
-  startResultCount(isNewBest, null, [['zan-r-score', 1150], ['zan-r-combo', 620], ['zan-r-perfect', 620], ['zan-r-acc', 620]]);
+  var rewards = claimRewards();                     // 限定 items whose record this song reached (looks only)
+  startResultCount(isNewBest, function(){ showRewards(rewards, btnRestart); }, [['zan-r-score', 1150], ['zan-r-combo', 620], ['zan-r-perfect', 620], ['zan-r-acc', 620]]);
   renderZanHome();
 }
 function zanGradeRank(g){ for(var i=0;i<ZAN_GRADES.length;i++) if(ZAN_GRADES[i][0]===g) return ZAN_GRADES.length - i; return 0; }
@@ -15275,8 +15407,8 @@ function drawZan(){
   ctx.fillRect(0, y - 6, W, h + 12);
   ctx.save();
   ctx.beginPath(); ctx.rect(0, y, W, h); ctx.clip();
-  var nsk = skinPart('noodle');
-  ctx.fillStyle = nsk ? nsk.dough : COLORS.dough;
+  var nsk = state.mode==='shinsoba' ? null : skinPart('noodle');   // (新そばの季節: the new soba's colour, as in the 自由修行)
+  ctx.fillStyle = state.mode==='shinsoba' ? SHINSOBA_DOUGH : (nsk ? nsk.dough : COLORS.dough);
   ctx.fillRect(0, y, W, h);
   var pxs = (W - jx)/ZAN_TRAVEL;
   // the beat grid moving with the notes (bar lines stronger)
@@ -15432,6 +15564,11 @@ function renderZanHome(){
     cards[i].setAttribute('aria-pressed', ok && id===sel ? 'true' : 'false');
     var bestEl = cards[i].querySelector('.zan-cbest'), rec = z && z.courses[id];
     if(bestEl) bestEl.textContent = rec && rec.best>0 ? ('ベスト ' + fmtPoints(rec.best) + (rec.bestGrade ? '・完成度 ' + rec.bestGrade : '')) : 'ベスト —';
+  }
+  var season = zanSeason(), seEl = document.getElementById('zan-season');
+  if(seEl){
+    seEl.hidden = !season;
+    if(season) seEl.textContent = 'いまは「' + SEASONAL_MODES[season].name + '」の季節。斬の画面も季節の見た目になります（' + seasonState(season, localToday()).until + 'まで・得点や判定は変わりません）。';
   }
   var off = loadZanOffset(), lab = document.getElementById('zan-offset-label');
   if(lab) lab.textContent = 'ずれ補正 ' + (off>0 ? '+' : '') + off + 'ms';
