@@ -85,9 +85,10 @@ window.__zukanExport = function(){
     return c.toDataURL('image/webp', 0.86);
   }
   var out = {total:GACHA_CATALOG.length, rarities:[], slots:EQUIP_SLOT_LABELS, items:[]};
-  ['nami','jo','tokujo','kiwami'].forEach(function(r){
+  ['nami','jo','tokujo','kiwami','gen'].forEach(function(r){
     var R = GACHA_RARITIES[r];
-    out.rarities.push({id:r, label:R.label, rate:R.rate/100, exchange:R.exchange, dupTickets:R.dupTickets, count:R.count});
+    if(!R) return;
+    out.rarities.push({id:r, label:R.label, rate:R.rate/100, exchange:R.exchange, dupTickets:R.dupTickets, count:R.count, reward:r==='gen'});
   });
   GACHA_CATALOG.forEach(function(it){
     var slot = it.applyTo, look = skinLook(slot, it.id) || {}, swatches = [], params = [], sounds = [];
@@ -110,7 +111,7 @@ window.__zukanExport = function(){
     out.items.push({
       id:it.id, name:it.name, rarity:it.rarity, category:it.category, slot:slot, slotLabel:EQUIP_SLOT_LABELS[slot] || slot,
       desc:it.desc, note:SKIN_NOTES[it.id] || EQUIP_SLOT_NOTES[slot] || '',
-      season:GACHA_SEASON_ONLY[it.id] ? '新そばモードの期間だけ出ます（交換も期間中のみ）' : '',
+      season:GACHA_SEASON_ONLY[it.id] ? '新そばモードの期間だけ出ます（交換も期間中のみ）' : (it.source==='reward' ? 'ガチャ・交換所には出ません。' + rewardCondText(it.cond) + 'されます。' : ''),
       thumb:t ? t.toDataURL('image/webp', 0.9) : '',
       preview:['bowl','noodle','tool','bg','effect'].indexOf(slot)>=0 ? preview(slot, look) : '',
       swatches:swatches, params:params, sounds:sounds
@@ -168,18 +169,21 @@ function renderPage(data, ver){
         <button type="button" class="card-btn" data-id="${it.id}" aria-label="${esc(it.name)}の詳細">
           <img class="pic" src="${it.thumb}" alt="" width="288" height="288" loading="lazy">
           <span class="nm">${esc(it.name)}</span>
-          <span class="meta"><span class="slot">${esc(it.slotLabel)}</span>${esc(it.category)}${it.season ? '<span class="season">期間限定</span>' : ''}</span>
+          <span class="meta"><span class="slot">${esc(it.slotLabel)}</span>${esc(it.category)}${it.season ? '<span class="season">' + (it.rarity === 'gen' ? '実績で解放' : '期間限定') + '</span>' : ''}</span>
         </button>
       </li>`).join('');
     return `
     <section class="band r-${r.id}" aria-labelledby="h-${r.id}">
       <header class="band-head">
         <h2 id="h-${r.id}"><span class="seal">${esc(r.label)}</span></h2>
-        <dl class="facts">
+        <dl class="facts">${r.reward ? `
+          <div><dt>入手</dt><dd>修行・クイズの実績</dd></div>
+          <div><dt>点数</dt><dd>${items.length}</dd></div>
+          <div><dt>ガチャ・交換</dt><dd>出ません</dd></div>` : `
           <div><dt>排出率</dt><dd>${r.rate.toFixed(r.rate % 1 ? 1 : 0)}%</dd></div>
           <div><dt>点数</dt><dd>${items.length}</dd></div>
           <div><dt>交換</dt><dd>そば札 ${r.exchange}枚</dd></div>
-          <div><dt>かぶり</dt><dd>そば札 ${r.dupTickets}枚</dd></div>
+          <div><dt>かぶり</dt><dd>そば札 ${r.dupTickets}枚</dd></div>`}
         </dl>
       </header>
       <ul class="grid">${cards}</ul>
@@ -195,7 +199,7 @@ function renderPage(data, ver){
 :root{
   --bg:#e7e0cd; --paper:#fbf7ec; --ink:#2c241a; --ink-soft:#5c5138; --line:rgba(44,36,26,0.14);
   --accent:#1f3f4a; --accent2:#9a4526; --chip:#efe7d3;
-  --r-nami:#74654a; --r-jo:#2f6f86; --r-tokujo:#8a6414; --r-kiwami:#7d3f8f;
+  --r-nami:#74654a; --r-jo:#2f6f86; --r-tokujo:#8a6414; --r-kiwami:#7d3f8f; --r-gen:#a3301c; --r-gen-bg:rgba(163,48,28,0.10);
   --r-nami-bg:rgba(116,101,74,0.09); --r-jo-bg:rgba(47,111,134,0.10); --r-tokujo-bg:rgba(194,154,60,0.16); --r-kiwami-bg:rgba(125,63,143,0.12);
   --shadow:0 1px 2px rgba(40,28,10,0.10),0 4px 14px rgba(40,28,10,0.08); --scrim:rgba(30,22,12,0.55);
   --font-display:'Yuji Syuku','Hiragino Mincho ProN','Yu Mincho',serif;
@@ -204,20 +208,20 @@ function renderPage(data, ver){
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   --bg:#181310; --paper:#251d16; --ink:#ece3d0; --ink-soft:#b9ac8e; --line:rgba(236,227,208,0.13);
   --accent:#9cc3cf; --accent2:#e39a76; --chip:#2e251c;
-  --r-nami:#bcae8f; --r-jo:#86bfd2; --r-tokujo:#e6b94f; --r-kiwami:#d29be0;
+  --r-nami:#bcae8f; --r-jo:#86bfd2; --r-tokujo:#e6b94f; --r-kiwami:#d29be0; --r-gen:#f08f72; --r-gen-bg:rgba(240,143,114,0.14);
   --r-nami-bg:rgba(188,174,143,0.10); --r-jo-bg:rgba(134,191,210,0.12); --r-tokujo-bg:rgba(230,185,79,0.14); --r-kiwami-bg:rgba(210,155,224,0.14);
   --shadow:0 1px 2px rgba(0,0,0,0.45),0 4px 14px rgba(0,0,0,0.3); --scrim:rgba(0,0,0,0.65); color-scheme:dark; } }
 :root[data-theme="dark"]{
   --bg:#181310; --paper:#251d16; --ink:#ece3d0; --ink-soft:#b9ac8e; --line:rgba(236,227,208,0.13);
   --accent:#9cc3cf; --accent2:#e39a76; --chip:#2e251c;
-  --r-nami:#bcae8f; --r-jo:#86bfd2; --r-tokujo:#e6b94f; --r-kiwami:#d29be0;
+  --r-nami:#bcae8f; --r-jo:#86bfd2; --r-tokujo:#e6b94f; --r-kiwami:#d29be0; --r-gen:#f08f72; --r-gen-bg:rgba(240,143,114,0.14);
   --r-nami-bg:rgba(188,174,143,0.10); --r-jo-bg:rgba(134,191,210,0.12); --r-tokujo-bg:rgba(230,185,79,0.14); --r-kiwami-bg:rgba(210,155,224,0.14);
   --shadow:0 1px 2px rgba(0,0,0,0.45),0 4px 14px rgba(0,0,0,0.3); --scrim:rgba(0,0,0,0.65); color-scheme:dark; }
 *{box-sizing:border-box;}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.6;}
 .wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:flex;flex-direction:column;gap:28px;}
 .r-nami{--rc:var(--r-nami);--rbg:var(--r-nami-bg);} .r-jo{--rc:var(--r-jo);--rbg:var(--r-jo-bg);}
-.r-tokujo{--rc:var(--r-tokujo);--rbg:var(--r-tokujo-bg);} .r-kiwami{--rc:var(--r-kiwami);--rbg:var(--r-kiwami-bg);}
+.r-tokujo{--rc:var(--r-tokujo);--rbg:var(--r-tokujo-bg);} .r-kiwami{--rc:var(--r-kiwami);--rbg:var(--r-kiwami-bg);} .r-gen{--rc:var(--r-gen);--rbg:var(--r-gen-bg);}
 .masthead{display:flex;flex-direction:column;gap:6px;}
 .masthead h1{margin:0;font-family:var(--font-display);font-weight:400;font-size:clamp(1.7rem,5vw,2.6rem);line-height:1.15;letter-spacing:.06em;color:var(--accent);text-wrap:balance;}
 .masthead h1 small{display:block;font-size:.5em;letter-spacing:.3em;color:var(--ink-soft);margin-top:4px;}
@@ -284,7 +288,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-siz
 <div class="wrap">
   <header class="masthead">
     <h1>無限そば道・斬<small>アイテム図鑑</small></h1>
-    <p class="lede">ガチャと交換所で手に入る全${data.total}点の絵と、装備したときの見た目です。絵はゲームの描画コードでそのまま描いたもので、アイテムの内容が変わるとこのページも作り直されます。カードを押すと、説明・色・模様の設定を見られます。</p>
+    <p class="lede">ガチャと交換所、修行やクイズの実績で手に入る全${data.total}点の絵と、装備したときの見た目です。絵はゲームの描画コードでそのまま描いたもので、アイテムの内容が変わるとこのページも作り直されます。カードを押すと、説明・色・模様の設定を見られます。</p>
   </header>
   <div class="tools" role="search">
     <div class="chips" role="group" aria-label="種類で絞り込む">
@@ -305,7 +309,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-siz
 (function(){
   var items = JSON.parse(document.getElementById('items').textContent), byId = {};
   items.forEach(function(it){ byId[it.id] = it; });
-  var RAR = {nami:'並', jo:'上', tokujo:'特上', kiwami:'極み'};
+  var RAR = {nami:'並', jo:'上', tokujo:'特上', kiwami:'極み', gen:'限定'};
   var slot = '', q = '', last = null;
   var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
   var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));

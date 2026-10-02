@@ -9,7 +9,10 @@
 ## 守ること
 - 1ファイル構成を保つ。CSS と JavaScript は `index.html` の中に書き、外部ライブラリや外部ファイルを追加しない（すでにある Google Fonts の読み込みはそのまま）。
 - 既存のゲーム性（スコア計算、判定、満足度、香り、そば猪口コイン、ガチャの排出率（画面に常に表示・合計100%）、そば札と交換所、季節モード）を壊したり省略したりしない。ガチャに天井（pity）と1日のコイン獲得上限は設けない。
-- セーブデータは localStorage の `echizenSoba.v1`（schema 11）。項目を足すときは古いセーブを読んでも壊れないようにし、自己ベスト・コイン・そば札・図鑑・装備を消さない。
+- セーブデータは localStorage の `echizenSoba.v1`（schema 12）。項目を足すときは古いセーブを読んでも壊れないようにし、自己ベスト・コイン・そば札・図鑑・装備を消さない。
+  - schema 12 で足した項目：`settings.onboarding`（ルール説明）・`settings.lastShareDate`（共有ボーナスを払った日）・`quiz`（1日3問のクイズ）・`badges`（ホームの赤丸）・`rewards`（実績で解放した限定品と称号）。schema 11 以前のセーブは `echizenSoba.v1.backup-s11` などに控えを取ってから移す。
+  - 限定アイテム（`GACHA_CATALOG` の `source:'reward'`・レア度 `gen`）はガチャの抽選・排出率の表・交換所に入れない。条件（`cond`）は実績で判定する。
+  - クイズの問題（`QUIZ_POOL`）は事実に基づいて書き、日付から決まる3問を全員共通で出す。要望箱の送り先は `FEEDBACK_URL`（Google フォームができたら差し替える）。
   - 段位は廃止し、称号（`TITLES_DATA`・`gacha.titles`・`gacha.equippedTitle`）に移行済み。schema 10 以前のセーブは `echizenSoba.v1.backup-s10` に控えを取ってから移行する。獲得した称号は消さない。
   - 読めない（壊れた）セーブは、作り直す前に `echizenSoba.v1.backup-unreadable` に控えを取る。ログイン中の「記録を消す」は `recordsClearedAt` で同期先にも伝わる。
   - アカウント情報は `echizenSoba.v1.account`、模擬クラウドは `echizenSoba.mockCloud`。パスワードは平文で保存・送信せず、SHA-256 でハッシュ化する。メールアドレスなどの個人情報は集めない。
