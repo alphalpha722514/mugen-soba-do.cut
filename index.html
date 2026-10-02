@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>無限そば道・斬 - 越前そば切り本格アクションゲーム</title>
-<meta name="description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム82種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
+<meta name="description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャと修行の実績で福井ゆかりのアイテム86種を集め、毎日のクイズで称号を目指そう。ブラウザですぐ遊べて登録不要。" />
 <!-- スマホ: ホーム画面に追加したときの見た目（アプリ名・ステータスバー・テーマ色） -->
 <meta name="theme-color" content="#e7e0cd" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#181310" media="(prefers-color-scheme: dark)" />
@@ -22,7 +22,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="無限そば道・斬" />
 <meta property="og:title" content="無限そば道・斬 - 越前そば切り本格アクションゲーム" />
-<meta property="og:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム82種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
+<meta property="og:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャと修行の実績で福井ゆかりのアイテム86種を集め、毎日のクイズで称号を目指そう。ブラウザですぐ遊べて登録不要。" />
 <meta property="og:url" content="https://alphalpha722514.github.io/mugen-soba-do.cut/" />
 <meta property="og:image" content="https://alphalpha722514.github.io/mugen-soba-do.cut/og-image.jpg" />
 <meta property="og:image:width" content="1200" />
@@ -31,7 +31,7 @@
 <meta property="og:locale" content="ja_JP" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="無限そば道・斬 - 越前そば切り本格アクションゲーム" />
-<meta name="twitter:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャで福井ゆかりのアイテム82種を集め、称号を目指そう。ブラウザですぐ遊べて登録不要。" />
+<meta name="twitter:description" content="越前そばをリズムに合わせて切り、お客さんに出す蕎麦切り修行ゲーム。そば猪口ガチャと修行の実績で福井ゆかりのアイテム86種を集め、毎日のクイズで称号を目指そう。ブラウザですぐ遊べて登録不要。" />
 <meta name="twitter:image" content="https://alphalpha722514.github.io/mugen-soba-do.cut/og-image.jpg" />
 <script>
 // ホーム画面に追加（PWA）: manifest.webmanifest と icons/ は tools/pwa/build.mjs で作る。
@@ -537,6 +537,28 @@ body{
 /* ---------- Result ---------- */
 .new-best-badge{color:var(--accent2-ink);font-weight:700;font-size:.92rem;margin:0 0 10px;display:none;}
 .new-best-badge.show{display:block;}
+/* the result's numbers roll like a drum, then lock with a little jump */
+#screen-result{position:relative;}
+.result-skip{position:absolute;top:8px;right:0;z-index:2;}
+.result-stats span.is-rolling{display:inline-block;filter:blur(.4px);opacity:.85;animation:slotRoll .09s linear infinite;font-variant-numeric:tabular-nums;}
+.result-stats span.is-locked{display:inline-block;animation:slotLock .32s cubic-bezier(.2,1.8,.4,1);}
+@keyframes slotRoll{0%{transform:translateY(-3px);}50%{transform:translateY(3px);}100%{transform:translateY(-3px);}}
+@keyframes slotLock{0%{transform:scale(1.35);color:var(--accent2-ink);}100%{transform:none;}}
+.new-best-badge.is-hot{display:inline-block;padding:4px 14px;border-radius:999px;color:#5a3a06;background:linear-gradient(180deg,#ffe9a8,#e8b84a);
+  box-shadow:0 0 0 2px #fff6d6,0 0 18px rgba(232,184,74,0.75);animation:bestHot 1.4s ease-in-out infinite alternate;}
+@keyframes bestHot{from{transform:scale(1);}to{transform:scale(1.06);}}
+/* 自己ベスト更新: a gold flash over the whole screen and gold confetti */
+.best-flash{position:fixed;inset:0;z-index:55;pointer-events:none;overflow:hidden;}
+.best-flash::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(255,236,160,0.85),rgba(232,184,74,0.35) 45%,rgba(232,184,74,0) 75%);
+  animation:bestFlash .9s ease-out both;}
+@keyframes bestFlash{0%{opacity:0;}15%{opacity:1;}100%{opacity:0;}}
+.best-conf{position:absolute;top:-16px;width:8px;height:12px;border-radius:2px;animation:bestFall var(--d,1.6s) cubic-bezier(.3,.6,.5,1) both;animation-delay:var(--w,0s);}
+@keyframes bestFall{from{transform:translate(0,0) rotate(0);}to{transform:translate(var(--dx,0px),110vh) rotate(var(--r,540deg));}}
+@media (prefers-reduced-motion:reduce){
+  .result-stats span.is-rolling,.result-stats span.is-locked,.new-best-badge.is-hot{animation:none;}
+  .best-flash::before{animation:none;opacity:0;}
+  .best-conf{display:none;}
+}
 .btn-main{
   font-family:var(--font-body);font-weight:700;font-size:1.05rem;
   padding:14px 36px;border:none;border-radius:999px;
@@ -745,21 +767,24 @@ body{
 .coin-box .coin-note:empty{display:none;}
 .coin-box .coin-status{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:.76rem;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
 /* ---------- そば猪口ガチャ・図鑑 ---------- */
-/* rarity colours: 並 茶 / 上 藍 / 特上 金 / 極み 紫 */
+/* rarity colours: 並 茶 / 上 藍 / 特上 金 / 極み 紫 / 限定（実績で解放） 朱 */
 :root{
-  --r-nami:#66583f;--r-jo:#275f74;--r-tokujo:#775610;--r-kiwami:#7d3f8f;
+  --r-nami:#66583f;--r-jo:#275f74;--r-tokujo:#775610;--r-kiwami:#7d3f8f;--r-gen:#a3301c;--r-gen-bg:rgba(163,48,28,0.10);
+  --dot:#c8321f;--washi:rgba(251,247,236,0.86);
   --r-nami-bg:rgba(116,101,74,0.09);--r-jo-bg:rgba(47,111,134,0.10);--r-tokujo-bg:rgba(194,154,60,0.16);--r-kiwami-bg:rgba(125,63,143,0.12);
   --sil-filter:grayscale(1) brightness(0);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --r-nami:#bcae8f;--r-jo:#86bfd2;--r-tokujo:#e6b94f;--r-kiwami:#d29be0;
+    --r-nami:#bcae8f;--r-jo:#86bfd2;--r-tokujo:#e6b94f;--r-kiwami:#d29be0;--r-gen:#f08f72;--r-gen-bg:rgba(240,143,114,0.14);
+    --dot:#ff6a52;--washi:rgba(37,29,22,0.86);
     --r-nami-bg:rgba(188,174,143,0.10);--r-jo-bg:rgba(134,191,210,0.12);--r-tokujo-bg:rgba(230,185,79,0.14);--r-kiwami-bg:rgba(210,155,224,0.14);
     --sil-filter:grayscale(1) brightness(0) invert(1);
   }
 }
 :root[data-theme="dark"]{
-  --r-nami:#bcae8f;--r-jo:#86bfd2;--r-tokujo:#e6b94f;--r-kiwami:#d29be0;
+  --r-nami:#bcae8f;--r-jo:#86bfd2;--r-tokujo:#e6b94f;--r-kiwami:#d29be0;--r-gen:#f08f72;--r-gen-bg:rgba(240,143,114,0.14);
+  --dot:#ff6a52;--washi:rgba(37,29,22,0.86);
   --r-nami-bg:rgba(188,174,143,0.10);--r-jo-bg:rgba(134,191,210,0.12);--r-tokujo-bg:rgba(230,185,79,0.14);--r-kiwami-bg:rgba(210,155,224,0.14);
   --sil-filter:grayscale(1) brightness(0) invert(1);
 }
@@ -767,11 +792,12 @@ body{
 .r-jo{--rc:var(--r-jo);--rbg:var(--r-jo-bg);}
 .r-tokujo{--rc:var(--r-tokujo);--rbg:var(--r-tokujo-bg);}
 .r-kiwami{--rc:var(--r-kiwami);--rbg:var(--r-kiwami-bg);}
+.r-gen{--rc:var(--r-gen);--rbg:var(--r-gen-bg);}
 .rar{
   display:inline-flex;align-items:center;flex:0 0 auto;font-size:.62rem;font-weight:900;line-height:1.5;
   padding:0 7px;border-radius:999px;border:1px solid var(--rc);color:var(--rc);background:var(--rbg);white-space:nowrap;
 }
-.rar.r-kiwami{background:var(--rc);color:var(--card);}
+.rar.r-kiwami,.rar.r-gen{background:var(--rc);color:var(--card);}
 
 /* home: coins + entrances */
 .collect-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:8px var(--pad-x);}
@@ -783,6 +809,115 @@ body{
 .collect-fuda{display:inline-block;margin-left:12px;font-size:.74rem;font-weight:700;color:var(--ink-soft);}
 .collect-fuda #home-tickets{color:var(--ink);font-weight:900;}
 .collect-title{flex-basis:100%;margin:0;font-size:.7rem;font-weight:900;color:var(--ok);}
+
+/* red dots: something new (図鑑・着せ替え) or today's quiz not answered yet */
+.has-dot{position:relative;}
+.dot{position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--dot);box-shadow:0 0 0 2px var(--card);pointer-events:none;}
+.dot .vh{color:var(--ink);background:var(--card);}   /* read aloud only; kept legible for contrast checkers too */
+/* home: today's quiz and the share bonus */
+.daily-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px var(--pad-x);}
+.daily-btn{
+  font:inherit;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;text-align:left;
+  padding:7px 10px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);color:var(--ink);
+  cursor:pointer;touch-action:manipulation;
+}
+.daily-name{font-size:.8rem;font-weight:900;}
+.daily-sub{font-size:.66rem;font-weight:700;color:var(--ink-soft);line-height:1.35;}
+.daily-btn.is-done .daily-sub{color:var(--ok);}
+@media (hover:hover){ .daily-btn:hover,.collect-btn:hover{border-color:var(--accent-ink);} }
+.help-opts{flex-wrap:wrap;}
+.bgm-opts{flex-wrap:wrap;align-items:center;}
+.bgm-vol{display:flex;align-items:center;gap:8px;flex:1 1 160px;min-width:0;font-size:.78rem;font-weight:700;}
+.bgm-vol input{flex:1 1 auto;min-width:0;accent-color:var(--accent-ink);}
+.bgm-vol output{min-width:2.2em;text-align:right;font-variant-numeric:tabular-nums;}
+.bgm-vol.is-off{opacity:.5;}
+/* the home over the equipped background: the background fills the screen, the home sits on washi paper */
+.home-bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+#app{z-index:1;}
+.home.has-bg{background:var(--washi);margin-inline:-8px;padding:8px;border-radius:16px;box-shadow:0 2px 14px rgba(20,14,8,0.18);}
+/* 限定 group in the 図鑑 */
+.zgroup-note{margin:0;font-size:.7rem;line-height:1.5;color:var(--ink-soft);}
+.zcard-hint{color:var(--r-gen);font-weight:700;}
+/* the quiz */
+.quiz{gap:10px;}
+.quiz .guide-title{font-size:1.12rem;}
+.quiz .guide-bar .btn-small{flex:0 0 auto;white-space:nowrap;}
+.quiz-lead{margin:0;font-size:.78rem;line-height:1.7;color:var(--ink-soft);}
+.quiz-progress{list-style:none;margin:0;padding:0;display:flex;gap:6px;}
+.quiz-progress li{flex:1 1 0;height:6px;border-radius:3px;background:var(--muted-fill);}
+.quiz-progress li.is-ok{background:var(--ok);}
+.quiz-progress li.is-ng{background:var(--accent2-ink);}
+.quiz-progress li.is-now{background:var(--accent-ink);opacity:.45;}
+.quiz-card,.quiz-done{padding:14px var(--pad-x);display:flex;flex-direction:column;gap:10px;}
+.quiz-num{margin:0;font-size:.72rem;font-weight:900;letter-spacing:.08em;color:var(--accent2-ink);}
+.quiz-q{margin:0;font-size:1rem;font-weight:900;line-height:1.6;text-wrap:pretty;}
+.quiz-q:focus,.quiz-done-h:focus{outline:none;}
+.quiz-choices{display:flex;flex-direction:column;gap:7px;}
+.quiz-choice{
+  font:inherit;font-size:.9rem;font-weight:700;text-align:left;line-height:1.5;
+  padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);color:var(--ink);
+  display:flex;gap:8px;align-items:flex-start;cursor:pointer;touch-action:manipulation;
+}
+.quiz-choice .qk{flex:0 0 auto;font-size:.72rem;font-weight:900;color:var(--ink-soft);padding-top:.15em;}
+@media (hover:hover){ .quiz-choice:hover:not(:disabled){border-color:var(--accent-ink);} }
+.quiz-choice:disabled{cursor:default;opacity:.62;}
+.quiz-choice.is-right{opacity:1;border-color:var(--ok);background:var(--ok-soft);}
+.quiz-choice.is-wrong{opacity:1;border-color:var(--accent2-ink);}
+.quiz-choice:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px;}
+.quiz-feedback{display:flex;flex-direction:column;gap:6px;align-items:stretch;}
+.quiz-verdict{margin:0;font-size:1rem;font-weight:900;}
+.quiz-verdict.is-ok{color:var(--ok);}
+.quiz-verdict.is-ng{color:var(--accent2-ink);}
+.quiz-explain{margin:0;font-size:.84rem;line-height:1.75;}
+.quiz-next{align-self:center;margin-top:4px;}
+.quiz-done-h{margin:0;font-size:.98rem;font-weight:900;line-height:1.6;color:var(--accent-ink);}
+.quiz-score{margin:0;font-size:.86rem;font-weight:700;}
+.quiz-review{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px;font-size:.8rem;line-height:1.6;}
+.quiz-review .qr-a{display:block;font-weight:700;}
+.quiz-review .qr-a.is-ok{color:var(--ok);}
+.quiz-review .qr-a.is-ng{color:var(--accent2-ink);}
+.quiz-review .qr-x{display:block;color:var(--ink-soft);}
+.quiz-stats{margin:0;font-size:.72rem;color:var(--ink-soft);text-align:center;}
+/* first-run rules guide */
+.ob-card{max-width:360px;gap:10px;}
+.ob-top{margin:0;width:100%;display:flex;justify-content:space-between;align-items:baseline;}
+.ob-eyebrow{font-size:.7rem;font-weight:900;letter-spacing:.1em;color:var(--accent2-ink);}
+.ob-step{font-size:.72rem;font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
+.ob-pic{width:100%;max-width:240px;}
+.ob-pic svg{display:block;width:100%;height:auto;}
+.ob-h:focus{outline:none;}
+.ob-text{margin:0;font-size:.86rem;line-height:1.75;text-align:left;min-height:6.2em;}
+.ob-dots{display:flex;gap:6px;}
+.ob-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);}
+.ob-dots i.is-on{background:var(--accent-ink);}
+.ob-nav{display:flex;justify-content:space-between;width:100%;gap:8px;}
+.ob-check{display:flex;align-items:center;gap:6px;font-size:.8rem;cursor:pointer;}
+.ob-check input{width:18px;height:18px;margin:0;accent-color:var(--accent-ink);}
+.ob-start{padding:11px 28px;font-size:.98rem;}
+.ob-svg .bd{fill:var(--board);} .ob-svg .bd2{fill:var(--board-dark);} .ob-svg .dg{fill:var(--dough);}
+.ob-svg .gd{fill:#c9a24a;} .ob-svg .ac{fill:var(--accent2-ink);} .ob-svg .ink{fill:var(--ink);} .ob-svg .soft{fill:var(--ink-soft);}
+.ob-svg .bl{fill:var(--bowl);} .ob-svg .br{fill:var(--broth);} .ob-svg .nd{stroke:var(--noodle);fill:none;stroke-width:2.2;stroke-linecap:round;}
+.ob-svg .stl{fill:#d9dee0;stroke:var(--ink-soft);stroke-width:1;} .ob-svg .ln{stroke:var(--accent2-ink);stroke-width:2;stroke-dasharray:3 3;}
+.ob-svg .sk{fill:var(--card);stroke:var(--ink);stroke-width:1.4;} .ob-svg .st{fill:none;stroke:var(--ink-soft);stroke-width:1.4;stroke-linecap:round;}
+.ob-svg text{font-family:var(--font-body);font-weight:900;}
+/* 限定 unlocked */
+.rw-card{gap:8px;}
+.rw-eyebrow{margin:0;font-size:.72rem;font-weight:900;letter-spacing:.12em;color:var(--r-gen);}
+.rw-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;width:100%;}
+.rw-item{display:flex;align-items:center;gap:10px;text-align:left;}
+.rw-item .art{width:64px;}
+.rw-item b{display:block;font-size:.92rem;}
+.rw-item span{display:block;font-size:.72rem;color:var(--ink-soft);line-height:1.5;}
+@media (prefers-reduced-motion:no-preference){
+  .rw-card{animation:rwPop .42s cubic-bezier(.2,1.4,.4,1) both;}
+  @keyframes rwPop{from{transform:scale(.86);opacity:0;}to{transform:none;opacity:1;}}
+}
+/* a short message at the bottom (the share bonus) */
+.toast{
+  position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;
+  max-width:calc(100% - 32px);padding:10px 16px;border-radius:12px;
+  background:var(--btn-bg);color:var(--btn-ink);font-size:.86rem;font-weight:700;line-height:1.5;box-shadow:0 6px 18px var(--shadow);
+}
 
 /* picture box shared by results, 図鑑 and the detail view */
 .art{
@@ -838,6 +973,32 @@ body{
 .gres.r-tokujo,.gres.r-kiwami{box-shadow:0 0 0 1px var(--rc),0 0 14px color-mix(in srgb,var(--rc) 45%,transparent);}
 @keyframes gresIn{from{opacity:0;transform:translateY(8px) scale(.96);}to{opacity:1;transform:none;}}
 .gres .art{width:52px;}
+/* 被り: the picture turns into a そば札 with a pop (after the cards have come in) */
+.gres{--art-w:52px;}
+.gres-list.is-single .gres{--art-w:96px;}
+.gres-fuda{
+  position:absolute;top:8px;left:50%;width:var(--art-w);aspect-ratio:1/1;margin-left:calc(var(--art-w) / -2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:10px;
+  background:linear-gradient(160deg,#fbf3dc,#ead7a6);border:2px solid #b58a35;color:#6b4a14;
+  font-size:calc(var(--art-w) * .2);font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums;
+  box-shadow:0 2px 6px rgba(80,55,15,0.25);opacity:0;transform:scale(.4);
+  animation:fudaIn .34s cubic-bezier(.2,1.6,.4,1) both;animation-delay:calc(var(--i,0) * 70ms + 620ms);
+}
+.gres-fuda b{display:grid;place-items:center;width:1.6em;height:1.6em;border-radius:5px;background:#a93a26;color:#fbf3dc;font-size:1.05em;}
+.gres.is-dup .art{animation:artOut .22s ease-in both;animation-delay:calc(var(--i,0) * 70ms + 600ms);}
+@keyframes fudaIn{from{opacity:0;transform:scale(.4) rotate(-12deg);}to{opacity:1;transform:none;}}
+@keyframes artOut{to{opacity:0;transform:scale(.5);}}
+/* the stage jolts when the capsule lands (ドスン!) and on a big pop */
+.gacha-stage-wrap.is-thud{animation:stageThud .28s ease-out;}
+.gacha-stage-wrap.is-boom{animation:stageBoom .42s ease-out;}
+@keyframes stageThud{0%{transform:translateY(0);}30%{transform:translateY(3px) scale(1.012);}65%{transform:translateY(-1px);}100%{transform:none;}}
+@keyframes stageBoom{0%{transform:scale(1);}25%{transform:scale(1.025);}55%{transform:scale(.995);}100%{transform:none;}}
+@media (prefers-reduced-motion:reduce){
+  .gres-fuda,.gres.is-dup .art{animation:none;}
+  .gres-fuda{opacity:1;transform:none;}
+  .gres.is-dup .art{opacity:0;}
+  .gacha-stage-wrap.is-thud,.gacha-stage-wrap.is-boom{animation:none;}
+}
 .gres-list.is-single .gres .art{width:96px;}
 .gres-name{font-size:.74rem;font-weight:900;line-height:1.35;word-break:auto-phrase;}
 .gres-list.is-single .gres-name{font-size:.95rem;}
@@ -1057,6 +1218,7 @@ body{
 </style>
 </head>
 <body>
+<canvas id="home-bg" class="home-bg" aria-hidden="true" hidden></canvas>
 <div id="app">
 
   <section id="screen-title" class="screen active home" aria-labelledby="home-title">
@@ -1202,11 +1364,22 @@ body{
       </div>
       <div class="collect-actions">
         <button id="btn-gacha" class="btn-small collect-btn" type="button">ガチャを引く</button>
-        <button id="btn-zukan" class="btn-small collect-btn" type="button">図鑑 <span id="home-zukan">0/82</span></button>
+        <button id="btn-zukan" class="btn-small collect-btn has-dot" type="button">図鑑 <span id="home-zukan">0/86</span><span class="dot" data-badge="zukan" hidden><span class="vh">（新着あり）</span></span></button>
         <button id="btn-exchange" class="btn-small collect-btn" type="button">交換所</button>
-        <button id="btn-kisekae" class="btn-small collect-btn" type="button">着せ替え</button>
+        <button id="btn-kisekae" class="btn-small collect-btn has-dot" type="button">着せ替え<span class="dot" data-badge="kisekae" hidden><span class="vh">（新着あり）</span></span></button>
       </div>
       <p id="home-title-chip" class="collect-title" hidden></p>
+    </section>
+
+    <section class="daily-row card" aria-labelledby="daily-row-label">
+      <h2 id="daily-row-label" class="vh">毎日のおたのしみ</h2>
+      <button id="btn-quiz" class="daily-btn has-dot" type="button">
+        <span class="daily-name">今日のクイズ</span><span id="quiz-state" class="daily-sub">越前そば＆福井 3問</span>
+        <span class="dot" data-badge="quiz" hidden><span class="vh">（未回答）</span></span>
+      </button>
+      <button id="btn-share-home" class="daily-btn" type="button">
+        <span class="daily-name">友達に共有</span><span id="share-state" class="daily-sub">1日1回 +200🪙</span>
+      </button>
     </section>
 
     <div class="howto-row">
@@ -1236,11 +1409,30 @@ body{
           <label class="fx-check"><input id="fx-particles" type="checkbox" checked> 紙吹雪やキラキラを出す</label>
           <p class="save-note">1杯出したあとの演出の強さです（得点や満足度は変わりません）。演出は画面をタップすると飛ばせます。</p>
         </div>
+        <div class="vis-row" role="group" aria-labelledby="bgm-title">
+          <span id="bgm-title" class="backup-title">BGM（音楽）</span>
+          <div class="vis-opts bgm-opts">
+            <button id="bgm-toggle" class="btn-small" type="button" aria-pressed="true">BGM オン</button>
+            <label class="bgm-vol" for="bgm-volume">音量
+              <input id="bgm-volume" type="range" min="0" max="100" step="5" value="40">
+              <output id="bgm-vol-out" for="bgm-volume">40</output>
+            </label>
+          </div>
+          <p class="save-note">効果音とは別に、BGMのオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</p>
+        </div>
+        <div class="vis-row" role="group" aria-labelledby="help-row-title">
+          <span id="help-row-title" class="backup-title">ルールとご意見</span>
+          <div class="vis-opts help-opts">
+            <button id="btn-guide-again" class="btn-small" type="button">ルール説明をもう一度見る</button>
+            <button id="btn-feedback" class="btn-small" type="button">要望・不具合を送る</button>
+          </div>
+          <p class="save-note">※「要望・不具合を送る」は外部の入力フォームが開きます。個人情報は入力しないでください。</p>
+        </div>
         <p class="save-note">記録はこの端末のブラウザ内に保存されます。マイページでログインすると、クラウドにも写しを保存して同期します。</p>
         <div class="clear-row">
           <button id="btn-clear" class="btn-small btn-danger" type="button">記録を消す</button>
           <div id="clear-confirm" class="clear-confirm" hidden>
-            <p class="clear-q">自己ベスト・限定ベスト・累計スコアなどの戦績・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備・獲得した称号・名前は残ります）。ログイン中は、クラウドとほかの端末の戦績も消えます。</p>
+            <p class="clear-q">自己ベスト・限定ベスト・累計スコアなどの戦績・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備・獲得した称号・名前・クイズの成績は残ります）。ログイン中は、クラウドとほかの端末の戦績も消えます。</p>
             <div class="clear-actions">
               <button id="btn-clear-yes" class="btn-small btn-danger-solid" type="button">消す</button>
               <button id="btn-clear-no" class="btn-small" type="button">やめる</button>
@@ -1392,7 +1584,7 @@ body{
 
     <section id="g-rank" class="gsec" aria-labelledby="g-rank-h">
       <h3 id="g-rank-h" tabindex="-1">称号</h3>
-      <p class="gnote">4つの系統の称号があり、条件を満たすと獲得します。獲得した称号はなくならず（「記録を消す」でも残ります）、マイページで好きな1つを身につけられます。身につけた称号は名前と一緒に、リザルトと共有画像に出ます。期間限定モードの得点は称号の記録に入りません。</p>
+      <p class="gnote">5つの系統の称号（クイズの称号を含む）があり、条件を満たすと獲得します。獲得した称号はなくならず（「記録を消す」でも残ります）、マイページで好きな1つを身につけられます。身につけた称号は名前と一緒に、リザルトと共有画像に出ます。期間限定モードの得点は称号の記録に入りません。</p>
       <div id="title-guide" class="title-guide"></div>
       <p class="gnote"><b>今回の腕前</b>　リザルトの「今回の腕前」は、その1回の得点が届いた「一撃の腕前」の称号の名前です。</p>
     </section>
@@ -1442,11 +1634,14 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、描画の細かさ、お客さんの反応の演出。</li>
+        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、BGMのオン・オフと音量、描画の細かさ、お客さんの反応の演出、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、コインとそば札は多いほう、図鑑・アイテム・称号は両方を合わせたものになります。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
-        <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
-        <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。</li>
+        <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
+        <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。ホームやリザルトの「友達に共有」で共有すると、1日1回+200（共有ボーナス）。</li>
+        <li><b>BGM</b>ホーム・修行・リザルト・ガチャで、場面ごとの和風の音楽が流れます（音声ファイルは使わず、ブラウザの中で合成しています）。修行中はコンボが10・20・30・40と続くたびに、三味線・篠笛・締太鼓・箏が1つずつ重なります。「記録と設定」で、効果音とは別にオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</li>
+        <li><b>今日のクイズ</b>ホームの「今日のクイズ」で、越前そばと福井にちなんだ4択クイズが1日3問出ます（問題は日付で決まり、その日はみんな同じ3問）。1問正解ごとにそば札1枚、3問とも正解するとさらに2枚。全問正解で称号「越前通」、通算30問正解で称号「そば博士」がもらえます。</li>
+        <li><b>限定アイテム</b>ガチャや交換所には出ない4種のアイテムが、修行やクイズの実績（最大30コンボ・累計スコア50,000点・修行30回・クイズ通算10問正解）で解放されます。図鑑の「限定」に、まだのものは「？？？」と解放の条件が出ます。</li>
         <li><b>ガチャと図鑑</b>ホームの「ガチャを引く」で、コインを使って越前・福井にちなんだアイテムを引けます（1回500・10連4,500）。確率はガチャ画面にいつも表示しています（天井はありません）。被ったアイテムは「そば札」に変わり、「交換所」でまだ持っていないアイテムと交換できます。集めたアイテムは「図鑑」で見られ、「着せ替え」で器・麺・包丁・背景・演出の色・効果音・称号を着せ替えられます（見た目と音だけで、得点や判定は変わりません）。</li>
       </ul>
       <p class="save-note"><a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a></p>
@@ -1512,8 +1707,8 @@ body{
       <button id="btn-zukan-back" class="btn-small" type="button">戻る</button>
     </div>
     <div class="zukan-sum card">
-      <p class="zs-row"><span class="zs-label">集めた数</span><span id="zukan-count" class="zs-count">0 / 82</span></p>
-      <div id="zukan-progress" class="progress" role="progressbar" aria-label="図鑑の集まり具合" aria-valuemin="0" aria-valuemax="82" aria-valuenow="0">
+      <p class="zs-row"><span class="zs-label">集めた数</span><span id="zukan-count" class="zs-count">0 / 86</span></p>
+      <div id="zukan-progress" class="progress" role="progressbar" aria-label="図鑑の集まり具合" aria-valuemin="0" aria-valuemax="86" aria-valuenow="0">
         <div id="zukan-progress-fill" class="progress-fill"></div>
       </div>
       <p id="zukan-rarity-counts" class="zs-rar"></p>
@@ -1687,7 +1882,33 @@ body{
     </section>
   </section>
 
+  <section id="screen-quiz" class="screen guide quiz" aria-labelledby="quiz-title">
+    <div class="guide-bar">
+      <h2 id="quiz-title" class="guide-title" tabindex="-1">越前そば＆福井クイズ</h2>
+      <button id="btn-quiz-back" class="btn-small" type="button">ホームへ戻る</button>
+    </div>
+    <p class="quiz-lead">1日3問の4択クイズ。1問正解ごとにそば札1枚、3問とも正解するとさらに2枚。問題は日付で決まり、その日はみんな同じ3問です。</p>
+    <ol id="quiz-progress" class="quiz-progress" aria-label="今日の3問の進み具合"></ol>
+    <section id="quiz-card" class="quiz-card card" aria-labelledby="quiz-q">
+      <p id="quiz-num" class="quiz-num">第1問</p>
+      <h3 id="quiz-q" class="quiz-q" tabindex="-1"></h3>
+      <div id="quiz-choices" class="quiz-choices" role="group" aria-labelledby="quiz-q"></div>
+      <div id="quiz-feedback" class="quiz-feedback" role="status" aria-live="polite" hidden>
+        <p id="quiz-verdict" class="quiz-verdict"></p>
+        <p id="quiz-explain" class="quiz-explain"></p>
+        <button id="quiz-next" class="btn-main quiz-next" type="button">次の問題へ</button>
+      </div>
+    </section>
+    <section id="quiz-done" class="quiz-done card" aria-labelledby="quiz-done-h" hidden>
+      <h3 id="quiz-done-h" class="quiz-done-h" tabindex="-1">本日の修行クイズは終了しました。また明日挑戦してください！</h3>
+      <p id="quiz-score" class="quiz-score"></p>
+      <ol id="quiz-review" class="quiz-review"></ol>
+    </section>
+    <p id="quiz-stats" class="quiz-stats"></p>
+  </section>
+
   <section id="screen-result" class="screen">
+    <button id="result-skip" class="btn-small result-skip" type="button" hidden>スキップ</button>
     <h2 class="result-title">修行終了!</h2>
     <p id="result-mode" class="result-mode" hidden></p>
     <div class="result-rank" id="result-rank">今回の腕前: ―</div>
@@ -1716,6 +1937,7 @@ body{
     </section>
     <button id="btn-restart" class="btn-main">もう一度挑戦</button>
     <div class="share-box">
+      <button id="btn-share-result" class="btn-sub" type="button">友達に共有する（1日1回 +200🪙）</button>
       <button id="btn-save-image" class="btn-sub" type="button">結果を画像で保存</button>
       <p id="share-msg" class="share-msg" role="status" aria-live="polite"></p>
       <button id="btn-download-image" class="btn-link" type="button" hidden>画像ファイルとしてダウンロード</button>
@@ -1725,6 +1947,37 @@ body{
       </figure>
     </div>
   </section>
+
+  <div id="onboard" class="zmodal onboard" hidden>
+    <div class="zmodal-backdrop"></div>
+    <div class="zmodal-card ob-card" role="dialog" aria-modal="true" aria-labelledby="ob-h" aria-describedby="ob-text">
+      <p class="ob-top"><span class="ob-eyebrow">はじめての修行</span><span id="ob-step" class="ob-step">1 / 4</span></p>
+      <div id="ob-pic" class="ob-pic" aria-hidden="true"></div>
+      <h3 id="ob-h" class="zm-name ob-h" tabindex="-1"></h3>
+      <p id="ob-text" class="ob-text"></p>
+      <div id="ob-dots" class="ob-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="ob-nav">
+        <button id="ob-prev" class="btn-small" type="button">戻る</button>
+        <button id="ob-next" class="btn-small btn-primary" type="button">次へ</button>
+      </div>
+      <label class="ob-check"><input id="ob-hide" type="checkbox" checked> 次回から表示しない</label>
+      <button id="ob-start" class="btn-main ob-start" type="button">修行を始める</button>
+    </div>
+  </div>
+
+  <div id="rwmodal" class="zmodal" hidden>
+    <div class="zmodal-backdrop" data-rwclose="1"></div>
+    <div class="zmodal-card r-gen rw-card" role="dialog" aria-modal="true" aria-labelledby="rw-h">
+      <p class="rw-eyebrow">実績達成</p>
+      <h3 id="rw-h" class="zm-name" tabindex="-1">限定アイテムを解放しました</h3>
+      <ul id="rw-list" class="rw-list"></ul>
+      <p class="zm-odds">ガチャには出ない限定品です。着せ替えで装備でき、図鑑の「限定」に並びます。</p>
+      <div class="zm-actions"><button id="rw-close" class="btn-small btn-primary" type="button">閉じる</button></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <div id="best-flash" class="best-flash" aria-hidden="true" hidden></div>
 
   <div id="zmodal" class="zmodal" hidden>
     <div class="zmodal-backdrop" data-close="1"></div>
@@ -1862,7 +2115,12 @@ const ART = {
   "dino_forest": "",
   "dino_roar_fx": "",
   "yellow_tag_aura": "",
-  "fossil_aura": ""
+  "fossil_aura": "",
+  // 限定（修行の実績で解放）
+  "shihan_shu_bowl": "",
+  "tsukiyo_soba_field": "",
+  "hakase_tanzaku": "",
+  "kaiden_knife": ""
 };
 (function(){
 'use strict';
@@ -2026,7 +2284,8 @@ var screens = {
   zukan: document.getElementById('screen-zukan'),
   exchange: document.getElementById('screen-exchange'),
   kisekae: document.getElementById('screen-kisekae'),
-  mypage: document.getElementById('screen-mypage')
+  mypage: document.getElementById('screen-mypage'),
+  quiz: document.getElementById('screen-quiz')
 };
 var canvas = document.getElementById('game-canvas');
 var ctx = canvas.getContext('2d');
@@ -2116,8 +2375,12 @@ var coinStatus = document.getElementById('coin-status');
 
 // ---------- Persistent Store (robust localStorage layer) ----------
 var STORE_KEY = 'echizenSoba.v1';
-var SCHEMA_VERSION = 11;   // 10 → 11: 段位 becomes 称号 (stats, profile, gacha.equippedTitle); older saves are carried over by coerceStore
+var SCHEMA_VERSION = 12;   // 10 → 11: 段位 becomes 称号 (stats, profile, gacha.equippedTitle); 11 → 12: the daily quiz, red dots,
+                           // reward-only items and settings.onboarding / lastShareDate. Older saves are carried over by coerceStore
 var LEGACY_KEYS = ['soba-dojo-bests','bestScores','soba-best','sobaBests'];
+var ONBOARDING_VERSION = 1;   // settings.onboarding.version: the rules guide a player has seen
+var QUIZ_PER_DAY = 3;         // the daily quiz: three questions a day, the same three for everyone on that date
+var DEFAULT_BGM_VOLUME = 0.4; // settings.sound.bgmVolume when a save has none
 // settings.visual.detail: how finely the bowl is drawn. Looks only; the schema stays 10 and saves without it get 'standard'.
 var VISUAL_DETAILS = ['high','standard','low'];
 var DEFAULT_VISUAL_DETAIL = 'standard';
@@ -2159,11 +2422,16 @@ var GACHA_RARITIES = {
   nami:  {label:'並',   rate:6000, dupTickets:1,  exchange:10,  count:13},
   jo:    {label:'上',   rate:2500, dupTickets:3,  exchange:30,  count:25},
   tokujo:{label:'特上', rate:1200, dupTickets:10, exchange:80,  count:26},
-  kiwami:{label:'極み', rate:300,  dupTickets:25, exchange:200, count:18}
+  kiwami:{label:'極み', rate:300,  dupTickets:25, exchange:200, count:18},
+  // 限定: earned by records only (source:'reward'). Not in GACHA_RARITY_ORDER, so it is never drawn, never in the
+  // rate table and never sold at the 交換所; the rates above still add up to 100%.
+  gen:   {label:'限定', rate:0,    dupTickets:0,  exchange:0,   count:4}
 };
 var GACHA_RATE_TOTAL = 10000;   // rates are in hundredths of a percent: 6000 = 60.00% (they must add up to 100%)
 var GACHA_TEN_MIN_INDEX = 1;    // GACHA_RARITY_ORDER index of 上: the 10連's sure slot is 上以上 = 上 + 特上 + 極み
-var GACHA_TOTAL_ITEMS = 82;
+var GACHA_TOTAL_ITEMS = 86;     // the 図鑑: 82 from the gacha + 4 限定 (reward-only)
+// 限定 items: {source:'reward', cond:{type, value}} — unlocked when the record `type` (titleMetrics) reaches `value`
+var REWARD_COND_TYPES = ['maxCombo','totalScore','quizTotal','plays','highScore','perfectClears','quizPerfect'];
 var GACHA_PULLS = {
   single:{count:1,  cost:500,  guaranteeMin:0},
   ten:   {count:10, cost:4500, guaranteeMin:GACHA_TEN_MIN_INDEX}   // 10連: the last slot is 上以上 if none came before it
@@ -2342,7 +2610,16 @@ var GACHA_CATALOG = [
   {id:'forging_hammer_sound', name:'勝山発掘ハンマー', rarity:'kiwami', category:'SE', applyTo:'sound',
    desc:'恐竜化石の発掘で知られる勝山。槌の打撃音のあとに、宝石のような「キーン」という余韻が残る。'},
   {id:'eisei_orchestra_sound', name:'永世蕎麦神のオーケストラ', rarity:'kiwami', category:'SE', applyTo:'sound',
-   desc:'琴や鈴の和楽器とシンセが重なり、切るたびに華やかな和音が広がる、最高峰の音。'}
+   desc:'琴や鈴の和楽器とシンセが重なり、切るたびに華やかな和音が広がる、最高峰の音。'},
+  // ---- 限定 (4): ガチャ・交換所には出ない。修行の実績（cond）で解放 ----
+  {id:'shihan_shu_bowl', name:'師範の朱塗り椀', rarity:'gen', source:'reward', cond:{type:'maxCombo', value:30}, category:'器', applyTo:'bowl',
+   desc:'朱の漆に金の縁をめぐらせた椀。越前漆器は鯖江市の河和田地区を中心に作られ、1500年ほどの歴史があると伝わる。'},
+  {id:'tsukiyo_soba_field', name:'月夜のそば畑', rarity:'gen', source:'reward', cond:{type:'totalScore', value:50000}, category:'背景', applyTo:'bg',
+   desc:'9〜10月、白いそばの花が咲く畑を月が照らす。花のあとに実ったそばは、10月下旬〜11月上旬に刈り取られる。'},
+  {id:'hakase_tanzaku', name:'そば博士の短冊吹雪', rarity:'gen', source:'reward', cond:{type:'quizTotal', value:10}, category:'演出', applyTo:'effect',
+   desc:'越前和紙の短冊が、ひらひらと舞い散る。越前和紙は越前市の今立地区で漉かれてきた。'},
+  {id:'kaiden_knife', name:'皆伝の蕎麦切り包丁', rarity:'gen', source:'reward', cond:{type:'plays', value:30}, category:'道具', applyTo:'tool',
+   desc:'修行を重ねた職人に許される、刃の長い蕎麦切り包丁。越前打刃物には約700年の歴史があると伝わる。'}
 ];
 // Stand-in pictures while ART is empty: an icon inside a frame in the rarity's colour.
 var GACHA_ICONS = {
@@ -2364,7 +2641,8 @@ var GACHA_ICONS = {
   mikata_rainbow:'🌈', asuwa_sakura:'🌸', mikuni_auction:'🦀', oshima_island:'🏝️', raptor_slash:'⚡', yokan_slice:'🔲', guji_scales:'🐠',
   phoenix_makie_bowl:'🐦', fukuiraptor_fossil_bowl:'🦴', crab_shell_bowl:'🦀', ryusen_knife:'🗡️', heisenji_moss:'⛩️', dino_forest:'🦕',
   dino_roar_fx:'🦖', yellow_tag_aura:'🏷️', fossil_aura:'🦴',
-  ryusen_crash_sound:'🔔', dino_beat_sound:'🦖', mochi_poyo_sound:'🍡', retro8bit_sound:'👾', eisei_orchestra_sound:'🎼'
+  ryusen_crash_sound:'🔔', dino_beat_sound:'🦖', mochi_poyo_sound:'🍡', retro8bit_sound:'👾', eisei_orchestra_sound:'🎼',
+  shihan_shu_bowl:'🥣', tsukiyo_soba_field:'🌕', hakase_tanzaku:'📜', kaiden_knife:'🔪'
 };
 // Where a long name may wrap on a narrow card (names with 「・」 wrap after it), so a word such as 「めのう」 is never split.
 var GACHA_NAME_LINES = {
@@ -2380,7 +2658,8 @@ var GACHA_NAME_LINES = {
   ono_spring_noodle:['大野名水','仕込みそば'], kanimiso_gold_noodle:['蟹味噌仕込みの','黄金そば'], dig_hammer_knife:['発掘ハンマー＆','化石包丁'],
   mikata_rainbow:['三方五湖 ','レインボーライン'], yokan_slice:['水ようかんの','和風スライス'], guji_scales:['若狭ぐじの','松笠うろこ舞い'],
   phoenix_makie_bowl:['越前漆器・','金蒔絵『鳳凰』'], fukuiraptor_fossil_bowl:['フクイラプトルの','化石発掘椀'], crab_shell_bowl:['越前がに','極み甲羅鉢'],
-  heisenji_moss:['平泉寺白山神社','（苔の回廊）'], oshima_island:['雄島','（おしま）'], yellow_tag_aura:['ブランド黄タグの','オーラ']
+  heisenji_moss:['平泉寺白山神社','（苔の回廊）'], oshima_island:['雄島','（おしま）'], yellow_tag_aura:['ブランド黄タグの','オーラ'],
+  shihan_shu_bowl:['師範の','朱塗り椀'], tsukiyo_soba_field:['月夜の','そば畑'], hakase_tanzaku:['そば博士の','短冊吹雪'], kaiden_knife:['皆伝の','蕎麦切り包丁']
 };
 var GACHA_BY_ID = {};
 (function(){ for(var i=0;i<GACHA_CATALOG.length;i++) GACHA_BY_ID[GACHA_CATALOG[i].id] = GACHA_CATALOG[i]; })();
@@ -2409,7 +2688,8 @@ var TITLE_CATS = [
   {id:'total',   label:'累計スコア', note:'通常モードで遊んだ得点の合計で昇格します。'},
   {id:'best',    label:'一撃の腕前', note:'1回の修行の最高得点で昇格します。'},
   {id:'skill',   label:'技の冴え',   note:'コンボとJUST!の正確さで獲得します。'},
-  {id:'collect', label:'収集',       note:'図鑑に集めたアイテムで獲得します。'}
+  {id:'collect', label:'収集',       note:'図鑑に集めたアイテムで獲得します。'},
+  {id:'quiz',    label:'クイズ',     note:'1日3問の「越前そば＆福井クイズ」で獲得します。'}
 ];
 var TITLES_DATA = [
   {id:'t_nyumon',     cat:'total',   name:'そば入門',           need:{key:'totalScore', min:0}},
@@ -2433,7 +2713,9 @@ var TITLES_DATA = [
   {id:'c_mania',      cat:'collect', name:'アイテムマニア',     need:{key:'owned', min:10}},
   {id:'c_collector',  cat:'collect', name:'アイテムコレクター', need:{key:'owned', min:30}},
   {id:'c_freak',      cat:'collect', name:'図鑑フリーク',       need:{key:'collectPct', min:80}},
-  {id:'c_complete',   cat:'collect', name:'越前図鑑コンプリート', need:{key:'collectPct', min:100}, top:true}
+  {id:'c_complete',   cat:'collect', name:'越前図鑑コンプリート', need:{key:'collectPct', min:100}, top:true},
+  {id:'q_echizentsu', cat:'quiz',    name:'越前通',             need:{key:'quizPerfect', min:1}},
+  {id:'q_hakase',     cat:'quiz',    name:'そば博士',           need:{key:'quizTotal', min:30}, top:true}
 ];
 var TITLE_BY_ID = {};
 (function(){ for(var i=0;i<TITLES_DATA.length;i++) TITLE_BY_ID[TITLES_DATA[i].id] = TITLES_DATA[i]; })();
@@ -2456,17 +2738,21 @@ function titleNeedText(t){
     case 'perfectClears': return 'すべての判定をJUST!で修行を終える';
     case 'owned':         return 'アイテムを' + v + '種集める';
     case 'collectPct':    return '図鑑を' + v + '%集める';
+    case 'quizPerfect':   return n.min>1 ? ('クイズで3問全問正解を' + v + '日') : 'クイズで3問全問正解する';
+    case 'quizTotal':     return 'クイズで通算' + v + '問正解';
+    case 'plays':         return '修行を' + v + '回終える';
   }
   return '';
 }
 // the records the titles are judged on, all whole numbers
 function titleMetrics(store){
-  var st = store.stats || {}, g = store.gacha;
+  var st = store.stats || {}, g = store.gacha, q = store.quiz || {};
   var owned = g ? gachaOwnedCount(g) : 0, total = GACHA_CATALOG.length;
   return {
     totalScore:st.totalScore || 0, highScore:st.highScore || 0, maxCombo:st.maxCombo || 0,
-    bestJustRate:st.bestJustRate || 0, perfectClears:st.perfectClears || 0,
-    owned:owned, collectPct:total ? Math.floor(owned*100/total) : 0
+    bestJustRate:st.bestJustRate || 0, perfectClears:st.perfectClears || 0, plays:st.plays || 0,
+    owned:owned, collectPct:total ? Math.floor(owned*100/total) : 0,
+    quizTotal:q.totalCorrect || 0, quizPerfect:q.perfectDays || 0
   };
 }
 // Adds every title whose record has been reached; returns the ids that were new. Titles are never taken away.
@@ -2476,8 +2762,12 @@ function evaluateTitles(store){
   var m = titleMetrics(store), got = [];
   for(var i=0;i<TITLES_DATA.length;i++){
     var t = TITLES_DATA[i];
-    if(g.titles.indexOf(t.id)<0 && (m[t.need.key] || 0)>=t.need.min){ g.titles.push(t.id); got.push(t.id); }
+    if(g.titles.indexOf(t.id)<0 && (m[t.need.key] || 0)>=t.need.min){
+      g.titles.push(t.id); got.push(t.id);
+      if(t.cat==='quiz' && store.rewards && store.rewards.unlockedTitles.indexOf(t.id)<0) store.rewards.unlockedTitles.push(t.id);
+    }
   }
+  if(got.length && store.badges) store.badges.kisekae = true;   // a new title to wear: a red dot on 着せ替え
   return got;
 }
 // 今回の腕前: the highest 一撃 title a single score reaches (shown on the result and its card)
@@ -2555,7 +2845,9 @@ var SKIN_NOTES = {
   kamisho_taro_aura:'切ったところと盛り付けた麺のまわりに、もっちりした白いオーラが広がります。',
   taniguchiya_age:'黄金色の揚げのかけらがはじけ、あたたかな湯気が立ちます。',
   heshiko_amber:'切ったところに琥珀色の光がにじみます。',
-  tomitsu_kintoki:'蜜色の光とほんのりとした湯気が立ちます。'
+  tomitsu_kintoki:'蜜色の光とほんのりとした湯気が立ちます。',
+  hakase_tanzaku:'切ったところから越前和紙の短冊が舞い、JUST!のとき金色の光線が広がります。',
+  kaiden_knife:'刃に流れる地紋と波の刃文が入り、JUST!のとき刃が高く長く鳴ります。'
 };
 
 // ---- 1アイテム＝1パレット ----
@@ -2595,7 +2887,8 @@ var SKIN_BOWLS = {
   claw_mark_bowl:           {body:'#120d0b', inner:'#d3bd93', rim:'#c9a64f', deco:'claw', grain:0, gloss:0.7, density:1, gold:'#c9a64f', ink:['#d8b457','#f0d890']},
   phoenix_makie_bowl:       {body:'#8a1a12', inner:'#d3bd93', rim:'#d8b457', deco:'phoenix', grain:1.6, gloss:0.95, density:1.3, gold:'#d8b457', ink:['#e0bd5c','#f5e2a3','#b8964a']},
   fukuiraptor_fossil_bowl:  {body:'#6e4a30', inner:'#cfb98f', rim:'#7a5a3c', deco:'fossil', grain:1.5, gloss:0.15, density:1.2, ink:['#d9c9a3','#a88a5c','#3e2a1a','#8e6a48']},
-  crab_shell_bowl:          {body:'#c8452a', inner:'#d8c69e', rim:'#e07a3a', deco:'crabshell', shape:'crab', grain:1.2, gloss:0.45, density:1.2, tag:'#f2d22e', ink:['#e2703e','#9e2e1a','#f4b07a']}
+  crab_shell_bowl:          {body:'#c8452a', inner:'#d8c69e', rim:'#e07a3a', deco:'crabshell', shape:'crab', grain:1.2, gloss:0.45, density:1.2, tag:'#f2d22e', ink:['#e2703e','#9e2e1a','#f4b07a']},
+  shihan_shu_bowl:          {body:'#a8261a', inner:'#d3bd93', rim:'#d8b457', deco:'lacquer', grain:0, gloss:0.95, density:1, gold:'#f0d27a', ink:['#ffffff'], mark:'師', markColor:'#e0bd5c', markStyle:'paint'}
 };
 // 麺: the dough on the lane and the noodles in the bowl (dry and soaked in tsuyu). The strand widths are never
 // touched: a noodle's thickness still shows how well it was cut. speck* = the grains on a strand, husk = flecks of
@@ -2631,7 +2924,8 @@ var SKIN_TOOLS = {
   tsuchime_blade:{blade:'#98a3a8', hagane:'#edf1f2', edge:'#46525a', handle:'#231811', band:'#c9a24a', shape:'kiri', deco:'tsuchime', hamon:'fine', gloss:1, density:1.3, just:'bladeRing'},
   crab_knife:    {blade:'#c8cfd1', hagane:'#eef2f3', edge:'#5b6a70', handle:'#b3402a', band:'#f2d22e', shape:'kani', deco:'jigane', hamon:'straight', gloss:0.8, just:'bladeChin'},
   dig_hammer_knife:{blade:'#b4bbbd', hagane:'#e8edee', edge:'#5a6468', handle:'#d9c9a3', band:'#8a7a5a', shape:'kiri', deco:'jigane', hamon:'straight', gloss:0.6, handleStyle:'bone', mei:'#5a4a3a', meiShape:'hammer', just:'hammerKan'},
-  ryusen_knife:  {blade:'#a9b3b8', hagane:'#f2f5f6', edge:'#3f4a50', handle:'#1a1210', band:'#d8b457', shape:'kiri', deco:'flow', hamon:'midare', gloss:1, density:1.4, mei:'#b8872f', just:'bladeKiran'}
+  ryusen_knife:  {blade:'#a9b3b8', hagane:'#f2f5f6', edge:'#3f4a50', handle:'#1a1210', band:'#d8b457', shape:'kiri', deco:'flow', hamon:'midare', gloss:1, density:1.4, mei:'#b8872f', just:'bladeKiran'},
+  kaiden_knife:  {blade:'#b9c2c6', hagane:'#f4f7f8', edge:'#3a454b', handle:'#2a1a12', band:'#a8261a', shape:'kiri', deco:'flow', hamon:'wave', gloss:1, density:1.2, mei:'#d8b457', just:'bladeKiran'}
 };
 // 背景: a scene drawn in code (BG_SCENES; used whenever ART has no picture for the item) and the light of its hour
 var SKIN_BGS = {
@@ -2641,7 +2935,8 @@ var SKIN_BGS = {
   eastern_cliff:{scene:'cliff', light:'evening'}, master_tansu:{scene:'tansu', light:'interior', fine:true},
   kehi_matsubara:{scene:'kehi', light:'noon'}, dig_site_night:{scene:'digNight', light:'night'}, echizen_isaribi:{scene:'isaribi', light:'night'},
   mikata_rainbow:{scene:'mikata', light:'noon'}, asuwa_sakura:{scene:'asuwa', light:'noon'}, mikuni_auction:{scene:'auction', light:'morning'},
-  oshima_island:{scene:'oshima', light:'mist'}, heisenji_moss:{scene:'heisenji', light:'mist'}, dino_forest:{scene:'dinoForest', light:'evening'}
+  oshima_island:{scene:'oshima', light:'mist'}, heisenji_moss:{scene:'heisenji', light:'mist'}, dino_forest:{scene:'dinoForest', light:'evening'},
+  tsukiyo_soba_field:{scene:'field', light:'night', moon:true}
 };
 // 演出: the colours of the ring and the bits when a cut lands (ring / JUST! ring / bits), and of the sparkles and
 // bits when a customer is pleased after a bowl is served. shape = the bits (BIT_SHAPES; a list mixes them),
@@ -2670,7 +2965,8 @@ var SKIN_EFFECTS = {
   guji_scales:           {ring:'#e07a3a', just:'#ffd27a', bits:['#f2c25a','#e8a040','#fff0b8'], shape:'scale', spark:'glint', ringStyle:'dots', grav:0.9, spin:2.2},
   dino_roar_fx:          {ring:'#8a5a2b', just:'#f0c060', bits:['#c9b48a','#a88a5c','#6e5638'], shape:['footprint','bone','chip'], spark:'star', ringStyle:'double', grav:1.2, spin:0.6, shake:5, overlay:'quake'},
   yellow_tag_aura:       {ring:'#d9a816', just:'#fff1a8', bits:['#f2d22e','#ffe680','#e0a81a'], shape:'tag', spark:'glint', ringStyle:'double', grav:0.8, spin:0.9, overlay:'tag', rays:true},
-  fossil_aura:           {ring:'#a88a5c', just:'#efe2c0', bits:['#e8dcc0','#c9b48a','#8a7a5a','#6e5a40'], shape:['bone','chip'], spark:'glint', ringStyle:'soft', grav:-0.35, spin:0.8, glow:'#e8d8b0'}
+  fossil_aura:           {ring:'#a88a5c', just:'#efe2c0', bits:['#e8dcc0','#c9b48a','#8a7a5a','#6e5a40'], shape:['bone','chip'], spark:'glint', ringStyle:'soft', grav:-0.35, spin:0.8, glow:'#e8d8b0'},
+  hakase_tanzaku:        {ring:'#3f5f8a', just:'#f0d27a', bits:['#f7f1e3','#e8c46a','#c8d8ec','#e6a8a0'], shape:'washi', spark:'glint', ringStyle:'brush', grav:0.45, spin:0.9, rays:true}
 };
 // 音: which game moments get which sound (cut = every successful cut, just = the 合いの手 just after a JUST!'s cut,
 // round = each bowl begins, finish = the bowl is done and goes out, serve = the customer eats, miss = a MISS).
@@ -2915,7 +3211,54 @@ function withEffectsDefaults(st){
   }
   return out;
 }
-function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}}; }
+function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}}; }
+// settings.onboarding (the first-run rules guide) and settings.lastShareDate (the day the 共有ボーナス was last paid).
+// A save without them gets them; a player who has already played is not shown the guide again (it is in 記録と設定).
+function isDateStr(v){ return typeof v==='string' && /^\d{4}-\d{2}-\d{2}$/.test(v); }
+function withDailyDefaults(st, played){
+  var out = isPlainObj(st) ? st : {};
+  var ob = isPlainObj(out.onboarding) ? out.onboarding : null;
+  out.onboarding = ob ? {done:ob.done===true, version:clampInt(ob.version, 1, 1000) || ONBOARDING_VERSION} : {done:!!played, version:ONBOARDING_VERSION};
+  out.lastShareDate = isDateStr(out.lastShareDate) ? out.lastShareDate : '';
+  // settings.sound.bgmOn / bgmVolume: the music, on its own switch and volume (soundOn, when there, is left as it is)
+  var snd = isPlainObj(out.sound) ? out.sound : {};
+  if(typeof snd.bgmOn!=='boolean') snd.bgmOn = true;
+  if(!(typeof snd.bgmVolume==='number' && snd.bgmVolume>=0 && snd.bgmVolume<=1)) snd.bgmVolume = DEFAULT_BGM_VOLUME;
+  out.sound = snd;
+  return out;
+}
+// quiz: today's 3 questions (answered = [{id, choice, ok}] in the order asked), all the right answers ever and the
+// days with all 3 right. badges: the red dots on the home buttons. rewards: what the reward-only items and titles gave.
+function sanitizeQuiz(raw){
+  var q = isPlainObj(raw) ? raw : {}, out = {lastDate:isDateStr(q.lastDate) ? q.lastDate : '', answered:[], correctCount:0,
+    totalCorrect:clampInt(q.totalCorrect, 0, STAT_MAX), perfectDays:clampInt(q.perfectDays, 0, STAT_MAX)};
+  if(out.lastDate && Array.isArray(q.answered)){
+    for(var i=0;i<q.answered.length && out.answered.length<QUIZ_PER_DAY;i++){
+      var a = q.answered[i];
+      if(isPlainObj(a) && typeof a.id==='string' && a.id.length<=32) out.answered.push({id:a.id, choice:clampInt(a.choice, 0, 3), ok:a.ok===true});
+    }
+  }
+  for(var j=0;j<out.answered.length;j++) if(out.answered[j].ok) out.correctCount++;
+  return out;
+}
+function sanitizeIdList(raw, max){
+  var out = [];
+  if(Array.isArray(raw)){
+    for(var i=0;i<raw.length && out.length<max;i++){
+      var id = raw[i];
+      if(typeof id==='string' && id.length>0 && id.length<=64 && out.indexOf(id)<0) out.push(id);
+    }
+  }
+  return out;
+}
+function sanitizeBadges(raw){
+  var b = isPlainObj(raw) ? raw : {};
+  return {quiz:b.quiz!==false, zukan:b.zukan===true, kisekae:b.kisekae===true};
+}
+function sanitizeRewards(raw){
+  var r = isPlainObj(raw) ? raw : {};
+  return {unlockedItems:sanitizeIdList(r.unlockedItems, 200), unlockedTitles:sanitizeIdList(r.unlockedTitles, 200)};
+}
 
 function readRawLS(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
 function writeRawLS(key,value){ try{ localStorage.setItem(key,value); return true; }catch(e){ return false; } }
@@ -2976,7 +3319,8 @@ function defaultStore(){
   var g = defaultGacha();
   g.titles = ['t_nyumon'];                        // everyone starts as そば入門, wearing it
   g.equippedTitle = g.equipped.title = 't_nyumon';
-  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, daily:null, stats:sanitizeStats(null), lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:g, settings:defaultSettings(), profile:sanitizeProfile(null), recordsClearedAt:0 };
+  return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, daily:null, stats:sanitizeStats(null), lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:g, settings:defaultSettings(), profile:sanitizeProfile(null), recordsClearedAt:0,
+           quiz:sanitizeQuiz(null), badges:sanitizeBadges(null), rewards:sanitizeRewards(null) };
 }
 
 function sanitizeFlatBests(raw){
@@ -3076,8 +3420,12 @@ function coerceStore(obj){
     lastPlayedSeasonal:sanitizeLastSeasonal(obj.lastPlayedSeasonal),
     gacha:sanitizeGacha(obj.gacha)
   };
-  out.settings = withEffectsDefaults(withVisualDefaults(sanitizeSettings(obj.settings)));   // visual / effects get their defaults when missing
+  var played = out.stats.plays>0 || sumBests(out.bests)>0;   // someone who has played already knows the rules
+  out.settings = withDailyDefaults(withEffectsDefaults(withVisualDefaults(sanitizeSettings(obj.settings))), played);   // visual / effects / onboarding get their defaults when missing
   out.profile = sanitizeProfile(obj.profile);
+  out.quiz = sanitizeQuiz(obj.quiz);
+  out.badges = sanitizeBadges(obj.badges);
+  out.rewards = sanitizeRewards(obj.rewards);
   out.recordsClearedAt = clampInt(obj.recordsClearedAt, 0, 1e15);   // when 「記録を消す」 was last used while logged in (0: never)
   if(!(typeof obj.schema==='number' && obj.schema>=11)) migrateToTitles(out, obj);   // 段位 → 称号 (schema 10 and before)
   evaluateTitles(out);
@@ -3182,6 +3530,9 @@ function clearAllBests(){
   fresh.gacha = keep.gacha;                          // coins, そば札, the 図鑑 and earned 称号 are not play records: they stay
   if(keep.settings) fresh.settings = keep.settings;
   fresh.profile = keep.profile;
+  fresh.quiz = keep.quiz;                            // the quiz, the red dots and what the rewards gave are not play records either
+  fresh.badges = keep.badges;
+  fresh.rewards = keep.rewards;
   // logged in: the clear is stamped so the next sync clears the cloud's records too, instead of merging them back
   fresh.recordsClearedAt = SyncManager.isLoggedIn() ? Date.now() : keep.recordsClearedAt;
   ensureDailyFresh(fresh);
@@ -4460,6 +4811,7 @@ function onSaveImageClick(){
 }
 
 btnSaveImage.addEventListener('click', function(){
+  finishResultCount();                         // the picture is made from the final numbers
   try{ onSaveImageClick(); }
   catch(e){ setCardBusy(false); setShareMsg('画像を保存できませんでした。ゲームはこのまま続けられます。', true); }
 });
@@ -4475,6 +4827,8 @@ function showScreen(name){
   if(name!=='game') stopDemoTaps();   // leaving the game: the master's booked taps stop with it
   for(var k in screens){ screens[k].classList.remove('active'); }
   screens[name].classList.add('active');
+  syncHomeBg(name==='title');
+  bgmOnScreen(name);                           // the music of the scene, crossfaded
   try{ window.scrollTo(0,0); }catch(e){}
   if(name==='result'){ try{ onResultShown(); }catch(e){} }
 }
@@ -4553,6 +4907,7 @@ function saveSoundPref(on){
     store.settings = st;
     saveStoreObj(store);
   }catch(e){}
+  bgmSync();                                   // 🔇 stops the music at once; 🔊 lets it play again
 }
 var audioEnabled = loadSoundPref();
 btnSoundToggle.textContent = audioEnabled ? '🔊' : '🔇';
@@ -4993,6 +5348,8 @@ function endGame(){
   showCoinsForGame(dailyJustCleared);
   showEquipOnResult();
   showScreen('result');
+  var rewards = claimRewards();               // 限定 items whose record this game reached (looks only)
+  startResultCount(isNewBest, function(){ showRewards(rewards, btnRestart); });   // the numbers roll in, then the news
 }
 
 // ---------- Limited-time modes: rules, records and looks ----------
@@ -5049,6 +5406,7 @@ function endSeasonalGame(){
   showCoinsForGame(false);   // limited modes earn coins too (no daily challenge there)
   showEquipOnResult();
   showScreen('result');
+  startResultCount(isNewBest, null);
 }
 function showAromaLost(){
   aromaPopupEl.textContent = '香りが飛んだ…';
@@ -5291,7 +5649,7 @@ function gachaPool(rarity, today){
   var pool = [];
   for(var i=0;i<GACHA_CATALOG.length;i++){
     var it = GACHA_CATALOG[i];
-    if(it.rarity===rarity && gachaItemAvailable(it, today)) pool.push(it);
+    if(it.rarity===rarity && it.source!=='reward' && gachaItemAvailable(it, today)) pool.push(it);   // 限定 items are never drawn
   }
   return pool;
 }
@@ -5361,6 +5719,7 @@ function runGachaTransaction(kind){
   }
   var gotTickets = Math.max(0, Math.min(dupTickets, TICKET_MAX - g.tickets));
   g.tickets += gotTickets;
+  if(newCount>0) markNewItems(store);   // red dots on 図鑑 and 着せ替え until they are opened
   g.stats.totalPulls = Math.min(100000000, g.stats.totalPulls + spec.count);
   var newTitle = gachaGrantCompletion(g);
   g.history.push({date:todayStr(), kind:kind, cost:spec.cost, items:ids, dupTickets:gotTickets});
@@ -5387,14 +5746,22 @@ function checkGachaTables(){
     }
     if(sum!==GACHA_RATE_TOTAL) return false;
     if(GACHA_CATALOG.length!==GACHA_TOTAL_ITEMS) return false;
+    var rewards = 0;
     for(i=0;i<GACHA_CATALOG.length;i++){
       var it = GACHA_CATALOG[i];
-      if(!it || typeof it.id!=='string' || seen[it.id] || !Object.prototype.hasOwnProperty.call(counts, it.rarity)) return false;
+      if(!it || typeof it.id!=='string' || seen[it.id]) return false;
       if(typeof it.name!=='string' || typeof it.category!=='string' || typeof it.desc!=='string') return false;
       if(GACHA_SLOTS.indexOf(it.applyTo)<0 || !Object.prototype.hasOwnProperty.call(SKIN_TABLES[it.applyTo], it.id)) return false;
       seen[it.id] = true;
+      if(it.source==='reward'){                       // 限定: its own rarity and a record to reach, outside the draw
+        if(it.rarity!=='gen' || !isPlainObj(it.cond) || REWARD_COND_TYPES.indexOf(it.cond.type)<0 || !(it.cond.value>0)) return false;
+        rewards++;
+        continue;
+      }
+      if(!Object.prototype.hasOwnProperty.call(counts, it.rarity)) return false;
       counts[it.rarity]++;
     }
+    if(rewards!==GACHA_RARITIES.gen.count) return false;
     for(i=0;i<GACHA_RARITY_ORDER.length;i++){
       var rk = GACHA_RARITY_ORDER[i];
       if(counts[rk]!==GACHA_RARITIES[rk].count) return false;
@@ -5507,6 +5874,8 @@ function renderCollectRow(){
   coinsEl.textContent = fmtPoints(g.currency);
   if(ticketsEl) ticketsEl.textContent = fmtPoints(g.tickets);
   zukanEl.textContent = gachaOwnedCount(g) + '/' + GACHA_CATALOG.length;
+  renderHomeBadges();
+  renderHomeBg();
   if(titleEl){
     var has = g.titles.indexOf(GACHA_COMPLETE_TITLE)>=0, worn = equippedTitleName(g);
     titleEl.hidden = !(has || worn);
@@ -5623,8 +5992,9 @@ function renderGachaRules(){
   }
 }
 var GACHA_REASON_LABELS = {ten:'10連の確定枠'};
+var GRES_STEP = 0.07, GRES_DUP_DELAY = 0.62;   // seconds: the cards come in one by one, then duplicates turn into そば札
 function renderGachaResults(res){
-  var spoken = [], dupN = 0;
+  var spoken = [], dupN = 0, fudaTimes = [];
   gachaResultList.textContent = '';
   gachaResultList.classList.toggle('is-single', res.results.length===1);
   for(var i=0;i<res.results.length;i++){
@@ -5643,6 +6013,17 @@ function renderGachaResults(res){
     sub.className = 'gres-sub ' + (r.dup ? 'is-dup' : 'is-new');
     sub.textContent = r.dup ? ('被り → そば札+' + fmtPoints(r.tickets)) : 'NEW';
     li.appendChild(sub);
+    if(r.dup){                                          // 被り: the picture turns into a そば札 with a pop
+      li.classList.add('is-dup');
+      var fuda = document.createElement('span');
+      fuda.className = 'gres-fuda';
+      fuda.setAttribute('aria-hidden', 'true');
+      var fb = document.createElement('b'); fb.textContent = '札';
+      fuda.appendChild(fb);
+      appendText(fuda, '+' + fmtPoints(r.tickets));
+      li.appendChild(fuda);
+      fudaTimes.push(GRES_DUP_DELAY + i*GRES_STEP);
+    }
     if(r.reason && Object.prototype.hasOwnProperty.call(GACHA_REASON_LABELS, r.reason)){
       var why = document.createElement('span');
       why.className = 'gres-why';
@@ -5661,6 +6042,7 @@ function renderGachaResults(res){
   gachaResultTitle.textContent = res.newTitle ? ('図鑑コンプリート！　称号「' + GACHA_TITLES[res.newTitle].name + '」を手に入れました。') : '';
   gachaResultsEl.hidden = false;
   gachaLive.textContent = '結果：' + spoken.join('、') + '。' + gachaResultTitle.textContent;
+  if(!fxConf().still) playFudaPops(fudaTimes);
 }
 function gachaFailText(res){
   if(res.reason==='short') return 'コインが足りません（あと' + fmtPoints(res.need) + '🪙）。';
@@ -5715,14 +6097,58 @@ function gachaTone(ac, f, at, dur, type, vol, f2){
   osc.start(t0);
   osc.stop(t0 + dur + 0.03);
 }
-function playGachaShake(ms){
+function playGachaShake(ms, delay){
   if(!audioEnabled) return;
   var ac = getAudioCtx();
   if(!ac) return;
   try{
     if(ac.state==='suspended'){ ac.resume(); }
-    var n = Math.max(3, Math.round(ms/150));
-    for(var i=0;i<n;i++) gachaTone(ac, i%2 ? 290 : 340, i*0.15, 0.07, 'triangle', 0.05 + 0.05*(i/n), i%2 ? 230 : 270);
+    var n = Math.max(3, Math.round(ms/150)), d = delay>0 ? delay : 0;
+    for(var i=0;i<n;i++) gachaTone(ac, i%2 ? 290 : 340, d + i*0.15, 0.07, 'triangle', 0.05 + 0.05*(i/n), i%2 ? 230 : 270);
+  }catch(e){}
+}
+// ドスン!: the capsule lands — a low thump, a dull knock of wood and a puff of dust
+function playGachaLand(){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended'){ ac.resume(); }
+    gachaTone(ac, 120, 0, 0.32, 'sine', 0.22, 42);
+    gachaTone(ac, 240, 0, 0.08, 'triangle', 0.07, 150);
+    sfxNoiseVoice(ac, {filter:'lowpass', f:900, f2:180, dur:0.18, vol:0.12, atk:0.002}, 0);
+  }catch(e){}
+}
+// a brass-like chord for the big fanfares (sawtooth through a soft filter)
+function gachaBrass(ac, freqs, at, dur, vol){
+  var t0 = ac.currentTime + at;
+  for(var i=0;i<freqs.length;i++){
+    var osc = ac.createOscillator(), filt = ac.createBiquadFilter(), g = ac.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freqs[i], t0);
+    filt.type = 'lowpass';
+    filt.frequency.setValueAtTime(900, t0);
+    filt.frequency.exponentialRampToValueAtTime(2600, t0 + 0.08);
+    filt.frequency.exponentialRampToValueAtTime(1200, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.03);
+    g.gain.setValueAtTime(vol, t0 + dur*0.6);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(filt); filt.connect(g); g.connect(sfxOut(ac));
+    osc.start(t0); osc.stop(t0 + dur + 0.03);
+  }
+}
+// そば札に変わる「ポンッ」: one pop for each duplicate, at the moment its card turns into そば札
+function playFudaPops(times){
+  if(!audioEnabled || !times.length) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended'){ ac.resume(); }
+    for(var i=0;i<times.length && i<10;i++){
+      gachaTone(ac, 520 + i*40, times[i], 0.09, 'sine', 0.09, 1250 + i*60);
+      sfxNoiseVoice(ac, {filter:'bandpass', f:2600, f2:1500, q:1.6, dur:0.05, vol:0.05, atk:0.001}, times[i]);
+    }
   }catch(e){}
 }
 var GACHA_CHIMES = {nami:[784], jo:[659,988], tokujo:[659,880,1319], kiwami:[523,659,784,1047,1568]};
@@ -5740,8 +6166,21 @@ function playGachaReveal(rarity){
     for(var i=0;i<notes.length;i++){
       gachaTone(ac, notes[i], 0.1 + i*0.09, i===notes.length-1 ? 0.7 : 0.3, 'triangle', 0.08);
     }
-    if(rarity==='kiwami'){
-      for(var k=0;k<6;k++) gachaTone(ac, k%2 ? 2637 : 2093, 0.57 + k*0.07, 0.25, 'sine', 0.03);
+    if(rarity==='jo'){                                  // 上: a bouncy pop on top
+      gachaTone(ac, 880, 0.3, 0.12, 'square', 0.035, 1320);
+      gachaTone(ac, 1320, 0.42, 0.18, 'triangle', 0.05);
+    } else if(rarity==='tokujo'){                       // 特上: a rich jingle — a low hit, a run up and a shimmer
+      gachaTone(ac, 98, 0.08, 0.5, 'sine', 0.14, 55);
+      var run = [880, 1047, 1319, 1568, 1760];
+      for(var r=0;r<run.length;r++) gachaTone(ac, run[r], 0.42 + r*0.06, 0.32, 'triangle', 0.045);
+      for(var sh=0;sh<5;sh++) gachaTone(ac, sh%2 ? 2637 : 3136, 0.75 + sh*0.06, 0.3, 'sine', 0.02);
+    } else if(rarity==='kiwami'){                       // 極み: taiko, a brass fanfare and a cascade of bells
+      gachaTone(ac, 110, 0.05, 0.6, 'sine', 0.2, 48);
+      gachaTone(ac, 110, 0.32, 0.6, 'sine', 0.18, 48);
+      gachaBrass(ac, [293.7, 440, 587.3], 0.55, 0.42, 0.035);
+      gachaBrass(ac, [392, 587.3, 784], 0.98, 0.42, 0.035);
+      gachaBrass(ac, [440, 659.3, 880, 1174.7], 1.4, 1.1, 0.032);
+      for(var k=0;k<8;k++) gachaTone(ac, k%2 ? 2637 : 2093, 1.45 + k*0.07, 0.4, 'sine', 0.025);
     }
   }catch(e){}
 }
@@ -5760,12 +6199,24 @@ function syncSoundButtons(){
 // lid, the seam wrapped in washi and sealed 「封」 — wobbles, the lid pops off and the contents burst out. The burst
 // throws the same particles as a pleased customer after a bowl is served (fxStep / drawFxParts: twinkling sparkles
 // and flipping confetti), with the expanding rings of a cut — more, faster and brighter for a higher rarity.
+// aura = the light of the rarity (並 白青・上 緑金・特上 金紫・極み 虹), rainbow = the aura's hue keeps turning,
+// sakura = gold cherry petals fall over the stage, hold = how long the burst plays (ms)
 var OPEN_FX = {
-  nami:  {shake:600,  count:14, rings:1, speed:0.9,  size:1.0,  flash:0,    rays:0,  glow:0.22, hint:false, extra:['soba','greenLight']},
-  jo:    {shake:800,  count:26, rings:2, speed:1.05, size:1.1,  flash:0.12, rays:0,  glow:0.35, hint:false, extra:['greenLight','soba','gold']},
-  tokujo:{shake:1050, count:44, rings:3, speed:1.2,  size:1.2,  flash:0.35, rays:8,  glow:0.55, hint:true,  extra:['gold','gold','soba','white']},
-  kiwami:{shake:1350, count:72, rings:4, speed:1.35, size:1.35, flash:0.6,  rays:14, glow:0.8,  hint:true,  extra:['gold','white','gold','greenLight']}
+  nami:  {shake:600,  count:14, rings:1, speed:0.9,  size:1.0,  flash:0,    rays:0,  glow:0.3,  hint:false, aura:['#cfe3ff','#8fb8e8'], extra:['white','soba'], hold:1700},
+  jo:    {shake:800,  count:26, rings:2, speed:1.05, size:1.1,  flash:0.12, rays:0,  glow:0.42, hint:false, aura:['#8fd46a','#e8c25a'], extra:['gold','greenLight','white'], hold:1700},
+  tokujo:{shake:1050, count:44, rings:3, speed:1.2,  size:1.2,  flash:0.35, rays:8,  glow:0.6,  hint:true,  aura:['#f2c14e','#a873e0'], extra:['gold','white','gold'], hold:1900},
+  kiwami:{shake:1350, count:72, rings:4, speed:1.35, size:1.35, flash:0.6,  rays:14, glow:0.85, hint:true,  aura:['#f5d77a','#f39ac0'], extra:['gold','white','gold'], hold:2500, rainbow:true, sakura:true}
 };
+var OPEN_DROP_MS = 380, OPEN_LAND_MS = 160;   // the capsule falls in (ドスン!) and settles before it starts to wobble
+// a colour from a hue (the 極み aura's rainbow)
+function hueHex(h){
+  h = ((h % 360) + 360) % 360;
+  var c = 0.78, x = c*(1 - Math.abs((h/60) % 2 - 1)), m = 0.2, r = 0, g = 0, b = 0;
+  if(h<60){ r = c; g = x; } else if(h<120){ r = x; g = c; } else if(h<180){ g = c; b = x; }
+  else if(h<240){ g = x; b = c; } else if(h<300){ r = x; b = c; } else { r = c; b = x; }
+  function hx(v){ var n = Math.round((v + m)*255).toString(16); return n.length<2 ? '0' + n : n; }
+  return '#' + hx(r) + hx(g) + hx(b);
+}
 var gStage = {ctx:null, w:0, h:0, raf:0, timer:0, anim:null, last:null};
 function stageInit(){
   try{ gStage.ctx = gachaStage.getContext('2d'); }catch(e){ gStage.ctx = null; }
@@ -5786,11 +6237,6 @@ function rgbaOf(color, a){
   var h = m ? m[1] : 'c29a3c';
   if(h.length===3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
   return 'rgba(' + parseInt(h.slice(0,2),16) + ',' + parseInt(h.slice(2,4),16) + ',' + parseInt(h.slice(4,6),16) + ',' + Math.max(0, Math.min(1, a)).toFixed(3) + ')';
-}
-function rarityColor(rarity){
-  var v = '';
-  try{ v = getComputedStyle(document.documentElement).getPropertyValue('--r-' + rarity).trim(); }catch(e){ v = ''; }
-  return v || '#c29a3c';
 }
 function fxColor(name){ return name==='white' ? '#ffffff' : (CARD_COL[name] || '#c29a3c'); }
 // the capsule: a ball of radius r; its seam is seen a little from above, as an ellipse (r × ry)
@@ -5967,12 +6413,13 @@ function drawStageScene(o){
     ctx.fillStyle = g;
     ctx.fillRect(0,0,W,H);
   }
-  ctx.fillStyle = 'rgba(40,28,10,0.14)';
+  var dy = o.dy || 0, near = Math.max(0, 1 + dy/Math.max(1, H));   // dy < 0: still falling (the shadow grows as it nears)
+  ctx.fillStyle = 'rgba(40,28,10,' + (0.14*near).toFixed(3) + ')';
   ctx.beginPath();
-  ctx.ellipse(k.cx, k.cy + k.r + 4*k.s, k.r*0.9, 6*k.s, 0, 0, Math.PI*2);
+  ctx.ellipse(k.cx, k.cy + k.r + 4*k.s, k.r*0.9*(0.5 + 0.5*near), 6*k.s*(0.5 + 0.5*near), 0, 0, Math.PI*2);
   ctx.fill();
   ctx.save();
-  ctx.translate(k.cx + (o.sx||0), k.cy + k.r);   // it rocks on its foot
+  ctx.translate(k.cx + (o.sx||0), k.cy + k.r + dy);   // it rocks on its foot
   ctx.rotate(o.rot||0);
   ctx.translate(-k.cx, -(k.cy + k.r));
   drawCapsuleLower(ctx, k, o.opened, o.color, o.opened ? o.glow : 0);
@@ -5995,8 +6442,38 @@ function spawnBurst(a){
   for(i=0;i<nSpark;i++){
     var an = Math.random()*Math.PI*2, rr = k.r*(0.55 + Math.random()*1.05);
     a.parts.push({kind:'spark', x:k.cx + Math.cos(an)*rr*1.25, y:k.cy - k.r*0.25 + Math.sin(an)*rr*0.75, vx:0, vy:-(8 + Math.random()*18),
-                  g:0, rot:0, vr:0, size:(3 + Math.random()*3)*fx.size, col:i % 2 ? CARD_COL.gold : a.color,
+                  g:0, rot:0, vr:0, size:(3 + Math.random()*3)*fx.size, col:i % 2 ? CARD_COL.gold : a.colors[i % a.colors.length],
                   age:-i*30, life:650 + Math.random()*420});
+  }
+  a.petals = [];                                        // 極み: gold cherry petals drifting down over everything
+  if(fx.sakura && a.petalN>0){
+    for(i=0;i<a.petalN;i++){
+      a.petals.push({x:Math.random()*gStage.w, y:-10 - Math.random()*gStage.h*0.9, vy:38 + Math.random()*46, sway:Math.random()*6.283,
+                     sw:0.6 + Math.random()*0.8, rot:Math.random()*6.283, vr:(Math.random() - 0.5)*3, size:(3.2 + Math.random()*2.6)*a.s,
+                     col:i % 3 ? '#f2c94c' : '#f7b2c8'});
+    }
+  }
+}
+function drawPetals(ctx, a, dt){
+  if(!a.petals || !a.petals.length) return;
+  var H = gStage.h;
+  for(var i=0;i<a.petals.length;i++){
+    var p = a.petals[i];
+    p.y += p.vy*dt/1000; p.sway += dt*0.003*p.sw; p.rot += p.vr*dt/1000;
+    if(p.y>H + 10) continue;
+    ctx.save();
+    ctx.translate(p.x + Math.sin(p.sway)*10, p.y);
+    ctx.rotate(p.rot);
+    ctx.scale(p.size, p.size*1.25);
+    ctx.beginPath();
+    ctx.moveTo(0, -1);
+    ctx.quadraticCurveTo(1.1, -0.25, 0.18, 0.95);
+    ctx.lineTo(0, 0.7);
+    ctx.lineTo(-0.18, 0.95);
+    ctx.quadraticCurveTo(-1.1, -0.25, 0, -1);
+    ctx.fillStyle = p.col;
+    ctx.fill();
+    ctx.restore();
   }
 }
 function drawBurst(a, since, dt){
@@ -6035,6 +6512,7 @@ function drawBurst(a, since, dt){
   ctx.globalAlpha = 1;
   a.parts = fxStep(a.parts, dt);                        // sparkles and confetti (the serving reaction's particles)
   drawFxParts(ctx, a.parts, false);
+  drawPetals(ctx, a, dt);
   if(fx.flash){
     var fa = fx.flash*(1 - since/280);
     if(fa>0){ ctx.fillStyle = 'rgba(255,255,255,' + fa.toFixed(3) + ')'; ctx.fillRect(0,0,W,H); }
@@ -6046,8 +6524,22 @@ function stageFrame(ts){
   var a = gStage.anim;
   if(!a) return;
   if(a.t0===null){ a.t0 = ts; a.last = ts; }
-  var t = ts - a.t0, dt = Math.min(50, Math.max(0, ts - a.last)), fx = a.fx;
+  var t0all = ts - a.t0, dt = Math.min(50, Math.max(0, ts - a.last)), fx = a.fx;
   a.last = ts;
+  if(fx.rainbow) a.color = hueHex(200 + t0all*0.22);     // 極み: the aura shimmers through every colour
+  var lead = OPEN_DROP_MS + OPEN_LAND_MS;
+  if(t0all<lead){                                       // ① it drops in from above and lands with a thud
+    var dy = 0;
+    if(t0all<OPEN_DROP_MS){ var q = t0all/OPEN_DROP_MS; dy = -gStage.h*0.95*(1 - q*q); }
+    else {
+      if(!a.landed){ a.landed = true; playGachaLand(); stagePulse('is-thud'); }
+      dy = -9*a.s*Math.sin(Math.PI*(t0all - OPEN_DROP_MS)/OPEN_LAND_MS);
+    }
+    drawStageScene({sx:0, rot:0, glow:0, color:a.color, opened:false, lift:0, dy:dy});
+    gStage.raf = requestAnimationFrame(stageFrame);
+    return;
+  }
+  var t = t0all - lead;
   if(!a.popped && t>=fx.shake) popOpening(a);
   if(!a.popped){
     var p = t/fx.shake;
@@ -6059,7 +6551,7 @@ function stageFrame(ts){
     drawStageScene({sx:0, rot:0, glow:fx.glow*(0.55 + 0.45*Math.max(0, 1 - since/900)), color:a.color, opened:true, lift:Math.min(1, since/420)});
     drawBurst(a, since, dt);
     if(!a.revealed && since>=240) revealOpening(a);
-    if(since>1700){ endOpening(); return; }
+    if(since>(fx.hold || 1700)){ endOpening(); return; }
   }
   gStage.raf = requestAnimationFrame(stageFrame);
 }
@@ -6067,6 +6559,14 @@ function popOpening(a){
   a.popped = true;
   spawnBurst(a);
   playGachaReveal(a.rarity);
+  if(a.rarity==='kiwami' || a.rarity==='tokujo') stagePulse('is-boom');
+}
+// the stage gives a small jolt (the landing, a big pop) — not when motion is to be kept calm
+function stagePulse(cls){
+  if(motionCalm()) return;
+  gachaStageWrap.classList.remove('is-thud', 'is-boom');
+  void gachaStageWrap.offsetWidth;
+  gachaStageWrap.classList.add(cls);
 }
 function revealOpening(a){
   if(a.revealed) return;
@@ -6076,7 +6576,7 @@ function revealOpening(a){
 }
 function drawStageIdle(){
   var r = gStage.last, fx = r ? OPEN_FX[r] : null;
-  drawStageScene({sx:0, rot:0, glow:fx ? fx.glow*0.5 : 0, color:r ? rarityColor(r) : '#c29a3c', opened:!!r, lift:1});
+  drawStageScene({sx:0, rot:0, glow:fx ? fx.glow*0.5 : 0, color:fx ? fx.aura[0] : '#c29a3c', opened:!!r, lift:1});
 }
 function endOpening(){
   var a = gStage.anim;
@@ -6090,9 +6590,12 @@ function endOpening(){
 function startOpening(rarity, onReveal){
   if(gStage.anim) endOpening();
   var fx = Object.prototype.hasOwnProperty.call(OPEN_FX, rarity) ? OPEN_FX[rarity] : OPEN_FX.nami;
-  var a = {rarity:rarity, fx:fx, t0:null, last:0, popped:false, revealed:false, onReveal:onReveal, parts:[], color:rarityColor(rarity), s:capsuleGeom().s};
-  a.colors = [a.color];
+  var a = {rarity:rarity, fx:fx, t0:null, last:0, popped:false, revealed:false, landed:false, onReveal:onReveal, parts:[], color:fx.aura[0], s:capsuleGeom().s};
+  a.colors = fx.aura.slice();
   for(var i=0;i<fx.extra.length;i++) a.colors.push(fxColor(fx.extra[i]));
+  var calmFx = visualDetail==='low' || effectsPref.level==='low';   // 軽量・控えめ: fewer bits, no petals
+  if(calmFx || !effectsPref.particlesOn){ a.fx = fx = Object.assign({}, fx, {count:Math.round(fx.count*(effectsPref.particlesOn ? 0.5 : 0.2))}); }
+  a.petalN = (fx.sakura && effectsPref.particlesOn && !calmFx) ? 34 : 0;
   if(!gStage.ctx || gStage.w<=0 || prefersReducedMotion()){
     // reduced motion (or no canvas): no wobbling or particles — straight to the opened capsule and the results
     gStage.last = rarity;
@@ -6104,8 +6607,9 @@ function startOpening(rarity, onReveal){
   gStage.anim = a;
   gachaSkipBtn.hidden = false;
   gachaStageWrap.classList.add('is-playing');
-  playGachaShake(fx.shake);
-  gStage.timer = setTimeout(function(){ revealOpening(a); }, fx.shake + 1200);   // safety net if frames stop coming
+  playGachaShake(fx.shake, (OPEN_DROP_MS + OPEN_LAND_MS)/1000);
+  bgmDuck(0.35, (OPEN_DROP_MS + OPEN_LAND_MS + fx.shake)/1000 + 1.6);   // the music steps back while the capsule opens
+  gStage.timer = setTimeout(function(){ revealOpening(a); }, OPEN_DROP_MS + OPEN_LAND_MS + fx.shake + 1200);   // safety net if frames stop coming
   gStage.raf = requestAnimationFrame(stageFrame);
 }
 function skipOpening(){
@@ -6128,8 +6632,9 @@ function renderZukan(){
   zukanProgress.setAttribute('aria-valuenow', String(got));
   zukanProgress.setAttribute('aria-valuemax', String(total));
   zukanRarCounts.textContent = '';
-  for(i=0;i<GACHA_RARITY_ORDER.length;i++){
-    var rk = GACHA_RARITY_ORDER[i];
+  var groups = GACHA_RARITY_ORDER.concat(['gen']);   // the 4 gacha rarities, then the 限定 items (earned by records)
+  for(i=0;i<groups.length;i++){
+    var rk = groups[i];
     var span = document.createElement('span');
     span.appendChild(gachaRarityChip(rk));
     appendText(span, gachaOwnedCount(g, rk) + '/' + GACHA_RARITIES[rk].count);
@@ -6147,8 +6652,8 @@ function renderZukan(){
   zukanTitleEquip.setAttribute('aria-label', '称号「' + titleName + '」を' + (titleOn ? '外す' : '装備する'));
   renderEquipPanel(eq);
   zukanGroups.textContent = '';
-  for(i=0;i<GACHA_RARITY_ORDER.length;i++){
-    var rar = GACHA_RARITY_ORDER[i];
+  for(i=0;i<groups.length;i++){
+    var rar = groups[i];
     var sec = document.createElement('section');
     sec.className = 'zgroup';
     sec.setAttribute('aria-labelledby', 'zg-' + rar);
@@ -6162,27 +6667,35 @@ function renderZukan(){
     cnt.textContent = gachaOwnedCount(g, rar) + ' / ' + GACHA_RARITIES[rar].count;
     h.appendChild(cnt);
     sec.appendChild(h);
+    if(rar==='gen'){
+      var gn = document.createElement('p');
+      gn.className = 'zgroup-note';
+      gn.textContent = 'ガチャや交換所には出ません。修行やクイズの実績で解放されます。';
+      sec.appendChild(gn);
+    }
     var ul = document.createElement('ul');
     ul.className = 'zgrid';
     for(j=0;j<GACHA_CATALOG.length;j++){
       var it = GACHA_CATALOG[j];
       if(it.rarity!==rar) continue;
-      var owned = !!have[it.id], season = gachaSeasonMode(it);
+      var owned = !!have[it.id], season = gachaSeasonMode(it), secret = it.source==='reward' && !owned;
       var on = !!(it.applyTo && eq[it.applyTo]===it.id);
       var li = document.createElement('li');
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'zcard r-' + it.rarity + (owned ? '' : ' is-locked') + (on ? ' is-equipped' : '');
       btn.setAttribute('data-id', it.id);
-      btn.setAttribute('aria-label', it.name + '（' + GACHA_RARITIES[it.rarity].label + '・' + it.category + (season ? '・秋限定' : '') + (owned ? '' : '・未入手') + (on ? '・装備中' : '') + '）');
+      btn.setAttribute('aria-label', secret ? ('？？？（限定・' + rewardCondText(it.cond) + '）')
+        : (it.name + '（' + GACHA_RARITIES[it.rarity].label + '・' + it.category + (season ? '・秋限定' : '') + (owned ? '' : '・未入手') + (on ? '・装備中' : '') + '）'));
       btn.appendChild(makeArt(it, owned));
       var nm = document.createElement('span');
       nm.className = 'zcard-name';
-      fillItemName(nm, it);
+      if(secret) nm.textContent = '？？？';
+      else fillItemName(nm, it);
       btn.appendChild(nm);
       var cat = document.createElement('span');
-      cat.className = 'zcard-cat';
-      cat.textContent = it.category + (season ? '・秋限定' : '') + (owned ? '' : '・未入手');
+      cat.className = 'zcard-cat' + (secret ? ' zcard-hint' : '');
+      cat.textContent = secret ? rewardCondText(it.cond) : (it.category + (season ? '・秋限定' : '') + (owned ? '' : '・未入手'));
       btn.appendChild(cat);
       if(on){
         var tag = document.createElement('span');
@@ -6222,13 +6735,20 @@ function openZukanDetail(id, opener){
   zmCat.textContent = it.category;
   zmSeason.hidden = !season;
   zmState.textContent = owned ? '入手済み' : '未入手';
-  zmName.textContent = it.name;
-  zmDesc.textContent = owned ? it.desc : 'まだ手に入れていません。ガチャで出ると、ここに説明が表示されます。';
+  var reward = it.source==='reward';
+  zmName.textContent = (reward && !owned) ? '？？？' : it.name;
+  zmCat.textContent = (reward && !owned) ? '限定' : it.category;
+  zmDesc.textContent = owned ? it.desc : (reward ? (rewardCondText(it.cond) + 'されます。') : 'まだ手に入れていません。ガチャで出ると、ここに説明が表示されます。');
   zmDesc.classList.toggle('is-locked', !owned);
-  var avail = gachaItemAvailable(it, today);
-  var odds = 'ガチャの' + rr.label + '（' + fmtRate(rr.rate) + '）から出ます。1種あたり' + (avail ? fmtItemRate(rr.rate, gachaPool(it.rarity, today).length) : '0%（いまは期間外）') + '。';
-  if(!owned) odds += '交換所なら、そば札' + fmtPoints(rr.exchange) + '枚で手に入ります' + (avail ? '' : '（期間中だけ）') + '。';
-  if(season) odds += '秋限定：' + seasonSpan(season) + 'だけ出ます。';
+  var odds;
+  if(reward){
+    odds = 'ガチャや交換所には出ない限定のアイテムです。条件：' + rewardCondText(it.cond) + '。';
+  } else {
+    var avail = gachaItemAvailable(it, today);
+    odds = 'ガチャの' + rr.label + '（' + fmtRate(rr.rate) + '）から出ます。1種あたり' + (avail ? fmtItemRate(rr.rate, gachaPool(it.rarity, today).length) : '0%（いまは期間外）') + '。';
+    if(!owned) odds += '交換所なら、そば札' + fmtPoints(rr.exchange) + '枚で手に入ります' + (avail ? '' : '（期間中だけ）') + '。';
+    if(season) odds += '秋限定：' + seasonSpan(season) + 'だけ出ます。';
+  }
   zmOdds.textContent = odds;
   zmCurrentId = id;
   renderZmEquip(g, it, owned);                        // 着せ替え: 装備する / 外す
@@ -6270,6 +6790,7 @@ function openZukan(from, opener){
   if(gStage.anim) endOpening();
   zukanFrom = from==='gacha' ? 'gacha' : 'title';
   zukanOpener = opener || null;
+  clearBadge('zukan');
   renderZukan();
   showScreen('zukan');
   focusEl(zukanTitleEl);
@@ -6598,6 +7119,7 @@ function previewEquipSound(it){
 // the 🔊 setting after a backup was read in (it may carry settings.sound.soundOn)
 function refreshSoundPref(){
   try{ audioEnabled = loadSoundPref(); syncSoundButtons(); }catch(e){}
+  try{ bgmPref = loadBgmPref(); renderBgmControls(); bgmSync(); }catch(e){}
 }
 
 // --- 着せ替えの絵: shared pieces. Grains and patterns are drawn once into an offscreen canvas (a sprite) and kept,
@@ -8283,20 +8805,30 @@ function sceneColumn(g, x, top, w, bottom, lit, shade, cap, seed){
 // things are, and the light of the hour is laid over by paintBgBase.
 var BG_SCENES = {
   field: function(g, W, H, b, q){    // そば畑: far hills, a farmhouse among trees, and a field of white soba flowers
-    sceneSky(g, W, H, [[0,'#a6c6dd'],[0.38,'#e6ecdf'],[1,'#e9eedf']]);
-    sceneCloud(g, W*0.72, H*0.07, W*0.13);
-    sceneCloud(g, W*0.3, H*0.12, W*0.07);
-    sceneRidge(g, W, H, H*0.21, H*0.04, 4.6, 0.8, '#b7c6cc');
-    sceneHaze(g, W, H*0.17, H*0.27, '236,240,232', 0.55);
-    sceneRidge(g, W, H, H*0.27, H*0.03, 7.4, 2.1, '#8faa90');
+    var night = !!b.moon;             // moon: the same field under a full moon (月夜のそば畑)
+    if(night){
+      sceneSky(g, W, H, [[0,'#141c36'],[0.38,'#34425f'],[1,'#3e4c60']]);
+      sceneDots(g, 808, 14 + Math.round(50*q.pattern), 0, 0, W, H*0.32, 0.4, 1.1, ['#fffbe8','#e2e8fa'], 0.85);
+      var mx = W*0.74, my = H*0.1, mr = Math.min(W, H)*0.055, halo = g.createRadialGradient(mx, my, mr*0.6, mx, my, mr*4);
+      halo.addColorStop(0, 'rgba(255,246,214,0.45)'); halo.addColorStop(1, 'rgba(255,246,214,0)');
+      g.fillStyle = halo; g.beginPath(); g.arc(mx, my, mr*4, 0, Math.PI*2); g.fill();
+      g.fillStyle = '#fff6d8'; g.beginPath(); g.arc(mx, my, mr, 0, Math.PI*2); g.fill();
+    } else {
+      sceneSky(g, W, H, [[0,'#a6c6dd'],[0.38,'#e6ecdf'],[1,'#e9eedf']]);
+      sceneCloud(g, W*0.72, H*0.07, W*0.13);
+      sceneCloud(g, W*0.3, H*0.12, W*0.07);
+    }
+    sceneRidge(g, W, H, H*0.21, H*0.04, 4.6, 0.8, night ? '#2c3850' : '#b7c6cc');
+    sceneHaze(g, W, H*0.17, H*0.27, night ? '120,135,165' : '236,240,232', night ? 0.3 : 0.55);
+    sceneRidge(g, W, H, H*0.27, H*0.03, 7.4, 2.1, night ? '#2e4236' : '#8faa90');
     var top = H*0.47;
-    g.fillStyle = '#7f9c6a';
+    g.fillStyle = night ? '#2f4630' : '#7f9c6a';
     g.fillRect(0, H*0.45, W, H*0.03);
-    sceneTrees(g, 717, 4 + Math.round(8*q.pattern), -W*0.05, W*1.05, H*0.475, Math.min(W, H)*0.035, ['#5d7a4c','#6b8a55','#55704a']);
+    sceneTrees(g, 717, 4 + Math.round(8*q.pattern), -W*0.05, W*1.05, H*0.475, Math.min(W, H)*0.035, night ? ['#1f3122','#263a28','#1b2b1e'] : ['#5d7a4c','#6b8a55','#55704a']);
     sceneHouse(g, W*0.8, H*0.478, Math.min(W, H)*0.08);
     var f = g.createLinearGradient(0, top, 0, H);
-    f.addColorStop(0, '#9ab57a');
-    f.addColorStop(1, '#4f7a3e');
+    f.addColorStop(0, night ? '#46603e' : '#9ab57a');
+    f.addColorStop(1, night ? '#1f3420' : '#4f7a3e');
     g.fillStyle = f;
     g.fillRect(0, top, W, H - top);
     g.strokeStyle = 'rgba(48,74,34,0.28)';
@@ -8313,7 +8845,7 @@ var BG_SCENES = {
       for(var c=0;c<m;c++) sceneFloret(g, x + (c - (m - 1)/2)*r*1.5 + (p.s - 0.5)*r, y + ((c*7) % 3 - 1)*r*0.8, r);
     }
     var lv = seededList(99, Math.round(18*q.pattern), function(r){ return {x:r(), y:r()}; });
-    g.fillStyle = '#3f6a32';                                    // heart-shaped leaves in the front
+    g.fillStyle = night ? '#1d3218' : '#3f6a32';                // heart-shaped leaves in the front
     for(var l=0;l<lv.length;l++){ var lx = lv[l].x*W, ly = H*(0.9 + lv[l].y*0.1); g.beginPath(); g.ellipse(lx, ly, 6*sz, 4*sz, (lv[l].x - 0.5), 0, Math.PI*2); g.fill(); }
   },
   noren: function(g, W, H, b, q){    // 越前和紙ののれん: a shop front with washi noren, a lit lattice and a wooden counter
@@ -9466,7 +9998,7 @@ function itemKindText(it){
 function runExchangeTransaction(id){
   if(!gachaTablesOk) return {ok:false, reason:'tables'};
   var it = gachaItem(id);
-  if(!it) return {ok:false, reason:'unknown'};
+  if(!it || it.source==='reward') return {ok:false, reason:'unknown'};   // 限定 items are earned by records, never bought
   var store = loadStore(), g = store.gacha;           // always the latest save (another tab may have changed it)
   // 1) 確認: not owned yet, and in season
   if(g.owned.indexOf(id)>=0) return {ok:false, reason:'owned'};
@@ -9477,6 +10009,7 @@ function runExchangeTransaction(id){
   // 3) 減算・付与（図鑑コンプの称号も）
   g.tickets -= cost;
   g.owned.push(id);
+  markNewItems(store);
   var newTitle = gachaGrantCompletion(g);
   g.history.push({date:todayStr(), kind:'exchange', tickets:cost, items:[id]});
   if(g.history.length>100) g.history = g.history.slice(-100);
@@ -10015,7 +10548,8 @@ var THUMB_BACKS = {
   nami:  {top:'#f7efdc', bot:'#e2d1ad', glow:'rgba(255,252,240,0.6)', dust:0,  frame:null},
   jo:    {top:'#eef4f5', bot:'#c2d5db', glow:'rgba(255,255,255,0.7)', dust:0,  frame:'#5d8fa1'},
   tokujo:{top:'#fbf1d6', bot:'#deb968', glow:'rgba(255,244,200,0.9)', dust:24, dustCol:'#fffbe8', frame:'#b88a2a'},
-  kiwami:{top:'#3c2449', bot:'#120a19', glow:'rgba(222,170,240,0.5)', dust:44, dustCol:'#f5e2a3', frame:'#d8b457'}
+  kiwami:{top:'#3c2449', bot:'#120a19', glow:'rgba(222,170,240,0.5)', dust:44, dustCol:'#f5e2a3', frame:'#d8b457'},
+  gen:   {top:'#5e1c12', bot:'#1e0806', glow:'rgba(255,196,150,0.45)', dust:36, dustCol:'#ffe2a8', frame:'#d8b457'}   // 限定: 朱塗りの夜
 };
 var thumbCache = {};
 // Runs fn with the game's drawing globals pointed at another canvas (the 着せ替え preview and the 図鑑 pictures),
@@ -10082,7 +10616,7 @@ function paintThumbFrame(g, rarity, S){
   g.strokeStyle = B.frame;
   g.lineWidth = rarity==='jo' ? 0.8 : 1.2;
   g.strokeRect(3.5, 3.5, S - 7, S - 7);
-  if(rarity==='kiwami'){
+  if(rarity==='kiwami' || rarity==='gen'){
     g.lineWidth = 0.6;
     g.strokeRect(5.5, 5.5, S - 11, S - 11);
     g.fillStyle = B.frame;
@@ -10621,6 +11155,16 @@ function mergeStores(localRaw, cloudRaw){
   for(k in g.equipped){ if(Object.prototype.hasOwnProperty.call(g.equipped, k) && !g.equipped[k]) g.equipped[k] = cg.equipped[k]; }
   if(!g.equippedTitle) g.equippedTitle = cg.equippedTitle;
   if(!out.profile.name) out.profile.name = C.profile.name;
+  // the quiz: the later day wins; on the same day the longer answer list (never two different lists for one day)
+  var lq = L.quiz, cq = C.quiz;
+  if(cq.lastDate>lq.lastDate || (cq.lastDate===lq.lastDate && cq.answered.length>lq.answered.length)){ out.quiz.lastDate = cq.lastDate; out.quiz.answered = cq.answered; out.quiz.correctCount = cq.correctCount; }
+  out.quiz.totalCorrect = Math.max(lq.totalCorrect, cq.totalCorrect);
+  out.quiz.perfectDays = Math.max(lq.perfectDays, cq.perfectDays);
+  out.rewards.unlockedItems = unionList(L.rewards.unlockedItems, C.rewards.unlockedItems);
+  out.rewards.unlockedTitles = unionList(L.rewards.unlockedTitles, C.rewards.unlockedTitles);
+  // seen the guide on either device: seen; the 共有ボーナス: the later day it was paid (so it is paid once a day)
+  if(C.settings.onboarding.done) out.settings.onboarding.done = true;
+  if(C.settings.lastShareDate>out.settings.lastShareDate) out.settings.lastShareDate = C.settings.lastShareDate;
   evaluateTitles(out);
   return out;
 }
@@ -11017,7 +11561,7 @@ document.addEventListener('keydown', function(e){
 var subFrom = {exchange:null, kisekae:null};
 function showSubScreen(name){
   if(name==='exchange'){ renderExchange(); showScreen('exchange'); }
-  else { renderKisekae(); showScreen('kisekae'); syncSoundButtons(); drawKisekaePreview(); }
+  else { clearBadge('kisekae'); renderKisekae(); showScreen('kisekae'); syncSoundButtons(); drawKisekaePreview(); }
 }
 function openSub(name, from, opener){
   // going to the screen this one was opened from is simply 戻る, so the two never send each other round in circles
@@ -12731,6 +13275,989 @@ function loop(ts){
   requestAnimationFrame(loop);
 }
 
+
+// ---------- 日課・収集・回遊: the rules guide, the daily quiz, 限定 rewards, the share bonus, red dots, the home background ----------
+// Nothing here touches the score, the judging, the gacha's rates or the notes: these are extras around the game.
+
+// --- a short message at the bottom ---
+var toastEl = document.getElementById('toast'), toastTimer = 0;
+function showToast(text){
+  if(!toastEl) return;
+  toastEl.textContent = text;
+  toastEl.hidden = false;
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toastEl.hidden = true; toastTimer = 0; }, 3200);
+}
+
+// --- red dots ---
+// zukan / kisekae: lit when something new arrives, put out when that screen is opened.
+// quiz: lit while today's 3 questions are not all answered, until the quiz is opened that day.
+function markNewItems(store){
+  if(store && store.badges){ store.badges.zukan = true; store.badges.kisekae = true; }
+}
+function clearBadge(name){
+  try{
+    var store = loadStore();
+    if(!store.badges || store.badges[name]===false) return;
+    store.badges[name] = false;
+    saveStoreObj(store);
+  }catch(e){}
+}
+function quizDoneToday(store){
+  var q = store.quiz;
+  return !!q && q.lastDate===todayStr() && q.answered.length>=QUIZ_PER_DAY;
+}
+function badgeOn(store, name){
+  if(!store || !store.badges) return false;
+  if(name==='quiz') return !quizDoneToday(store) && (store.badges.quiz || store.quiz.lastDate!==todayStr());
+  return !!store.badges[name];
+}
+function renderHomeBadges(){
+  try{
+    var store = loadStore(), dots = document.querySelectorAll('.dot[data-badge]');
+    for(var i=0;i<dots.length;i++) dots[i].hidden = !badgeOn(store, dots[i].getAttribute('data-badge'));
+    var qs = document.getElementById('quiz-state'), qb = document.getElementById('btn-quiz');
+    if(qs && qb){
+      var done = quizDoneToday(store);
+      qs.textContent = done ? ('今日は' + store.quiz.correctCount + '/' + QUIZ_PER_DAY + '問正解・また明日') : '越前そば＆福井 3問';
+      qb.classList.toggle('is-done', done);
+    }
+    var ss = document.getElementById('share-state'), sb = document.getElementById('btn-share-home');
+    if(ss && sb){
+      var paid = store.settings.lastShareDate===todayStr();
+      ss.textContent = paid ? '今日のボーナスは受け取り済み' : '1日1回 +' + SHARE_BONUS + '🪙';
+      sb.classList.toggle('is-done', paid);
+    }
+  }catch(e){}
+}
+
+// --- 限定 items: unlocked when a record reaches the item's cond (and the quiz titles, through TITLES_DATA) ---
+function rewardCondText(cond){
+  if(!cond) return '';
+  var v = fmtPoints(cond.value);
+  switch(cond.type){
+    case 'maxCombo':      return '最大' + v + 'コンボ達成で解放';
+    case 'totalScore':    return '累計スコア' + v + '点で解放';
+    case 'quizTotal':     return 'クイズ通算' + v + '問正解で解放';
+    case 'plays':         return '修行' + v + '回で解放';
+    case 'highScore':     return '1回の得点' + v + '点で解放';
+    case 'perfectClears': return 'すべての判定をJUST!で修行を終えると解放';
+    case 'quizPerfect':   return 'クイズ3問全問正解で解放';
+  }
+  return '';
+}
+// Adds every 限定 item whose record has been reached; returns the new ids. Items are never taken away.
+function checkRewardUnlocks(store){
+  var g = store && store.gacha, got = [];
+  if(!g || !store.rewards) return got;
+  var m = titleMetrics(store);
+  for(var i=0;i<GACHA_CATALOG.length;i++){
+    var it = GACHA_CATALOG[i];
+    if(it.source!=='reward' || !it.cond || g.owned.indexOf(it.id)>=0) continue;
+    if((m[it.cond.type] || 0) >= it.cond.value){
+      g.owned.push(it.id);
+      if(store.rewards.unlockedItems.indexOf(it.id)<0) store.rewards.unlockedItems.push(it.id);
+      got.push(it.id);
+    }
+  }
+  if(got.length){ markNewItems(store); gachaGrantCompletion(g); }
+  return got;
+}
+// Reads the save, unlocks what the records now reach, saves once. {items, titles}: what was new.
+function claimRewards(){
+  try{
+    var store = loadStore();
+    var items = checkRewardUnlocks(store);
+    var titles = evaluateTitles(store);
+    if(items.length || titles.length) saveStoreObj(store);
+    return {items:items, titles:titles};
+  }catch(e){ return {items:[], titles:[]}; }
+}
+var rwModal = document.getElementById('rwmodal'), rwList = document.getElementById('rw-list'), rwH = document.getElementById('rw-h');
+var rwOpener = null;
+function showRewards(res, opener){
+  if(!rwModal || !res || (!res.items.length && !res.titles.length)) return;
+  rwList.textContent = '';
+  for(var i=0;i<res.items.length;i++){
+    var it = gachaItem(res.items[i]);
+    if(!it) continue;
+    var li = document.createElement('li');
+    li.className = 'rw-item r-gen';
+    li.appendChild(makeArt(it, true));
+    var tx = document.createElement('div');
+    var b = document.createElement('b'); b.textContent = it.name;
+    var sp = document.createElement('span'); sp.textContent = EQUIP_SLOT_LABELS[it.applyTo] + '・' + rewardCondText(it.cond).replace(/で解放$/, '');
+    tx.appendChild(b); tx.appendChild(sp);
+    li.appendChild(tx);
+    rwList.appendChild(li);
+  }
+  for(var j=0;j<res.titles.length;j++){
+    var t = TITLE_BY_ID[res.titles[j]];
+    var lt = document.createElement('li');
+    lt.className = 'rw-item';
+    var tt = document.createElement('div');
+    var tb = document.createElement('b'); tb.textContent = '称号「' + titleDisplayName(res.titles[j]) + '」';
+    var ts = document.createElement('span'); ts.textContent = t ? titleNeedText(t) : '';
+    tt.appendChild(tb); tt.appendChild(ts);
+    lt.appendChild(tt);
+    rwList.appendChild(lt);
+  }
+  rwH.textContent = res.items.length ? '限定アイテムを解放しました' : '新しい称号を獲得しました';
+  rwOpener = opener || null;
+  rwModal.hidden = false;
+  try{ playReactionSound('good'); }catch(e){}          // a little chime (silent while 🔇)
+  focusEl(rwH);
+}
+function closeRewards(){
+  if(!rwModal || rwModal.hidden) return;
+  rwModal.hidden = true;
+  renderCollectRow();
+  focusEl(rwOpener);
+  rwOpener = null;
+}
+document.getElementById('rw-close').addEventListener('click', closeRewards);
+rwModal.addEventListener('click', function(e){ if(e.target && e.target.getAttribute && e.target.getAttribute('data-rwclose')) closeRewards(); });
+
+// --- 1日3問「越前そば＆福井クイズ」 ---
+// QUIZ_POOL: answer = the index of the right choice as written (the order is shuffled for each day).
+// Every fact here is one the game already states (the catalog, the seasons) or a well-known one about Fukui.
+var QUIZ_POOL = [
+  {id:'q01', q:'「越前そば」という呼び名が広まったきっかけとされるのは？',
+   choices:['昭和天皇が福井でおろしそばを召し上がったこと','江戸の将軍にそばを献上したこと','明治時代の博覧会で賞をとったこと','戦国武将がそばの歌を詠んだこと'], answer:0,
+   explain:'1947年（昭和22年）、福井を訪れた昭和天皇がおろしそばを召し上がり、のちに「越前のそば」と話されたことから、その名が広まったと伝えられています。'},
+  {id:'q02', q:'「挽きぐるみ」のそば粉とは、どんな粉？',
+   choices:['そばの実を甘皮ごと挽いた粉','実の中心だけを挽いた白い粉','小麦粉を2割まぜた粉','新そばだけを挽いた粉'], answer:0,
+   explain:'そばの実を甘皮ごと挽くので、色が黒っぽく、香りが強いのが特徴です。越前そばでよく使われます。'},
+  {id:'q03', q:'越前でそばづくりが広まった始まりとして伝わる話は？',
+   choices:['一乗谷の朝倉氏が、籠城に備える食料としてそばの栽培をすすめた','南蛮貿易の船がそばの種を運んできた','明治政府が北海道からそばを取り寄せた','北前船の船乗りがそば打ちを教えた'], answer:0,
+   explain:'戦国時代、一乗谷を本拠とした朝倉氏が、籠城のときの兵糧としてそばの栽培を奨励したのが始まりと伝えられています。'},
+  {id:'q04', q:'国が指定する福井県の伝統的工芸品（7品目）に入っていないのは？',
+   choices:['九谷焼','越前和紙','若狭塗','越前焼'], answer:0,
+   explain:'福井県の国指定の伝統的工芸品は、越前漆器・越前和紙・越前打刃物・越前箪笥・越前焼・若狭塗・若狭めのう細工の7品目。九谷焼は石川県の焼き物です。'},
+  {id:'q05', q:'越前おろしそばに欠かせない薬味は？',
+   choices:['大根おろし','とろろ','わさび漬け','梅干し'], answer:0,
+   explain:'辛みのある大根おろしを、そばにのせたり、つゆに入れたりして食べます。削り節やねぎもよく合わせます。'},
+  {id:'q06', q:'若狭の郷土料理「へしこ」とは？',
+   choices:['鯖などを塩漬けにしてから糠に漬け、熟成させたもの','小麦粉を練って焼いた菓子','昆布で巻いたかまぼこ','米粉でつくっただんご'], answer:0,
+   explain:'へしこは、鯖などの魚を塩漬けにしてから糠に漬けこみ、じっくり熟成させた若狭地方の保存食です。'},
+  {id:'q07', q:'越前打刃物の始まりとして伝わる話は？',
+   choices:['京都の刀匠が府中（今の越前市）で、農民のために鎌を作った','南蛮の鍛冶職人が包丁の作り方を伝えた','江戸の大工がのこぎりを持ちこんだ','明治時代に工場で包丁を作りはじめた'], answer:0,
+   explain:'南北朝時代（約700年前）、京都の刀匠・千代鶴国安が府中に来て、刀を作るかたわら農民のために鎌を作ったのが始まりと伝えられています。'},
+  {id:'q08', q:'福井でそばの白い花が咲くのは、主にいつごろ？',
+   choices:['9〜10月','4〜5月','6〜7月','12〜1月'], answer:0,
+   explain:'福井は秋そばが主流です。9〜10月に白い花が咲き、10月下旬〜11月上旬に収穫されます。'},
+  {id:'q09', q:'「越前がに」の目印として付けられているものは？',
+   choices:['黄色いタグ','赤いひも','青い札','金色の鈴'], answer:0,
+   explain:'福井県の港に水揚げされたオスのズワイガニ「越前がに」には、黄色いタグが付けられています。'},
+  {id:'q10', q:'福井県立恐竜博物館があるのは何市？',
+   choices:['勝山市','敦賀市','小浜市','鯖江市'], answer:0,
+   explain:'恐竜博物館は勝山市にあります。勝山市北谷の地層からは、フクイラプトルなど多くの恐竜化石が見つかっています。'},
+  {id:'q11', q:'越前焼は「日本六古窯」のひとつ。六古窯に入っていないのは？',
+   choices:['有田焼','瀬戸焼','信楽焼','備前焼'], answer:0,
+   explain:'日本六古窯は、瀬戸・常滑・越前・信楽・丹波・備前の6つ。有田焼は佐賀県の磁器です。'},
+  {id:'q12', q:'「十割そば」とは、どんなそば？',
+   choices:['そば粉だけで打ったそば','十人前の量を盛ったそば','十日間寝かせた麺','十種類の薬味をのせたそば'], answer:0,
+   explain:'つなぎを使わず、そば粉だけで打つのが十割そば。香りが豊かですが、切れやすく打つのが難しいそばです。'},
+  {id:'q13', q:'「二八そば」の「二八」が表すものとして一般的なのは？',
+   choices:['小麦粉2割・そば粉8割の配合','2月8日に打ったそば','2人で8人前を打つこと','2回ゆでて8回洗うこと'], answer:0,
+   explain:'一般には、そば粉8割・つなぎの小麦粉2割の配合をいいます（江戸時代の値段が十六文だったから、という説もあります）。'},
+  {id:'q14', q:'福井の銘菓「羽二重餅」の名前の由来は？',
+   choices:['なめらかな絹織物の「羽二重」','餅を二重に重ねること','鳥の羽の形','考えた人の名前'], answer:0,
+   explain:'福井は絹織物「羽二重」の産地として知られ、そのなめらかさにちなんで名づけられたお菓子です。'},
+  {id:'q15', q:'福井では、水ようかんを主にいつ食べる習慣がある？',
+   choices:['冬','夏','お盆','春のお花見'], answer:0,
+   explain:'福井では、冬にこたつで水ようかんを食べるのが定番です。平たい箱に流した、あっさり甘い水ようかんです。'},
+  {id:'q16', q:'永平寺（永平寺町）を開いた僧は？',
+   choices:['道元','親鸞','空海','日蓮'], answer:0,
+   explain:'永平寺は、鎌倉時代に道元が開いた曹洞宗の大本山です。'},
+  {id:'q17', q:'坂井市の丸岡城の天守について正しいのは？',
+   choices:['江戸時代以前から残る「現存12天守」のひとつ','昭和に新しく建てられた','石垣だけが残っている','平成に別の場所から移された'], answer:0,
+   explain:'丸岡城の天守は、江戸時代以前に建てられて今に残る、全国12の現存天守のひとつです。'},
+  {id:'q18', q:'坂井市の東尋坊で見られる景色は？',
+   choices:['柱のような形の岩が並ぶ断崖','どこまでも続く砂丘','大きな鍾乳洞','煙を上げる火山の火口'], answer:0,
+   explain:'東尋坊は、柱のような形の岩（柱状節理）が海に向かって切り立つ断崖です。'},
+  {id:'q19', q:'越前和紙が漉かれてきたのは、どこ？',
+   choices:['越前市の今立地区','坂井市の三国','小浜市','大野市'], answer:0,
+   explain:'越前和紙は、越前市の今立地区で漉かれてきました。約1500年の歴史があると伝わります。'},
+  {id:'q20', q:'三方五湖は、いくつの湖が集まっている？',
+   choices:['5つ','3つ','4つ','7つ'], answer:0,
+   explain:'三方五湖は、若狭町と美浜町にまたがる5つの湖。湖ごとに水の色が少しずつ違って見えます。'}
+];
+var QUIZ_BY_ID = {};
+(function(){ for(var i=0;i<QUIZ_POOL.length;i++) QUIZ_BY_ID[QUIZ_POOL[i].id] = QUIZ_POOL[i]; })();
+var QUIZ_TICKET_EACH = 1, QUIZ_TICKET_PERFECT = 2;   // そば札: 1 for each right answer, 2 more when all 3 are right
+var QUIZ_KEYS = ['ア','イ','ウ','エ'];
+// a small seeded generator, so a date always gives the same questions and the same order (for every player)
+function quizRng(seed){
+  var a = seed >>> 0;
+  return function(){
+    a = (a + 0x6D2B79F5) >>> 0;
+    var t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+// The day's 3 questions: [{id, q, choices (shuffled), answer (in the shuffled order), explain}]
+function quizForDate(dateStr){
+  var rnd = quizRng(seedFromDate('soba-quiz:' + dateStr));
+  var idx = [], i;
+  for(i=0;i<QUIZ_POOL.length;i++) idx.push(i);
+  for(i=idx.length-1;i>0;i--){ var j = Math.floor(rnd()*(i + 1)), t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
+  var out = [];
+  for(i=0;i<QUIZ_PER_DAY && i<idx.length;i++){
+    var src = QUIZ_POOL[idx[i]], order = [0,1,2,3];
+    for(var k=order.length-1;k>0;k--){ var r = Math.floor(rnd()*(k + 1)), tt = order[k]; order[k] = order[r]; order[r] = tt; }
+    out.push({id:src.id, q:src.q, explain:src.explain,
+      choices:order.map(function(o){ return src.choices[o]; }), answer:order.indexOf(src.answer)});
+  }
+  return out;
+}
+// today's quiz state in the save (a new day starts with no answers)
+function quizToday(store){
+  var today = todayStr(), q = store.quiz;
+  if(q.lastDate!==today){ q.lastDate = today; q.answered = []; q.correctCount = 0; }
+  return q;
+}
+var quizEls = {};
+['quiz-title','btn-quiz-back','quiz-progress','quiz-card','quiz-num','quiz-q','quiz-choices','quiz-feedback','quiz-verdict',
+ 'quiz-explain','quiz-next','quiz-done','quiz-done-h','quiz-score','quiz-review','quiz-stats'].forEach(function(id){ quizEls[id] = document.getElementById(id); });
+var quizOpener = null, quizShowing = -1;   // quizShowing: the question whose answer is on screen (until 次へ)
+var quizNewTitles = [];                    // titles today's answers earned, shown after the last question
+function openQuiz(opener){
+  quizOpener = opener || null;
+  var store = loadStore();
+  quizToday(store);
+  store.badges.quiz = false;                       // opened today: the red dot goes out
+  saveStoreObj(store);
+  quizShowing = -1;
+  renderQuiz();
+  showScreen('quiz');
+  focusEl(quizDoneToday(store) ? quizEls['quiz-done-h'] : quizEls['quiz-q']);
+}
+function closeQuiz(){
+  showScreen('title');
+  renderHome();
+  focusEl(quizOpener || document.getElementById('btn-quiz'));
+}
+function renderQuizProgress(q){
+  var ol = quizEls['quiz-progress'];
+  ol.textContent = '';
+  for(var i=0;i<QUIZ_PER_DAY;i++){
+    var li = document.createElement('li'), a = q.answered[i];
+    li.className = a ? (a.ok ? 'is-ok' : 'is-ng') : (i===q.answered.length ? 'is-now' : '');
+    var vh = document.createElement('span');
+    vh.className = 'vh';
+    vh.textContent = '第' + (i + 1) + '問' + (a ? (a.ok ? '：正解' : '：不正解') : '：まだ');
+    li.appendChild(vh);
+    ol.appendChild(li);
+  }
+}
+function renderQuiz(){
+  var store = loadStore(), q = quizToday(store), set = quizForDate(q.lastDate);
+  renderQuizProgress(q);
+  quizEls['quiz-stats'].textContent = 'これまでの正解 ' + fmtPoints(q.totalCorrect) + '問・全問正解 ' + fmtPoints(q.perfectDays) + '日';
+  var done = q.answered.length>=QUIZ_PER_DAY && quizShowing<0;
+  quizEls['quiz-card'].hidden = done;
+  quizEls['quiz-done'].hidden = !done;
+  if(done){ renderQuizDone(q, set); return; }
+  var n = quizShowing>=0 ? quizShowing : q.answered.length, item = set[n], ans = q.answered[n];
+  quizEls['quiz-num'].textContent = '第' + (n + 1) + '問 / ' + QUIZ_PER_DAY;
+  quizEls['quiz-q'].textContent = item.q;
+  var box = quizEls['quiz-choices'];
+  box.textContent = '';
+  for(var i=0;i<item.choices.length;i++){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'quiz-choice';
+    b.setAttribute('data-choice', String(i));
+    var k = document.createElement('span'); k.className = 'qk'; k.textContent = QUIZ_KEYS[i];
+    var t = document.createElement('span'); t.textContent = item.choices[i];
+    b.appendChild(k); b.appendChild(t);
+    if(ans){
+      b.disabled = true;
+      if(i===item.answer) b.classList.add('is-right');
+      else if(i===ans.choice) b.classList.add('is-wrong');
+    }
+    box.appendChild(b);
+  }
+  quizEls['quiz-feedback'].hidden = !ans;
+  if(ans){
+    quizEls['quiz-verdict'].textContent = ans.ok ? '正解！ そば札+' + QUIZ_TICKET_EACH + '枚' : '残念…　正解は「' + item.choices[item.answer] + '」';
+    quizEls['quiz-verdict'].className = 'quiz-verdict ' + (ans.ok ? 'is-ok' : 'is-ng');
+    quizEls['quiz-explain'].textContent = item.explain;
+    quizEls['quiz-next'].textContent = n + 1<QUIZ_PER_DAY ? '次の問題へ' : '結果を見る';
+  }
+}
+function renderQuizDone(q, set){
+  var perfect = q.correctCount>=QUIZ_PER_DAY;
+  var tickets = q.correctCount*QUIZ_TICKET_EACH + (perfect ? QUIZ_TICKET_PERFECT : 0);
+  quizEls['quiz-score'].textContent = '今日の結果：' + QUIZ_PER_DAY + '問中' + q.correctCount + '問正解（そば札+' + tickets + '枚' + (perfect ? '・全問正解ボーナス込み' : '') + '）';
+  var ol = quizEls['quiz-review'];
+  ol.textContent = '';
+  for(var i=0;i<set.length;i++){
+    var a = q.answered[i], it = set[i], li = document.createElement('li');
+    var qq = document.createElement('span'); qq.textContent = it.q;
+    var aa = document.createElement('span');
+    aa.className = 'qr-a ' + (a && a.ok ? 'is-ok' : 'is-ng');
+    aa.textContent = (a && a.ok ? '○ ' : '× ') + '正解：' + it.choices[it.answer];
+    var xx = document.createElement('span'); xx.className = 'qr-x'; xx.textContent = it.explain;
+    li.appendChild(qq); li.appendChild(aa); li.appendChild(xx);
+    ol.appendChild(li);
+  }
+}
+function answerQuiz(choice){
+  var store = loadStore(), q = quizToday(store), g = store.gacha;
+  var n = q.answered.length;
+  if(n>=QUIZ_PER_DAY || quizShowing>=0) return;
+  var item = quizForDate(q.lastDate)[n], ok = choice===item.answer;
+  q.answered.push({id:item.id, choice:choice, ok:ok});
+  if(ok){
+    q.correctCount++;
+    q.totalCorrect = Math.min(STAT_MAX, q.totalCorrect + 1);
+    g.tickets = Math.min(TICKET_MAX, g.tickets + QUIZ_TICKET_EACH);
+  }
+  if(q.answered.length>=QUIZ_PER_DAY && q.correctCount>=QUIZ_PER_DAY){
+    q.perfectDays = Math.min(STAT_MAX, q.perfectDays + 1);
+    g.tickets = Math.min(TICKET_MAX, g.tickets + QUIZ_TICKET_PERFECT);
+  }
+  var got = evaluateTitles(store);                 // e.g. 越前通: kept to show with the results (the save below would add it quietly)
+  for(var i=0;i<got.length;i++) if(quizNewTitles.indexOf(got[i])<0) quizNewTitles.push(got[i]);
+  saveStoreObj(store);                             // saved at once: a reload never asks the same question again
+  try{ playReactionSound(ok ? 'good' : 'miss'); }catch(e){}
+  quizShowing = n;
+  renderQuiz();
+  focusEl(quizEls['quiz-next']);
+}
+function nextQuiz(){
+  var last = quizShowing + 1>=QUIZ_PER_DAY;
+  quizShowing = -1;
+  renderQuiz();
+  if(last){
+    focusEl(quizEls['quiz-done-h']);
+    var res = claimRewards();                      // e.g. 越前通 for 3 right, a 限定 item at 10 right answers
+    for(var i=0;i<quizNewTitles.length;i++) if(res.titles.indexOf(quizNewTitles[i])<0) res.titles.push(quizNewTitles[i]);
+    quizNewTitles = [];
+    showRewards(res, quizEls['quiz-done-h']);
+  } else focusEl(quizEls['quiz-q']);
+}
+quizEls['quiz-choices'].addEventListener('click', function(e){
+  var b = e.target && e.target.closest ? e.target.closest('.quiz-choice') : null;
+  if(!b || b.disabled) return;
+  answerQuiz(clampInt(b.getAttribute('data-choice'), 0, 3));
+});
+quizEls['quiz-next'].addEventListener('click', nextQuiz);
+quizEls['btn-quiz-back'].addEventListener('click', closeQuiz);
+document.getElementById('btn-quiz').addEventListener('click', function(){ openQuiz(this); });
+
+// --- 1日1回の共有ボーナス ---
+var SHARE_BONUS = 200;
+var SHARE_URL = 'https://alphalpha722514.github.io/mugen-soba-do.cut/';
+var SHARE_TEXT = '越前そばをリズムに合わせて切る！ブラウザで遊べる蕎麦切り修行ゲーム「無限そば道・斬」';
+// Pays the bonus once a day (this device's date; synced devices share the day). Returns the coins paid (0 if not).
+function grantShareBonus(){
+  var store = loadStore(), today = todayStr(), g = store.gacha;
+  if(store.settings.lastShareDate===today) return 0;
+  var add = Math.max(0, Math.min(SHARE_BONUS, COIN_MAX - g.currency));
+  g.currency += add;
+  if(g.dailyEarned.date===today) g.dailyEarned.amount = Math.min(COIN_MAX, g.dailyEarned.amount + add);   // 今日の獲得数 (shown only)
+  else g.dailyEarned = {date:today, amount:add, challenge:false};
+  store.settings.lastShareDate = today;
+  if(!saveStoreObj(store)) return 0;
+  return add;
+}
+function afterShared(){
+  var got = grantShareBonus();
+  showToast(got ? ('共有ボーナス！' + got + 'コインを獲得しました！') : '共有しました。共有ボーナスは1日1回です（今日は受け取り済み）。');
+  renderCollectRow();
+}
+// Web Share where there is one (phones), otherwise the link is copied. The bonus comes only when it went through.
+function shareGame(){
+  var data = {title:'無限そば道・斬', text:SHARE_TEXT, url:SHARE_URL};
+  var p = null;
+  try{ if(navigator.share) p = navigator.share(data); }catch(e){ p = null; }
+  if(p && typeof p.then==='function'){
+    p.then(afterShared, function(err){
+      if(err && err.name==='AbortError') showToast('共有をやめました。');
+      else copyShareLink();
+    });
+    return;
+  }
+  copyShareLink();
+}
+function copyShareLink(){
+  var text = SHARE_TEXT + ' ' + SHARE_URL, c = null;
+  try{ if(navigator.clipboard && navigator.clipboard.writeText) c = navigator.clipboard.writeText(text); }catch(e){ c = null; }
+  if(c && typeof c.then==='function'){
+    c.then(function(){ showToast('ゲームのURLをコピーしました。友達に送ってね！'); setTimeout(afterShared, 900); },
+           function(){ showToast('URLをコピーできませんでした：' + SHARE_URL); });
+  } else showToast('このURLを友達に送ってね：' + SHARE_URL);
+}
+document.getElementById('btn-share-home').addEventListener('click', shareGame);
+document.getElementById('btn-share-result').addEventListener('click', shareGame);
+
+// --- 要望箱: an outside form in a new tab (no personal data, please) ---
+// Swap FEEDBACK_URL for a Google Forms link when one is made. Until then it opens the game's GitHub Issues.
+var FEEDBACK_URL = 'https://github.com/alphalpha722514/mugen-soba-do.cut/issues/new';
+document.getElementById('btn-feedback').addEventListener('click', function(){
+  var w = null;
+  try{ w = window.open(FEEDBACK_URL, '_blank'); }catch(e){ w = null; }
+  if(w){ try{ w.opener = null; }catch(e){} }       // the form's page cannot reach back into the game
+  showSaveMsg(w ? '外部の入力フォームを開きました。個人情報は入力しないでください。'
+                : ('フォームが開かないときは、こちらのURLから送れます：' + FEEDBACK_URL));
+});
+
+// --- はじめてのルール説明 (4 slides) ---
+var OB_SLIDES = [
+  {h:'① 蕎麦を見る・リズムを感じる', t:'まず師匠がお手本で6回切ります。流れてくる金色の印と「トントン」の音で、切るリズムを覚えましょう。',
+   svg:'<svg class="ob-svg" viewBox="0 0 240 110"><rect class="bd2" x="8" y="44" width="224" height="34" rx="4"/><rect class="bd" x="8" y="48" width="224" height="26" rx="3"/><rect class="dg" x="8" y="52" width="60" height="18" rx="2"/>' +
+       '<circle class="gd" cx="96" cy="61" r="6"/><circle class="gd" cx="128" cy="61" r="6"/><circle class="gd" cx="152" cy="61" r="6"/><circle class="gd" cx="186" cy="61" r="6"/><circle class="gd" cx="210" cy="61" r="6"/>' +
+       '<text class="soft" x="150" y="30" font-size="17" text-anchor="middle">トン　トン　トン♪</text></svg>'},
+  {h:'② タイミングよく切る', t:'「あなたの番!」になったら、同じリズムで画面をタップ（パソコンはスペースキー）。赤茶色の印が包丁の線に重なった瞬間なら「JUST!」。ぴったりほど細く美しい麺になります。',
+   svg:'<svg class="ob-svg" viewBox="0 0 240 110"><rect class="bd2" x="8" y="58" width="224" height="34" rx="4"/><rect class="bd" x="8" y="62" width="224" height="26" rx="3"/><rect class="dg" x="8" y="66" width="70" height="18" rx="2"/>' +
+       '<line class="ln" x1="80" y1="40" x2="80" y2="100"/><circle class="ac" cx="80" cy="75" r="6"/><circle class="ac" cx="140" cy="75" r="6"/><circle class="ac" cx="196" cy="75" r="6"/>' +
+       '<path class="stl" d="M66 14 h30 v34 h-30z"/><rect class="ink" x="66" y="8" width="30" height="8" rx="2"/><text class="ac" x="112" y="40" font-size="22">JUST!</text></svg>'},
+  {h:'③ 提供する', t:'切った麺は器に盛られ、お客さんのもとへ。お客さんごとに好みが違い、満足度が変わります。5人に出したら修行終了です。',
+   svg:'<svg class="ob-svg" viewBox="0 0 240 110"><path class="st" d="M84 30 q6 -10 0 -20 M100 30 q6 -10 0 -20 M116 30 q6 -10 0 -20"/>' +
+       '<ellipse class="br" cx="100" cy="52" rx="52" ry="10"/><path class="nd" d="M62 50 q10 -8 20 0 M80 48 q12 -9 24 1 M102 50 q10 -8 20 -1 M118 51 q8 -6 16 0"/><path class="bl" d="M48 52 Q100 112 152 52 Z"/>' +
+       '<circle class="sk" cx="196" cy="56" r="18"/><circle class="ink" cx="190" cy="52" r="2"/><circle class="ink" cx="202" cy="52" r="2"/><path class="st" d="M188 62 q8 7 16 0"/><text class="ac" x="180" y="100" font-size="15">満足！</text></svg>'},
+  {h:'④ 目指せ極上', t:'得点でそば猪口コインがもらえ、ガチャ・着せ替え・称号が楽しめます。毎日のチャレンジとクイズにも挑戦して、極上の職人を目指しましょう！',
+   svg:'<svg class="ob-svg" viewBox="0 0 240 110"><circle class="gd" cx="120" cy="56" r="40" opacity=".22"/><circle class="gd" cx="120" cy="56" r="28" opacity=".35"/>' +
+       '<text class="ink" x="120" y="66" font-size="28" text-anchor="middle">極上</text>' +
+       '<path class="gd" d="M44 30 l4 9 10 1 -8 6 3 10 -9 -6 -9 6 3 -10 -8 -6 10 -1z"/><path class="gd" d="M196 64 l3 7 8 1 -6 5 2 8 -7 -5 -7 5 2 -8 -6 -5 8 -1z"/><path class="gd" d="M184 16 l2 5 6 .5 -4.5 3.5 1.5 6 -5 -3.5 -5 3.5 1.5 -6 -4.5 -3.5 6 -.5z"/></svg>'}
+];
+var obEls = {};
+['onboard','ob-step','ob-pic','ob-h','ob-text','ob-dots','ob-prev','ob-next','ob-hide','ob-start'].forEach(function(id){ obEls[id] = document.getElementById(id); });
+var obIndex = 0, obOpener = null, obPendingRewards = null;   // 限定 items unlocked at start wait until the guide is closed
+function renderOnboarding(){
+  var sl = OB_SLIDES[obIndex];
+  obEls['ob-step'].textContent = (obIndex + 1) + ' / ' + OB_SLIDES.length;
+  obEls['ob-pic'].innerHTML = sl.svg;               // the game's own fixed drawing (no outside text)
+  obEls['ob-h'].textContent = sl.h;
+  obEls['ob-text'].textContent = sl.t;
+  var dots = obEls['ob-dots'].children;
+  for(var i=0;i<dots.length;i++) dots[i].classList.toggle('is-on', i===obIndex);
+  obEls['ob-prev'].disabled = obIndex===0;
+  obEls['ob-next'].hidden = obIndex>=OB_SLIDES.length - 1;
+}
+function openOnboarding(opener){
+  obOpener = opener || null;
+  obIndex = 0;
+  obEls['ob-hide'].checked = true;                 // 「次回から表示しない」 starts ticked; untick it to see the guide next time
+  renderOnboarding();
+  obEls['onboard'].hidden = false;
+  document.body.style.overflow = 'hidden';
+  focusEl(obEls['ob-h']);
+}
+// 修行を始める (or Esc): remember the choice of 「次回から表示しない」, then on to STEP 1 of the home
+function closeOnboarding(){
+  if(obEls['onboard'].hidden) return;
+  obEls['onboard'].hidden = true;
+  document.body.style.overflow = '';
+  try{
+    var store = loadStore();
+    store.settings.onboarding = {done:!!obEls['ob-hide'].checked, version:ONBOARDING_VERSION};
+    saveStoreObj(store);
+  }catch(e){}
+  if(obPendingRewards){ var pr = obPendingRewards; obPendingRewards = null; showRewards(pr, null); return; }
+  if(obOpener){ focusEl(obOpener); obOpener = null; return; }
+  if(screens.title.classList.contains('active')){
+    var first = document.querySelector('.flour-opt[aria-pressed="true"]') || document.querySelector('.flour-opt');
+    focusEl(first);
+    revealEl(step1El);
+  }
+}
+obEls['ob-prev'].addEventListener('click', function(){ if(obIndex>0){ obIndex--; renderOnboarding(); focusEl(obEls['ob-h']); } });
+obEls['ob-next'].addEventListener('click', function(){
+  if(obIndex<OB_SLIDES.length - 1){ obIndex++; renderOnboarding(); focusEl(obIndex===OB_SLIDES.length - 1 ? obEls['ob-start'] : obEls['ob-h']); }
+});
+obEls['ob-start'].addEventListener('click', closeOnboarding);
+document.getElementById('btn-guide-again').addEventListener('click', function(){ openOnboarding(this); });
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Escape') return;
+  if(!obEls['onboard'].hidden){ e.preventDefault(); closeOnboarding(); }
+  else if(rwModal && !rwModal.hidden){ e.preventDefault(); closeRewards(); }
+});
+
+// --- the equipped background behind the home (the same scene as in play), under washi paper for the text ---
+var homeBgCanvas = document.getElementById('home-bg'), homeBgKey = '';
+function homeBgLook(){
+  try{
+    var g = loadStore().gacha, id = g.equipped.bg;
+    if(!equipAllowed(g, 'bg', id)) return null;
+    var look = skinLook('bg', id);
+    return look ? look : null;
+  }catch(e){ return null; }
+}
+function renderHomeBg(){
+  if(!homeBgCanvas) return;
+  var b = homeBgLook(), homeScr = screens.title;
+  homeScr.classList.toggle('has-bg', !!b);
+  if(!b){ homeBgCanvas.hidden = true; homeBgKey = ''; return; }
+  homeBgCanvas.hidden = !homeScr.classList.contains('active');
+  var w = Math.max(1, window.innerWidth || 360), h = Math.max(1, window.innerHeight || 640), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var useImg = bgImageReady(b.id);
+  var key = b.id + '|' + w + 'x' + h + '@' + dpr + '|' + (useImg ? 'img' : 'draw:' + visualDetail);
+  if(key===homeBgKey) return;
+  try{
+    homeBgCanvas.width = Math.round(w*dpr);
+    homeBgCanvas.height = Math.round(h*dpr);
+    var g2 = homeBgCanvas.getContext('2d');
+    if(!g2) return;
+    g2.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var drawn = false;
+    if(useImg){ try{ drawn = drawCoverImage(g2, bgLayer.img, w, h); }catch(e){ drawn = false; } }
+    if(!drawn) drawn = paintBgBase(g2, w, h, b);
+    if(!drawn){ homeBgCanvas.hidden = true; homeScr.classList.remove('has-bg'); return; }
+    homeBgKey = key;
+  }catch(e){
+    homeBgCanvas.hidden = true;
+    homeScr.classList.remove('has-bg');
+  }
+}
+function syncHomeBg(onHome){
+  if(!homeBgCanvas) return;
+  if(!onHome){ homeBgCanvas.hidden = true; return; }
+  renderHomeBg();
+}
+var homeBgResizeTimer = 0;
+window.addEventListener('resize', function(){
+  if(homeBgResizeTimer) clearTimeout(homeBgResizeTimer);
+  homeBgResizeTimer = setTimeout(function(){ homeBgResizeTimer = 0; if(screens.title.classList.contains('active')) renderHomeBg(); }, 150);
+});
+
+// --- at start: the home with its dots and background, 限定 items already reached, and the guide for a first visit ---
+renderHome();
+(function(){
+  var res = claimRewards();
+  var store = loadStore();
+  if(!store.settings.onboarding.done){
+    if(res.items.length || res.titles.length) obPendingRewards = res;
+    openOnboarding(null);
+  } else showRewards(res, null);
+})();
+
+// ---------- BGM: Japanese-style music made in Web Audio (no audio files), one piece per scene ----------
+// ホーム 箏のペンタトニック／修行 低い和太鼓と薄い和音（コンボ10ごとに三味線・篠笛・締太鼓と鉦・高い箏が重なる）／
+// リザルト 晴れやかな和音／ガチャ 神秘的なアルペジオ. Notes are booked a moment ahead on the audio clock, so the
+// tempo never wobbles with the frame rate. The music has its own volume and switch (settings.sound.bgmOn /
+// bgmVolume) and goes straight to the speakers, not through the sound effects' compressor, so a cut's 「シャキッ」
+// is never pushed down by it. While 🔇 (settings.sound.soundOn) nothing of it plays at all.
+var BGM_LEVEL = 2.0;                  // the music at bgmVolume 1.0 peaks near 0.2, the effects near 0.5: the cuts stay on top
+var BGM_LOOKAHEAD = 0.3, BGM_TICK_MS = 50;
+function loadBgmPref(){
+  try{
+    var s = loadStore().settings.sound || {};
+    return {on:s.bgmOn!==false, vol:(typeof s.bgmVolume==='number' && s.bgmVolume>=0 && s.bgmVolume<=1) ? s.bgmVolume : DEFAULT_BGM_VOLUME};
+  }catch(e){ return {on:true, vol:DEFAULT_BGM_VOLUME}; }
+}
+function saveBgmPref(){
+  try{
+    var store = loadStore(), st = store.settings, snd = isPlainObj(st.sound) ? st.sound : {};
+    snd.bgmOn = !!bgmPref.on;
+    snd.bgmVolume = Math.round(Math.max(0, Math.min(1, bgmPref.vol))*100)/100;
+    st.sound = snd;
+    saveStoreObj(store);
+  }catch(e){}
+}
+var bgmPref = loadBgmPref();
+var bgm = {bus:null, scene:null, out:null, timer:0, next:0, step:0, unlocked:false, screen:'title', duckUntil:0, duckTo:1};
+function mtof(m){ return 440*Math.pow(2, (m - 69)/12); }
+var YO = [0, 2, 5, 7, 9];             // 陽音階 (D E G A B over D)
+var IN = [0, 1, 5, 7, 8];             // 都節 (D E♭ G A B♭ over D): the mysterious, older sound
+function scaleNote(scale, root, deg){ var o = Math.floor(deg/5); return root + o*12 + scale[((deg % 5) + 5) % 5]; }
+
+// --- instruments (all into the scene's own gain node `out`) ---
+function bgmEnv(ac, out, t, atk, dur, vol){
+  var g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), t + atk);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  g.connect(out);
+  return g;
+}
+function bgmOsc(ac, dest, type, f, t, dur, f2){
+  var o = ac.createOscillator();
+  o.type = type;
+  o.frequency.setValueAtTime(f, t);
+  if(f2) o.frequency.exponentialRampToValueAtTime(f2, t + Math.min(dur, 0.06));
+  o.connect(dest);
+  o.start(t);
+  o.stop(t + dur + 0.05);
+  return o;
+}
+function bgmNoise(ac, dest, t, dur, type, f, q){
+  var src = ac.createBufferSource(), fl = ac.createBiquadFilter();
+  src.buffer = sfxNoiseBuffer(ac);
+  fl.type = type; fl.frequency.setValueAtTime(f, t); if(q) fl.Q.setValueAtTime(q, t);
+  src.connect(fl); fl.connect(dest);
+  src.start(t, Math.random()*0.8); src.stop(t + dur + 0.05);
+}
+// 箏: a plucked string — a bright attack that settles a hair flat, with two quieter overtones
+function bgmKoto(ac, out, m, t, vol, len){
+  var f = mtof(m), d = len || 1.3;
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.004, d, vol), 'triangle', f*1.012, t, d, f);
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.003, d*0.45, vol*0.32), 'sine', f*2, t, d*0.45);
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.002, d*0.2, vol*0.14), 'sine', f*3.01, t, d*0.2);
+}
+// 和太鼓: a deep skin that drops in pitch, and the slap of the stick
+function bgmTaiko(ac, out, t, vol){
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.004, 0.55, vol), 'sine', 118, t, 0.55, 46);
+  bgmNoise(ac, bgmEnv(ac, out, t, 0.002, 0.09, vol*0.35), t, 0.09, 'lowpass', 520);
+}
+// 締太鼓: a tight, high drum for the quick 16ths
+function bgmShime(ac, out, t, vol){
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.002, 0.07, vol), 'triangle', 380, t, 0.07, 300);
+  bgmNoise(ac, bgmEnv(ac, out, t, 0.001, 0.04, vol*0.6), t, 0.04, 'bandpass', 2400, 2);
+}
+// 鉦: a small gong — two bright partials that ring
+function bgmKane(ac, out, t, vol){
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.002, 0.5, vol), 'sine', 1760, t, 0.5);
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.002, 0.35, vol*0.6), 'sine', 2637, t, 0.35);
+}
+// 三味線: a twangy pluck (a bright saw that darkens fast) with the 撥's click
+function bgmShamisen(ac, out, m, t, vol){
+  var f = mtof(m), fl = ac.createBiquadFilter();
+  fl.type = 'lowpass';
+  fl.frequency.setValueAtTime(3200, t);
+  fl.frequency.exponentialRampToValueAtTime(520, t + 0.22);
+  fl.connect(bgmEnv(ac, out, t, 0.002, 0.34, vol));
+  bgmOsc(ac, fl, 'sawtooth', f, t, 0.34);
+  bgmNoise(ac, bgmEnv(ac, out, t, 0.001, 0.02, vol*0.5), t, 0.02, 'highpass', 3000);
+}
+// 篠笛: a breathy flute with a slow vibrato
+function bgmFlute(ac, out, m, t, dur, vol){
+  var f = mtof(m), g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.07);
+  g.gain.setValueAtTime(vol, t + dur*0.75);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  g.connect(out);
+  var o = bgmOsc(ac, g, 'sine', f, t, dur), lfo = ac.createOscillator(), dep = ac.createGain();
+  lfo.frequency.setValueAtTime(5.2, t);
+  dep.gain.setValueAtTime(0, t);
+  dep.gain.linearRampToValueAtTime(f*0.012, t + Math.min(dur, 0.35));
+  lfo.connect(dep); dep.connect(o.frequency);
+  lfo.start(t); lfo.stop(t + dur + 0.05);
+  bgmNoise(ac, bgmEnv(ac, out, t, 0.04, dur*0.6, vol*0.18), t, dur*0.6, 'bandpass', f*2, 3);
+}
+// 笙のような和音: soft sines that swell and fade (the harmony under everything)
+function bgmPad(ac, out, ms, t, dur, vol){
+  for(var i=0;i<ms.length;i++){
+    var g = ac.createGain(), f = mtof(ms[i]);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + dur*0.35);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    g.connect(out);
+    bgmOsc(ac, g, 'sine', f*1.0015, t, dur);
+    bgmOsc(ac, g, 'sine', f*0.9985, t, dur);
+  }
+}
+
+// --- the scenes: each books one 16th-note step at a time (s = the step in the loop, n = steps since it began) ---
+var HOME_ARP = [0,2,4,5, 7,5,4,2, 1,3,5,6, 8,6,5,3, 0,2,4,7, 9,7,4,2, 3,5,7,8, 10,8,7,5];   // 陽音階の度数（8分音符）
+var GACHA_ARP = [0,2,3,5, 7,5,3,2, 0,3,5,7, 8,7,5,3];                                       // 都節の度数（16分音符）
+var PLAY_SHAMI = [0,0,5,0, 3,0,5,4, 0,0,5,0, 3,4,2,1];
+var PLAY_FLUTE = [[0,10,8],[8,9,4],[12,7,4],[16,8,6],[22,5,2],[24,7,8],[32,10,6],[38,12,2],[40,10,6],[48,9,6],[54,8,2],[56,7,8]];   // [step, degree, length in 16ths]
+var BGM_SCENES = {
+  home:{bpm:72, steps:128, level:1, play:function(ac, out, t, s){
+    if(s % 2===0){ var d = HOME_ARP[(s/2) % HOME_ARP.length]; if(!((s/2) % 16===15)) bgmKoto(ac, out, scaleNote(YO, 62, d), t, 0.055, 1.6); }
+    if(s % 32===0) bgmPad(ac, out, (s/32) % 2 ? [55, 62, 67] : [50, 57, 62], t, 6.5, 0.022);
+    if(s % 64===48) bgmKoto(ac, out, scaleNote(YO, 74, 4), t, 0.03, 2.2);
+  }},
+  play:{bpm:100, steps:64, level:1, play:function(ac, out, t, s){
+    var layer = Math.min(4, Math.floor(((state && state.combo) || 0)/10));   // コンボ10・20・30・40で1層ずつ
+    if(s % 16===0) bgmTaiko(ac, out, t, 0.2);
+    else if(s % 16===8) bgmTaiko(ac, out, t, 0.13);
+    else if(s % 16===14) bgmTaiko(ac, out, t, 0.06);
+    if(s % 32===0) bgmPad(ac, out, (s/32) % 2 ? [55, 62] : [50, 57], t, 4.6, 0.016);
+    if(layer>=1 && s % 2===0) bgmShamisen(ac, out, scaleNote(YO, 50, PLAY_SHAMI[(s/2) % PLAY_SHAMI.length]), t, 0.05);
+    if(layer>=2){ for(var i=0;i<PLAY_FLUTE.length;i++) if(PLAY_FLUTE[i][0]===s % 64){ var fl = PLAY_FLUTE[i]; bgmFlute(ac, out, scaleNote(YO, 62, fl[1]), t, fl[2]*60/100/4*0.95, 0.045); } }
+    if(layer>=3){ bgmShime(ac, out, t, s % 4===0 ? 0.07 : 0.035); if(s % 8===6) bgmKane(ac, out, t, 0.022); }
+    if(layer>=4 && s % 2===1 && (Math.floor(s/16) % 2===1)) bgmKoto(ac, out, scaleNote(YO, 74, (s*3) % 10), t, 0.03, 0.7);
+  }},
+  result:{bpm:92, steps:32, level:1, play:function(ac, out, t, s){
+    var strum = function(ms, vol){ for(var i=0;i<ms.length;i++) bgmKoto(ac, out, ms[i], t + i*0.028, vol, 1.8); };
+    if(s===0){ bgmTaiko(ac, out, t, 0.2); strum([50, 57, 62, 64, 69], 0.05); }
+    if(s===6) strum([62, 69], 0.03);
+    if(s===16){ bgmTaiko(ac, out, t, 0.17); strum([55, 62, 67, 71, 74], 0.05); }
+    if(s===22) strum([67, 74], 0.03);
+    if(s===24 || s===28) bgmKane(ac, out, t, 0.018);
+    if(s===0) bgmPad(ac, out, [50, 57, 62], t, 5.4, 0.018);
+  }},
+  gacha:{bpm:80, steps:64, level:1, play:function(ac, out, t, s){
+    if(s % 2===0){ var d = GACHA_ARP[(s/2) % GACHA_ARP.length] + (Math.floor(s/32) % 2 ? 2 : 0); bgmKoto(ac, out, scaleNote(IN, 62, d), t, 0.04, 2); }
+    if(s===0 || s===32) bgmPad(ac, out, s ? [43, 50, 55] : [38, 45, 50], t, 7, 0.024);
+    if(s % 16===12) bgmKane(ac, out, t, 0.012);
+  }}
+};
+function bgmSceneFor(screen){
+  if(screen==='game') return 'play';
+  if(screen==='result') return 'result';
+  if(screen==='gacha') return 'gacha';
+  return 'home';
+}
+function bgmAllowed(){ return !!(audioEnabled && bgmPref.on && bgmPref.vol>0 && bgm.unlocked && !document.hidden); }
+function bgmBus(ac){
+  if(!bgm.bus || bgm.bus.context!==ac){
+    bgm.bus = ac.createGain();
+    bgm.bus.gain.value = 0;
+    bgm.bus.connect(ac.destination);
+  }
+  return bgm.bus;
+}
+function bgmLevel(){ return bgmPref.vol*BGM_LEVEL; }
+// One call keeps everything right: the scene of this screen while the music may play, silence otherwise.
+function bgmSync(){
+  if(!bgm) return;
+  var want = bgmAllowed() ? bgmSceneFor(bgm.screen) : null;
+  var ac = want ? getAudioCtx() : audioCtx;
+  if(!want){
+    if(bgm.scene) bgmStopScene(!audioEnabled);   // 🔇: cut at once; anything else fades
+    return;
+  }
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended') ac.resume();
+    var bus = bgmBus(ac), now = ac.currentTime;
+    bus.gain.cancelScheduledValues(now);
+    bus.gain.setTargetAtTime(bgmLevel(), now, 0.08);
+    if(want!==bgm.scene) bgmStartScene(ac, want);
+  }catch(e){}
+}
+function bgmStartScene(ac, name){
+  var old = bgm.out, now = ac.currentTime;
+  if(old){                                          // the old scene fades out under the new one
+    try{ old.gain.cancelScheduledValues(now); old.gain.setValueAtTime(old.gain.value, now); old.gain.linearRampToValueAtTime(0, now + 0.7); }catch(e){}
+    setTimeout(function(){ try{ old.disconnect(); }catch(e){} }, 1200);
+  }
+  var out = ac.createGain();
+  out.gain.setValueAtTime(0, now);
+  out.gain.linearRampToValueAtTime(BGM_SCENES[name].level, now + 0.9);
+  out.connect(bgmBus(ac));
+  bgm.out = out;
+  bgm.scene = name;
+  bgm.step = 0;
+  bgm.next = now + 0.12;
+  if(!bgm.timer) bgm.timer = setInterval(bgmTick, BGM_TICK_MS);
+}
+function bgmStopScene(hard){
+  var out = bgm.out, ac = audioCtx;
+  bgm.scene = null;
+  bgm.out = null;
+  if(bgm.timer){ clearInterval(bgm.timer); bgm.timer = 0; }
+  if(!ac) return;
+  var now = ac.currentTime;
+  try{
+    if(bgm.bus){
+      bgm.bus.gain.cancelScheduledValues(now);
+      if(hard) bgm.bus.gain.setValueAtTime(0, now);   // 🔇: not a sound more, not even the tail of a note
+      else { bgm.bus.gain.setValueAtTime(bgm.bus.gain.value, now); bgm.bus.gain.linearRampToValueAtTime(0, now + 0.5); }
+    }
+  }catch(e){}
+  if(out) setTimeout(function(){ try{ out.disconnect(); }catch(e){} }, hard ? 0 : 900);
+}
+function bgmTick(){
+  var ac = audioCtx;
+  if(!bgm.scene || !bgm.out || !ac){ return; }
+  if(!bgmAllowed()){ bgmSync(); return; }
+  var sc = BGM_SCENES[bgm.scene], stepDur = 60/sc.bpm/4, now = ac.currentTime;
+  if(bgm.next < now - 0.2) bgm.next = now + 0.05;      // the tab was asleep: pick up from now, never a burst of notes
+  // while the master shows the rhythm (お手本) or the capsule opens, the music steps back
+  var duck = (bgm.scene==='play' && state && state.phase==='playing' && state.roundStage==='demo') ? 0.45 : 1;
+  if(performance.now() < bgm.duckUntil) duck = Math.min(duck, bgm.duckTo);
+  try{ bgm.out.gain.setTargetAtTime(sc.level*duck, now, 0.15); }catch(e){}
+  var guard = 0;
+  while(bgm.next < now + BGM_LOOKAHEAD && guard++ < 16){
+    try{ sc.play(ac, bgm.out, bgm.next, bgm.step % sc.steps, bgm.step); }catch(e){}
+    bgm.next += stepDur;
+    bgm.step++;
+  }
+}
+function bgmDuck(to, seconds){
+  if(!bgm) return;
+  bgm.duckTo = to;
+  bgm.duckUntil = performance.now() + seconds*1000;
+}
+function bgmOnScreen(name){
+  if(!bgm) return;
+  bgm.screen = name;
+  bgmSync();
+}
+// iPhone and most browsers start sound only after a tap: the first tap (and any later one, if the audio was
+// interrupted) wakes the audio and lets the music begin. Nothing is made while 🔇.
+function bgmUnlock(){
+  bgm.unlocked = true;
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(ac && ac.state!=='running'){ try{ ac.resume(); }catch(e){} }
+  bgmSync();
+}
+document.addEventListener('pointerdown', bgmUnlock, true);
+document.addEventListener('keydown', bgmUnlock, true);
+document.addEventListener('visibilitychange', function(){ bgmSync(); });
+
+// --- 記録と設定: BGM オン／オフ and its volume ---
+var bgmToggleBtn = document.getElementById('bgm-toggle'), bgmVolInput = document.getElementById('bgm-volume'), bgmVolOut = document.getElementById('bgm-vol-out');
+function renderBgmControls(){
+  if(!bgmToggleBtn) return;
+  bgmToggleBtn.textContent = bgmPref.on ? 'BGM オン' : 'BGM オフ';
+  bgmToggleBtn.setAttribute('aria-pressed', bgmPref.on ? 'true' : 'false');
+  var v = Math.round(bgmPref.vol*100);
+  bgmVolInput.value = String(v);
+  bgmVolOut.textContent = String(v);
+  bgmVolInput.closest('.bgm-vol').classList.toggle('is-off', !bgmPref.on);
+}
+bgmToggleBtn.addEventListener('click', function(){
+  bgmPref.on = !bgmPref.on;
+  saveBgmPref();
+  renderBgmControls();
+  bgmSync();
+});
+bgmVolInput.addEventListener('input', function(){
+  bgmPref.vol = clampInt(bgmVolInput.value, 0, 100)/100;
+  bgmVolOut.textContent = String(Math.round(bgmPref.vol*100));
+  bgmSync();                                         // heard at once while dragging
+});
+bgmVolInput.addEventListener('change', saveBgmPref);  // saved when the finger lets go
+renderBgmControls();
+bgm.screen = (function(){ for(var k in screens){ if(screens[k].classList.contains('active')) return k; } return 'title'; })();
+
+// ---------- リザルト: the numbers roll like a slot drum and lock one by one ----------
+// 得点 → 最大コンボ → 満足度 → 香りボーナス, each easing out (easeOutExpo) with a light tick while it rolls and a
+// crisp 「ピタッ」 when it stops. A new 自己ベスト gets a gold flash, gold confetti and its own fanfare. A tap anywhere on
+// the result (or スキップ) jumps to the final numbers. Only the display moves: the score was settled before this.
+var resultSkipBtn = document.getElementById('result-skip'), bestFlashEl = document.getElementById('best-flash');
+var RC = {running:false, raf:0, items:[], idx:0, t0:0, lastTick:0, best:false, celebrated:false, after:null, timer:0};
+function easeOutExpo(p){ return p>=1 ? 1 : 1 - Math.pow(2, -10*p); }
+function resultCountCalm(){ var fc = fxConf(); return fc.still || effectsPref.level==='low'; }
+function startResultCount(isNewBest, after){
+  finishResultCount(true);
+  var defs = [[resultScore, 1150], [resultCombo, 620], [resultSatisfaction, 620], [resultAroma, 620]];
+  RC.items = [];
+  for(var i=0;i<defs.length;i++){
+    var el = defs[i][0], to = parseInt(String(el.textContent).replace(/[^0-9]/g, ''), 10);
+    RC.items.push({el:el, to:isFinite(to) ? to : 0, text:el.textContent, dur:defs[i][1]});
+  }
+  RC.best = !!isNewBest;
+  RC.celebrated = false;
+  RC.after = after || null;
+  if(RC.best) resultNewBest.classList.remove('show');   // the badge waits for the score to lock
+  if(resultCountCalm()){ finishResultCount(); return; }
+  for(var j=0;j<RC.items.length;j++){ RC.items[j].el.textContent = '0'; RC.items[j].el.classList.remove('is-locked'); }
+  RC.running = true;
+  RC.idx = 0;
+  RC.t0 = 0;
+  resultSkipBtn.hidden = false;
+  RC.raf = requestAnimationFrame(resultCountFrame);
+  RC.timer = setTimeout(function(){ finishResultCount(); }, 6000);   // a safety net if frames stop coming
+}
+function resultCountFrame(ts){
+  RC.raf = 0;
+  if(!RC.running) return;
+  var it = RC.items[RC.idx];
+  if(!it){ finishResultCount(); return; }
+  if(!RC.t0) RC.t0 = ts;
+  if(ts<RC.t0){ RC.raf = requestAnimationFrame(resultCountFrame); return; }   // the breath between two drums
+  var p = Math.min(1, (ts - RC.t0)/it.dur), v = Math.max(0, Math.round(it.to*easeOutExpo(p)));
+  if(p<1){
+    it.el.classList.add('is-rolling');
+    // the drum: while far from the end, the low digits spin past; it settles as it eases in
+    it.el.textContent = String(p<0.85 && it.to>9 ? Math.min(it.to, v + Math.floor(Math.random()*Math.min(9, it.to - v + 1))) : v);
+    if(ts - RC.lastTick>58){ RC.lastTick = ts; playResultTick(); }
+  } else {
+    lockResultItem(it, RC.idx);
+    RC.idx++;
+    RC.t0 = ts + 130;                                     // a short breath before the next drum
+  }
+  RC.raf = requestAnimationFrame(resultCountFrame);
+}
+function lockResultItem(it, i){
+  it.el.textContent = it.text;
+  it.el.classList.remove('is-rolling');
+  it.el.classList.remove('is-locked'); void it.el.offsetWidth; it.el.classList.add('is-locked');
+  playResultLock(i);
+  if(i===0 && RC.best) celebrateBest();
+}
+// skip (or the end): every number final, the badge out, then whatever waits for the numbers (the rewards)
+function finishResultCount(quiet){
+  if(RC.raf){ cancelAnimationFrame(RC.raf); RC.raf = 0; }
+  if(RC.timer){ clearTimeout(RC.timer); RC.timer = 0; }
+  var was = RC.running;
+  RC.running = false;
+  if(resultSkipBtn) resultSkipBtn.hidden = true;
+  for(var i=0;i<RC.items.length;i++){ RC.items[i].el.textContent = RC.items[i].text; RC.items[i].el.classList.remove('is-rolling'); }
+  if(quiet){ RC.items = []; RC.after = null; return; }
+  if(RC.best && !RC.celebrated) celebrateBest();
+  var after = RC.after;
+  RC.after = null;
+  RC.items = [];
+  if(after) try{ after(); }catch(e){}
+  return was;
+}
+// 自己ベスト更新: a gold flash and gold confetti over the whole screen, and a fanfare; the badge glows
+function celebrateBest(){
+  RC.celebrated = true;
+  resultNewBest.classList.add('show', 'is-hot');
+  playBestFanfare();
+  if(fxConf().still) return;                            // reduced motion: the sound and the badge only
+  bestFlashEl.textContent = '';
+  var n = (!effectsPref.particlesOn || effectsPref.level==='low' || visualDetail==='low') ? 0 : (effectsPref.level==='high' ? 46 : 32);
+  var cols = ['#f2c94c', '#e8b84a', '#fff1b8', '#d4a017', '#f7d774'];
+  for(var i=0;i<n;i++){
+    var c = document.createElement('i');
+    c.className = 'best-conf';
+    c.style.left = (Math.random()*100).toFixed(1) + '%';
+    c.style.background = cols[i % cols.length];
+    c.style.setProperty('--dx', Math.round((Math.random() - 0.5)*120) + 'px');
+    c.style.setProperty('--r', Math.round(360 + Math.random()*540) + 'deg');
+    c.style.setProperty('--d', (1.3 + Math.random()*0.9).toFixed(2) + 's');
+    c.style.setProperty('--w', (Math.random()*0.35).toFixed(2) + 's');
+    bestFlashEl.appendChild(c);
+  }
+  bestFlashEl.hidden = false;
+  bestFlashEl.classList.remove('go'); void bestFlashEl.offsetWidth; bestFlashEl.classList.add('go');
+  setTimeout(function(){ bestFlashEl.hidden = true; bestFlashEl.textContent = ''; }, 2600);
+}
+// the sounds of the drum (all through the effects' bus; silent while 🔇)
+function playResultTick(){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{ sfxNoiseVoice(ac, {filter:'bandpass', f:3600, q:3, dur:0.018, vol:0.035, atk:0.001}, 0); }catch(e){}
+}
+function playResultLock(i){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    var base = [1047, 1175, 1319, 1568][i % 4];
+    gachaTone(ac, base, 0, 0.16, 'triangle', 0.08);
+    gachaTone(ac, base*1.5, 0.03, 0.22, 'sine', 0.05);
+    gachaTone(ac, 180, 0, 0.12, 'sine', 0.08, 90);
+    sfxNoiseVoice(ac, {filter:'highpass', f:5000, dur:0.03, vol:0.04, atk:0.001}, 0);
+  }catch(e){}
+}
+function playBestFanfare(){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended') ac.resume();
+    gachaTone(ac, 110, 0, 0.5, 'sine', 0.2, 48);
+    gachaTone(ac, 110, 0.22, 0.5, 'sine', 0.16, 48);
+    gachaBrass(ac, [293.7, 440, 587.3], 0.18, 0.28, 0.03);
+    gachaBrass(ac, [329.6, 493.9, 659.3], 0.46, 0.28, 0.03);
+    gachaBrass(ac, [392, 587.3, 784, 987.8], 0.74, 0.9, 0.03);
+    for(var k=0;k<7;k++) gachaTone(ac, [1568, 1760, 2093, 2349, 2637, 3136, 3520][k], 0.8 + k*0.06, 0.45, 'sine', 0.025);
+  }catch(e){}
+  bgmDuck(0.4, 2.2);
+}
+screens.result.addEventListener('pointerdown', function(){ if(RC.running) finishResultCount(); }, true);
+resultSkipBtn.addEventListener('click', function(){ finishResultCount(); focusEl(btnRestart); });
+document.addEventListener('keydown', function(e){
+  if(RC.running && (e.key==='Escape' || e.key==='Enter' || e.key===' ')){ finishResultCount(); if(e.key==='Escape') e.preventDefault(); }
+});
 })();
 </script>
 </body>
