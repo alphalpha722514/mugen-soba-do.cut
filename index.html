@@ -537,6 +537,28 @@ body{
 /* ---------- Result ---------- */
 .new-best-badge{color:var(--accent2-ink);font-weight:700;font-size:.92rem;margin:0 0 10px;display:none;}
 .new-best-badge.show{display:block;}
+/* the result's numbers roll like a drum, then lock with a little jump */
+#screen-result{position:relative;}
+.result-skip{position:absolute;top:8px;right:0;z-index:2;}
+.result-stats span.is-rolling{display:inline-block;filter:blur(.4px);opacity:.85;animation:slotRoll .09s linear infinite;font-variant-numeric:tabular-nums;}
+.result-stats span.is-locked{display:inline-block;animation:slotLock .32s cubic-bezier(.2,1.8,.4,1);}
+@keyframes slotRoll{0%{transform:translateY(-3px);}50%{transform:translateY(3px);}100%{transform:translateY(-3px);}}
+@keyframes slotLock{0%{transform:scale(1.35);color:var(--accent2-ink);}100%{transform:none;}}
+.new-best-badge.is-hot{display:inline-block;padding:4px 14px;border-radius:999px;color:#5a3a06;background:linear-gradient(180deg,#ffe9a8,#e8b84a);
+  box-shadow:0 0 0 2px #fff6d6,0 0 18px rgba(232,184,74,0.75);animation:bestHot 1.4s ease-in-out infinite alternate;}
+@keyframes bestHot{from{transform:scale(1);}to{transform:scale(1.06);}}
+/* 自己ベスト更新: a gold flash over the whole screen and gold confetti */
+.best-flash{position:fixed;inset:0;z-index:55;pointer-events:none;overflow:hidden;}
+.best-flash::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(255,236,160,0.85),rgba(232,184,74,0.35) 45%,rgba(232,184,74,0) 75%);
+  animation:bestFlash .9s ease-out both;}
+@keyframes bestFlash{0%{opacity:0;}15%{opacity:1;}100%{opacity:0;}}
+.best-conf{position:absolute;top:-16px;width:8px;height:12px;border-radius:2px;animation:bestFall var(--d,1.6s) cubic-bezier(.3,.6,.5,1) both;animation-delay:var(--w,0s);}
+@keyframes bestFall{from{transform:translate(0,0) rotate(0);}to{transform:translate(var(--dx,0px),110vh) rotate(var(--r,540deg));}}
+@media (prefers-reduced-motion:reduce){
+  .result-stats span.is-rolling,.result-stats span.is-locked,.new-best-badge.is-hot{animation:none;}
+  .best-flash::before{animation:none;opacity:0;}
+  .best-conf{display:none;}
+}
 .btn-main{
   font-family:var(--font-body);font-weight:700;font-size:1.05rem;
   padding:14px 36px;border:none;border-radius:999px;
@@ -804,6 +826,11 @@ body{
 .daily-btn.is-done .daily-sub{color:var(--ok);}
 @media (hover:hover){ .daily-btn:hover,.collect-btn:hover{border-color:var(--accent-ink);} }
 .help-opts{flex-wrap:wrap;}
+.bgm-opts{flex-wrap:wrap;align-items:center;}
+.bgm-vol{display:flex;align-items:center;gap:8px;flex:1 1 160px;min-width:0;font-size:.78rem;font-weight:700;}
+.bgm-vol input{flex:1 1 auto;min-width:0;accent-color:var(--accent-ink);}
+.bgm-vol output{min-width:2.2em;text-align:right;font-variant-numeric:tabular-nums;}
+.bgm-vol.is-off{opacity:.5;}
 /* the home over the equipped background: the background fills the screen, the home sits on washi paper */
 .home-bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 #app{z-index:1;}
@@ -946,6 +973,32 @@ body{
 .gres.r-tokujo,.gres.r-kiwami{box-shadow:0 0 0 1px var(--rc),0 0 14px color-mix(in srgb,var(--rc) 45%,transparent);}
 @keyframes gresIn{from{opacity:0;transform:translateY(8px) scale(.96);}to{opacity:1;transform:none;}}
 .gres .art{width:52px;}
+/* 被り: the picture turns into a そば札 with a pop (after the cards have come in) */
+.gres{--art-w:52px;}
+.gres-list.is-single .gres{--art-w:96px;}
+.gres-fuda{
+  position:absolute;top:8px;left:50%;width:var(--art-w);aspect-ratio:1/1;margin-left:calc(var(--art-w) / -2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:10px;
+  background:linear-gradient(160deg,#fbf3dc,#ead7a6);border:2px solid #b58a35;color:#6b4a14;
+  font-size:calc(var(--art-w) * .2);font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums;
+  box-shadow:0 2px 6px rgba(80,55,15,0.25);opacity:0;transform:scale(.4);
+  animation:fudaIn .34s cubic-bezier(.2,1.6,.4,1) both;animation-delay:calc(var(--i,0) * 70ms + 620ms);
+}
+.gres-fuda b{display:grid;place-items:center;width:1.6em;height:1.6em;border-radius:5px;background:#a93a26;color:#fbf3dc;font-size:1.05em;}
+.gres.is-dup .art{animation:artOut .22s ease-in both;animation-delay:calc(var(--i,0) * 70ms + 600ms);}
+@keyframes fudaIn{from{opacity:0;transform:scale(.4) rotate(-12deg);}to{opacity:1;transform:none;}}
+@keyframes artOut{to{opacity:0;transform:scale(.5);}}
+/* the stage jolts when the capsule lands (ドスン!) and on a big pop */
+.gacha-stage-wrap.is-thud{animation:stageThud .28s ease-out;}
+.gacha-stage-wrap.is-boom{animation:stageBoom .42s ease-out;}
+@keyframes stageThud{0%{transform:translateY(0);}30%{transform:translateY(3px) scale(1.012);}65%{transform:translateY(-1px);}100%{transform:none;}}
+@keyframes stageBoom{0%{transform:scale(1);}25%{transform:scale(1.025);}55%{transform:scale(.995);}100%{transform:none;}}
+@media (prefers-reduced-motion:reduce){
+  .gres-fuda,.gres.is-dup .art{animation:none;}
+  .gres-fuda{opacity:1;transform:none;}
+  .gres.is-dup .art{opacity:0;}
+  .gacha-stage-wrap.is-thud,.gacha-stage-wrap.is-boom{animation:none;}
+}
 .gres-list.is-single .gres .art{width:96px;}
 .gres-name{font-size:.74rem;font-weight:900;line-height:1.35;word-break:auto-phrase;}
 .gres-list.is-single .gres-name{font-size:.95rem;}
@@ -1356,6 +1409,17 @@ body{
           <label class="fx-check"><input id="fx-particles" type="checkbox" checked> 紙吹雪やキラキラを出す</label>
           <p class="save-note">1杯出したあとの演出の強さです（得点や満足度は変わりません）。演出は画面をタップすると飛ばせます。</p>
         </div>
+        <div class="vis-row" role="group" aria-labelledby="bgm-title">
+          <span id="bgm-title" class="backup-title">BGM（音楽）</span>
+          <div class="vis-opts bgm-opts">
+            <button id="bgm-toggle" class="btn-small" type="button" aria-pressed="true">BGM オン</button>
+            <label class="bgm-vol" for="bgm-volume">音量
+              <input id="bgm-volume" type="range" min="0" max="100" step="5" value="40">
+              <output id="bgm-vol-out" for="bgm-volume">40</output>
+            </label>
+          </div>
+          <p class="save-note">効果音とは別に、BGMのオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</p>
+        </div>
         <div class="vis-row" role="group" aria-labelledby="help-row-title">
           <span id="help-row-title" class="backup-title">ルールとご意見</span>
           <div class="vis-opts help-opts">
@@ -1570,11 +1634,12 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、描画の細かさ、お客さんの反応の演出、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
+        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、効果音のオン・オフ、BGMのオン・オフと音量、描画の細かさ、お客さんの反応の演出、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、コインとそば札は多いほう、図鑑・アイテム・称号は両方を合わせたものになります。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
         <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。ホームやリザルトの「友達に共有」で共有すると、1日1回+200（共有ボーナス）。</li>
+        <li><b>BGM</b>ホーム・修行・リザルト・ガチャで、場面ごとの和風の音楽が流れます（音声ファイルは使わず、ブラウザの中で合成しています）。修行中はコンボが10・20・30・40と続くたびに、三味線・篠笛・締太鼓・箏が1つずつ重なります。「記録と設定」で、効果音とは別にオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</li>
         <li><b>今日のクイズ</b>ホームの「今日のクイズ」で、越前そばと福井にちなんだ4択クイズが1日3問出ます（問題は日付で決まり、その日はみんな同じ3問）。1問正解ごとにそば札1枚、3問とも正解するとさらに2枚。全問正解で称号「越前通」、通算30問正解で称号「そば博士」がもらえます。</li>
         <li><b>限定アイテム</b>ガチャや交換所には出ない4種のアイテムが、修行やクイズの実績（最大30コンボ・累計スコア50,000点・修行30回・クイズ通算10問正解）で解放されます。図鑑の「限定」に、まだのものは「？？？」と解放の条件が出ます。</li>
         <li><b>ガチャと図鑑</b>ホームの「ガチャを引く」で、コインを使って越前・福井にちなんだアイテムを引けます（1回500・10連4,500）。確率はガチャ画面にいつも表示しています（天井はありません）。被ったアイテムは「そば札」に変わり、「交換所」でまだ持っていないアイテムと交換できます。集めたアイテムは「図鑑」で見られ、「着せ替え」で器・麺・包丁・背景・演出の色・効果音・称号を着せ替えられます（見た目と音だけで、得点や判定は変わりません）。</li>
@@ -1843,6 +1908,7 @@ body{
   </section>
 
   <section id="screen-result" class="screen">
+    <button id="result-skip" class="btn-small result-skip" type="button" hidden>スキップ</button>
     <h2 class="result-title">修行終了!</h2>
     <p id="result-mode" class="result-mode" hidden></p>
     <div class="result-rank" id="result-rank">今回の腕前: ―</div>
@@ -1911,6 +1977,7 @@ body{
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <div id="best-flash" class="best-flash" aria-hidden="true" hidden></div>
 
   <div id="zmodal" class="zmodal" hidden>
     <div class="zmodal-backdrop" data-close="1"></div>
@@ -2313,6 +2380,7 @@ var SCHEMA_VERSION = 12;   // 10 → 11: 段位 becomes 称号 (stats, profile, 
 var LEGACY_KEYS = ['soba-dojo-bests','bestScores','soba-best','sobaBests'];
 var ONBOARDING_VERSION = 1;   // settings.onboarding.version: the rules guide a player has seen
 var QUIZ_PER_DAY = 3;         // the daily quiz: three questions a day, the same three for everyone on that date
+var DEFAULT_BGM_VOLUME = 0.4; // settings.sound.bgmVolume when a save has none
 // settings.visual.detail: how finely the bowl is drawn. Looks only; the schema stays 10 and saves without it get 'standard'.
 var VISUAL_DETAILS = ['high','standard','low'];
 var DEFAULT_VISUAL_DETAIL = 'standard';
@@ -3143,7 +3211,7 @@ function withEffectsDefaults(st){
   }
   return out;
 }
-function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:''}; }
+function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}}; }
 // settings.onboarding (the first-run rules guide) and settings.lastShareDate (the day the 共有ボーナス was last paid).
 // A save without them gets them; a player who has already played is not shown the guide again (it is in 記録と設定).
 function isDateStr(v){ return typeof v==='string' && /^\d{4}-\d{2}-\d{2}$/.test(v); }
@@ -3152,6 +3220,11 @@ function withDailyDefaults(st, played){
   var ob = isPlainObj(out.onboarding) ? out.onboarding : null;
   out.onboarding = ob ? {done:ob.done===true, version:clampInt(ob.version, 1, 1000) || ONBOARDING_VERSION} : {done:!!played, version:ONBOARDING_VERSION};
   out.lastShareDate = isDateStr(out.lastShareDate) ? out.lastShareDate : '';
+  // settings.sound.bgmOn / bgmVolume: the music, on its own switch and volume (soundOn, when there, is left as it is)
+  var snd = isPlainObj(out.sound) ? out.sound : {};
+  if(typeof snd.bgmOn!=='boolean') snd.bgmOn = true;
+  if(!(typeof snd.bgmVolume==='number' && snd.bgmVolume>=0 && snd.bgmVolume<=1)) snd.bgmVolume = DEFAULT_BGM_VOLUME;
+  out.sound = snd;
   return out;
 }
 // quiz: today's 3 questions (answered = [{id, choice, ok}] in the order asked), all the right answers ever and the
@@ -4738,6 +4811,7 @@ function onSaveImageClick(){
 }
 
 btnSaveImage.addEventListener('click', function(){
+  finishResultCount();                         // the picture is made from the final numbers
   try{ onSaveImageClick(); }
   catch(e){ setCardBusy(false); setShareMsg('画像を保存できませんでした。ゲームはこのまま続けられます。', true); }
 });
@@ -4754,6 +4828,7 @@ function showScreen(name){
   for(var k in screens){ screens[k].classList.remove('active'); }
   screens[name].classList.add('active');
   syncHomeBg(name==='title');
+  bgmOnScreen(name);                           // the music of the scene, crossfaded
   try{ window.scrollTo(0,0); }catch(e){}
   if(name==='result'){ try{ onResultShown(); }catch(e){} }
 }
@@ -4832,6 +4907,7 @@ function saveSoundPref(on){
     store.settings = st;
     saveStoreObj(store);
   }catch(e){}
+  bgmSync();                                   // 🔇 stops the music at once; 🔊 lets it play again
 }
 var audioEnabled = loadSoundPref();
 btnSoundToggle.textContent = audioEnabled ? '🔊' : '🔇';
@@ -5272,7 +5348,8 @@ function endGame(){
   showCoinsForGame(dailyJustCleared);
   showEquipOnResult();
   showScreen('result');
-  showRewards(claimRewards(), btnRestart);   // 限定 items whose record this game reached (looks only)
+  var rewards = claimRewards();               // 限定 items whose record this game reached (looks only)
+  startResultCount(isNewBest, function(){ showRewards(rewards, btnRestart); });   // the numbers roll in, then the news
 }
 
 // ---------- Limited-time modes: rules, records and looks ----------
@@ -5329,6 +5406,7 @@ function endSeasonalGame(){
   showCoinsForGame(false);   // limited modes earn coins too (no daily challenge there)
   showEquipOnResult();
   showScreen('result');
+  startResultCount(isNewBest, null);
 }
 function showAromaLost(){
   aromaPopupEl.textContent = '香りが飛んだ…';
@@ -5914,8 +5992,9 @@ function renderGachaRules(){
   }
 }
 var GACHA_REASON_LABELS = {ten:'10連の確定枠'};
+var GRES_STEP = 0.07, GRES_DUP_DELAY = 0.62;   // seconds: the cards come in one by one, then duplicates turn into そば札
 function renderGachaResults(res){
-  var spoken = [], dupN = 0;
+  var spoken = [], dupN = 0, fudaTimes = [];
   gachaResultList.textContent = '';
   gachaResultList.classList.toggle('is-single', res.results.length===1);
   for(var i=0;i<res.results.length;i++){
@@ -5934,6 +6013,17 @@ function renderGachaResults(res){
     sub.className = 'gres-sub ' + (r.dup ? 'is-dup' : 'is-new');
     sub.textContent = r.dup ? ('被り → そば札+' + fmtPoints(r.tickets)) : 'NEW';
     li.appendChild(sub);
+    if(r.dup){                                          // 被り: the picture turns into a そば札 with a pop
+      li.classList.add('is-dup');
+      var fuda = document.createElement('span');
+      fuda.className = 'gres-fuda';
+      fuda.setAttribute('aria-hidden', 'true');
+      var fb = document.createElement('b'); fb.textContent = '札';
+      fuda.appendChild(fb);
+      appendText(fuda, '+' + fmtPoints(r.tickets));
+      li.appendChild(fuda);
+      fudaTimes.push(GRES_DUP_DELAY + i*GRES_STEP);
+    }
     if(r.reason && Object.prototype.hasOwnProperty.call(GACHA_REASON_LABELS, r.reason)){
       var why = document.createElement('span');
       why.className = 'gres-why';
@@ -5952,6 +6042,7 @@ function renderGachaResults(res){
   gachaResultTitle.textContent = res.newTitle ? ('図鑑コンプリート！　称号「' + GACHA_TITLES[res.newTitle].name + '」を手に入れました。') : '';
   gachaResultsEl.hidden = false;
   gachaLive.textContent = '結果：' + spoken.join('、') + '。' + gachaResultTitle.textContent;
+  if(!fxConf().still) playFudaPops(fudaTimes);
 }
 function gachaFailText(res){
   if(res.reason==='short') return 'コインが足りません（あと' + fmtPoints(res.need) + '🪙）。';
@@ -6006,14 +6097,58 @@ function gachaTone(ac, f, at, dur, type, vol, f2){
   osc.start(t0);
   osc.stop(t0 + dur + 0.03);
 }
-function playGachaShake(ms){
+function playGachaShake(ms, delay){
   if(!audioEnabled) return;
   var ac = getAudioCtx();
   if(!ac) return;
   try{
     if(ac.state==='suspended'){ ac.resume(); }
-    var n = Math.max(3, Math.round(ms/150));
-    for(var i=0;i<n;i++) gachaTone(ac, i%2 ? 290 : 340, i*0.15, 0.07, 'triangle', 0.05 + 0.05*(i/n), i%2 ? 230 : 270);
+    var n = Math.max(3, Math.round(ms/150)), d = delay>0 ? delay : 0;
+    for(var i=0;i<n;i++) gachaTone(ac, i%2 ? 290 : 340, d + i*0.15, 0.07, 'triangle', 0.05 + 0.05*(i/n), i%2 ? 230 : 270);
+  }catch(e){}
+}
+// ドスン!: the capsule lands — a low thump, a dull knock of wood and a puff of dust
+function playGachaLand(){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended'){ ac.resume(); }
+    gachaTone(ac, 120, 0, 0.32, 'sine', 0.22, 42);
+    gachaTone(ac, 240, 0, 0.08, 'triangle', 0.07, 150);
+    sfxNoiseVoice(ac, {filter:'lowpass', f:900, f2:180, dur:0.18, vol:0.12, atk:0.002}, 0);
+  }catch(e){}
+}
+// a brass-like chord for the big fanfares (sawtooth through a soft filter)
+function gachaBrass(ac, freqs, at, dur, vol){
+  var t0 = ac.currentTime + at;
+  for(var i=0;i<freqs.length;i++){
+    var osc = ac.createOscillator(), filt = ac.createBiquadFilter(), g = ac.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freqs[i], t0);
+    filt.type = 'lowpass';
+    filt.frequency.setValueAtTime(900, t0);
+    filt.frequency.exponentialRampToValueAtTime(2600, t0 + 0.08);
+    filt.frequency.exponentialRampToValueAtTime(1200, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.03);
+    g.gain.setValueAtTime(vol, t0 + dur*0.6);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(filt); filt.connect(g); g.connect(sfxOut(ac));
+    osc.start(t0); osc.stop(t0 + dur + 0.03);
+  }
+}
+// そば札に変わる「ポンッ」: one pop for each duplicate, at the moment its card turns into そば札
+function playFudaPops(times){
+  if(!audioEnabled || !times.length) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended'){ ac.resume(); }
+    for(var i=0;i<times.length && i<10;i++){
+      gachaTone(ac, 520 + i*40, times[i], 0.09, 'sine', 0.09, 1250 + i*60);
+      sfxNoiseVoice(ac, {filter:'bandpass', f:2600, f2:1500, q:1.6, dur:0.05, vol:0.05, atk:0.001}, times[i]);
+    }
   }catch(e){}
 }
 var GACHA_CHIMES = {nami:[784], jo:[659,988], tokujo:[659,880,1319], kiwami:[523,659,784,1047,1568]};
@@ -6031,8 +6166,21 @@ function playGachaReveal(rarity){
     for(var i=0;i<notes.length;i++){
       gachaTone(ac, notes[i], 0.1 + i*0.09, i===notes.length-1 ? 0.7 : 0.3, 'triangle', 0.08);
     }
-    if(rarity==='kiwami'){
-      for(var k=0;k<6;k++) gachaTone(ac, k%2 ? 2637 : 2093, 0.57 + k*0.07, 0.25, 'sine', 0.03);
+    if(rarity==='jo'){                                  // 上: a bouncy pop on top
+      gachaTone(ac, 880, 0.3, 0.12, 'square', 0.035, 1320);
+      gachaTone(ac, 1320, 0.42, 0.18, 'triangle', 0.05);
+    } else if(rarity==='tokujo'){                       // 特上: a rich jingle — a low hit, a run up and a shimmer
+      gachaTone(ac, 98, 0.08, 0.5, 'sine', 0.14, 55);
+      var run = [880, 1047, 1319, 1568, 1760];
+      for(var r=0;r<run.length;r++) gachaTone(ac, run[r], 0.42 + r*0.06, 0.32, 'triangle', 0.045);
+      for(var sh=0;sh<5;sh++) gachaTone(ac, sh%2 ? 2637 : 3136, 0.75 + sh*0.06, 0.3, 'sine', 0.02);
+    } else if(rarity==='kiwami'){                       // 極み: taiko, a brass fanfare and a cascade of bells
+      gachaTone(ac, 110, 0.05, 0.6, 'sine', 0.2, 48);
+      gachaTone(ac, 110, 0.32, 0.6, 'sine', 0.18, 48);
+      gachaBrass(ac, [293.7, 440, 587.3], 0.55, 0.42, 0.035);
+      gachaBrass(ac, [392, 587.3, 784], 0.98, 0.42, 0.035);
+      gachaBrass(ac, [440, 659.3, 880, 1174.7], 1.4, 1.1, 0.032);
+      for(var k=0;k<8;k++) gachaTone(ac, k%2 ? 2637 : 2093, 1.45 + k*0.07, 0.4, 'sine', 0.025);
     }
   }catch(e){}
 }
@@ -6051,12 +6199,24 @@ function syncSoundButtons(){
 // lid, the seam wrapped in washi and sealed 「封」 — wobbles, the lid pops off and the contents burst out. The burst
 // throws the same particles as a pleased customer after a bowl is served (fxStep / drawFxParts: twinkling sparkles
 // and flipping confetti), with the expanding rings of a cut — more, faster and brighter for a higher rarity.
+// aura = the light of the rarity (並 白青・上 緑金・特上 金紫・極み 虹), rainbow = the aura's hue keeps turning,
+// sakura = gold cherry petals fall over the stage, hold = how long the burst plays (ms)
 var OPEN_FX = {
-  nami:  {shake:600,  count:14, rings:1, speed:0.9,  size:1.0,  flash:0,    rays:0,  glow:0.22, hint:false, extra:['soba','greenLight']},
-  jo:    {shake:800,  count:26, rings:2, speed:1.05, size:1.1,  flash:0.12, rays:0,  glow:0.35, hint:false, extra:['greenLight','soba','gold']},
-  tokujo:{shake:1050, count:44, rings:3, speed:1.2,  size:1.2,  flash:0.35, rays:8,  glow:0.55, hint:true,  extra:['gold','gold','soba','white']},
-  kiwami:{shake:1350, count:72, rings:4, speed:1.35, size:1.35, flash:0.6,  rays:14, glow:0.8,  hint:true,  extra:['gold','white','gold','greenLight']}
+  nami:  {shake:600,  count:14, rings:1, speed:0.9,  size:1.0,  flash:0,    rays:0,  glow:0.3,  hint:false, aura:['#cfe3ff','#8fb8e8'], extra:['white','soba'], hold:1700},
+  jo:    {shake:800,  count:26, rings:2, speed:1.05, size:1.1,  flash:0.12, rays:0,  glow:0.42, hint:false, aura:['#8fd46a','#e8c25a'], extra:['gold','greenLight','white'], hold:1700},
+  tokujo:{shake:1050, count:44, rings:3, speed:1.2,  size:1.2,  flash:0.35, rays:8,  glow:0.6,  hint:true,  aura:['#f2c14e','#a873e0'], extra:['gold','white','gold'], hold:1900},
+  kiwami:{shake:1350, count:72, rings:4, speed:1.35, size:1.35, flash:0.6,  rays:14, glow:0.85, hint:true,  aura:['#f5d77a','#f39ac0'], extra:['gold','white','gold'], hold:2500, rainbow:true, sakura:true}
 };
+var OPEN_DROP_MS = 380, OPEN_LAND_MS = 160;   // the capsule falls in (ドスン!) and settles before it starts to wobble
+// a colour from a hue (the 極み aura's rainbow)
+function hueHex(h){
+  h = ((h % 360) + 360) % 360;
+  var c = 0.78, x = c*(1 - Math.abs((h/60) % 2 - 1)), m = 0.2, r = 0, g = 0, b = 0;
+  if(h<60){ r = c; g = x; } else if(h<120){ r = x; g = c; } else if(h<180){ g = c; b = x; }
+  else if(h<240){ g = x; b = c; } else if(h<300){ r = x; b = c; } else { r = c; b = x; }
+  function hx(v){ var n = Math.round((v + m)*255).toString(16); return n.length<2 ? '0' + n : n; }
+  return '#' + hx(r) + hx(g) + hx(b);
+}
 var gStage = {ctx:null, w:0, h:0, raf:0, timer:0, anim:null, last:null};
 function stageInit(){
   try{ gStage.ctx = gachaStage.getContext('2d'); }catch(e){ gStage.ctx = null; }
@@ -6077,11 +6237,6 @@ function rgbaOf(color, a){
   var h = m ? m[1] : 'c29a3c';
   if(h.length===3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
   return 'rgba(' + parseInt(h.slice(0,2),16) + ',' + parseInt(h.slice(2,4),16) + ',' + parseInt(h.slice(4,6),16) + ',' + Math.max(0, Math.min(1, a)).toFixed(3) + ')';
-}
-function rarityColor(rarity){
-  var v = '';
-  try{ v = getComputedStyle(document.documentElement).getPropertyValue('--r-' + rarity).trim(); }catch(e){ v = ''; }
-  return v || '#c29a3c';
 }
 function fxColor(name){ return name==='white' ? '#ffffff' : (CARD_COL[name] || '#c29a3c'); }
 // the capsule: a ball of radius r; its seam is seen a little from above, as an ellipse (r × ry)
@@ -6258,12 +6413,13 @@ function drawStageScene(o){
     ctx.fillStyle = g;
     ctx.fillRect(0,0,W,H);
   }
-  ctx.fillStyle = 'rgba(40,28,10,0.14)';
+  var dy = o.dy || 0, near = Math.max(0, 1 + dy/Math.max(1, H));   // dy < 0: still falling (the shadow grows as it nears)
+  ctx.fillStyle = 'rgba(40,28,10,' + (0.14*near).toFixed(3) + ')';
   ctx.beginPath();
-  ctx.ellipse(k.cx, k.cy + k.r + 4*k.s, k.r*0.9, 6*k.s, 0, 0, Math.PI*2);
+  ctx.ellipse(k.cx, k.cy + k.r + 4*k.s, k.r*0.9*(0.5 + 0.5*near), 6*k.s*(0.5 + 0.5*near), 0, 0, Math.PI*2);
   ctx.fill();
   ctx.save();
-  ctx.translate(k.cx + (o.sx||0), k.cy + k.r);   // it rocks on its foot
+  ctx.translate(k.cx + (o.sx||0), k.cy + k.r + dy);   // it rocks on its foot
   ctx.rotate(o.rot||0);
   ctx.translate(-k.cx, -(k.cy + k.r));
   drawCapsuleLower(ctx, k, o.opened, o.color, o.opened ? o.glow : 0);
@@ -6286,8 +6442,38 @@ function spawnBurst(a){
   for(i=0;i<nSpark;i++){
     var an = Math.random()*Math.PI*2, rr = k.r*(0.55 + Math.random()*1.05);
     a.parts.push({kind:'spark', x:k.cx + Math.cos(an)*rr*1.25, y:k.cy - k.r*0.25 + Math.sin(an)*rr*0.75, vx:0, vy:-(8 + Math.random()*18),
-                  g:0, rot:0, vr:0, size:(3 + Math.random()*3)*fx.size, col:i % 2 ? CARD_COL.gold : a.color,
+                  g:0, rot:0, vr:0, size:(3 + Math.random()*3)*fx.size, col:i % 2 ? CARD_COL.gold : a.colors[i % a.colors.length],
                   age:-i*30, life:650 + Math.random()*420});
+  }
+  a.petals = [];                                        // 極み: gold cherry petals drifting down over everything
+  if(fx.sakura && a.petalN>0){
+    for(i=0;i<a.petalN;i++){
+      a.petals.push({x:Math.random()*gStage.w, y:-10 - Math.random()*gStage.h*0.9, vy:38 + Math.random()*46, sway:Math.random()*6.283,
+                     sw:0.6 + Math.random()*0.8, rot:Math.random()*6.283, vr:(Math.random() - 0.5)*3, size:(3.2 + Math.random()*2.6)*a.s,
+                     col:i % 3 ? '#f2c94c' : '#f7b2c8'});
+    }
+  }
+}
+function drawPetals(ctx, a, dt){
+  if(!a.petals || !a.petals.length) return;
+  var H = gStage.h;
+  for(var i=0;i<a.petals.length;i++){
+    var p = a.petals[i];
+    p.y += p.vy*dt/1000; p.sway += dt*0.003*p.sw; p.rot += p.vr*dt/1000;
+    if(p.y>H + 10) continue;
+    ctx.save();
+    ctx.translate(p.x + Math.sin(p.sway)*10, p.y);
+    ctx.rotate(p.rot);
+    ctx.scale(p.size, p.size*1.25);
+    ctx.beginPath();
+    ctx.moveTo(0, -1);
+    ctx.quadraticCurveTo(1.1, -0.25, 0.18, 0.95);
+    ctx.lineTo(0, 0.7);
+    ctx.lineTo(-0.18, 0.95);
+    ctx.quadraticCurveTo(-1.1, -0.25, 0, -1);
+    ctx.fillStyle = p.col;
+    ctx.fill();
+    ctx.restore();
   }
 }
 function drawBurst(a, since, dt){
@@ -6326,6 +6512,7 @@ function drawBurst(a, since, dt){
   ctx.globalAlpha = 1;
   a.parts = fxStep(a.parts, dt);                        // sparkles and confetti (the serving reaction's particles)
   drawFxParts(ctx, a.parts, false);
+  drawPetals(ctx, a, dt);
   if(fx.flash){
     var fa = fx.flash*(1 - since/280);
     if(fa>0){ ctx.fillStyle = 'rgba(255,255,255,' + fa.toFixed(3) + ')'; ctx.fillRect(0,0,W,H); }
@@ -6337,8 +6524,22 @@ function stageFrame(ts){
   var a = gStage.anim;
   if(!a) return;
   if(a.t0===null){ a.t0 = ts; a.last = ts; }
-  var t = ts - a.t0, dt = Math.min(50, Math.max(0, ts - a.last)), fx = a.fx;
+  var t0all = ts - a.t0, dt = Math.min(50, Math.max(0, ts - a.last)), fx = a.fx;
   a.last = ts;
+  if(fx.rainbow) a.color = hueHex(200 + t0all*0.22);     // 極み: the aura shimmers through every colour
+  var lead = OPEN_DROP_MS + OPEN_LAND_MS;
+  if(t0all<lead){                                       // ① it drops in from above and lands with a thud
+    var dy = 0;
+    if(t0all<OPEN_DROP_MS){ var q = t0all/OPEN_DROP_MS; dy = -gStage.h*0.95*(1 - q*q); }
+    else {
+      if(!a.landed){ a.landed = true; playGachaLand(); stagePulse('is-thud'); }
+      dy = -9*a.s*Math.sin(Math.PI*(t0all - OPEN_DROP_MS)/OPEN_LAND_MS);
+    }
+    drawStageScene({sx:0, rot:0, glow:0, color:a.color, opened:false, lift:0, dy:dy});
+    gStage.raf = requestAnimationFrame(stageFrame);
+    return;
+  }
+  var t = t0all - lead;
   if(!a.popped && t>=fx.shake) popOpening(a);
   if(!a.popped){
     var p = t/fx.shake;
@@ -6350,7 +6551,7 @@ function stageFrame(ts){
     drawStageScene({sx:0, rot:0, glow:fx.glow*(0.55 + 0.45*Math.max(0, 1 - since/900)), color:a.color, opened:true, lift:Math.min(1, since/420)});
     drawBurst(a, since, dt);
     if(!a.revealed && since>=240) revealOpening(a);
-    if(since>1700){ endOpening(); return; }
+    if(since>(fx.hold || 1700)){ endOpening(); return; }
   }
   gStage.raf = requestAnimationFrame(stageFrame);
 }
@@ -6358,6 +6559,14 @@ function popOpening(a){
   a.popped = true;
   spawnBurst(a);
   playGachaReveal(a.rarity);
+  if(a.rarity==='kiwami' || a.rarity==='tokujo') stagePulse('is-boom');
+}
+// the stage gives a small jolt (the landing, a big pop) — not when motion is to be kept calm
+function stagePulse(cls){
+  if(motionCalm()) return;
+  gachaStageWrap.classList.remove('is-thud', 'is-boom');
+  void gachaStageWrap.offsetWidth;
+  gachaStageWrap.classList.add(cls);
 }
 function revealOpening(a){
   if(a.revealed) return;
@@ -6367,7 +6576,7 @@ function revealOpening(a){
 }
 function drawStageIdle(){
   var r = gStage.last, fx = r ? OPEN_FX[r] : null;
-  drawStageScene({sx:0, rot:0, glow:fx ? fx.glow*0.5 : 0, color:r ? rarityColor(r) : '#c29a3c', opened:!!r, lift:1});
+  drawStageScene({sx:0, rot:0, glow:fx ? fx.glow*0.5 : 0, color:fx ? fx.aura[0] : '#c29a3c', opened:!!r, lift:1});
 }
 function endOpening(){
   var a = gStage.anim;
@@ -6381,9 +6590,12 @@ function endOpening(){
 function startOpening(rarity, onReveal){
   if(gStage.anim) endOpening();
   var fx = Object.prototype.hasOwnProperty.call(OPEN_FX, rarity) ? OPEN_FX[rarity] : OPEN_FX.nami;
-  var a = {rarity:rarity, fx:fx, t0:null, last:0, popped:false, revealed:false, onReveal:onReveal, parts:[], color:rarityColor(rarity), s:capsuleGeom().s};
-  a.colors = [a.color];
+  var a = {rarity:rarity, fx:fx, t0:null, last:0, popped:false, revealed:false, landed:false, onReveal:onReveal, parts:[], color:fx.aura[0], s:capsuleGeom().s};
+  a.colors = fx.aura.slice();
   for(var i=0;i<fx.extra.length;i++) a.colors.push(fxColor(fx.extra[i]));
+  var calmFx = visualDetail==='low' || effectsPref.level==='low';   // 軽量・控えめ: fewer bits, no petals
+  if(calmFx || !effectsPref.particlesOn){ a.fx = fx = Object.assign({}, fx, {count:Math.round(fx.count*(effectsPref.particlesOn ? 0.5 : 0.2))}); }
+  a.petalN = (fx.sakura && effectsPref.particlesOn && !calmFx) ? 34 : 0;
   if(!gStage.ctx || gStage.w<=0 || prefersReducedMotion()){
     // reduced motion (or no canvas): no wobbling or particles — straight to the opened capsule and the results
     gStage.last = rarity;
@@ -6395,8 +6607,9 @@ function startOpening(rarity, onReveal){
   gStage.anim = a;
   gachaSkipBtn.hidden = false;
   gachaStageWrap.classList.add('is-playing');
-  playGachaShake(fx.shake);
-  gStage.timer = setTimeout(function(){ revealOpening(a); }, fx.shake + 1200);   // safety net if frames stop coming
+  playGachaShake(fx.shake, (OPEN_DROP_MS + OPEN_LAND_MS)/1000);
+  bgmDuck(0.35, (OPEN_DROP_MS + OPEN_LAND_MS + fx.shake)/1000 + 1.6);   // the music steps back while the capsule opens
+  gStage.timer = setTimeout(function(){ revealOpening(a); }, OPEN_DROP_MS + OPEN_LAND_MS + fx.shake + 1200);   // safety net if frames stop coming
   gStage.raf = requestAnimationFrame(stageFrame);
 }
 function skipOpening(){
@@ -6906,6 +7119,7 @@ function previewEquipSound(it){
 // the 🔊 setting after a backup was read in (it may carry settings.sound.soundOn)
 function refreshSoundPref(){
   try{ audioEnabled = loadSoundPref(); syncSoundButtons(); }catch(e){}
+  try{ bgmPref = loadBgmPref(); renderBgmControls(); bgmSync(); }catch(e){}
 }
 
 // --- 着せ替えの絵: shared pieces. Grains and patterns are drawn once into an offscreen canvas (a sprite) and kept,
@@ -13622,6 +13836,428 @@ renderHome();
     openOnboarding(null);
   } else showRewards(res, null);
 })();
+
+// ---------- BGM: Japanese-style music made in Web Audio (no audio files), one piece per scene ----------
+// ホーム 箏のペンタトニック／修行 低い和太鼓と薄い和音（コンボ10ごとに三味線・篠笛・締太鼓と鉦・高い箏が重なる）／
+// リザルト 晴れやかな和音／ガチャ 神秘的なアルペジオ. Notes are booked a moment ahead on the audio clock, so the
+// tempo never wobbles with the frame rate. The music has its own volume and switch (settings.sound.bgmOn /
+// bgmVolume) and goes straight to the speakers, not through the sound effects' compressor, so a cut's 「シャキッ」
+// is never pushed down by it. While 🔇 (settings.sound.soundOn) nothing of it plays at all.
+var BGM_LEVEL = 2.0;                  // the music at bgmVolume 1.0 peaks near 0.2, the effects near 0.5: the cuts stay on top
+var BGM_LOOKAHEAD = 0.3, BGM_TICK_MS = 50;
+function loadBgmPref(){
+  try{
+    var s = loadStore().settings.sound || {};
+    return {on:s.bgmOn!==false, vol:(typeof s.bgmVolume==='number' && s.bgmVolume>=0 && s.bgmVolume<=1) ? s.bgmVolume : DEFAULT_BGM_VOLUME};
+  }catch(e){ return {on:true, vol:DEFAULT_BGM_VOLUME}; }
+}
+function saveBgmPref(){
+  try{
+    var store = loadStore(), st = store.settings, snd = isPlainObj(st.sound) ? st.sound : {};
+    snd.bgmOn = !!bgmPref.on;
+    snd.bgmVolume = Math.round(Math.max(0, Math.min(1, bgmPref.vol))*100)/100;
+    st.sound = snd;
+    saveStoreObj(store);
+  }catch(e){}
+}
+var bgmPref = loadBgmPref();
+var bgm = {bus:null, scene:null, out:null, timer:0, next:0, step:0, unlocked:false, screen:'title', duckUntil:0, duckTo:1};
+function mtof(m){ return 440*Math.pow(2, (m - 69)/12); }
+var YO = [0, 2, 5, 7, 9];             // 陽音階 (D E G A B over D)
+var IN = [0, 1, 5, 7, 8];             // 都節 (D E♭ G A B♭ over D): the mysterious, older sound
+function scaleNote(scale, root, deg){ var o = Math.floor(deg/5); return root + o*12 + scale[((deg % 5) + 5) % 5]; }
+
+// --- instruments (all into the scene's own gain node `out`) ---
+function bgmEnv(ac, out, t, atk, dur, vol){
+  var g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), t + atk);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  g.connect(out);
+  return g;
+}
+function bgmOsc(ac, dest, type, f, t, dur, f2){
+  var o = ac.createOscillator();
+  o.type = type;
+  o.frequency.setValueAtTime(f, t);
+  if(f2) o.frequency.exponentialRampToValueAtTime(f2, t + Math.min(dur, 0.06));
+  o.connect(dest);
+  o.start(t);
+  o.stop(t + dur + 0.05);
+  return o;
+}
+function bgmNoise(ac, dest, t, dur, type, f, q){
+  var src = ac.createBufferSource(), fl = ac.createBiquadFilter();
+  src.buffer = sfxNoiseBuffer(ac);
+  fl.type = type; fl.frequency.setValueAtTime(f, t); if(q) fl.Q.setValueAtTime(q, t);
+  src.connect(fl); fl.connect(dest);
+  src.start(t, Math.random()*0.8); src.stop(t + dur + 0.05);
+}
+// 箏: a plucked string — a bright attack that settles a hair flat, with two quieter overtones
+function bgmKoto(ac, out, m, t, vol, len){
+  var f = mtof(m), d = len || 1.3;
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.004, d, vol), 'triangle', f*1.012, t, d, f);
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.003, d*0.45, vol*0.32), 'sine', f*2, t, d*0.45);
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.002, d*0.2, vol*0.14), 'sine', f*3.01, t, d*0.2);
+}
+// 和太鼓: a deep skin that drops in pitch, and the slap of the stick
+function bgmTaiko(ac, out, t, vol){
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.004, 0.55, vol), 'sine', 118, t, 0.55, 46);
+  bgmNoise(ac, bgmEnv(ac, out, t, 0.002, 0.09, vol*0.35), t, 0.09, 'lowpass', 520);
+}
+// 締太鼓: a tight, high drum for the quick 16ths
+function bgmShime(ac, out, t, vol){
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.002, 0.07, vol), 'triangle', 380, t, 0.07, 300);
+  bgmNoise(ac, bgmEnv(ac, out, t, 0.001, 0.04, vol*0.6), t, 0.04, 'bandpass', 2400, 2);
+}
+// 鉦: a small gong — two bright partials that ring
+function bgmKane(ac, out, t, vol){
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.002, 0.5, vol), 'sine', 1760, t, 0.5);
+  bgmOsc(ac, bgmEnv(ac, out, t, 0.002, 0.35, vol*0.6), 'sine', 2637, t, 0.35);
+}
+// 三味線: a twangy pluck (a bright saw that darkens fast) with the 撥's click
+function bgmShamisen(ac, out, m, t, vol){
+  var f = mtof(m), fl = ac.createBiquadFilter();
+  fl.type = 'lowpass';
+  fl.frequency.setValueAtTime(3200, t);
+  fl.frequency.exponentialRampToValueAtTime(520, t + 0.22);
+  fl.connect(bgmEnv(ac, out, t, 0.002, 0.34, vol));
+  bgmOsc(ac, fl, 'sawtooth', f, t, 0.34);
+  bgmNoise(ac, bgmEnv(ac, out, t, 0.001, 0.02, vol*0.5), t, 0.02, 'highpass', 3000);
+}
+// 篠笛: a breathy flute with a slow vibrato
+function bgmFlute(ac, out, m, t, dur, vol){
+  var f = mtof(m), g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.07);
+  g.gain.setValueAtTime(vol, t + dur*0.75);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  g.connect(out);
+  var o = bgmOsc(ac, g, 'sine', f, t, dur), lfo = ac.createOscillator(), dep = ac.createGain();
+  lfo.frequency.setValueAtTime(5.2, t);
+  dep.gain.setValueAtTime(0, t);
+  dep.gain.linearRampToValueAtTime(f*0.012, t + Math.min(dur, 0.35));
+  lfo.connect(dep); dep.connect(o.frequency);
+  lfo.start(t); lfo.stop(t + dur + 0.05);
+  bgmNoise(ac, bgmEnv(ac, out, t, 0.04, dur*0.6, vol*0.18), t, dur*0.6, 'bandpass', f*2, 3);
+}
+// 笙のような和音: soft sines that swell and fade (the harmony under everything)
+function bgmPad(ac, out, ms, t, dur, vol){
+  for(var i=0;i<ms.length;i++){
+    var g = ac.createGain(), f = mtof(ms[i]);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + dur*0.35);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    g.connect(out);
+    bgmOsc(ac, g, 'sine', f*1.0015, t, dur);
+    bgmOsc(ac, g, 'sine', f*0.9985, t, dur);
+  }
+}
+
+// --- the scenes: each books one 16th-note step at a time (s = the step in the loop, n = steps since it began) ---
+var HOME_ARP = [0,2,4,5, 7,5,4,2, 1,3,5,6, 8,6,5,3, 0,2,4,7, 9,7,4,2, 3,5,7,8, 10,8,7,5];   // 陽音階の度数（8分音符）
+var GACHA_ARP = [0,2,3,5, 7,5,3,2, 0,3,5,7, 8,7,5,3];                                       // 都節の度数（16分音符）
+var PLAY_SHAMI = [0,0,5,0, 3,0,5,4, 0,0,5,0, 3,4,2,1];
+var PLAY_FLUTE = [[0,10,8],[8,9,4],[12,7,4],[16,8,6],[22,5,2],[24,7,8],[32,10,6],[38,12,2],[40,10,6],[48,9,6],[54,8,2],[56,7,8]];   // [step, degree, length in 16ths]
+var BGM_SCENES = {
+  home:{bpm:72, steps:128, level:1, play:function(ac, out, t, s){
+    if(s % 2===0){ var d = HOME_ARP[(s/2) % HOME_ARP.length]; if(!((s/2) % 16===15)) bgmKoto(ac, out, scaleNote(YO, 62, d), t, 0.055, 1.6); }
+    if(s % 32===0) bgmPad(ac, out, (s/32) % 2 ? [55, 62, 67] : [50, 57, 62], t, 6.5, 0.022);
+    if(s % 64===48) bgmKoto(ac, out, scaleNote(YO, 74, 4), t, 0.03, 2.2);
+  }},
+  play:{bpm:100, steps:64, level:1, play:function(ac, out, t, s){
+    var layer = Math.min(4, Math.floor(((state && state.combo) || 0)/10));   // コンボ10・20・30・40で1層ずつ
+    if(s % 16===0) bgmTaiko(ac, out, t, 0.2);
+    else if(s % 16===8) bgmTaiko(ac, out, t, 0.13);
+    else if(s % 16===14) bgmTaiko(ac, out, t, 0.06);
+    if(s % 32===0) bgmPad(ac, out, (s/32) % 2 ? [55, 62] : [50, 57], t, 4.6, 0.016);
+    if(layer>=1 && s % 2===0) bgmShamisen(ac, out, scaleNote(YO, 50, PLAY_SHAMI[(s/2) % PLAY_SHAMI.length]), t, 0.05);
+    if(layer>=2){ for(var i=0;i<PLAY_FLUTE.length;i++) if(PLAY_FLUTE[i][0]===s % 64){ var fl = PLAY_FLUTE[i]; bgmFlute(ac, out, scaleNote(YO, 62, fl[1]), t, fl[2]*60/100/4*0.95, 0.045); } }
+    if(layer>=3){ bgmShime(ac, out, t, s % 4===0 ? 0.07 : 0.035); if(s % 8===6) bgmKane(ac, out, t, 0.022); }
+    if(layer>=4 && s % 2===1 && (Math.floor(s/16) % 2===1)) bgmKoto(ac, out, scaleNote(YO, 74, (s*3) % 10), t, 0.03, 0.7);
+  }},
+  result:{bpm:92, steps:32, level:1, play:function(ac, out, t, s){
+    var strum = function(ms, vol){ for(var i=0;i<ms.length;i++) bgmKoto(ac, out, ms[i], t + i*0.028, vol, 1.8); };
+    if(s===0){ bgmTaiko(ac, out, t, 0.2); strum([50, 57, 62, 64, 69], 0.05); }
+    if(s===6) strum([62, 69], 0.03);
+    if(s===16){ bgmTaiko(ac, out, t, 0.17); strum([55, 62, 67, 71, 74], 0.05); }
+    if(s===22) strum([67, 74], 0.03);
+    if(s===24 || s===28) bgmKane(ac, out, t, 0.018);
+    if(s===0) bgmPad(ac, out, [50, 57, 62], t, 5.4, 0.018);
+  }},
+  gacha:{bpm:80, steps:64, level:1, play:function(ac, out, t, s){
+    if(s % 2===0){ var d = GACHA_ARP[(s/2) % GACHA_ARP.length] + (Math.floor(s/32) % 2 ? 2 : 0); bgmKoto(ac, out, scaleNote(IN, 62, d), t, 0.04, 2); }
+    if(s===0 || s===32) bgmPad(ac, out, s ? [43, 50, 55] : [38, 45, 50], t, 7, 0.024);
+    if(s % 16===12) bgmKane(ac, out, t, 0.012);
+  }}
+};
+function bgmSceneFor(screen){
+  if(screen==='game') return 'play';
+  if(screen==='result') return 'result';
+  if(screen==='gacha') return 'gacha';
+  return 'home';
+}
+function bgmAllowed(){ return !!(audioEnabled && bgmPref.on && bgmPref.vol>0 && bgm.unlocked && !document.hidden); }
+function bgmBus(ac){
+  if(!bgm.bus || bgm.bus.context!==ac){
+    bgm.bus = ac.createGain();
+    bgm.bus.gain.value = 0;
+    bgm.bus.connect(ac.destination);
+  }
+  return bgm.bus;
+}
+function bgmLevel(){ return bgmPref.vol*BGM_LEVEL; }
+// One call keeps everything right: the scene of this screen while the music may play, silence otherwise.
+function bgmSync(){
+  if(!bgm) return;
+  var want = bgmAllowed() ? bgmSceneFor(bgm.screen) : null;
+  var ac = want ? getAudioCtx() : audioCtx;
+  if(!want){
+    if(bgm.scene) bgmStopScene(!audioEnabled);   // 🔇: cut at once; anything else fades
+    return;
+  }
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended') ac.resume();
+    var bus = bgmBus(ac), now = ac.currentTime;
+    bus.gain.cancelScheduledValues(now);
+    bus.gain.setTargetAtTime(bgmLevel(), now, 0.08);
+    if(want!==bgm.scene) bgmStartScene(ac, want);
+  }catch(e){}
+}
+function bgmStartScene(ac, name){
+  var old = bgm.out, now = ac.currentTime;
+  if(old){                                          // the old scene fades out under the new one
+    try{ old.gain.cancelScheduledValues(now); old.gain.setValueAtTime(old.gain.value, now); old.gain.linearRampToValueAtTime(0, now + 0.7); }catch(e){}
+    setTimeout(function(){ try{ old.disconnect(); }catch(e){} }, 1200);
+  }
+  var out = ac.createGain();
+  out.gain.setValueAtTime(0, now);
+  out.gain.linearRampToValueAtTime(BGM_SCENES[name].level, now + 0.9);
+  out.connect(bgmBus(ac));
+  bgm.out = out;
+  bgm.scene = name;
+  bgm.step = 0;
+  bgm.next = now + 0.12;
+  if(!bgm.timer) bgm.timer = setInterval(bgmTick, BGM_TICK_MS);
+}
+function bgmStopScene(hard){
+  var out = bgm.out, ac = audioCtx;
+  bgm.scene = null;
+  bgm.out = null;
+  if(bgm.timer){ clearInterval(bgm.timer); bgm.timer = 0; }
+  if(!ac) return;
+  var now = ac.currentTime;
+  try{
+    if(bgm.bus){
+      bgm.bus.gain.cancelScheduledValues(now);
+      if(hard) bgm.bus.gain.setValueAtTime(0, now);   // 🔇: not a sound more, not even the tail of a note
+      else { bgm.bus.gain.setValueAtTime(bgm.bus.gain.value, now); bgm.bus.gain.linearRampToValueAtTime(0, now + 0.5); }
+    }
+  }catch(e){}
+  if(out) setTimeout(function(){ try{ out.disconnect(); }catch(e){} }, hard ? 0 : 900);
+}
+function bgmTick(){
+  var ac = audioCtx;
+  if(!bgm.scene || !bgm.out || !ac){ return; }
+  if(!bgmAllowed()){ bgmSync(); return; }
+  var sc = BGM_SCENES[bgm.scene], stepDur = 60/sc.bpm/4, now = ac.currentTime;
+  if(bgm.next < now - 0.2) bgm.next = now + 0.05;      // the tab was asleep: pick up from now, never a burst of notes
+  // while the master shows the rhythm (お手本) or the capsule opens, the music steps back
+  var duck = (bgm.scene==='play' && state && state.phase==='playing' && state.roundStage==='demo') ? 0.45 : 1;
+  if(performance.now() < bgm.duckUntil) duck = Math.min(duck, bgm.duckTo);
+  try{ bgm.out.gain.setTargetAtTime(sc.level*duck, now, 0.15); }catch(e){}
+  var guard = 0;
+  while(bgm.next < now + BGM_LOOKAHEAD && guard++ < 16){
+    try{ sc.play(ac, bgm.out, bgm.next, bgm.step % sc.steps, bgm.step); }catch(e){}
+    bgm.next += stepDur;
+    bgm.step++;
+  }
+}
+function bgmDuck(to, seconds){
+  if(!bgm) return;
+  bgm.duckTo = to;
+  bgm.duckUntil = performance.now() + seconds*1000;
+}
+function bgmOnScreen(name){
+  if(!bgm) return;
+  bgm.screen = name;
+  bgmSync();
+}
+// iPhone and most browsers start sound only after a tap: the first tap (and any later one, if the audio was
+// interrupted) wakes the audio and lets the music begin. Nothing is made while 🔇.
+function bgmUnlock(){
+  bgm.unlocked = true;
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(ac && ac.state!=='running'){ try{ ac.resume(); }catch(e){} }
+  bgmSync();
+}
+document.addEventListener('pointerdown', bgmUnlock, true);
+document.addEventListener('keydown', bgmUnlock, true);
+document.addEventListener('visibilitychange', function(){ bgmSync(); });
+
+// --- 記録と設定: BGM オン／オフ and its volume ---
+var bgmToggleBtn = document.getElementById('bgm-toggle'), bgmVolInput = document.getElementById('bgm-volume'), bgmVolOut = document.getElementById('bgm-vol-out');
+function renderBgmControls(){
+  if(!bgmToggleBtn) return;
+  bgmToggleBtn.textContent = bgmPref.on ? 'BGM オン' : 'BGM オフ';
+  bgmToggleBtn.setAttribute('aria-pressed', bgmPref.on ? 'true' : 'false');
+  var v = Math.round(bgmPref.vol*100);
+  bgmVolInput.value = String(v);
+  bgmVolOut.textContent = String(v);
+  bgmVolInput.closest('.bgm-vol').classList.toggle('is-off', !bgmPref.on);
+}
+bgmToggleBtn.addEventListener('click', function(){
+  bgmPref.on = !bgmPref.on;
+  saveBgmPref();
+  renderBgmControls();
+  bgmSync();
+});
+bgmVolInput.addEventListener('input', function(){
+  bgmPref.vol = clampInt(bgmVolInput.value, 0, 100)/100;
+  bgmVolOut.textContent = String(Math.round(bgmPref.vol*100));
+  bgmSync();                                         // heard at once while dragging
+});
+bgmVolInput.addEventListener('change', saveBgmPref);  // saved when the finger lets go
+renderBgmControls();
+bgm.screen = (function(){ for(var k in screens){ if(screens[k].classList.contains('active')) return k; } return 'title'; })();
+
+// ---------- リザルト: the numbers roll like a slot drum and lock one by one ----------
+// 得点 → 最大コンボ → 満足度 → 香りボーナス, each easing out (easeOutExpo) with a light tick while it rolls and a
+// crisp 「ピタッ」 when it stops. A new 自己ベスト gets a gold flash, gold confetti and its own fanfare. A tap anywhere on
+// the result (or スキップ) jumps to the final numbers. Only the display moves: the score was settled before this.
+var resultSkipBtn = document.getElementById('result-skip'), bestFlashEl = document.getElementById('best-flash');
+var RC = {running:false, raf:0, items:[], idx:0, t0:0, lastTick:0, best:false, celebrated:false, after:null, timer:0};
+function easeOutExpo(p){ return p>=1 ? 1 : 1 - Math.pow(2, -10*p); }
+function resultCountCalm(){ var fc = fxConf(); return fc.still || effectsPref.level==='low'; }
+function startResultCount(isNewBest, after){
+  finishResultCount(true);
+  var defs = [[resultScore, 1150], [resultCombo, 620], [resultSatisfaction, 620], [resultAroma, 620]];
+  RC.items = [];
+  for(var i=0;i<defs.length;i++){
+    var el = defs[i][0], to = parseInt(String(el.textContent).replace(/[^0-9]/g, ''), 10);
+    RC.items.push({el:el, to:isFinite(to) ? to : 0, text:el.textContent, dur:defs[i][1]});
+  }
+  RC.best = !!isNewBest;
+  RC.celebrated = false;
+  RC.after = after || null;
+  if(RC.best) resultNewBest.classList.remove('show');   // the badge waits for the score to lock
+  if(resultCountCalm()){ finishResultCount(); return; }
+  for(var j=0;j<RC.items.length;j++){ RC.items[j].el.textContent = '0'; RC.items[j].el.classList.remove('is-locked'); }
+  RC.running = true;
+  RC.idx = 0;
+  RC.t0 = 0;
+  resultSkipBtn.hidden = false;
+  RC.raf = requestAnimationFrame(resultCountFrame);
+  RC.timer = setTimeout(function(){ finishResultCount(); }, 6000);   // a safety net if frames stop coming
+}
+function resultCountFrame(ts){
+  RC.raf = 0;
+  if(!RC.running) return;
+  var it = RC.items[RC.idx];
+  if(!it){ finishResultCount(); return; }
+  if(!RC.t0) RC.t0 = ts;
+  if(ts<RC.t0){ RC.raf = requestAnimationFrame(resultCountFrame); return; }   // the breath between two drums
+  var p = Math.min(1, (ts - RC.t0)/it.dur), v = Math.max(0, Math.round(it.to*easeOutExpo(p)));
+  if(p<1){
+    it.el.classList.add('is-rolling');
+    // the drum: while far from the end, the low digits spin past; it settles as it eases in
+    it.el.textContent = String(p<0.85 && it.to>9 ? Math.min(it.to, v + Math.floor(Math.random()*Math.min(9, it.to - v + 1))) : v);
+    if(ts - RC.lastTick>58){ RC.lastTick = ts; playResultTick(); }
+  } else {
+    lockResultItem(it, RC.idx);
+    RC.idx++;
+    RC.t0 = ts + 130;                                     // a short breath before the next drum
+  }
+  RC.raf = requestAnimationFrame(resultCountFrame);
+}
+function lockResultItem(it, i){
+  it.el.textContent = it.text;
+  it.el.classList.remove('is-rolling');
+  it.el.classList.remove('is-locked'); void it.el.offsetWidth; it.el.classList.add('is-locked');
+  playResultLock(i);
+  if(i===0 && RC.best) celebrateBest();
+}
+// skip (or the end): every number final, the badge out, then whatever waits for the numbers (the rewards)
+function finishResultCount(quiet){
+  if(RC.raf){ cancelAnimationFrame(RC.raf); RC.raf = 0; }
+  if(RC.timer){ clearTimeout(RC.timer); RC.timer = 0; }
+  var was = RC.running;
+  RC.running = false;
+  if(resultSkipBtn) resultSkipBtn.hidden = true;
+  for(var i=0;i<RC.items.length;i++){ RC.items[i].el.textContent = RC.items[i].text; RC.items[i].el.classList.remove('is-rolling'); }
+  if(quiet){ RC.items = []; RC.after = null; return; }
+  if(RC.best && !RC.celebrated) celebrateBest();
+  var after = RC.after;
+  RC.after = null;
+  RC.items = [];
+  if(after) try{ after(); }catch(e){}
+  return was;
+}
+// 自己ベスト更新: a gold flash and gold confetti over the whole screen, and a fanfare; the badge glows
+function celebrateBest(){
+  RC.celebrated = true;
+  resultNewBest.classList.add('show', 'is-hot');
+  playBestFanfare();
+  if(fxConf().still) return;                            // reduced motion: the sound and the badge only
+  bestFlashEl.textContent = '';
+  var n = (!effectsPref.particlesOn || effectsPref.level==='low' || visualDetail==='low') ? 0 : (effectsPref.level==='high' ? 46 : 32);
+  var cols = ['#f2c94c', '#e8b84a', '#fff1b8', '#d4a017', '#f7d774'];
+  for(var i=0;i<n;i++){
+    var c = document.createElement('i');
+    c.className = 'best-conf';
+    c.style.left = (Math.random()*100).toFixed(1) + '%';
+    c.style.background = cols[i % cols.length];
+    c.style.setProperty('--dx', Math.round((Math.random() - 0.5)*120) + 'px');
+    c.style.setProperty('--r', Math.round(360 + Math.random()*540) + 'deg');
+    c.style.setProperty('--d', (1.3 + Math.random()*0.9).toFixed(2) + 's');
+    c.style.setProperty('--w', (Math.random()*0.35).toFixed(2) + 's');
+    bestFlashEl.appendChild(c);
+  }
+  bestFlashEl.hidden = false;
+  bestFlashEl.classList.remove('go'); void bestFlashEl.offsetWidth; bestFlashEl.classList.add('go');
+  setTimeout(function(){ bestFlashEl.hidden = true; bestFlashEl.textContent = ''; }, 2600);
+}
+// the sounds of the drum (all through the effects' bus; silent while 🔇)
+function playResultTick(){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{ sfxNoiseVoice(ac, {filter:'bandpass', f:3600, q:3, dur:0.018, vol:0.035, atk:0.001}, 0); }catch(e){}
+}
+function playResultLock(i){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    var base = [1047, 1175, 1319, 1568][i % 4];
+    gachaTone(ac, base, 0, 0.16, 'triangle', 0.08);
+    gachaTone(ac, base*1.5, 0.03, 0.22, 'sine', 0.05);
+    gachaTone(ac, 180, 0, 0.12, 'sine', 0.08, 90);
+    sfxNoiseVoice(ac, {filter:'highpass', f:5000, dur:0.03, vol:0.04, atk:0.001}, 0);
+  }catch(e){}
+}
+function playBestFanfare(){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended') ac.resume();
+    gachaTone(ac, 110, 0, 0.5, 'sine', 0.2, 48);
+    gachaTone(ac, 110, 0.22, 0.5, 'sine', 0.16, 48);
+    gachaBrass(ac, [293.7, 440, 587.3], 0.18, 0.28, 0.03);
+    gachaBrass(ac, [329.6, 493.9, 659.3], 0.46, 0.28, 0.03);
+    gachaBrass(ac, [392, 587.3, 784, 987.8], 0.74, 0.9, 0.03);
+    for(var k=0;k<7;k++) gachaTone(ac, [1568, 1760, 2093, 2349, 2637, 3136, 3520][k], 0.8 + k*0.06, 0.45, 'sine', 0.025);
+  }catch(e){}
+  bgmDuck(0.4, 2.2);
+}
+screens.result.addEventListener('pointerdown', function(){ if(RC.running) finishResultCount(); }, true);
+resultSkipBtn.addEventListener('click', function(){ finishResultCount(); focusEl(btnRestart); });
+document.addEventListener('keydown', function(e){
+  if(RC.running && (e.key==='Escape' || e.key==='Enter' || e.key===' ')){ finishResultCount(); if(e.key==='Escape') e.preventDefault(); }
+});
 })();
 </script>
 </body>
