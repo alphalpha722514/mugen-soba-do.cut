@@ -3678,7 +3678,7 @@ function spawnStageNotes(isDemo, startTime){
   var times = computeTargetTimes(startTime, state.pattern);
   state.notes = [];
   for(var i=0;i<times.length;i++){
-    state.notes.push({targetTime:times[i], judged:false, isDemo:isDemo});
+    state.notes.push({targetTime:times[i], judged:false, isDemo:isDemo, beat:i});
   }
 }
 function startRound(){
@@ -3804,6 +3804,7 @@ btnStart.addEventListener('click', function(){
   // a limited-time mode starts only while today (device date) is inside its period
   if(isSeasonalMode(home.mode) && !seasonState(home.mode, localToday()).open){ renderHome(); return; }
   if(pendingStyle!==home.style) applyStyleSelection(home.style, false);
+  wakeAudio();   // the first お手本 comes before any cut, and iPhone lets sound start only inside a tap like this one
   startGame(home.tier, home.mode);
 });
 rankBadge.addEventListener('click', function(){ openMypage(rankBadge); });
@@ -4471,6 +4472,7 @@ getDownloads();   // ask early; the viewer answers later, never during this firs
 
 // ---------- Screens ----------
 function showScreen(name){
+  if(name!=='game') stopDemoTaps();   // leaving the game: the master's booked taps stop with it
   for(var k in screens){ screens[k].classList.remove('active'); }
   screens[name].classList.add('active');
   try{ window.scrollTo(0,0); }catch(e){}
@@ -4486,6 +4488,7 @@ function startGame(tierKey, modeId){
   var tier = TIERS[tierKey] || (mode==='hana' && SEASON_TIERS[tierKey]) || TIERS.regular;
   var style = STYLES[pendingStyle] ? pendingStyle : DEFAULT_STYLE;
   var styleConf = modeStyleConf(STYLES[style], mode);
+  stopDemoTaps();
   state = freshState();
   resetServeShow();
   state.skin = resolveSkin();   // 着せ替え: the equipped look and sound for this game (anything invalid = the original)
@@ -4557,7 +4560,8 @@ btnSoundToggle.addEventListener('click', function(){
   audioEnabled = !audioEnabled;
   btnSoundToggle.textContent = audioEnabled ? '🔊' : '🔇';
   saveSoundPref(audioEnabled);
-  if(!audioEnabled) stopPourSound();
+  if(!audioEnabled){ stopPourSound(); stopDemoTaps(); }
+  else wakeAudio();
 });
 
 // 描画の細かさ (settings.visual.detail): read from the save here and kept in memory, so drawing never reads the save.
@@ -6463,6 +6467,7 @@ function sfxNoiseVoice(ac, v, at, ratio){
   gain.connect(sfxOut(ac));
   src.start(t0);
   src.stop(t0 + dur + 0.05);
+  return src;
 }
 // a tone with its own attack (a struck board or metal starts at once; a rumble swells in) and a decay to silence
 function sfxToneVoice(ac, v, at, ratio){
@@ -6478,6 +6483,7 @@ function sfxToneVoice(ac, v, at, ratio){
   gain.connect(sfxOut(ac));
   osc.start(t0);
   osc.stop(t0 + dur + 0.03);
+  return osc;
 }
 // plays one recipe: ratio = the combo's note (see p), delay = seconds from now. Nothing at all while 🔇.
 function playSfx(name, ratio, delay){
@@ -6522,6 +6528,57 @@ function playFinishSound(){
 function playMissSound(){
   try{ var snd = skinPart('sound'); playSfx(snd && snd.miss ? snd.miss : 'missDrop', 1, 0); }catch(e){}
 }
+// 師匠のお手本: a dry 「トン」 of a knife on the wooden まな板. It is the master's own sound whatever sound item is
+// equipped, so the demonstration always sounds the same and stands apart from the player's cuts. Each tap is booked on
+// the audio clock a moment before its mark reaches the line, so it lands right on the beat; the booked taps are kept,
+// so leaving the game or switching to 🔇 stops them at once (nothing is left ringing).
+var DEMO_TAP_VOICES = [
+  {t:'tone', wave:'triangle', f:240, f2:180, dur:0.10, vol:0.22, atk:0.002, p:1},   // the board's hollow body
+  {t:'tone', wave:'sine', f:930, f2:700, dur:0.045, vol:0.11, atk:0.001, p:1},      // the knock of the wood
+  {t:'noise', filter:'lowpass', f:3400, f2:800, dur:0.028, vol:0.08, atk:0.001}     // the blade's dry click
+];
+var DEMO_TAP_LEAD_MS = 120;          // how far ahead a tap is booked
+var DEMO_TAP_LATE_MS = 60;           // a mark passed longer ago than this (the tab was hidden) stays silent
+var DEMO_TAP_PITCH = [1, 0.94];      // トン、トン: every other tap a touch lower, like a hand on a real board
+var demoTaps = [];
+function playDemoTap(delayMs, beat){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended') ac.resume();
+    var at = Math.max(0, delayMs)/1000, r = DEMO_TAP_PITCH[(beat||0) % DEMO_TAP_PITCH.length], now = ac.currentTime;
+    demoTaps = (demoTaps || []).filter(function(t){ return t.until > now; });
+    for(var i=0;i<DEMO_TAP_VOICES.length;i++){
+      var v = DEMO_TAP_VOICES[i];
+      var node = v.t==='tone' ? sfxToneVoice(ac, v, at, r) : sfxNoiseVoice(ac, v, at, r);
+      if(node) demoTaps.push({node:node, until:now + at + v.dur + 0.06});
+    }
+  }catch(e){}
+}
+// inside a tap: make the audio ready (a silent blip unlocks iPhone's Safari), so a sound booked later can play. Never while 🔇.
+function wakeAudio(){
+  if(!audioEnabled) return;
+  var ac = getAudioCtx();
+  if(!ac) return;
+  try{
+    if(ac.state==='suspended') ac.resume();
+    var blip = ac.createBufferSource();
+    blip.buffer = ac.createBuffer(1, 1, ac.sampleRate);
+    blip.connect(ac.destination);
+    blip.start(0);
+  }catch(e){}
+}
+function stopDemoTaps(){
+  var taps = demoTaps || [];
+  demoTaps = [];
+  for(var i=0;i<taps.length;i++){
+    try{ taps[i].node.stop(); }catch(e){}
+    try{ taps[i].node.disconnect(); }catch(e){}
+  }
+}
+document.addEventListener('visibilitychange', function(){ if(document.hidden) stopDemoTaps(); });
+window.addEventListener('pagehide', stopDemoTaps);
 // event: 'round' (each bowl begins), 'serve' (the customer eats) — moments only some sound items have
 function equipSfx(event){
   try{
@@ -11011,6 +11068,10 @@ function update(dt, now){
     } else if(state.roundStage==='demo'){
       for(var i=0;i<state.notes.length;i++){
         var n = state.notes[i];
+        if(!n.judged && !n.tapBooked && now>=n.targetTime-DEMO_TAP_LEAD_MS){
+          n.tapBooked = true;   // 師匠のトン: booked on the audio clock to land on the mark
+          if(now-n.targetTime<=DEMO_TAP_LATE_MS) playDemoTap(n.targetTime-now, n.beat);
+        }
         if(!n.judged && now>=n.targetTime){
           n.judged = true;
           state.knifeChop = 140;
