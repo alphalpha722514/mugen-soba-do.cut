@@ -57,11 +57,11 @@ window.__zukanExport = function(){
   var SWATCH = {body:'外側', inner:'内側', rim:'縁', gold:'金線', ink:'模様', shell:'卵殻', needle:'松葉',
     dough:'生地', doughDark:'生地の影', fills:'麺', outline:'輪郭', soak:'つゆ浸し', outlineSoak:'つゆ浸しの輪郭',
     blade:'地鉄', hagane:'刃', edge:'刃の線', handle:'柄', band:'口輪', collar:'口金', mei:'銘',
-    ring:'リング', just:'JUST!のリング', bits:'粒'};
+    ring:'リング', just:'Perfectのリング', bits:'粒'};
   var PATTERN = {deco:'模様', shape:'形', hamon:'刃紋', scene:'場面', light:'光', ringStyle:'リングの型', spark:'きらめき',
     grain:'粒', gloss:'艶', density:'模様の密度', speckDensity:'粒の量', husk:'甘皮', jitter:'不揃い', crack:'ヒビ', wet:'みずみずしさ',
     steam:'湯気の乗りやすさ', grav:'落ち方', spin:'回り方', unique:'一点ものの柄'};
-  var SOUND_WHEN = {cut:'切るたび（コンボで音階が上がる）', just:'JUST!の合いの手', round:'1杯ごとの始まり', finish:'1杯の仕上がり', serve:'お客さんが食べるとき', miss:'MISSのとき'};
+  var SOUND_WHEN = {cut:'切るたび（コンボで音階が上がる）', just:'Perfectの合いの手', round:'曲の始まり', finish:'リザルトの判子', serve:'リザルトでお客さんが味わうとき', miss:'Missのとき'};
   function isHex(v){ return typeof v==='string' && /^#[0-9a-f]{6}$/i.test(v); }
   function preview(slot, look){
     var w = 360, h = 190, dpr = 2, c = document.createElement('canvas');
@@ -106,12 +106,12 @@ window.__zukanExport = function(){
     if(slot==='sound') Object.keys(SOUND_WHEN).forEach(function(k){
       if(look[k]) sounds.push({when:SOUND_WHEN[k], recipe:look[k], voices:(SKIN_SFX[look[k]] || []).length});
     });
-    if(slot==='tool' && look.just) sounds.push({when:'JUST!のとき', recipe:look.just, voices:(SKIN_SFX[look.just] || []).length});
+    if(slot==='tool' && look.just) sounds.push({when:'Perfectのとき', recipe:look.just, voices:(SKIN_SFX[look.just] || []).length});
     var t = itemThumb(it);
     out.items.push({
       id:it.id, name:it.name, rarity:it.rarity, category:it.category, slot:slot, slotLabel:EQUIP_SLOT_LABELS[slot] || slot,
       desc:it.desc, note:SKIN_NOTES[it.id] || EQUIP_SLOT_NOTES[slot] || '',
-      season:GACHA_SEASON_ONLY[it.id] ? '新そばモードの期間だけ出ます（交換も期間中のみ）' : (it.source==='reward' ? 'ガチャ・交換所には出ません。' + rewardCondText(it.cond) + 'されます。' : ''),
+      season:GACHA_SEASON_ONLY[it.id] ? '新そばの期間（10月21日〜11月30日）だけ出ます（交換も期間中のみ）' : (it.source==='reward' ? 'ガチャ・交換所には出ません。' + rewardCondText(it.cond) + 'されます。' : ''),
       thumb:t ? t.toDataURL('image/webp', 0.9) : '',
       preview:['bowl','noodle','tool','bg','effect'].indexOf(slot)>=0 ? preview(slot, look) : '',
       swatches:swatches, params:params, sounds:sounds
