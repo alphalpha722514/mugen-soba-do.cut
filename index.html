@@ -878,6 +878,13 @@ body{
 .zan-tools-note{font-size:.68rem;color:var(--ink-soft);}
 .rank-sent{margin:-16px 0 20px;font-size:.8rem;font-weight:700;color:var(--accent-ink);text-align:center;}
 .rank-sent[hidden]{display:none;}
+/* 今日の一杯 (V5) */
+.ippai-grid{margin:8px 0 4px;font-size:1.15rem;line-height:1.3;letter-spacing:1px;white-space:pre-line;word-break:break-all;}
+.ippai-grid[hidden]{display:none;}
+.ippai-r-grid{font-size:1.3rem;}
+.ippai-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.ippai-box{border-color:var(--accent-ink);}
+.ippai-box .duel-box-h{color:var(--accent-ink);}
 /* 挑戦状 (V5) */
 .duel-box{width:100%;max-width:340px;margin:0 0 22px;padding:14px 16px;border-radius:16px;border:2px dashed var(--accent2-ink);background:var(--card);box-shadow:var(--card-shadow);text-align:center;}
 .duel-box[hidden]{display:none;}
@@ -1475,6 +1482,17 @@ body{
       </details>
     </section>
 
+    <section class="challenge ippai" aria-labelledby="ippai-label">
+      <div class="challenge-top">
+        <h2 id="ippai-label" class="challenge-label">今日の一杯 <span id="ippai-no"></span></h2>
+        <span id="ippai-status" class="chip chip-todo">未挑戦</span>
+      </div>
+      <p class="challenge-desc"><span id="ippai-desc"></span><span class="challenge-free">全員同じお題・0時に替わります</span></p>
+      <p id="ippai-grid" class="ippai-grid" aria-label="今日のベストの小節ごとの結果" hidden></p>
+      <div class="ippai-btns"><button id="ippai-go" class="btn-small btn-primary" type="button">挑む</button><button id="ippai-share" class="btn-small" type="button" hidden>結果をシェア</button></div>
+      <p id="ippai-msg" class="share-msg" role="status" aria-live="polite"></p>
+    </section>
+
     <section class="challenge" aria-labelledby="challenge-label">
       <div class="challenge-top">
         <h2 id="challenge-label" class="challenge-label">本日のチャレンジ</h2>
@@ -2031,6 +2049,13 @@ body{
       <p id="coin-status" class="coin-status"></p>
     </section>
     <p id="rank-sent" class="rank-sent" role="status" hidden></p>
+    <section id="ippai-box" class="duel-box ippai-box" aria-labelledby="ippai-box-h" hidden>
+      <h3 id="ippai-box-h" class="duel-box-h">今日の一杯</h3>
+      <p id="ippai-r-grid" class="ippai-grid ippai-r-grid" aria-label="小節ごとの結果"></p>
+      <p id="ippai-r-note" class="duel-lead"></p>
+      <button id="btn-ippai-share" class="btn-sub duel-btn" type="button">結果をシェア</button>
+      <p id="ippai-r-msg" class="share-msg" role="status" aria-live="polite"></p>
+    </section>
     <section id="duel-box" class="duel-box" aria-labelledby="duel-box-h" hidden>
       <h3 id="duel-box-h" class="duel-box-h">挑戦状</h3>
       <p id="duel-verdict" class="duel-verdict" hidden></p>
@@ -3526,6 +3551,12 @@ function sanitizeSectionMiss(raw){
   }
   return out;
 }
+// ippai (schema 14・V5): 今日の一杯 — the day, how many tries, and that day's best (its score, 完成度, 極・一閃 and grid)
+function sanitizeIppai(raw){
+  var r = isPlainObj(raw) ? raw : {}, ok = isDateStr(r.date);
+  return {date:ok ? r.date : '', tries:ok ? clampInt(r.tries, 0, 999) : 0, best:ok ? clampInt(r.best, 0, STAT_MAX) : 0, grade:ok && ZAN_GRADE_NAMES.indexOf(r.grade)>=0 ? r.grade : '',
+          crit:ok ? clampInt(r.crit, 0, STAT_MAX) : 0, grid:ok && typeof r.grid==='string' && /^[ygwr]{0,40}$/.test(r.grid) ? r.grid : '', bestTry:ok ? clampInt(r.bestTry, 0, 999) : 0};
+}
 // weekly (schema 14): 週の段位認定 — the week (its Monday, this device's date), whether it was passed, and how many weeks
 function sanitizeWeekly(raw){
   var w = isPlainObj(raw) ? raw : {};
@@ -3717,6 +3748,7 @@ function coerceStore(obj){
   out.rewards = sanitizeRewards(obj.rewards);
   out.zan = sanitizeZan(obj.zan);
   out.weekly = sanitizeWeekly(obj.weekly);                // 週の段位認定 (schema 14; older saves: none yet)
+  out.ippai = sanitizeIppai(obj.ippai);                   // 今日の一杯 (schema 14・V5; older saves: none yet)
   out.recordsClearedAt = clampInt(obj.recordsClearedAt, 0, 1e15);   // when 「記録を消す」 was last used while logged in (0: never)
   if(!(typeof obj.schema==='number' && obj.schema>=11)) migrateToTitles(out, obj);   // 段位 → 称号 (schema 10 and before)
   evaluateTitles(out);
@@ -3922,6 +3954,104 @@ function zanWeeklyText(g){
   var c = zanCourse(g.course);
   return g.name + 'で' + Math.ceil(zanJudgeCount(zanSongFor(c))*g.value) + 'コンボ以上';
 }
+// --- 今日の一杯 (V5): one course and its 心得 for everyone on the same day (this device's date), shared as a grid of
+// the bars of your turns: 🟨 all Perfect with 極・一閃 in half or more, 🟩 all Perfect, ⬜ an OK (or a フェイント bitten), 🟥 a Miss
+var IPPAI_EPOCH = Date.UTC(2026, 9, 3);             // 今日の一杯 #1
+var IPPAI_MODS = [{speed:1}, {speed:1.2}, {speed:1, strict:true}, {speed:1, blind:true}, {speed:1.2, blind:true}, {speed:1.5}];
+var IPPAI_EMOJI = {y:'🟨', g:'🟩', w:'⬜', r:'🟥'};
+function ippaiNo(date){
+  var t = Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10));
+  return Math.max(1, Math.round((t - IPPAI_EPOCH)/86400000) + 1);
+}
+function zanIppaiOf(date){
+  var seed = zanMix(seedFromDate(date + '|ippai')), cid = ZAN_COURSE_IDS[seed % ZAN_COURSE_IDS.length];
+  if(!zanPlayable(cid)) cid = ZAN_COURSE_IDS[0];
+  var c = zanCourse(cid);
+  return {date:date, no:ippaiNo(date), course:cid, mods:sanitizeMods(IPPAI_MODS[zanMix(seed + 1) % IPPAI_MODS.length]), trick:!!c.alwaysTrick || zanMix(seed + 2) % 3===0};
+}
+function zanIppaiRules(d){ var l = [].concat(d.trick ? ['イタズラ'] : [], zanModLabels(d.mods)); return l.length ? l.join('・') : '心得なし'; }
+function zanIppaiGrid(judges){
+  var bars = {}, keys = [];
+  for(var i=0;i<judges.length;i++){
+    var j = judges[i], k = Math.floor(j.b/4 + 1e-6);
+    if(!bars[k]){ bars[k] = {n:0, p:0, c:0, bad:false, miss:false}; keys.push(k); }
+    var o = bars[k];
+    if(j.rating==='MISS') o.miss = true;
+    else if(j.rating==='FOOLED' || j.rating==='OK') o.bad = true;
+    else { o.p++; if(j.crit) o.c++; }
+    if(j.rating!=='FOOLED') o.n++;
+  }
+  keys.sort(function(a, b){ return a - b; });
+  return keys.map(function(k){ var o = bars[k]; return o.miss ? 'r' : o.bad ? 'w' : o.c*2>=o.p ? 'y' : 'g'; }).join('').slice(0, 40);
+}
+function zanIppaiGridText(grid){
+  var em = grid.split('').map(function(ch){ return IPPAI_EMOJI[ch] || ''; }), per = Math.ceil(em.length/Math.max(1, Math.ceil(em.length/10))), rows = [];   // (rows of 10 or fewer, even)
+  for(var i=0;i<em.length;i+=per) rows.push(em.slice(i, i + per).join(''));
+  return rows.join('\n');
+}
+// finishZan: a 今日の一杯 run counts its try and keeps the day's best (on its own date only)
+function zanIppaiRecord(store, grade){
+  var d = zan.ippai;
+  if(!d || d.date!==todayStr()) return null;
+  var ip = store.ippai, grid = zanIppaiGrid(zan.judges);
+  if(ip.date!==d.date){ ip.date = d.date; ip.tries = 0; ip.best = 0; ip.grade = ''; ip.crit = 0; ip.grid = ''; ip.bestTry = 0; }
+  ip.tries = Math.min(999, ip.tries + 1);
+  var isBest = ip.tries===1 || zan.score>ip.best;
+  if(isBest){ ip.best = zan.score; ip.grade = grade; ip.crit = zan.crit; ip.grid = grid; ip.bestTry = ip.tries; }
+  return {grid:grid, isBest:isBest, tries:ip.tries};
+}
+function zanIppaiShareText(ip){
+  var d = zanIppaiOf(ip.date), c = zanCourse(d.course);
+  return '斬 今日の一杯 #' + d.no + ' ' + c.name + '［' + zanIppaiRules(d) + '］\n' + zanIppaiGridText(ip.grid) + '\n' + fmtPoints(ip.best) + '点 ' + ip.grade + '・極' + ip.crit + '（' + ip.bestTry + '杯目）\n' + SHARE_URL;
+}
+function zanIppaiShare(msgEl){
+  var ip = loadStore().ippai;
+  if(ip.date!==todayStr() || !ip.tries) return;
+  var text = zanIppaiShareText(ip), p = null;
+  try{ if(navigator.share) p = navigator.share({text:text}); }catch(e){ p = null; }
+  var copy = function(){
+    var c = null;
+    try{ if(navigator.clipboard && navigator.clipboard.writeText) c = navigator.clipboard.writeText(text); }catch(e){ c = null; }
+    if(c && typeof c.then==='function') c.then(function(){ msgEl.textContent = '結果をコピーしました。SNS や LINE に貼ってね。'; }, function(){ msgEl.textContent = 'コピーできませんでした。'; });
+    else msgEl.textContent = 'コピーできませんでした。';
+  };
+  if(p && typeof p.then==='function') p.then(function(){ msgEl.textContent = '結果をシェアしました。'; }, function(err){ if(err && err.name==='AbortError') msgEl.textContent = ''; else copy(); });
+  else copy();
+}
+function renderIppai(){
+  var el = document.getElementById('ippai-desc');
+  if(!el || typeof ZAN_COURSES==='undefined' || !ZAN_COURSES || typeof ZAN_SONGS==='undefined' || !ZAN_SONGS) return;   // (the home is drawn once before this part of the script has run)
+  var day = todayStr(), d = zanIppaiOf(day), ip = loadStore().ippai, played = ip.date===day && ip.tries>0;
+  document.getElementById('ippai-no').textContent = '#' + d.no;
+  el.textContent = zanCourse(d.course).name + '・' + zanIppaiRules(d);
+  var st = document.getElementById('ippai-status');
+  st.textContent = played ? 'ベスト ' + fmtPoints(ip.best) + '点' : '未挑戦';
+  st.className = 'chip ' + (played ? 'chip-done' : 'chip-todo');
+  var g = document.getElementById('ippai-grid');
+  g.hidden = !played;
+  g.textContent = played ? zanIppaiGridText(ip.grid) : '';
+  document.getElementById('ippai-share').hidden = !played;
+  document.getElementById('ippai-go').textContent = played ? 'もう一杯' : '挑む';
+}
+function zanIppaiResult(r){
+  var box = document.getElementById('ippai-box');
+  box.hidden = !r;
+  if(!r) return;
+  var ip = loadStore().ippai;
+  document.getElementById('ippai-box-h').textContent = '今日の一杯 #' + zan.ippai.no;
+  document.getElementById('ippai-r-grid').textContent = zanIppaiGridText(r.grid);
+  document.getElementById('ippai-r-note').textContent = (r.isBest ? '今日のベスト！' : '今日のベストは ' + fmtPoints(ip.best) + '点（' + ip.bestTry + '杯目）') + '・' + r.tries + '杯目';
+  document.getElementById('ippai-r-msg').textContent = '';
+}
+document.getElementById('ippai-go').addEventListener('click', function(){
+  var d = zanIppaiOf(todayStr());
+  zanArmed = {ippai:d};
+  zanHomeCourse = d.course;
+  wakeAudio();
+  zanLaunch(d.course);
+});
+document.getElementById('ippai-share').addEventListener('click', function(){ zanIppaiShare(document.getElementById('ippai-msg')); });
+document.getElementById('btn-ippai-share').addEventListener('click', function(){ zanIppaiShare(document.getElementById('ippai-r-msg')); });
 // called by finishZan on its store, before the titles are judged: true when the test was passed just now
 function zanWeeklyCheck(store, r){
   var wk = zanWeekKey(), g = zanWeeklyGoal(wk), w = store.weekly;
@@ -3943,6 +4073,7 @@ function renderWeekly(){
   st.textContent = done ? '合格' : '未認定';
   st.className = 'chip ' + (done ? 'chip-done' : 'chip-todo');
   document.getElementById('weekly-note').textContent = '月曜に替わります・合格 ' + store.weekly.total + '週';
+  renderIppai();
 }
 function zanCheckDailyClear(r){
   var store = loadStore();
@@ -10964,6 +11095,7 @@ function mergeStores(localRaw, cloudRaw){
     out.bests = R.bests; out.seasonal = R.seasonal; out.satisfaction = R.satisfaction; out.stats = R.stats;
     out.daily = R.daily; out.lastPlayedSeasonal = R.lastPlayedSeasonal; out.recordsClearedAt = R.recordsClearedAt;
     out.weekly = R.weekly;
+    out.ippai = R.ippai;
     out.zan = R.zan;
   } else {
     out.bests = mergeMaxNested(L.bests, C.bests);
@@ -10975,6 +11107,8 @@ function mergeStores(localRaw, cloudRaw){
     out.weekly = {weekKey:L.weekly.weekKey, cleared:L.weekly.cleared, total:Math.max(L.weekly.total, C.weekly.total)};   // 週の段位認定
     if(C.weekly.weekKey===L.weekly.weekKey) out.weekly.cleared = L.weekly.cleared || C.weekly.cleared;
     else if(C.weekly.weekKey>L.weekly.weekKey){ out.weekly.weekKey = C.weekly.weekKey; out.weekly.cleared = C.weekly.cleared; }
+    if(C.ippai.date===L.ippai.date){ out.ippai = C.ippai.best>L.ippai.best ? C.ippai : L.ippai; out.ippai.tries = Math.max(L.ippai.tries, C.ippai.tries); }   // 今日の一杯: the day's better one
+    else out.ippai = C.ippai.date>L.ippai.date ? C.ippai : L.ippai;
     if(!out.lastPlayedSeasonal) out.lastPlayedSeasonal = C.lastPlayedSeasonal;
   }
   var g = out.gacha, lg = L.gacha, cg = C.gacha;
@@ -14486,7 +14620,7 @@ function zanLaunch(courseId){
   });
 }
 function startZan(courseId, backing, practice){
-  var course = zanPlayable(courseId) ? zanCourse(courseId) : ZAN_COURSES[0], duel = !practice && zanArmed && zanArmed.duel && zanArmed.duel.course===course.id ? zanArmed.duel : null, mods = practice ? sanitizeMods(null) : duel ? duel.mods : zanCurrentMods(), song = practice ? practice.song : zanPlaySong(course, mods), tm = zanTempoOf(song);   // (区間練習: no 心得; 挑戦状: the sender's)
+  var course = zanPlayable(courseId) ? zanCourse(courseId) : ZAN_COURSES[0], duel = !practice && zanArmed && zanArmed.duel && zanArmed.duel.course===course.id ? zanArmed.duel : null, ippai = !practice && !duel && zanArmed && zanArmed.ippai && zanArmed.ippai.course===course.id ? zanArmed.ippai : null, mods = practice ? sanitizeMods(null) : duel ? duel.mods : ippai ? ippai.mods : zanCurrentMods(), song = practice ? practice.song : zanPlaySong(course, mods), tm = zanTempoOf(song);   // (区間練習: no 心得; 挑戦状: the sender's)
   stopDemoTaps();
   finishResultCount(true);
   state = freshState();
@@ -14503,13 +14637,14 @@ function startZan(courseId, backing, practice){
   var trick = false;
   try{ trick = !practice && loadStore().settings.zanTrick===true; }catch(e){}   // (区間練習: no イタズラ)
   if(duel) trick = duel.trick;                       // (挑戦状: the sender's イタズラ)
+  else if(ippai) trick = ippai.trick;                // (今日の一杯: the day's)
   if(!practice && course.alwaysTrick) trick = true;  // 越前打挽き: always (×1.2 too)
   var trickFrom = zanTrickFrom(song, practice ? null : course);
   var buzz = zanBuzzAllowed();
   var notes = zanChart(song, tm, trick, trickFrom);
   var ghost = null;                                  // ゴースト (looks only): this course's best, on the same chart
   try{ var gs = loadStore(); if(duel) ghost = zanGhostLoad(duel.ghost, song, tm); else if(!practice && gs.settings.ghost===true) ghost = zanGhostLoad(gs.zan.courses[course.id].ghost, song, tm); }catch(e){ ghost = null; }   // (挑戦状: the sender's knife)
-  zan = {course:course, song:song, tempo:tm, win:zanWindows(course, mods.strict), mods:mods, modMult:zanModMult(mods), travel:ZAN_TRAVEL/mods.speed, crit:0, judges:[], tono:null, ghost:ghost, duel:duel, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
+  zan = {course:course, song:song, tempo:tm, win:zanWindows(course, mods.strict), mods:mods, modMult:zanModMult(mods), travel:ZAN_TRAVEL/mods.speed, crit:0, judges:[], tono:null, ghost:ghost, duel:duel, ippai:ippai, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
          p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
@@ -14521,7 +14656,7 @@ function startZan(courseId, backing, practice){
   applyModeLook('normal');
   modeTag.hidden = false;
   modeTag.textContent = practice ? '練習中（記録されません）・' + course.name + '「' + practice.label + '」' + zanSpeedLabel(practice.speed)
-                                 : '斬・' + course.name + '・♩=' + zanBpmLabel(course) + (season ? '・' + SEASONAL_MODES[season].name + (song.shinsoba ? '譜面' : '') : '') + (zanModsActive(mods) ? '・' + zanModLabels(mods).join('・') : '') + (duel ? '・挑戦状「' + duel.name + '」' : '');
+                                 : '斬・' + course.name + '・♩=' + zanBpmLabel(course) + (season ? '・' + SEASONAL_MODES[season].name + (song.shinsoba ? '譜面' : '') : '') + (zanModsActive(mods) ? '・' + zanModLabels(mods).join('・') : '') + (duel ? '・挑戦状「' + duel.name + '」' : '') + (ippai ? '・今日の一杯 #' + ippai.no : '');
   document.getElementById('btn-practice-quit').hidden = !practice;
   document.getElementById('btn-zan-pause').hidden = false;
   zanPauseBox(false);
@@ -14710,7 +14845,7 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape' && duelMod
 document.getElementById('duel-home-go').addEventListener('click', function(){ duelAccept(zanDuelHeld); });
 document.getElementById('duel-home-drop').addEventListener('click', function(){ zanDuelHeld = null; zanArmed = null; renderDuelHome(); });
 // the 心得 of the next start (a challenge plays the sender's, not this device's)
-function zanRunMods(){ return zanArmed && zanArmed.duel ? zanArmed.duel.mods : zanCurrentMods(); }
+function zanRunMods(){ return zanArmed && zanArmed.duel ? zanArmed.duel.mods : zanArmed && zanArmed.ippai ? zanArmed.ippai.mods : zanCurrentMods(); }
 // after a song: the box to send it as a challenge, and the verdict when it was one
 function zanDuelResult(){
   var box = document.getElementById('duel-box'), v = document.getElementById('duel-verdict'), btn = document.getElementById('btn-duel');
@@ -15005,6 +15140,7 @@ function finishZan(){
     if(zan.perfect===total){ store.zan.perfectClears = Math.min(STAT_MAX, store.zan.perfectClears + 1); rec.perfect = true; }   // (+ the course's 全Perfectメダル)
   }
   var weeklyJust = zanWeeklyCheck(store, {course:cid, score:zan.score, perfect:zan.perfect, combo:zan.maxCombo, grade:grade, total:total});   // 週の段位認定
+  var ippaiRes = zanIppaiRecord(store, grade);      // 今日の一杯
   var newTitles = evaluateTitles(store);
   saveStoreObj(store);
   state.phase = 'result';
@@ -15033,6 +15169,7 @@ function finishZan(){
   try{ renderCoinResult(awardCoins(coinParts0), '完成度'); }catch(e){ coinBox.hidden = true; }
   zanRankSend({perfect:zan.perfect, combo:zan.maxCombo, grade:grade});   // 番付 (参加している人だけ; a failure never touches the records)
   zanDuelResult();                                  // 挑戦状: the verdict, and this song as one to send
+  zanIppaiResult(ippaiRes);
   showScreen('result');
   zanShowStart({grade:grade, rate:total ? zan.perfect/total : 0, allPerfect:total>0 && zan.perfect===total});
   var rewards = claimRewards();                     // 限定 items whose record this song reached (looks only)
