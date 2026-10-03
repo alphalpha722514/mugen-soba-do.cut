@@ -14121,7 +14121,7 @@ function zanRelease(e){
 // --- judging ---
 function zanKind(n, part){ return n.type==='hold' ? part : n.type; }
 function zanHit(n, part, err){
-  var ae = Math.abs(err), rating = ae<=zan.win.perfect ? 'PERFECT' : 'OK', crit = ae<=zan.win.crit, kind = zanKind(n, part), songT = zanTarget(n, part);
+  var ae = Math.abs(err), errMs = Math.round(err*1000), rating = ae<=zan.win.perfect ? 'PERFECT' : 'OK', crit = Math.abs(errMs)<=Math.round(zan.win.crit*1000), kind = zanKind(n, part), songT = zanTarget(n, part);
   if(part==='head') n.headDone = true;
   else n.judged = true;
   if(n.res!=='M') n.res = rating==='PERFECT' && n.res!=='O' ? 'P' : 'O';   // the note's worst (a hold: of both ends)
@@ -14135,7 +14135,7 @@ function zanHit(n, part, err){
   if(rating==='PERFECT') zan.perfect++; else zan.ok++;
   if(crit) zan.crit++;
   zan.errs.push(err*1000);
-  zan.judges.push({b:zanT2B(songT), t:songT, kind:kind, rating:rating, err:Math.round(err*1000), tono:tonoOn, crit:crit});   // (for the result's ふりかえり)
+  zan.judges.push({b:zanT2B(songT), t:songT, kind:kind, rating:rating, err:errMs, tono:tonoOn, crit:crit});   // (for the result's ふりかえり)
   // the look of the cut (only the look): the knife comes down, the ring, a cut line in the dough
   if(part!=='head'){ zanKnifeStrike(zan.pKnife, kind==='tail'); zanCutMark(songT + err, kind==='tail', false); }
   state.cutFx.push({t:0, rating:crit ? 'CRIT' : rating==='PERFECT' ? 'JUST' : 'PERFECT'});
