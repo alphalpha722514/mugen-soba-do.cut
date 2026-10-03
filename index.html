@@ -1384,6 +1384,13 @@ body{
           </div>
           <p class="save-note">効果音とは別に、BGMのオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</p>
         </div>
+        <div class="vis-row" role="group" aria-labelledby="haptics-title">
+          <span id="haptics-title" class="backup-title">振動</span>
+          <div class="vis-opts">
+            <button id="haptics-toggle" class="btn-small" type="button" aria-pressed="true">振動 オン</button>
+          </div>
+          <p class="save-note">リズム修行・斬で切ったとき（Perfect・OK）とMissのときに、端末が短く震えます。対応する端末だけで、iPhoneやパソコンでは震えません。効果音のオン・オフとは別です。演出「控えめ」や、端末の「視差効果を減らす」の設定では震えません。</p>
+        </div>
         <div class="vis-row" role="group" aria-labelledby="help-row-title">
           <span id="help-row-title" class="backup-title">ルールとご意見</span>
           <div class="vis-opts help-opts">
@@ -1480,7 +1487,7 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラのアリ・ナシ、効果音のオン・オフ、BGMのオン・オフと音量、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
+        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラのアリ・ナシ、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。自己ベスト・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で斬の自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
@@ -3100,7 +3107,7 @@ function withEffectsDefaults(st){
   }
   return out;
 }
-function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}}; }
+function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}}; }
 // settings.onboarding (the first-run rules guide) and settings.lastShareDate (the day the 共有ボーナス was last paid).
 // A save without them gets them; a player who has already played is not shown the guide again (it is in 記録と設定).
 function isDateStr(v){ return typeof v==='string' && /^\d{4}-\d{2}-\d{2}$/.test(v); }
@@ -3114,6 +3121,8 @@ function withDailyDefaults(st, played){
   if(typeof snd.bgmOn!=='boolean') snd.bgmOn = true;
   if(!(typeof snd.bgmVolume==='number' && snd.bgmVolume>=0 && snd.bgmVolume<=1)) snd.bgmVolume = DEFAULT_BGM_VOLUME;
   out.sound = snd;
+  // settings.haptics.on: 振動 (on unless a save turned it off; anything else there is dropped)
+  out.haptics = {on:!(isPlainObj(out.haptics) && out.haptics.on===false)};
   return out;
 }
 // quiz: today's 3 questions (answered = [{id, choice, ok}] in the order asked), all the right answers ever and the
@@ -3822,7 +3831,7 @@ btnExport.addEventListener('click', function(){
 btnImport.addEventListener('click', function(){
   var result = importStoreString(saveIo.value);
   showSaveMsg(result.message);
-  if(result.ok){ renderHome(); refreshSoundPref(); refreshVisualPref(); refreshEffectsPref(); }
+  if(result.ok){ renderHome(); refreshSoundPref(); refreshVisualPref(); refreshEffectsPref(); renderHapticsControls(); }
 });
 
 // ---------- Result card image (結果を画像で保存) ----------
@@ -12598,6 +12607,30 @@ bgmVolInput.addEventListener('input', function(){
 });
 bgmVolInput.addEventListener('change', saveBgmPref);  // saved when the finger lets go
 renderBgmControls();
+
+// --- 振動 (settings.haptics.on): a short buzz on a cut in リズム修行・斬. Only the feel: judging and scores never read it.
+// Off with 演出「控えめ」 or prefers-reduced-motion, and wherever navigator.vibrate is missing (iPhone, PCs). 🔊／🔇 does not
+// matter here. The switch is read once when a song starts (zan.buzz), so a cut never reads the save.
+var hapticsToggleBtn = document.getElementById('haptics-toggle');
+function hapticsOn(){ try{ return loadStore().settings.haptics.on!==false; }catch(e){ return true; } }
+function zanBuzzAllowed(){
+  return hapticsOn() && effectsPref.level!=='low' && !prefersReducedMotion() && typeof navigator!=='undefined' && typeof navigator.vibrate==='function';
+}
+function zanBuzz(ms){
+  if(!zan || !zan.buzz) return;
+  try{ navigator.vibrate(ms); }catch(e){}
+}
+function renderHapticsControls(){
+  if(!hapticsToggleBtn) return;
+  var on = hapticsOn();
+  hapticsToggleBtn.textContent = on ? '振動 オン' : '振動 オフ';
+  hapticsToggleBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+}
+if(hapticsToggleBtn) hapticsToggleBtn.addEventListener('click', function(){
+  try{ var store = loadStore(); store.settings.haptics = {on:store.settings.haptics.on===false}; saveStoreObj(store); }catch(e){}
+  renderHapticsControls();
+});
+renderHapticsControls();
 bgm.screen = (function(){ for(var k in screens){ if(screens[k].classList.contains('active')) return k; } return 'title'; })();
 
 // ---------- リザルト: the numbers roll like a slot drum and lock one by one ----------
@@ -13282,6 +13315,7 @@ function zanHit(n, part, err){
   if(n.res!=='M') n.res = rating==='PERFECT' && n.res!=='O' ? 'P' : 'O';   // the note's worst (a hold: of both ends)
   zan.combo++;
   zan.maxCombo = Math.max(zan.maxCombo, zan.combo);
+  zanBuzz(rating==='PERFECT' ? 10 : 6);             // 振動 (only the feel: the score is not touched)
   var mult = 1 + Math.min(1, Math.floor(zan.combo/10)*0.1);   // ×1.0 → ×2.0 over 100 in a row
   zan.score += Math.round(ZAN_POINTS[kind][rating==='PERFECT' ? 0 : 1]*mult*(zan.trick ? ZAN_TRICK_SCORE : 1));   // (イタズラ ×1.2)
   if(rating==='PERFECT') zan.perfect++; else zan.ok++;
@@ -13312,6 +13346,7 @@ function zanMiss(n, part, t){
   if(zan.holding===n){ zan.holding = null; zanChargeStop(); }
   zan.combo = 0;
   zan.miss++;
+  zanBuzz(20);
   zan.slump = 260;                                   // the board tips (ずっこけ)
   showPopup('MISS');
   zanHitSound('MISS', zanKind(n, part), t || zanTarget(n, part));
@@ -13458,8 +13493,9 @@ function startZan(courseId, backing){
   state.phase = 'zan';
   var trick = false;
   try{ trick = loadStore().settings.zanTrick===true; }catch(e){}
+  var buzz = zanBuzzAllowed();
   var notes = zanChart(song, tm, trick);
-  zan = {course:course, song:song, tempo:tm, trick:trick, fooled:0, trickFrom:song.sections.length>2 ? song.sections[2].from : 1e9, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
+  zan = {course:course, song:song, tempo:tm, trick:trick, buzz:buzz, fooled:0, trickFrom:song.sections.length>2 ? song.sections[2].from : 1e9, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
          p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
