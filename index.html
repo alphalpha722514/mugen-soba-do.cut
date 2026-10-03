@@ -1179,6 +1179,12 @@ body{
 .mp-zan-list .mz-best{font-size:1.05rem;font-weight:900;font-variant-numeric:tabular-nums;}
 .mp-zan-list .mz-sub{color:var(--ink-soft);font-weight:700;}
 .mp-zan-list li.is-soon{opacity:.6;}
+.mp-zan-list .mz-medal{font-size:.68rem;font-weight:900;line-height:1.6;padding:0 8px;border-radius:999px;background:#c9a24a;color:#2c1d08;white-space:nowrap;align-self:center;}
+.mz-ken{flex:1 1 100%;display:flex;align-items:center;gap:8px;min-width:0;}
+.mz-ken-bar{position:relative;flex:0 0 42%;height:7px;border-radius:4px;background:var(--muted-fill);overflow:hidden;border:1px solid var(--line);}
+.mz-ken-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--accent-ink);border-radius:4px;}
+.mz-ken-bar b{position:absolute;top:0;bottom:0;width:1px;background:var(--card);min-width:0;}
+.mz-ken-txt{font-size:.7rem;color:var(--ink-soft);font-weight:700;min-width:0;}
 .mp-zan-sum{margin:0;font-size:.72rem;line-height:1.55;color:var(--ink-soft);}
 .mp-titles-line{margin:0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px;font-size:.78rem;font-weight:700;}
 .mp-status{margin:0;font-weight:900;font-size:.9rem;overflow-wrap:anywhere;}
@@ -1556,7 +1562,7 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数・区間ごとのMissの累計、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラのアリ・ナシ、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
+        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数・全Perfectのメダル・区間ごとのMissの累計、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラのアリ・ナシ、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。自己ベスト・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で斬の自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
@@ -3251,7 +3257,11 @@ function sanitizeZan(raw){
   out.bestPerfectRate = clampInt(z.bestPerfectRate, 0, 100);
   out.perfectClears = clampInt(z.perfectClears, 0, STAT_MAX);
   out.courses = {};
-  for(var i=0;i<ZAN_COURSE_IDS.length;i++) out.courses[ZAN_COURSE_IDS[i]] = sanitizeZanRec(cs[ZAN_COURSE_IDS[i]]);
+  for(var i=0;i<ZAN_COURSE_IDS.length;i++){
+    var cr = cs[ZAN_COURSE_IDS[i]];
+    out.courses[ZAN_COURSE_IDS[i]] = sanitizeZanRec(cr);
+    out.courses[ZAN_COURSE_IDS[i]].perfect = isPlainObj(cr) && cr.perfect===true;   // 全Perfectメダル (schema 14; older saves: false)
+  }
   out.lastCourse = ZAN_COURSE_IDS.indexOf(z.lastCourse)>=0 ? z.lastCourse : '';
   out.todayDone = typeof z.todayDone==='string' && /^\d{4}-\d{2}-\d{2}$/.test(z.todayDone) ? z.todayDone : '';   // 今日の一曲: the day its bonus was paid
   out.sectionMiss = sanitizeSectionMiss(z.sectionMiss);
@@ -10410,7 +10420,7 @@ function mergeStores(localRaw, cloudRaw){
     zanMax(out.zan, L.zan, C.zan);
     ['totalScore', 'maxCombo', 'bestPerfectRate', 'perfectClears'].forEach(function(k){ out.zan[k] = Math.max(L.zan[k], C.zan[k]); });
     out.zan.courses = {};
-    for(var zc=0;zc<ZAN_COURSE_IDS.length;zc++){ var zid = ZAN_COURSE_IDS[zc]; out.zan.courses[zid] = {}; zanMax(out.zan.courses[zid], L.zan.courses[zid], C.zan.courses[zid]); }
+    for(var zc=0;zc<ZAN_COURSE_IDS.length;zc++){ var zid = ZAN_COURSE_IDS[zc]; out.zan.courses[zid] = {}; zanMax(out.zan.courses[zid], L.zan.courses[zid], C.zan.courses[zid]); out.zan.courses[zid].perfect = L.zan.courses[zid].perfect || C.zan.courses[zid].perfect; }
     out.zan.lastCourse = L.zan.lastCourse || C.zan.lastCourse;
     out.zan.todayDone = C.zan.todayDone>L.zan.todayDone ? C.zan.todayDone : L.zan.todayDone;
     out.zan.sectionMiss = {};                         // 苦手の記録: the larger count of each part (like the other counters)
@@ -10596,6 +10606,30 @@ function renderMypage(){
   renderMypageAccount();
 }
 // リズム修行・斬 by course (best, 完成度, songs) and over all of them
+// 研鑽度: how much a course has been played (looks only). Four steps at 10 / 30 / 50 / 100 songs; the bar is split in
+// four equal parts and fills within the part being climbed.
+var ZAN_KEN_STEPS = [10, 30, 50, 100], ZAN_KEN_NAMES = ['見習い', '一人前', '熟練', '達人', '名人'];
+function zanKen(plays){
+  var n = Math.max(0, plays || 0), st = 0;
+  while(st<ZAN_KEN_STEPS.length && n>=ZAN_KEN_STEPS[st]) st++;
+  var lo = st ? ZAN_KEN_STEPS[st - 1] : 0, hi = st<ZAN_KEN_STEPS.length ? ZAN_KEN_STEPS[st] : lo;
+  return {step:st, name:ZAN_KEN_NAMES[st], fill:st>=ZAN_KEN_STEPS.length ? 1 : (st + (n - lo)/(hi - lo))/ZAN_KEN_STEPS.length, next:hi, left:Math.max(0, hi - n)};
+}
+function zanKenBar(plays){
+  var k = zanKen(plays), wrap = document.createElement('span'), bar = document.createElement('span'), fill = document.createElement('i'), txt = document.createElement('span');
+  wrap.className = 'mz-ken';
+  bar.className = 'mz-ken-bar';
+  bar.setAttribute('role', 'img');
+  bar.setAttribute('aria-label', '研鑽度 ' + k.name);
+  fill.style.width = Math.round(k.fill*100) + '%';
+  bar.appendChild(fill);
+  for(var i=1;i<ZAN_KEN_STEPS.length;i++){ var tick = document.createElement('b'); tick.style.left = (i*100/ZAN_KEN_STEPS.length) + '%'; bar.appendChild(tick); }
+  txt.className = 'mz-ken-txt';
+  txt.textContent = '研鑽度 ' + k.name + (k.step<ZAN_KEN_STEPS.length ? '（あと' + k.left + '回）' : '（' + ZAN_KEN_STEPS[ZAN_KEN_STEPS.length - 1] + '回以上）');
+  txt.title = k.step<ZAN_KEN_STEPS.length ? k.next + '回で「' + ZAN_KEN_NAMES[k.step + 1] + '」' : '';
+  wrap.appendChild(bar); wrap.appendChild(txt);
+  return wrap;
+}
 function renderMypageZan(z){
   var list = document.getElementById('mp-zan-list'), sum = document.getElementById('mp-zan-sum');
   if(!list || !z) return;
@@ -10608,6 +10642,8 @@ function renderMypageZan(z){
     var sub = document.createElement('span'); sub.className = 'mz-sub';
     sub.textContent = ok ? (c.level + '・完成度 ' + (r.bestGrade || '—') + '・' + fmtPoints(r.plays) + '回') : (c.level + '・準備中');
     li.appendChild(b); li.appendChild(best); li.appendChild(sub);
+    if(ok && r.perfect){ var medal = document.createElement('span'); medal.className = 'mz-medal'; medal.textContent = '全Perfect'; medal.title = 'このコースを全部Perfectで切った'; li.appendChild(medal); }
+    if(ok) li.appendChild(zanKenBar(r.plays));
     list.appendChild(li);
   }
   sum.textContent = '全コースで ' + fmtPoints(z.plays) + '曲・最高 ' + fmtPoints(z.best) + '点' + (z.bestGrade ? '・最高の完成度 ' + z.bestGrade : '') +
@@ -13960,7 +13996,7 @@ function finishZan(){
   store.zan.maxCombo = Math.max(store.zan.maxCombo, zan.maxCombo);
   if(total>0){
     store.zan.bestPerfectRate = Math.max(store.zan.bestPerfectRate, Math.floor(zan.perfect*100/total));
-    if(zan.perfect===total) store.zan.perfectClears = Math.min(STAT_MAX, store.zan.perfectClears + 1);
+    if(zan.perfect===total){ store.zan.perfectClears = Math.min(STAT_MAX, store.zan.perfectClears + 1); rec.perfect = true; }   // (+ the course's 全Perfectメダル)
   }
   var newTitles = evaluateTitles(store);
   saveStoreObj(store);
