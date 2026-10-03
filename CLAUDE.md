@@ -31,7 +31,7 @@
   - 伴奏は曲の開始前に OfflineAudioContext で小節ごとに作って1本の音にする（`zanRenderBacking`）。作れないときや間に合わないときは、これまでどおりその場で鳴らす。コンボで重なる音・師匠の音・メトロノームはその場で鳴らす。
   - 「試し切り」のずれ補正は `echizenSoba.v1.zanOffset`（ミリ秒・±300）。端末ごとに違うので、この端末だけに置き、同期しない。入力の時刻からこの分を引いて判定する。
   - ほかのアプリに切り替えると一時停止し（`zanPause`）、タップで続きから再開する。
-  - 判定は音の時計（`zanNow`・入力の timeStamp）で Perfect ±35ms・OK ±80ms。得点と記録は `store.zan` に入れる。
+  - 判定は音の時計（`zanNow`・入力の timeStamp）。判定の幅はコースごと（`ZAN_COURSES` の `perfectMs`・`okMs`・`guardMs`。二八 35/80/120・十割 30/70/105・粗挽き 25/60/90。ないコースは `ZAN_PERFECT` などの既定値で、既定より広くしない）。曲の開始時に `zanWindows` で `zan.win` に入れ、判定・掃き出し・フェイント・盤の判定帯はすべてこれを使う。ずれ±15ms以内は真・PERFECT（`ZAN_SHIN`）で、その切りの基本点×1.5（`ZAN_SHIN_MULT`。Perfect に数え、回数は `zan.shin`）。コンボ倍率の式は変えない。得点と記録は `store.zan` に入れる。
   - 称号と限定アイテムの条件は、斬の記録（`zan.totalScore`・`maxCombo`・`bestPerfectRate`・`perfectClears`・`best`・`plays`）と図鑑・クイズで判定する（`titleMetrics`）。獲得済みの称号は条件に届かなくなっても消さない。
   - 本日のチャレンジは斬で挑む（`conditionId` が `zan:<kind>:<value>`。kind は score・perfect・combo・grade、コースは自由、達成で500コイン）。以前の形（`<お客さん>:<点数>`）のチャレンジは、未クリアなら schema 13 への移行で作り直す。
   - ルール説明（`OB_SLIDES`）は斬の内容で、`ONBOARDING_VERSION` は 2（1 を見た人にも一度だけ出す）。リザルトの共有画像は斬でも作れる（コース・完成度・Perfect・最大コンボ・平均のずれ）。
