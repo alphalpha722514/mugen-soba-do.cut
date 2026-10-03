@@ -57,6 +57,7 @@
 - 例外として置いてよい公開用ファイル: `og-image.jpg`（SNS共有カードの画像。ゲームは読まない。`node tools/og/build.mjs` で作り直す）と `.nojekyll`。
 - Google Play（PWABuilder / TWA）用に置いてよいファイル: `manifest.webmanifest` と `icons/`（`node tools/pwa/build.mjs` で、favicon の SVG から作り直す）、`privacy.html`（プライバシーポリシー。集める情報を変えたら必ず直す）。
 - 同期サーバーのコードは `tools/sync-server/worker.js`（Cloudflare の Worker「soba-sync」に貼って公開する）。ゲームの同期の仕組みを変えたら、こちらも合わせて直す。
+- 番付（`/ranking`）：ログイン中で、この端末で `settings.rankJoin` を選んだときだけ、斬の1曲ごとに判定の記録（`zan.judges` を `[拍×4, ずれms|null, 種類, 判定 0P/1OK/2Miss/3つられた, 殿様]` にしたもの）を送る（`zanRankSend`）。サーバー（`rankCheck`）は得点・最大コンボ・Perfect数・判定の数・判定の幅・拍の位置を計算し直し、合わなければ載せない。**斬の得点の決まり（コースと判定の幅、基本点、真・PERFECT、コンボ倍率、殿様、イタズラ、曲ごとの判定の数 `RANK_COURSES.charts`）を変えたら、`worker.js` も同じに直す**（曲を足したり譜面を変えたりしたときも）。番付に載せるのは表示名（ユーザー名は載せない）・得点・完成度・最大コンボ・Perfect数・イタズラ。コース×（今週・全期間）の上位50人、週は日本時間の月曜から（`rankWeekKey`）。参加をやめる・アカウント削除で番付から消す。疑似クラウド（mock）にも同じ呼び出しがある（計算し直しはしない）。集める情報を変えたら `privacy.html` も直す。
 - `googlef4f1cd7b25710dc9.html` は Google Search Console の所有権確認用。消すと確認が外れるので残す。
 - 公開URLを変えたら `canonical`・`og:url`・`og:image`・`twitter:image` を合わせて直す。
 

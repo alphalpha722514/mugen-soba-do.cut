@@ -865,6 +865,28 @@ body{
 .zp-last{margin:0;font-size:.78rem;font-weight:700;color:var(--accent-ink);line-height:1.55;}
 .zp-last[hidden]{display:none;}
 .zp-note{margin:0;font-size:.68rem;line-height:1.55;color:var(--ink-soft);}
+.zan-tools-note{font-size:.68rem;color:var(--ink-soft);}
+.rank-sent{margin:-16px 0 20px;font-size:.8rem;font-weight:700;color:var(--accent-ink);text-align:center;}
+.rank-sent[hidden]{display:none;}
+/* 番付 */
+.rk-lead{margin:0 0 12px;font-size:.8rem;line-height:1.6;color:var(--ink-soft);}
+.rk-login,.rk-join{padding:12px 14px;margin-bottom:12px;display:grid;gap:8px;}
+.rk-login p{margin:0;font-weight:700;}
+.rk-login .btn-small{justify-self:start;}
+.rk-note{margin:0;font-size:.7rem;line-height:1.6;color:var(--ink-soft);}
+.rk-msg{color:var(--accent-ink);font-weight:700;}
+.rk-msg:empty{display:none;}
+.rk-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.rk-tabs .btn-small[aria-pressed="true"]{background:var(--sel);border-color:var(--accent-ink);box-shadow:inset 0 0 0 1px var(--accent-ink);}
+.rk-status{margin:4px 0 8px;font-size:.75rem;font-weight:700;color:var(--ink-soft);}
+.rk-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;}
+.rk-list li{display:grid;grid-template-columns:2.2em minmax(0,1fr) auto;align-items:baseline;gap:2px 10px;padding:7px 12px;border-radius:var(--radius);background:var(--card);border:1px solid var(--line);}
+.rk-list li.is-me{border-color:var(--accent2-ink);box-shadow:inset 0 0 0 1px var(--accent2-ink);}
+.rk-rank{font-weight:900;font-variant-numeric:tabular-nums;color:var(--ink-soft);}
+.rk-list li:nth-child(-n+3) .rk-rank{color:#b8892a;}
+.rk-name{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.rk-score{font-weight:900;font-variant-numeric:tabular-nums;}
+.rk-sub{grid-column:2 / -1;font-size:.7rem;color:var(--ink-soft);font-weight:700;}
 .practice-quit{display:block;margin:6px auto 0;}
 .practice-quit[hidden]{display:none;}
 .zan-season{margin:0;padding:4px 10px;border-radius:var(--radius);background:color-mix(in srgb,#c9a24a 16%,var(--card));font-size:.7rem;line-height:1.55;font-weight:700;}
@@ -1374,6 +1396,7 @@ body{
       </div>
       <button id="btn-zan" class="btn-start zan-start" type="button">斬 修行開始</button>
       <p class="zan-tools"><button id="btn-calib" class="link-btn" type="button">試し切り（ずれ調整）</button><span id="zan-offset-label">ずれ補正 0ms</span></p>
+      <p class="zan-tools"><button id="btn-ranking" class="link-btn" type="button">番付を見る</button><span class="zan-tools-note">ログイン中・参加した人の記録</span></p>
       <details id="zan-practice" class="zan-practice">
         <summary>区間練習<span class="zp-sub">記録されません</span></summary>
         <div class="zp-body">
@@ -1526,6 +1549,7 @@ body{
         <li><b>試し切り（ずれ調整）</b>音に対してタップがずれると感じたら、ホームの「試し切り」で「トン」の音に合わせて8回たたくと、ずれを測って判定をそろえます。イヤホンを使うときは、つけたまま測ってください。値はこの端末だけに保存します。</li>
         <li><b>一時停止</b>遊んでいる途中でほかのアプリに切り替えると止まり、画面をタップすると続きから再開します。</li>
         <li><b>ひょっこり客</b>あなたの番の1小節が終わるたびに、画面の下からお客さんが顔を出して、その小節の出来（全部Perfect・OKまじり・Missあり）に反応します。全部Perfectの小節が2回続くと蕎麦奉行、4回でお姫様、6回で殿様が来店します。殿様が来店すると「殿様ご来店！ 倍率UP」と出て、そこからあなたの番2小節ぶん（16拍）、コンボ倍率が+0.2されます。蕎麦奉行・お姫様とふつうのお客さんは見た目だけで、得点は変わりません。</li>
+        <li><b>番付</b>ホームの「番付を見る」で、コースごとの「今週」と「全期間」の上位50人が見られます（ログインが必要）。「番付に参加する」を選ぶと、それから遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラの有無）が番付に送られます。サーバーで判定の記録から得点を計算し直して載せる参考記録です。送れなくても、この端末の記録はそのまま残ります。参加をやめると番付から消えます。</li>
         <li><b>ゴースト</b>ホームで「ゴースト」をアリにすると、そのコースで自己ベストを出したときの包丁が、半透明の青い包丁であなたの包丁と一緒に切ります。自分のベストより早いか遅いかが見えます（見た目だけで、得点や判定は変わりません）。ゴーストは自己ベストを更新したときに残ります。</li>
         <li><b>区間練習</b>ホームの「区間練習」で、選んだコースの1区間（お手本・刻み・タメ切り など）だけを3回くり返して練習できます。速さは0.8倍・0.9倍・1.0倍。得点・ベスト・コイン・称号・チャレンジには入りません（師匠のイタズラはなし）。途中でやめるときは画面下の「練習をやめる」。終わるとホームに、その練習のPerfect・OK・Missが出ます。</li>
         <li><b>ふりかえり</b>リザルトに、極上まであと何回OKをPerfectにすればよいか（Missがあるときは「Miss 0」が条件であること）と、曲の区間ごとのMissの数とずれの帯が出ます。いちばんMissの多かった区間を「苦手」として示し、コースごとに区間のMissの累計を記録します。</li>
@@ -1569,7 +1593,7 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数・全Perfectのメダル・自己ベストのときの切り（ゴースト）・区間ごとのMissの累計、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラとゴーストのアリ・ナシ、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
+        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数・全Perfectのメダル・自己ベストのときの切り（ゴースト）・区間ごとのMissの累計、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラとゴーストのアリ・ナシ、番付に参加するかどうか、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。自己ベスト・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で斬の自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
@@ -1824,6 +1848,32 @@ body{
     </section>
   </section>
 
+  <section id="screen-ranking" class="screen guide ranking" aria-labelledby="ranking-title">
+    <div class="guide-bar">
+      <h2 id="ranking-title" class="guide-title" tabindex="-1">番付</h2>
+      <button id="btn-ranking-back" class="btn-small" type="button">ホームへ戻る</button>
+    </div>
+    <p class="rk-lead">リズム修行・斬のコースごとの番付（上位50人）。サーバーで判定の記録から得点を計算し直して載せる参考記録です。</p>
+    <div id="rk-login" class="rk-login card">
+      <p>番付は、マイページでログインすると見られます。</p>
+      <button id="rk-open-mypage" class="btn-small" type="button">マイページでログイン</button>
+    </div>
+    <div id="rk-body" hidden>
+      <div class="rk-join card">
+        <label class="fx-check"><input id="rk-join" type="checkbox"> 番付に参加する</label>
+        <p class="rk-note">参加すると、遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラの有無）がこの端末から送られ、番付でほかの人にも見えます。表示名はマイページで変えられます。参加をやめると、番付からあなたの記録を消します。</p>
+        <p id="rk-join-msg" class="rk-note rk-msg" role="status"></p>
+      </div>
+      <div id="rk-courses" class="rk-tabs" role="group" aria-label="コース"></div>
+      <div id="rk-periods" class="rk-tabs" role="group" aria-label="期間">
+        <button class="btn-small rk-period" type="button" data-period="week" aria-pressed="true">今週</button>
+        <button class="btn-small rk-period" type="button" data-period="all" aria-pressed="false">全期間</button>
+      </div>
+      <p id="rk-status" class="rk-status" role="status"></p>
+      <ol id="rk-list" class="rk-list"></ol>
+    </div>
+  </section>
+
   <section id="screen-quiz" class="screen guide quiz" aria-labelledby="quiz-title">
     <div class="guide-bar">
       <h2 id="quiz-title" class="guide-title" tabindex="-1">越前そば＆福井クイズ</h2>
@@ -1896,6 +1946,7 @@ body{
       <p id="coin-note" class="coin-note"></p>
       <p id="coin-status" class="coin-status"></p>
     </section>
+    <p id="rank-sent" class="rank-sent" role="status" hidden></p>
     <button id="btn-restart" class="btn-main">もう一度挑戦</button>
     <div class="share-box">
       <button id="btn-share-result" class="btn-sub" type="button">友達に共有する（1日1回 +200🪙）</button>
@@ -2228,7 +2279,8 @@ var screens = {
   exchange: document.getElementById('screen-exchange'),
   kisekae: document.getElementById('screen-kisekae'),
   mypage: document.getElementById('screen-mypage'),
-  quiz: document.getElementById('screen-quiz')
+  quiz: document.getElementById('screen-quiz'),
+  ranking: document.getElementById('screen-ranking')
 };
 var canvas = document.getElementById('game-canvas');
 var ctx = canvas.getContext('2d');
@@ -3200,7 +3252,7 @@ function withEffectsDefaults(st){
   }
   return out;
 }
-function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}, ghost:false}; }
+function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}, ghost:false, rankJoin:false}; }
 // settings.onboarding (the first-run rules guide) and settings.lastShareDate (the day the 共有ボーナス was last paid).
 // A save without them gets them; a player who has already played is not shown the guide again (it is in 記録と設定).
 function isDateStr(v){ return typeof v==='string' && /^\d{4}-\d{2}-\d{2}$/.test(v); }
@@ -3217,6 +3269,7 @@ function withDailyDefaults(st, played){
   // settings.haptics.on: 振動 (on unless a save turned it off; anything else there is dropped)
   out.haptics = {on:!(isPlainObj(out.haptics) && out.haptics.on===false)};
   out.ghost = out.ghost===true;                      // ゴースト (アリ/ナシ, off unless turned on)
+  out.rankJoin = out.rankJoin===true;                // 番付に参加する (this device; off unless chosen)
   return out;
 }
 // quiz: today's 3 questions (answered = [{id, choice, ok}] in the order asked), all the right answers ever and the
@@ -3281,7 +3334,7 @@ function zanGhostOf(song, judges){
   var cuts = [];
   for(var i=0;i<judges.length && cuts.length<ZAN_GHOST_MAX;i++){
     var j = judges[i];
-    if(j.rating==='MISS') continue;
+    if(j.rating!=='PERFECT' && j.rating!=='OK') continue;
     cuts.push([Math.round(j.b*4), Math.max(-300, Math.min(300, j.err)), j.kind==='head' ? 1 : j.kind==='tail' ? 2 : 0]);
   }
   return cuts.length ? {chart:song.id, cuts:cuts} : null;
@@ -10368,10 +10421,53 @@ var MockCloudAdapter = {
       if(!u) return {ok:false, error:'session'};
       if(u.hash!==hash) return {ok:false, error:'auth'};
       delete db.users[String(name).toLowerCase()];
+      if(isPlainObj(db.ranking)) for(var rk in db.ranking) if(Object.prototype.hasOwnProperty.call(db.ranking, rk)) db.ranking[rk] = db.ranking[rk].filter(function(e){ return e.uid!==u.name.toLowerCase(); });
+      return writeRawLS(MOCK_CLOUD_KEY, JSON.stringify(db)) ? {ok:true} : {ok:false, error:'storage'};
+    });
+  },
+  // 番付 (stand-in: this browser only, all time and this week by course; no re-scoring here — the real server does that)
+  tokenUser:function(db, token){ for(var k in db.users) if(Object.prototype.hasOwnProperty.call(db.users, k) && db.users[k].token===token) return db.users[k]; return null; },
+  rankSubmit:function(token, b){
+    var self = this;
+    return this.later(function(){
+      var db = self.read(), u = self.tokenUser(db, token);
+      if(!u) return {ok:false, error:'session'};
+      if(!isPlainObj(b) || !zanCourse(b.course) || typeof b.score!=='number') return {ok:false, error:'rejected'};
+      db.ranking = isPlainObj(db.ranking) ? db.ranking : {};
+      var e = {uid:u.name.toLowerCase(), name:cleanProfileName(b.name) || DEFAULT_PLAYER_NAME, score:b.score, grade:b.grade, perfect:b.perfect, combo:b.combo, trick:b.trick===true, at:Date.now()};
+      ['all', 'w' + rankWeekKey(Date.now())].forEach(function(p){
+        var k = b.course + ':' + p, list = (db.ranking[k] || []).filter(function(x){ return x.uid!==e.uid || x.score>=e.score; });
+        if(!list.some(function(x){ return x.uid===e.uid; })) list.push(e);
+        list.sort(function(x, y){ return y.score - x.score || x.at - y.at; });
+        db.ranking[k] = list.slice(0, 50);
+      });
+      return writeRawLS(MOCK_CLOUD_KEY, JSON.stringify(db)) ? {ok:true} : {ok:false, error:'storage'};
+    });
+  },
+  rankGet:function(token, course, period){
+    var self = this;
+    return this.later(function(){
+      var db = self.read(), u = token ? self.tokenUser(db, token) : null, k = course + ':' + (period==='all' ? 'all' : 'w' + rankWeekKey(Date.now()));
+      var list = (isPlainObj(db.ranking) && db.ranking[k]) || [];
+      return {ok:true, course:course, period:period, week:rankWeekKey(Date.now()), entries:list.map(function(e, i){ return {rank:i + 1, name:e.name, score:e.score, grade:e.grade, perfect:e.perfect, combo:e.combo, trick:e.trick, me:!!(u && e.uid===u.name.toLowerCase())}; })};
+    });
+  },
+  rankLeave:function(token){
+    var self = this;
+    return this.later(function(){
+      var db = self.read(), u = self.tokenUser(db, token);
+      if(!u) return {ok:false, error:'session'};
+      if(isPlainObj(db.ranking)) for(var rk in db.ranking) if(Object.prototype.hasOwnProperty.call(db.ranking, rk)) db.ranking[rk] = db.ranking[rk].filter(function(e){ return e.uid!==u.name.toLowerCase(); });
       return writeRawLS(MOCK_CLOUD_KEY, JSON.stringify(db)) ? {ok:true} : {ok:false, error:'storage'};
     });
   }
 };
+// the week of the 番付: the Monday it starts on, in Japan time (the server counts weeks the same way)
+function rankWeekKey(now){
+  var d = new Date(now + 9*3600*1000);
+  d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7);
+  return d.toISOString().slice(0, 10);
+}
 // 汎用 REST: POST /register and /login {user, hash} → {ok, user, token}; GET /save → {ok, data, updatedAt};
 // PUT /save {data} → {ok, updatedAt}; DELETE /account {hash} → {ok} (the account and its save are gone).
 // The token goes as "Authorization: Bearer …".
@@ -10398,7 +10494,10 @@ var RestAdapter = {
   login:function(name, hash){ return this.call('/login', 'POST', {user:name, hash:hash}); },
   load:function(name, token){ return this.call('/save', 'GET', null, token); },
   save:function(name, token, data){ return this.call('/save', 'PUT', {data:data}, token); },
-  remove:function(name, token, hash){ return this.call('/account', 'DELETE', {hash:hash}, token); }
+  remove:function(name, token, hash){ return this.call('/account', 'DELETE', {hash:hash}, token); },
+  rankSubmit:function(token, payload){ return this.call('/ranking', 'POST', payload, token); },
+  rankGet:function(token, course, period){ return this.call('/ranking?course=' + encodeURIComponent(course) + '&period=' + (period==='all' ? 'all' : 'week'), 'GET', null, token); },
+  rankLeave:function(token){ return this.call('/ranking', 'DELETE', null, token); }
 };
 
 // --- マージ: the better of this device and the cloud ---
@@ -10560,6 +10659,22 @@ var SyncManager = {
       self.logout();
       return {ok:true};
     }, function(){ return {ok:false, error:'offline'}; });
+  },
+  // 番付: only while logged in (and, for sending, only when this device chose to take part)
+  rankSubmit:function(payload){
+    var acc = this.account();
+    if(!acc || typeof this.adapter.rankSubmit!=='function') return Promise.resolve({ok:false, error:'nologin'});
+    return this.adapter.rankSubmit(acc.token, payload).then(function(r){ return r || {ok:false, error:'offline'}; }, function(){ return {ok:false, error:'offline'}; });
+  },
+  rankGet:function(course, period){
+    var acc = this.account();
+    if(!acc || typeof this.adapter.rankGet!=='function') return Promise.resolve({ok:false, error:'nologin'});
+    return this.adapter.rankGet(acc.token, course, period).then(function(r){ return r || {ok:false, error:'offline'}; }, function(){ return {ok:false, error:'offline'}; });
+  },
+  rankLeave:function(){
+    var acc = this.account();
+    if(!acc || typeof this.adapter.rankLeave!=='function') return Promise.resolve({ok:false, error:'nologin'});
+    return this.adapter.rankLeave(acc.token).then(function(r){ return r || {ok:false, error:'offline'}; }, function(){ return {ok:false, error:'offline'}; });
   },
   // a save was written: send it up a moment later (only while logged in; never for the sync's own write)
   request:function(){
@@ -13618,6 +13733,7 @@ function zanHit(n, part, err){
 function zanFooled(n){
   n.judged = true;
   zan.combo = 0;
+  zan.judges.push({b:zanT2B(n.t), t:n.t, kind:'tap', rating:'FOOLED', err:null});   // (no cut of soba: only the combo breaks)
   zan.fooled++;
   zanKnifeStrike(zan.pKnife, false);
   zanCutMark(n.t, false, false);
@@ -13983,6 +14099,111 @@ function zanGrade(acc, miss){
   for(var i=0;i<ZAN_GRADES.length;i++){ var g = ZAN_GRADES[i]; if(acc>=g[1] && (!g[2] || miss===0)) return g[0]; }
   return '並';
 }
+// --- 番付: after a song, the judge log goes to the server, which scores it again (参考記録). Only when logged in and
+// 参加 is chosen on this device; the result here is saved first, so a failure (offline…) only shows a line.
+function zanRankPayload(r){
+  var j = zan.judges.map(function(x){
+    return [Math.round(x.b*4), x.rating==='PERFECT' || x.rating==='OK' ? x.err : null, x.kind==='head' ? 1 : x.kind==='tail' ? 2 : 0,
+            x.rating==='PERFECT' ? 0 : x.rating==='OK' ? 1 : x.rating==='FOOLED' ? 3 : 2, x.tono ? 1 : 0];
+  });
+  var name = '';
+  try{ name = loadStore().profile.name; }catch(e){}
+  return {course:zan.course.id, chart:zan.song.id, score:zan.score, grade:r.grade, perfect:r.perfect, combo:r.combo, trick:!!zan.trick, name:name || DEFAULT_PLAYER_NAME, judges:j};
+}
+function zanRankSend(r){
+  var el = document.getElementById('rank-sent');
+  if(el){ el.hidden = true; el.textContent = ''; }
+  var join = false;
+  try{ join = loadStore().settings.rankJoin===true; }catch(e){}
+  if(!join || zan.practice || !SyncManager.isLoggedIn()) return;
+  var payload = zanRankPayload(r);
+  if(el){ el.hidden = false; el.textContent = '番付に送っています…'; }
+  SyncManager.rankSubmit(payload).then(function(res){
+    if(!el) return;
+    el.textContent = res.ok ? '番付に送りました（参考記録）。' : res.error==='rejected' ? 'この記録は番付に載せられませんでした。' : '番付に送れませんでした（記録はこの端末に残っています）。';
+  });
+}
+// --- 番付の画面: course × this week / all time, the top 50; your row is marked
+var rankView = {course:'', period:'week', seq:0}, rankOpener = null;
+function openRanking(opener){
+  rankOpener = opener || null;
+  if(!rankView.course) rankView.course = zanSelectedCourse();
+  renderRanking();
+  showScreen('ranking');
+  focusEl(document.getElementById('ranking-title'));
+}
+function closeRanking(){
+  showScreen('title');
+  renderHome();
+  focusEl(rankOpener || document.getElementById('btn-ranking'));
+}
+function renderRanking(){
+  var logged = SyncManager.isLoggedIn(), join = false;
+  try{ join = loadStore().settings.rankJoin===true; }catch(e){}
+  document.getElementById('rk-login').hidden = logged;
+  document.getElementById('rk-body').hidden = !logged;
+  var tabs = document.getElementById('rk-courses');
+  tabs.textContent = '';
+  ZAN_COURSES.forEach(function(c){
+    if(!zanPlayable(c.id)) return;
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'btn-small rk-tab'; b.setAttribute('data-course', c.id);
+    b.setAttribute('aria-pressed', c.id===rankView.course ? 'true' : 'false');
+    b.textContent = c.name;
+    tabs.appendChild(b);
+  });
+  var ps = document.querySelectorAll('.rk-period');
+  for(var i=0;i<ps.length;i++) ps[i].setAttribute('aria-pressed', ps[i].getAttribute('data-period')===rankView.period ? 'true' : 'false');
+  var jb = document.getElementById('rk-join');
+  jb.checked = join;
+  if(!logged) return;
+  var list = document.getElementById('rk-list'), status = document.getElementById('rk-status'), seq = ++rankView.seq;
+  list.textContent = '';
+  status.textContent = '読み込み中…';
+  SyncManager.rankGet(rankView.course, rankView.period).then(function(res){
+    if(seq!==rankView.seq) return;                   // (another tab was chosen meanwhile)
+    if(!res.ok){ status.textContent = '番付を読み込めませんでした。通信できるところで、もう一度開いてください。'; return; }
+    var es = Array.isArray(res.entries) ? res.entries : [], c = zanCourse(rankView.course);
+    status.textContent = (c ? c.name : '') + '・' + (rankView.period==='all' ? '全期間' : '今週（' + String(res.week || '').replace(/^\d{4}-0?(\d+)-0?(\d+)$/, '$1月$2日') + 'からの週）') + (es.length ? '　上位' + es.length + '人' : '　まだ誰も載っていません');
+    es.forEach(function(e){
+      var li = document.createElement('li');
+      if(e.me) li.className = 'is-me';
+      var rk = document.createElement('span'); rk.className = 'rk-rank'; rk.textContent = String(e.rank);
+      var nm = document.createElement('span'); nm.className = 'rk-name'; nm.textContent = cleanProfileName(String(e.name || '')) || DEFAULT_PLAYER_NAME;
+      var sc = document.createElement('span'); sc.className = 'rk-score'; sc.textContent = fmtPoints(clampInt(e.score, 0, STAT_MAX)) + '点';
+      var sub = document.createElement('span'); sub.className = 'rk-sub';
+      sub.textContent = (ZAN_GRADE_NAMES.indexOf(e.grade)>=0 ? '完成度 ' + e.grade + '・' : '') + 'コンボ ' + clampInt(e.combo, 0, STAT_MAX) + (e.trick ? '・イタズラ' : '') + (e.me ? '・あなた' : '');
+      li.appendChild(rk); li.appendChild(nm); li.appendChild(sc); li.appendChild(sub);
+      list.appendChild(li);
+    });
+  });
+}
+document.getElementById('btn-ranking').addEventListener('click', function(){ openRanking(this); });
+document.getElementById('btn-ranking-back').addEventListener('click', closeRanking);
+document.getElementById('rk-open-mypage').addEventListener('click', function(){ openMypage(document.getElementById('btn-ranking')); });
+document.getElementById('rk-courses').addEventListener('click', function(e){
+  var b = e.target.closest && e.target.closest('.rk-tab');
+  if(!b) return;
+  rankView.course = b.getAttribute('data-course');
+  renderRanking();
+});
+document.getElementById('rk-periods').addEventListener('click', function(e){
+  var b = e.target.closest && e.target.closest('.rk-period');
+  if(!b) return;
+  rankView.period = b.getAttribute('data-period')==='all' ? 'all' : 'week';
+  renderRanking();
+});
+document.getElementById('rk-join').addEventListener('change', function(){
+  var on = this.checked, msg = document.getElementById('rk-join-msg');
+  try{ var store = loadStore(); store.settings.rankJoin = on; saveStoreObj(store); }catch(e){}
+  msg.textContent = on ? '参加しました。これから遊んだ記録が番付に送られます。' : '番付から外れています…';
+  if(!on) SyncManager.rankLeave().then(function(res){
+    msg.textContent = res.ok ? '参加をやめました。番付からあなたの記録を消しました。' : '参加をやめました（番付からの削除は、通信できるときにもう一度「参加する」を外してください）。';
+    renderRanking();
+  });
+  else renderRanking();
+});
+
 // --- リザルトのふりかえり (only what is shown and the 苦手 counts: the score and the 完成度 are not touched) ---
 // the judgements by part of the song (sections[].from, in beats): how many, the Misses and the mean |ずれ| of the cuts
 function zanReview(song, judges){
@@ -13993,6 +14214,7 @@ function zanReview(song, judges){
   }
   for(i=0;i<judges.length;i++){
     var j = judges[i], k = secs.length - 1;
+    if(j.rating==='FOOLED') continue;
     while(k>0 && j.b < secs[k].from - 1e-6) k--;
     var s = secs[k];
     s.n++;
@@ -14121,6 +14343,7 @@ function finishZan(){
   resultDailyClear.classList.toggle('show', dailyJustCleared);
   if(dailyJustCleared) coinParts0.challenge = COIN_CHALLENGE_BONUS;
   try{ renderCoinResult(awardCoins(coinParts0), '完成度'); }catch(e){ coinBox.hidden = true; }
+  zanRankSend({perfect:zan.perfect, combo:zan.maxCombo, grade:grade});   // 番付 (参加している人だけ; a failure never touches the records)
   showScreen('result');
   zanShowStart({grade:grade, rate:total ? zan.perfect/total : 0, allPerfect:total>0 && zan.perfect===total});
   var rewards = claimRewards();                     // 限定 items whose record this song reached (looks only)
