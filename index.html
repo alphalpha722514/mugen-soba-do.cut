@@ -659,6 +659,13 @@ body{
   opacity:0;pointer-events:none;text-shadow:0 2px 6px rgba(0,0,0,.35);
 }
 .popup.show{animation:popIn .5s ease-out;}
+/* 殿様ご来店: a longer message (演出「控えめ」・視差効果を減らす: a plain fade, no zoom) */
+.popup.is-long{font-size:1.3rem;white-space:nowrap;}
+.popup.is-long.show{animation:popLong 1.6s ease-out;}
+.popup.is-long.is-calm.show{animation:popFade 1.6s linear;}
+@keyframes popLong{0%{opacity:0;transform:translate(-50%,-50%) scale(.7);}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08);}25%{opacity:1;transform:translate(-50%,-50%) scale(1);}80%{opacity:1;transform:translate(-50%,-50%) scale(1);}100%{opacity:0;transform:translate(-50%,-55%) scale(1);}}
+@keyframes popFade{0%{opacity:0;transform:translate(-50%,-50%);}10%{opacity:1;transform:translate(-50%,-50%);}80%{opacity:1;transform:translate(-50%,-50%);}100%{opacity:0;transform:translate(-50%,-50%);}}
+@media (prefers-reduced-motion:reduce){ .popup.is-long.show{animation:popFade 1.6s linear;} }
 @keyframes popIn{
   0%{opacity:0;transform:translate(-50%,-50%) scale(.5);}
   25%{opacity:1;transform:translate(-50%,-50%) scale(1.15);}
@@ -1506,7 +1513,7 @@ body{
         <li><b>完成度</b>Perfectは1、OKは0.5として数えた割合で「並・上・特上・極上」が決まります（極上は95%以上かつMissなし）。</li>
         <li><b>試し切り（ずれ調整）</b>音に対してタップがずれると感じたら、ホームの「試し切り」で「トン」の音に合わせて8回たたくと、ずれを測って判定をそろえます。イヤホンを使うときは、つけたまま測ってください。値はこの端末だけに保存します。</li>
         <li><b>一時停止</b>遊んでいる途中でほかのアプリに切り替えると止まり、画面をタップすると続きから再開します。</li>
-        <li><b>ひょっこり客</b>あなたの番の1小節が終わるたびに、画面の下からお客さんが顔を出して、その小節の出来（全部Perfect・OKまじり・Missあり）に反応します。全部Perfectの小節が2回続くと蕎麦奉行、4回でお姫様、6回で殿様が来店します（見た目だけで、得点は変わりません）。</li>
+        <li><b>ひょっこり客</b>あなたの番の1小節が終わるたびに、画面の下からお客さんが顔を出して、その小節の出来（全部Perfect・OKまじり・Missあり）に反応します。全部Perfectの小節が2回続くと蕎麦奉行、4回でお姫様、6回で殿様が来店します。殿様が来店すると「殿様ご来店！ 倍率UP」と出て、そこからあなたの番2小節ぶん（16拍）、コンボ倍率が+0.2されます。蕎麦奉行・お姫様とふつうのお客さんは見た目だけで、得点は変わりません。</li>
         <li><b>区間練習</b>ホームの「区間練習」で、選んだコースの1区間（お手本・刻み・タメ切り など）だけを3回くり返して練習できます。速さは0.8倍・0.9倍・1.0倍。得点・ベスト・コイン・称号・チャレンジには入りません（師匠のイタズラはなし）。途中でやめるときは画面下の「練習をやめる」。終わるとホームに、その練習のPerfect・OK・Missが出ます。</li>
         <li><b>ふりかえり</b>リザルトに、極上まであと何回OKをPerfectにすればよいか（Missがあるときは「Miss 0」が条件であること）と、曲の区間ごとのMissの数とずれの帯が出ます。いちばんMissの多かった区間を「苦手」として示し、コースごとに区間のMissの累計を記録します。</li>
         <li><b>リザルト</b>切った蕎麦がざるに盛られ、大根おろし・ネギ・かつお節がのり、完成度に合ったお客さんが味わいます。最後に完成度の判子が押され、師匠がひと言。Perfectが多いほど麺がそろって艶やかに。タップで飛ばせます（演出「控えめ」などの設定では、はじめから仕上がった姿で出ます）。</li>
@@ -4699,8 +4706,11 @@ function playJustSound(){
 
 
 function showPopup(text){
+  var long = text.indexOf('殿様')===0;
   elPopup.textContent = text;
-  elPopup.style.color = text==='JUST!' ? '#ffd54a' : text==='真・PERFECT' ? '#c8921a' : text==='PERFECT' ? 'var(--accent)' : text==='GOOD' ? 'var(--accent2)' : text==='OK' ? 'var(--dough)' : '#948a78';
+  elPopup.classList.toggle('is-long', long);
+  elPopup.classList.toggle('is-calm', long && effectsPref.level==='low');
+  elPopup.style.color = text==='JUST!' ? '#ffd54a' : text==='真・PERFECT' || text.indexOf('殿様')===0 ? '#c8921a' : text==='PERFECT' ? 'var(--accent)' : text==='GOOD' ? 'var(--accent2)' : text==='OK' ? 'var(--dough)' : '#948a78';
   elPopup.classList.remove('show');
   void elPopup.offsetWidth;
   elPopup.classList.add('show');
@@ -12876,7 +12886,8 @@ document.addEventListener('keydown', function(e){
 // every note sits on its beat grid (whole, half and quarter beats).
 var ZAN_PERFECT = 0.035, ZAN_OK = 0.080, ZAN_GUARD = 0.12;   // seconds: Perfect ±35ms, OK ±80ms, a press further than ±120ms is a whiff
                                   // (the defaults: each course sets its own in ZAN_COURSES — perfectMs / okMs / guardMs — read by zanWindows)
-var ZAN_SHIN = 0.015, ZAN_SHIN_MULT = 1.5;   // 真・PERFECT: within ±15ms the cut's points are ×1.5 (still counted as a Perfect)
+var ZAN_SHIN = 0.015, ZAN_SHIN_MULT = 1.5;
+var ZAN_TONO_BONUS = 0.2, ZAN_TONO_BEATS = 16;   // 殿様ご来店: the combo multiplier +0.2 for the next 16 beats (two of your bars)   // 真・PERFECT: within ±15ms the cut's points are ×1.5 (still counted as a Perfect)
 var ZAN_LATE_GRACE = 0.06;        // a passed note is called a Miss only this much after its OK window closes, so a tap
                                   // made in time but delivered a frame late is still judged (by its own timestamp)
 var ZAN_TRAVEL = 1.25;            // seconds a note takes from the right edge to the knife
@@ -13453,13 +13464,14 @@ function zanHit(n, part, err){
   zan.combo++;
   zan.maxCombo = Math.max(zan.maxCombo, zan.combo);
   zanBuzz(rating==='PERFECT' ? 10 : 6);             // 振動 (only the feel: the score is not touched)
-  var mult = 1 + Math.min(1, Math.floor(zan.combo/10)*0.1);   // ×1.0 → ×2.0 over 100 in a row
+  var tonoOn = !!(zan.tono && zanT2B(songT) < zan.tono.until);   // 殿様ご来店: +0.2 on top (the formula below is unchanged)
+  var mult = 1 + Math.min(1, Math.floor(zan.combo/10)*0.1) + (tonoOn ? ZAN_TONO_BONUS : 0);   // ×1.0 → ×2.0 over 100 in a row
   var base = ZAN_POINTS[kind][rating==='PERFECT' ? 0 : 1]*(shin ? ZAN_SHIN_MULT : 1);   // 真・PERFECT: ×1.5
   zan.score += Math.round(base*mult*(zan.trick ? ZAN_TRICK_SCORE : 1));   // (イタズラ ×1.2)
   if(rating==='PERFECT') zan.perfect++; else zan.ok++;
   if(shin) zan.shin++;
   zan.errs.push(err*1000);
-  zan.judges.push({b:zanT2B(songT), t:songT, kind:kind, rating:rating, err:Math.round(err*1000)});   // (for the result's ふりかえり)
+  zan.judges.push({b:zanT2B(songT), t:songT, kind:kind, rating:rating, err:Math.round(err*1000), tono:tonoOn});   // (for the result's ふりかえり)
   // the look of the cut (only the look): the knife comes down, the ring, a cut line in the dough
   if(part!=='head'){ zanKnifeStrike(zan.pKnife, kind==='tail'); zanCutMark(songT + err, kind==='tail', false); }
   state.cutFx.push({t:0, rating:rating==='PERFECT' ? 'JUST' : 'PERFECT'});
@@ -13544,6 +13556,10 @@ function zanPeekCheck(){
   var key = special || pool[(turn/2) % pool.length];
   if(zan.peeks.length>2) zan.peeks.shift();
   zan.peeks.push({at:performance.now(), dur:zanB2T(to + 4) - zanB2T(to), key:key, special:special, verdict:verdict, side:(turn/2) % 2});
+  if(special==='tono' && zan.greatRun===6){         // 殿様ご来店 (each time a run of 6 all-Perfect bars is reached): a bonus for a while
+    zan.tono = {from:to, until:to + ZAN_TONO_BEATS};
+    showPopup('殿様ご来店！ 倍率UP');
+  }
   if(special && audioEnabled){                      // a small bell for a special guest (silent while 🔇)
     try{ var ac = getAudioCtx(); if(ac){ gachaTone(ac, 1568, 0, 0.3, 'sine', 0.045); gachaTone(ac, 2349, 0.09, 0.4, 'sine', 0.035); } }catch(e){}
   }
@@ -13760,7 +13776,7 @@ function startZan(courseId, backing, practice){
   var trickFrom = zanTrickFrom(song, practice ? null : course);
   var buzz = zanBuzzAllowed();
   var notes = zanChart(song, tm, trick, trickFrom);
-  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), shin:0, judges:[], practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
+  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), shin:0, judges:[], tono:null, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
          p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
