@@ -878,6 +878,27 @@ body{
 .zan-tools-note{font-size:.68rem;color:var(--ink-soft);}
 .rank-sent{margin:-16px 0 20px;font-size:.8rem;font-weight:700;color:var(--accent-ink);text-align:center;}
 .rank-sent[hidden]{display:none;}
+/* 挑戦状 (V5) */
+.duel-box{width:100%;max-width:340px;margin:0 0 22px;padding:14px 16px;border-radius:16px;border:2px dashed var(--accent2-ink);background:var(--card);box-shadow:var(--card-shadow);text-align:center;}
+.duel-box[hidden]{display:none;}
+.duel-box-h{margin:0 0 6px;font-family:var(--font-display);font-size:1.25rem;color:var(--accent2-ink);}
+.duel-verdict{margin:0 0 8px;font-size:1.05rem;font-weight:900;line-height:1.5;color:var(--ink);}
+.duel-verdict b{display:block;font-family:var(--font-display);font-size:1.7rem;color:var(--accent2-ink);}
+.duel-verdict.is-lose b{color:var(--ink-soft);}
+.duel-verdict[hidden]{display:none;}
+.duel-lead{margin:0 0 10px;font-size:.8rem;line-height:1.55;color:var(--ink-soft);}
+.duel-btn{width:100%;}
+.duel-home{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding:10px 12px;border-radius:12px;border:2px dashed var(--accent2-ink);background:color-mix(in srgb,var(--accent2-ink) 8%,var(--card));}
+.duel-home[hidden]{display:none;}
+.duel-home-text{margin:0;flex:1 1 180px;font-size:.84rem;line-height:1.5;}
+.duel-home-text b{margin-right:6px;color:var(--accent2-ink);}
+.duel-home-btns{display:flex;gap:6px;}
+.duel-from{margin:0 0 8px;font-size:1rem;font-weight:900;}
+.duel-info{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 10px;font-size:.88rem;}
+.duel-info dt{color:var(--ink-soft);}
+.duel-info dd{margin:0;font-weight:700;overflow-wrap:anywhere;}
+.duel-err{margin:0 0 8px;font-size:.85rem;font-weight:700;color:var(--accent2-ink);}
+.duel-err[hidden]{display:none;}
 /* 番付 */
 .rk-lead{margin:0 0 12px;font-size:.8rem;line-height:1.6;color:var(--ink-soft);}
 .rk-login,.rk-join{padding:12px 14px;margin-bottom:12px;display:grid;gap:8px;}
@@ -1379,6 +1400,10 @@ body{
     <section id="zan-hero" class="zan-hero card" aria-labelledby="zan-hero-h">
       <h2 id="zan-hero-h" class="zan-h"><span class="zan-seal" aria-hidden="true">斬</span>リズム修行・斬</h2>
       <p class="zan-sub">師匠が1小節お手本を切って見せたら、次の小節であなたが同じリズムで切る。BGMの拍にぴったり合わせて切るリズムモード（1曲 約80〜90秒）。</p>
+      <div id="duel-home" class="duel-home" hidden>
+        <p class="duel-home-text"><b>挑戦状</b><span id="duel-home-text"></span></p>
+        <div class="duel-home-btns"><button id="duel-home-go" class="btn-small btn-primary" type="button">勝負する</button><button id="duel-home-drop" class="btn-small" type="button">やめる</button></div>
+      </div>
       <div class="zan-courses" role="group" aria-label="コースを選ぶ">
         <button class="opt zan-course" type="button" data-course="nihachi" aria-pressed="true">
           <span class="opt-top"><span class="opt-name">二八</span><span class="tag">初級</span><span class="tag">♩=110</span><span class="zan-today" data-today="nihachi" hidden>今日の一曲 +100🪙</span></span>
@@ -1397,7 +1422,7 @@ body{
         </button>
         <button class="opt zan-course" type="button" data-course="uchihiki" aria-pressed="false">
           <span class="opt-top"><span class="opt-name">越前打挽き</span><span class="tag">最上級</span><span class="tag">♩=120→150</span><span class="zan-today" data-today="uchihiki" hidden>今日の一曲 +100🪙</span></span>
-          <span class="opt-desc">曲の途中で♩=150へ加速。最初から師匠のイタズラ入りで、判定もいちばん厳しい。</span>
+          <span class="opt-desc">曲の途中で♩=150へ加速。最初から師匠のイタズラ入りの、いちばん難しいコース。</span>
           <span class="zan-cbest" data-zbest="uchihiki">ベスト —</span>
         </button>
       </div>
@@ -2006,6 +2031,13 @@ body{
       <p id="coin-status" class="coin-status"></p>
     </section>
     <p id="rank-sent" class="rank-sent" role="status" hidden></p>
+    <section id="duel-box" class="duel-box" aria-labelledby="duel-box-h" hidden>
+      <h3 id="duel-box-h" class="duel-box-h">挑戦状</h3>
+      <p id="duel-verdict" class="duel-verdict" hidden></p>
+      <p id="duel-lead" class="duel-lead">この1曲を挑戦状にして友達に送れます。開いた人は、あなたの包丁（青いゴースト）と同じ曲で勝負します。</p>
+      <button id="btn-duel" class="btn-sub duel-btn" type="button">挑戦状を送る</button>
+      <p id="duel-msg" class="share-msg" role="status" aria-live="polite"></p>
+    </section>
     <button id="btn-restart" class="btn-main">もう一度挑戦</button>
     <div class="share-box">
       <button id="btn-share-result" class="btn-sub" type="button">友達に共有する（1日1回 +200🪙）</button>
@@ -2038,6 +2070,19 @@ body{
       </div>
       <label class="ob-check"><input id="ob-hide" type="checkbox" checked> 次回から表示しない</label>
       <button id="ob-start" class="btn-main ob-start" type="button">修行を始める</button>
+    </div>
+  </div>
+
+  <div id="duelmodal" class="zmodal" hidden>
+    <div class="zmodal-backdrop" data-duelclose="1"></div>
+    <div class="zmodal-card duel-card" role="dialog" aria-modal="true" aria-labelledby="duel-h" aria-describedby="duel-desc">
+      <p class="rw-eyebrow">リズム修行・斬</p>
+      <h3 id="duel-h" class="zm-name" tabindex="-1">挑戦状が届きました</h3>
+      <p id="duel-from" class="duel-from"></p>
+      <dl id="duel-info" class="duel-info"></dl>
+      <p id="duel-desc" class="zm-desc">同じコース・同じ心得で、相手の包丁（青いゴースト）と一緒に切ります。得点が上なら勝ち。記録はいつもどおり残ります。</p>
+      <p id="duel-err" class="duel-err" role="alert" hidden></p>
+      <div class="zm-actions"><button id="duel-later" class="btn-small" type="button">あとで</button><button id="duel-go" class="btn-small btn-primary" type="button">受けて立つ</button></div>
     </div>
   </div>
 
@@ -4255,7 +4300,7 @@ function readResultForCard(){
   if(screens.result.classList.contains('is-zan') && zanLastResult){   // リズム修行・斬's own card
     var zr = zanLastResult;
     return {zan:true, score:fmtPoints(zr.score), course:zr.course, grade:zr.grade, perfect:zr.perfect, combo:String(zr.combo), err:zr.err,
-            crit:zr.crit, perfectN:zr.perfectN, ok:zr.ok, miss:zr.miss, acc:zr.acc, trick:zr.trick, mods:zr.mods,
+            crit:zr.crit, perfectN:zr.perfectN, ok:zr.ok, miss:zr.miss, acc:zr.acc, trick:zr.trick, mods:zr.mods, duel:zr.duel || null,
             tier:playTierName(zr.score), total:fmtPoints(titleMetrics(loadStore()).totalScore) + '点',
             newBest:resultNewBest.classList.contains('show'), who:cardIdentity(), mode:resultMode.textContent, date:cardInfo.date || new Date()};
   }
@@ -4808,7 +4853,7 @@ function drawZanCard(canvas, d){
   fitFont(k, d.grade, chipW - 20, 30, 18, '700', CARD_SANS);
   k.fillText(d.grade, ix + iw - chipW/2, py + 58);
   // イタズラ・修行の心得
-  var tags = [].concat(d.trick ? ['イタズラ'] : [], zanModLabels(d.mods)), tx = ix;
+  var tags = [].concat(d.duel ? ['VS ' + d.duel.name + ' ' + (d.duel.win ? '勝ち' : d.duel.draw ? '引き分け' : '負け')] : [], d.trick ? ['イタズラ'] : [], zanModLabels(d.mods)), tx = ix;
   k.font = cardFont('700', 18, CARD_SANS); k.textAlign = 'left';
   for(var ti=0; ti<tags.length; ti++){
     var tw = k.measureText(tags[ti]).width + 22;
@@ -14426,7 +14471,7 @@ document.getElementById('zpb-home').addEventListener('click', function(){ zanQui
 var zanLaunching = false;
 function zanLaunch(courseId){
   if(zanLaunching || !zanPlayable(courseId)) return;
-  var song = zanPlaySong(zanCourse(courseId), zanCurrentMods());
+  var song = zanPlaySong(zanCourse(courseId), zanRunMods());
   if(song.baseId && !zanRenders[song.id]) for(var vk in zanRenders) if(Object.prototype.hasOwnProperty.call(zanRenders, vk) && vk.indexOf('.x')>=0) delete zanRenders[vk];   // (one 心得 track kept at a time)
   if(!audioEnabled || zanRenders[song.id]){ startZan(courseId, zanRenders[song.id] || null); return; }
   var btn = document.getElementById('btn-zan'), label = btn.textContent;
@@ -14441,7 +14486,7 @@ function zanLaunch(courseId){
   });
 }
 function startZan(courseId, backing, practice){
-  var course = zanPlayable(courseId) ? zanCourse(courseId) : ZAN_COURSES[0], mods = practice ? sanitizeMods(null) : zanCurrentMods(), song = practice ? practice.song : zanPlaySong(course, mods), tm = zanTempoOf(song);   // (区間練習: no 心得)
+  var course = zanPlayable(courseId) ? zanCourse(courseId) : ZAN_COURSES[0], duel = !practice && zanArmed && zanArmed.duel && zanArmed.duel.course===course.id ? zanArmed.duel : null, mods = practice ? sanitizeMods(null) : duel ? duel.mods : zanCurrentMods(), song = practice ? practice.song : zanPlaySong(course, mods), tm = zanTempoOf(song);   // (区間練習: no 心得; 挑戦状: the sender's)
   stopDemoTaps();
   finishResultCount(true);
   state = freshState();
@@ -14457,13 +14502,14 @@ function startZan(courseId, backing, practice){
   state.phase = 'zan';
   var trick = false;
   try{ trick = !practice && loadStore().settings.zanTrick===true; }catch(e){}   // (区間練習: no イタズラ)
+  if(duel) trick = duel.trick;                       // (挑戦状: the sender's イタズラ)
   if(!practice && course.alwaysTrick) trick = true;  // 越前打挽き: always (×1.2 too)
   var trickFrom = zanTrickFrom(song, practice ? null : course);
   var buzz = zanBuzzAllowed();
   var notes = zanChart(song, tm, trick, trickFrom);
   var ghost = null;                                  // ゴースト (looks only): this course's best, on the same chart
-  try{ var gs = loadStore(); if(!practice && gs.settings.ghost===true) ghost = zanGhostLoad(gs.zan.courses[course.id].ghost, song, tm); }catch(e){ ghost = null; }
-  zan = {course:course, song:song, tempo:tm, win:zanWindows(course, mods.strict), mods:mods, modMult:zanModMult(mods), travel:ZAN_TRAVEL/mods.speed, crit:0, judges:[], tono:null, ghost:ghost, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
+  try{ var gs = loadStore(); if(duel) ghost = zanGhostLoad(duel.ghost, song, tm); else if(!practice && gs.settings.ghost===true) ghost = zanGhostLoad(gs.zan.courses[course.id].ghost, song, tm); }catch(e){ ghost = null; }   // (挑戦状: the sender's knife)
+  zan = {course:course, song:song, tempo:tm, win:zanWindows(course, mods.strict), mods:mods, modMult:zanModMult(mods), travel:ZAN_TRAVEL/mods.speed, crit:0, judges:[], tono:null, ghost:ghost, duel:duel, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
          p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
@@ -14475,7 +14521,7 @@ function startZan(courseId, backing, practice){
   applyModeLook('normal');
   modeTag.hidden = false;
   modeTag.textContent = practice ? '練習中（記録されません）・' + course.name + '「' + practice.label + '」' + zanSpeedLabel(practice.speed)
-                                 : '斬・' + course.name + '・♩=' + zanBpmLabel(course) + (season ? '・' + SEASONAL_MODES[season].name + (song.shinsoba ? '譜面' : '') : '') + (zanModsActive(mods) ? '・' + zanModLabels(mods).join('・') : '');
+                                 : '斬・' + course.name + '・♩=' + zanBpmLabel(course) + (season ? '・' + SEASONAL_MODES[season].name + (song.shinsoba ? '譜面' : '') : '') + (zanModsActive(mods) ? '・' + zanModLabels(mods).join('・') : '') + (duel ? '・挑戦状「' + duel.name + '」' : '');
   document.getElementById('btn-practice-quit').hidden = !practice;
   document.getElementById('btn-zan-pause').hidden = false;
   zanPauseBox(false);
@@ -14536,6 +14582,194 @@ function zanGrade(acc, miss){
   for(var i=0;i<ZAN_GRADES.length;i++){ var g = ZAN_GRADES[i]; if(acc>=g[1] && (!g[2] || miss===0)) return g[0]; }
   return '並';
 }
+// --- 挑戦状 (V5): one play put into a link (#duel=…). Whoever opens it plays the same course, 心得 and イタズラ with the
+// sender's cuts as the ゴースト, then sees who won and can send one back (倍返し). Nothing goes through a server: the link
+// holds the display name, the numbers and the cuts ([beat×4, ずれ ms, kind] as in a ゴースト), and every field is checked.
+var DUEL_VER = 1, DUEL_MAX_CHARS = 6000;
+var zanArmed = null;                                 // the run the next start plays: {duel} (cleared by a plain start)
+var zanDuelHeld = null;                              // an invite opened but not yet played (the home shows it)
+var zanDuelSrc = null;                               // the last song, as a challenge to send
+function b64uEnc(bytes){
+  var bin = '';
+  for(var i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function b64uDec(str){
+  if(typeof str!=='string' || !/^[A-Za-z0-9_-]*$/.test(str) || str.length>DUEL_MAX_CHARS) return null;
+  var b = str.replace(/-/g, '+').replace(/_/g, '/');
+  while(b.length % 4) b += '=';
+  try{ var bin = atob(b), out = new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i); return out; }catch(e){ return null; }
+}
+// the cuts as bytes: per cut, (Δbeat×4)×3 + kind and the zigzagged ずれ, each a varint
+function duelPackCuts(cuts){
+  var out = [], prev = 0, list = cuts.slice().sort(function(a, b){ return a[0] - b[0]; });
+  function vi(v){ while(v>=128){ out.push((v % 128) + 128); v = Math.floor(v/128); } out.push(v); }
+  for(var i=0;i<list.length;i++){
+    var c = list[i], e = Math.max(-300, Math.min(300, Math.round(c[1])));
+    vi((c[0] - prev)*3 + c[2]);
+    vi(e>=0 ? e*2 : -e*2 - 1);
+    prev = c[0];
+  }
+  return new Uint8Array(out);
+}
+function duelUnpackCuts(bytes){
+  var cuts = [], i = 0, q = 0;
+  function vi(){ var v = 0, m = 1, n = 0; while(i<bytes.length){ var x = bytes[i++]; v += (x % 128)*m; if(x<128) return v; m *= 128; if(++n>3) return -1; } return -1; }
+  while(i<bytes.length && cuts.length<ZAN_GHOST_MAX){
+    var a = vi(), z = vi();
+    if(a<0 || z<0) return null;
+    q += Math.floor(a/3);
+    cuts.push([q, z % 2 ? -(z + 1)/2 : z/2, a % 3]);
+  }
+  return cuts;
+}
+function duelModsCode(m){ return ZAN_MOD_SPEEDS.indexOf(m.speed)*4 + (m.strict ? 2 : 0) + (m.blind ? 1 : 0); }
+function duelModsOf(code){ return {speed:ZAN_MOD_SPEEDS[code >> 2], strict:(code & 2)===2, blind:(code & 1)===1}; }
+function duelEncode(d){
+  var meta = {v:DUEL_VER, c:d.course, h:d.chart, m:duelModsCode(d.mods), t:d.trick ? 1 : 0, s:d.score, g:d.grade, k:d.crit, n:d.name, r:d.round};
+  if(d.vs) meta.o = d.vs;
+  return b64uEnc(new TextEncoder().encode(JSON.stringify(meta))) + '.' + b64uEnc(duelPackCuts(d.cuts));
+}
+// a link's challenge, checked field by field (null if anything is off)
+function duelDecode(code){
+  try{
+    if(typeof code!=='string' || code.length>DUEL_MAX_CHARS) return null;
+    var parts = code.split('.');
+    if(parts.length!==2) return null;
+    var mb = b64uDec(parts[0]), cb = b64uDec(parts[1]);
+    if(!mb || !cb) return null;
+    var m = JSON.parse(new TextDecoder().decode(mb));
+    if(!isPlainObj(m) || m.v!==DUEL_VER || ZAN_COURSE_IDS.indexOf(m.c)<0 || typeof m.h!=='string' || !/^[a-z0-9~._-]{1,40}$/.test(m.h)) return null;
+    if(!Number.isInteger(m.m) || m.m<0 || (m.m >> 2)>=ZAN_MOD_SPEEDS.length || !Number.isInteger(m.s) || m.s<0 || m.s>STAT_MAX || ZAN_GRADE_NAMES.indexOf(m.g)<0) return null;
+    var cuts = duelUnpackCuts(cb), ghost = cuts ? sanitizeGhost({chart:m.h, cuts:cuts}) : null;
+    if(!ghost) return null;
+    return {course:m.c, chart:m.h, mods:duelModsOf(m.m), trick:m.t===1, score:m.s, grade:m.g, crit:clampInt(m.k, 0, STAT_MAX), name:cleanProfileName(m.n) || DEFAULT_PLAYER_NAME,
+            round:clampInt(m.r, 1, 99) || 1, vs:cleanProfileName(m.o) || '', ghost:ghost};
+  }catch(e){ return null; }
+}
+function duelLink(d){ return SHARE_URL + '#duel=' + duelEncode(d); }
+// can this challenge be played here (the same chart: 新そばの譜面 only while it is open, the 心得's own track)?
+function duelCheck(d){
+  var c = zanCourse(d.course);
+  if(!zanPlayable(d.course)) return 'このコースは今は遊べません。';
+  var song = zanPlaySong(c, d.mods);
+  if(!song || song.id!==d.chart) return 'この挑戦状の譜面（' + (/\.shin/.test(d.chart) ? '新そばの譜面' : 'いつもの譜面') + '）は、今は遊べません。季節が変わると譜面が変わります。';
+  return '';
+}
+function duelRulesText(d){
+  var l = [].concat(d.trick ? ['イタズラ'] : [], zanModLabels(d.mods));
+  return l.length ? l.join('・') : 'なし';
+}
+var duelModal = document.getElementById('duelmodal'), duelOpener = null;
+function duelInfoRow(dl, k, v){ var dt = document.createElement('dt'); dt.textContent = k; var dd = document.createElement('dd'); dd.textContent = v; dl.appendChild(dt); dl.appendChild(dd); }
+function openDuel(d, opener){
+  if(!duelModal || !d) return;
+  var c = zanCourse(d.course), err = duelCheck(d);
+  document.getElementById('duel-h').textContent = d.round>1 ? '倍返しの挑戦状が届きました' : '挑戦状が届きました';
+  document.getElementById('duel-from').textContent = '「' + d.name + '」より' + (d.vs ? '（「' + d.vs + '」への倍返し）' : '');
+  var dl = document.getElementById('duel-info');
+  dl.textContent = '';
+  duelInfoRow(dl, 'コース', c.name + '（' + c.level + '）');
+  duelInfoRow(dl, '相手の得点', fmtPoints(d.score) + '点（' + d.grade + '）');
+  duelInfoRow(dl, '極・一閃', d.crit + '回');
+  duelInfoRow(dl, '心得', duelRulesText(d));
+  var e = document.getElementById('duel-err');
+  e.hidden = !err; e.textContent = err;
+  document.getElementById('duel-go').disabled = !!err;
+  zanDuelHeld = err ? null : d;
+  duelOpener = opener || null;
+  duelModal.hidden = false;
+  focusEl(document.getElementById('duel-h'));
+}
+function closeDuel(){
+  if(!duelModal || duelModal.hidden) return;
+  duelModal.hidden = true;
+  renderDuelHome();
+  focusEl(duelOpener);
+  duelOpener = null;
+}
+function renderDuelHome(){
+  var box = document.getElementById('duel-home');
+  if(!box) return;
+  var d = zanDuelHeld;
+  box.hidden = !d;
+  if(d) document.getElementById('duel-home-text').textContent = '「' + d.name + '」' + zanCourse(d.course).name + ' ' + fmtPoints(d.score) + '点（' + d.grade + '）・心得 ' + duelRulesText(d);
+}
+// 受けて立つ: the next start plays this challenge (and やり直す keeps it) until a plain start
+function duelAccept(d){
+  if(!d || duelCheck(d)) return;
+  zanArmed = {duel:d};
+  zanHomeCourse = d.course;
+  wakeAudio();
+  zanLaunch(d.course);
+}
+document.getElementById('duel-go').addEventListener('click', function(){ var d = zanDuelHeld; duelModal.hidden = true; duelOpener = null; duelAccept(d); });
+document.getElementById('duel-later').addEventListener('click', closeDuel);
+duelModal.addEventListener('click', function(e){ if(e.target && e.target.getAttribute && e.target.getAttribute('data-duelclose')) closeDuel(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && duelModal && !duelModal.hidden){ e.preventDefault(); closeDuel(); } });
+document.getElementById('duel-home-go').addEventListener('click', function(){ duelAccept(zanDuelHeld); });
+document.getElementById('duel-home-drop').addEventListener('click', function(){ zanDuelHeld = null; zanArmed = null; renderDuelHome(); });
+// the 心得 of the next start (a challenge plays the sender's, not this device's)
+function zanRunMods(){ return zanArmed && zanArmed.duel ? zanArmed.duel.mods : zanCurrentMods(); }
+// after a song: the box to send it as a challenge, and the verdict when it was one
+function zanDuelResult(){
+  var box = document.getElementById('duel-box'), v = document.getElementById('duel-verdict'), btn = document.getElementById('btn-duel');
+  document.getElementById('duel-msg').textContent = '';
+  zanDuelSrc = null;
+  if(zan.practice){ box.hidden = true; return; }
+  var ghost = zanGhostOf(zan.song, zan.judges), name = '';
+  try{ name = loadStore().profile.name; }catch(e){}
+  var d = zan.duel;
+  if(ghost) zanDuelSrc = {course:zan.course.id, chart:zan.song.id, mods:zan.mods, trick:!!zan.trick, score:zan.score, grade:zanLastResult ? zanLastResult.grade : '並',
+                          crit:zan.crit, name:cleanProfileName(name) || DEFAULT_PLAYER_NAME, round:d ? Math.min(99, d.round + 1) : 1, vs:d ? d.name : '', cuts:ghost.cuts};
+  box.hidden = !zanDuelSrc && !d;
+  btn.hidden = !zanDuelSrc;
+  btn.textContent = d ? '倍返しの挑戦状を送る' : '挑戦状を送る';
+  document.getElementById('duel-lead').hidden = !!d;
+  v.hidden = !d;
+  if(d){
+    var diff = zan.score - d.score, win = diff>0, draw = diff===0;
+    v.classList.toggle('is-lose', !win && !draw);
+    v.textContent = '';
+    var big = document.createElement('b');
+    big.textContent = win ? '勝ち！' : draw ? '引き分け' : '負け…';
+    v.appendChild(big);
+    v.appendChild(document.createTextNode('「' + d.name + '」' + fmtPoints(d.score) + '点 に対して、あなた ' + fmtPoints(zan.score) + '点' + (draw ? '' : '（' + (win ? '+' : '') + fmtPoints(diff) + '）')));
+    if(zanLastResult) zanLastResult.duel = {name:d.name, win:win, draw:draw};
+  }
+}
+function duelSend(){
+  var d = zanDuelSrc, msg = document.getElementById('duel-msg');
+  if(!d) return;
+  var url = duelLink(d), c = zanCourse(d.course);
+  var text = '『無限そば道・斬』' + (d.vs ? '「' + d.vs + '」へ倍返しの' : '') + '挑戦状！ ' + c.name + ' ' + fmtPoints(d.score) + '点（' + d.grade + '）' + (zanModsActive(d.mods) ? '［' + zanModLabels(d.mods).join('・') + '］' : '') + '。この包丁を超えられるか？';
+  var p = null;
+  try{ if(navigator.share) p = navigator.share({title:'無限そば道・斬 挑戦状', text:text, url:url}); }catch(e){ p = null; }
+  if(p && typeof p.then==='function'){
+    p.then(function(){ msg.textContent = '挑戦状を送りました。'; }, function(err){ if(err && err.name==='AbortError') msg.textContent = '送るのをやめました。'; else duelCopy(text, url, msg); });
+    return;
+  }
+  duelCopy(text, url, msg);
+}
+function duelCopy(text, url, msg){
+  var c = null;
+  try{ if(navigator.clipboard && navigator.clipboard.writeText) c = navigator.clipboard.writeText(text + '\n' + url); }catch(e){ c = null; }
+  if(c && typeof c.then==='function') c.then(function(){ msg.textContent = '挑戦状のリンクをコピーしました。LINE などに貼って送ってね。'; }, function(){ msg.textContent = 'コピーできませんでした。このリンクを送ってください：' + url; });
+  else msg.textContent = 'このリンクを送ってください：' + url;
+}
+document.getElementById('btn-duel').addEventListener('click', duelSend);
+// a link opened with #duel=…: the invite (the address is cleaned at once, so a reload does not ask again)
+function duelFromLocation(){
+  var h = '';
+  try{ h = location.hash || ''; }catch(e){ return; }
+  var m = /^#duel=([A-Za-z0-9_.-]+)$/.exec(h);
+  if(!m) return;
+  try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+  var d = duelDecode(m[1]);
+  if(!d){ showToast('挑戦状のリンクが読めませんでした（途中で切れているかもしれません）。'); return; }
+  openDuel(d, null);
+}
+window.addEventListener('hashchange', duelFromLocation);
 // --- 番付: after a song, the judge log goes to the server, which scores it again (参考記録). Only when logged in and
 // 参加 is chosen on this device; the result here is saved first, so a failure (offline…) only shows a line.
 function zanRankPayload(r){
@@ -14798,6 +15032,7 @@ function finishZan(){
   if(dailyJustCleared) coinParts0.challenge = COIN_CHALLENGE_BONUS;
   try{ renderCoinResult(awardCoins(coinParts0), '完成度'); }catch(e){ coinBox.hidden = true; }
   zanRankSend({perfect:zan.perfect, combo:zan.maxCombo, grade:grade});   // 番付 (参加している人だけ; a failure never touches the records)
+  zanDuelResult();                                  // 挑戦状: the verdict, and this song as one to send
   showScreen('result');
   zanShowStart({grade:grade, rate:total ? zan.perfect/total : 0, allPerfect:total>0 && zan.perfect===total});
   var rewards = claimRewards();                     // 限定 items whose record this song reached (looks only)
@@ -15305,7 +15540,7 @@ function drawZan(){
   else {
     if(finale){ ctx.save(); ctx.globalAlpha = 0.55; zanDrawKnife(jx, y, h, mPose, true, nowP); ctx.restore(); }   // 同時切り: the master's knife beside yours
     zanDrawKnife(jx, y, h, pPose, false, nowP);
-    if(zan.ghost && playing){ var gPose = zanGhostPose(songT, dtK, h, still); ctx.save(); ctx.globalAlpha = 0.5; zanDrawKnife(jx, y, h, gPose, false, nowP, true); ctx.restore(); }   // ゴースト (over yours, see-through)
+    if(zan.ghost && playing){ var gPose = zanGhostPose(songT, dtK, h, still); ctx.save(); ctx.globalAlpha = 0.5; zanDrawKnife(jx, y, h, gPose, false, nowP, true); if(zan.duel){ ctx.globalAlpha = 0.85; ctx.fillStyle = '#2f6f86'; ctx.font = '700 11px "Zen Maru Gothic",sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(zan.duel.name, jx - 19, y - gPose.lift - 48); } ctx.restore(); }   // ゴースト (over yours, see-through; 挑戦状: the sender's name)
   }
   if(playing) zanDrawTurn(jx, y, h, beat, masterTurn, finale);
   zanDrawPeeks(nowP, still);
@@ -15409,6 +15644,7 @@ function zanPrepSelected(){
 function renderZanHome(){
   if(typeof ZAN_COURSES==='undefined' || !ZAN_COURSES) return;   // (the home is drawn once before this part of the script has run)
   zanPrepSelected();
+  renderDuelHome();
   var z = null, sel = zanSelectedCourse();
   try{ z = loadStore().zan; }catch(e){}
   var cards = document.querySelectorAll('.zan-course');
@@ -15460,7 +15696,7 @@ document.querySelector('.zan-courses').addEventListener('click', function(e){
   zanHomeCourse = b.getAttribute('data-course');
   renderZanHome();
 });
-document.getElementById('btn-zan').addEventListener('click', function(){ wakeAudio(); zanLaunch(zanSelectedCourse()); });
+document.getElementById('btn-zan').addEventListener('click', function(){ wakeAudio(); zanArmed = null; zanLaunch(zanSelectedCourse()); });
 document.querySelector('.zan-trick:not(.zan-ghost)').addEventListener('click', function(e){   // 師匠のイタズラ: アリ / ナシ (kept in settings.zanTrick)
   var b = e.target.closest('.trick-opt');
   if(!b) return;
@@ -15579,6 +15815,9 @@ document.getElementById('screen-game').addEventListener('pointercancel', functio
 window.addEventListener('keyup', function(e){ if(e.code==='Space' && state.phase==='zan'){ e.preventDefault(); zanRelease(e); } });
 window.addEventListener('pagehide', function(){ zanPause(); });
 renderZanHome();
+// 挑戦状 in the address: the invite (after the first-run guide, it waits on the home instead)
+if(document.getElementById('onboard').hidden) duelFromLocation();
+else { try{ var dm = /^#duel=([A-Za-z0-9_.-]+)$/.exec(location.hash || ''); if(dm){ history.replaceState(null, '', location.pathname + location.search); zanDuelHeld = duelDecode(dm[1]); if(zanDuelHeld && duelCheck(zanDuelHeld)) zanDuelHeld = null; renderDuelHome(); } }catch(e){} }
 })();
 </script>
 </body>
