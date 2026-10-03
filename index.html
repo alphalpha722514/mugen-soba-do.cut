@@ -860,6 +860,28 @@ body{
 /* result of 斬: its own numbers in place of the bowl's */
 #screen-result.is-zan .result-stats:not(.zan-stats),#screen-result.is-zan #result-equip{display:none;}
 .zan-stats[hidden]{display:none;}
+/* リザルトのふりかえり: 極上までの逆算と、区間ごとの Miss（帯の色が濃いほど Miss が多い） */
+.zan-review{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin:-12px 0 28px;box-shadow:0 4px 12px var(--shadow);width:100%;max-width:420px;box-sizing:border-box;display:grid;gap:10px;text-align:left;}
+.zan-review[hidden]{display:none;}
+.zan-review-h{margin:0;font-size:15px;}
+.zan-goal{margin:0;font-weight:700;color:var(--accent-ink);line-height:1.6;}
+.zan-heat{display:flex;height:16px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--muted-fill);}
+.zan-heat i{position:relative;display:block;min-width:2px;border-right:1px solid var(--card);}
+.zan-heat i:last-child{border-right:0;}
+.zan-heat i::after{content:"";position:absolute;inset:0;background:var(--heat-c);opacity:var(--heat-a);}
+.zan-heat-list{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:13px;}
+.zan-heat-list li{display:grid;grid-template-columns:5.5em minmax(0,1fr) auto;align-items:center;gap:8px;}
+.zan-heat-list .hl-name{font-weight:700;}
+.zan-heat-list .hl-bar{height:8px;border-radius:4px;background:var(--muted-fill);overflow:hidden;}
+.zan-heat-list .hl-bar b{display:block;height:100%;background:var(--accent2-ink);border-radius:4px;transform-origin:left;animation:heatGrow .6s ease-out both;}
+.zan-heat-list .hl-num{font-variant-numeric:tabular-nums;color:var(--ink-soft);white-space:nowrap;}
+.zan-heat-list li.is-weak .hl-name,.zan-heat-list li.is-weak .hl-num{color:var(--accent2-ink);}
+.zan-review.is-calm .zan-heat,.zan-review.is-calm .hl-bar{display:none;}
+.zan-review.is-calm .zan-heat-list li{grid-template-columns:5.5em minmax(0,1fr);}
+.zan-weak{margin:0;line-height:1.6;}
+.zan-weak-total{margin:0;font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
+@keyframes heatGrow{from{transform:scaleX(0);}}
+@media (prefers-reduced-motion:reduce){ .zan-heat-list .hl-bar b{animation:none;} }
 /* result of 斬: the bowl is plated, the guest tastes it and the seal comes down (looks only) */
 .zan-show{width:100%;max-width:360px;margin:0 auto 4px;}
 .zan-show[hidden]{display:none;}
@@ -1447,6 +1469,7 @@ body{
         <li><b>試し切り（ずれ調整）</b>音に対してタップがずれると感じたら、ホームの「試し切り」で「トン」の音に合わせて8回たたくと、ずれを測って判定をそろえます。イヤホンを使うときは、つけたまま測ってください。値はこの端末だけに保存します。</li>
         <li><b>一時停止</b>遊んでいる途中でほかのアプリに切り替えると止まり、画面をタップすると続きから再開します。</li>
         <li><b>ひょっこり客</b>あなたの番の1小節が終わるたびに、画面の下からお客さんが顔を出して、その小節の出来（全部Perfect・OKまじり・Missあり）に反応します。全部Perfectの小節が2回続くと蕎麦奉行、4回でお姫様、6回で殿様が来店します（見た目だけで、得点は変わりません）。</li>
+        <li><b>ふりかえり</b>リザルトに、極上まであと何回OKをPerfectにすればよいか（Missがあるときは「Miss 0」が条件であること）と、曲の区間ごとのMissの数とずれの帯が出ます。いちばんMissの多かった区間を「苦手」として示し、コースごとに区間のMissの累計を記録します。</li>
         <li><b>リザルト</b>切った蕎麦がざるに盛られ、大根おろし・ネギ・かつお節がのり、完成度に合ったお客さんが味わいます。最後に完成度の判子が押され、師匠がひと言。Perfectが多いほど麺がそろって艶やかに。タップで飛ばせます（演出「控えめ」などの設定では、はじめから仕上がった姿で出ます）。</li>
         <li><b>同時切り</b>曲の最後の1小節は、師匠とあなたが同じ拍でいっしょに切ります（お手本はありません。その直前の小節で師匠が切って見せたリズムです）。</li>
         <li><b>師匠のイタズラ</b>ホームで「アリ」にすると、曲の2つ目のパート（刻み・裏拍）から、あなたの番でこま板が盤の一部を隠し、師匠がお手本の中で包丁を振りかぶって切らない「フェイント」をかけてきます。フェイントの拍につられて切るとコンボが切れます（Missには数えません）。そのかわり得点×1.2・コイン×1.2。記録は同じ自己ベストに入り、イタズラありで出したベストには「（イタズラ）」の印がつきます。</li>
@@ -1487,7 +1510,7 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラのアリ・ナシ、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
+        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数・区間ごとのMissの累計、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラのアリ・ナシ、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。自己ベスト・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で斬の自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
@@ -1798,6 +1821,14 @@ body{
       <p>完成度 <span id="zan-r-acc">0%</span></p>
       <p>平均のずれ <span id="zan-r-err">±0ms</span></p>
     </div>
+    <section id="zan-review" class="zan-review" aria-labelledby="zan-review-h" hidden>
+      <h3 id="zan-review-h" class="zan-review-h">ふりかえり</h3>
+      <p id="zan-goal" class="zan-goal"></p>
+      <div id="zan-heat" class="zan-heat" aria-hidden="true"></div>
+      <ul id="zan-heat-list" class="zan-heat-list"></ul>
+      <p id="zan-weak" class="zan-weak"></p>
+      <p id="zan-weak-total" class="zan-weak-total"></p>
+    </section>
     <p id="result-equip" class="result-equip" hidden></p>
     <section id="coin-box" class="coin-box" aria-label="そば猪口コイン" hidden>
       <p class="coin-head"><span class="coin-name">そば猪口コイン</span><span id="coin-gain" class="coin-gain">+0🪙</span></p>
@@ -2194,10 +2225,12 @@ var coinStatus = document.getElementById('coin-status');
 
 // ---------- Persistent Store (robust localStorage layer) ----------
 var STORE_KEY = 'echizenSoba.v1';
-var SCHEMA_VERSION = 13;   // 10 → 11: 段位 becomes 称号 (stats, profile, gacha.equippedTitle); 11 → 12: the daily quiz, red dots,
+var SCHEMA_VERSION = 14;   // 10 → 11: 段位 becomes 称号 (stats, profile, gacha.equippedTitle); 11 → 12: the daily quiz, red dots,
                            // reward-only items and settings.onboarding / lastShareDate; 12 → 13: the 自由修行 is retired — its
                            // records (bests, seasonal, satisfaction, stats) are cleared and the titles are judged on リズム修行・斬
-                           // alone; titles, 限定 items, coins, そば札, the 図鑑 and the equipment stay. Older saves are carried over
+                           // alone; titles, 限定 items, coins, そば札, the 図鑑 and the equipment stay; 13 → 14: zan.sectionMiss (the
+                           // Misses by course and part of the song, for the result's 苦手 line) — nothing to move, a 13 save gets {}.
+                           // Older saves are carried over
                            // by coerceStore (each kept first as echizenSoba.v1.backup-s<its schema>)
 var LEGACY_KEYS = ['soba-dojo-bests','bestScores','soba-best','sobaBests'];
 var ONBOARDING_VERSION = 2;   // settings.onboarding.version: the rules guide a player has seen (2: リズム修行・斬; a player who saw 1 sees it once more)
@@ -3174,6 +3207,23 @@ function sanitizeZan(raw){
   for(var i=0;i<ZAN_COURSE_IDS.length;i++) out.courses[ZAN_COURSE_IDS[i]] = sanitizeZanRec(cs[ZAN_COURSE_IDS[i]]);
   out.lastCourse = ZAN_COURSE_IDS.indexOf(z.lastCourse)>=0 ? z.lastCourse : '';
   out.todayDone = typeof z.todayDone==='string' && /^\d{4}-\d{2}-\d{2}$/.test(z.todayDone) ? z.todayDone : '';   // 今日の一曲: the day its bonus was paid
+  out.sectionMiss = sanitizeSectionMiss(z.sectionMiss);
+  return out;
+}
+// zan.sectionMiss (schema 14): {courseId: {sectionKey: Misses so far}} — a course or key that is not a plain name is dropped
+function sanitizeSectionMiss(raw){
+  var sm = isPlainObj(raw) ? raw : {}, out = {};
+  for(var i=0;i<ZAN_COURSE_IDS.length;i++){
+    var c = sm[ZAN_COURSE_IDS[i]];
+    if(!isPlainObj(c)) continue;
+    var o = {}, n = 0;
+    for(var k in c){
+      if(!Object.prototype.hasOwnProperty.call(c, k) || !/^[a-z]{1,16}$/.test(k) || n>=16) continue;
+      var v = clampInt(c[k], 0, STAT_MAX);
+      if(v>0){ o[k] = v; n++; }
+    }
+    if(n) out[ZAN_COURSE_IDS[i]] = o;
+  }
   return out;
 }
 function sanitizeRewards(raw){
@@ -10313,6 +10363,13 @@ function mergeStores(localRaw, cloudRaw){
     for(var zc=0;zc<ZAN_COURSE_IDS.length;zc++){ var zid = ZAN_COURSE_IDS[zc]; out.zan.courses[zid] = {}; zanMax(out.zan.courses[zid], L.zan.courses[zid], C.zan.courses[zid]); }
     out.zan.lastCourse = L.zan.lastCourse || C.zan.lastCourse;
     out.zan.todayDone = C.zan.todayDone>L.zan.todayDone ? C.zan.todayDone : L.zan.todayDone;
+    out.zan.sectionMiss = {};                         // 苦手の記録: the larger count of each part (like the other counters)
+    for(var sc=0;sc<ZAN_COURSE_IDS.length;sc++){
+      var sid = ZAN_COURSE_IDS[sc], sl = L.zan.sectionMiss[sid] || {}, sr = C.zan.sectionMiss[sid] || {}, so = {}, any = false;
+      for(var sk in sl) if(Object.prototype.hasOwnProperty.call(sl, sk)){ so[sk] = sl[sk]; any = true; }
+      for(sk in sr) if(Object.prototype.hasOwnProperty.call(sr, sk)){ so[sk] = Math.max(so[sk] || 0, sr[sk]); any = true; }
+      if(any) out.zan.sectionMiss[sid] = so;
+    }
   }
   // seen the guide on either device: seen; the 共有ボーナス: the later day it was paid (so it is paid once a day)
   var obL = out.settings.onboarding, obC = C.settings.onboarding;
@@ -13332,6 +13389,7 @@ function zanHit(n, part, err){
   if(rating==='PERFECT') zan.perfect++; else zan.ok++;
   if(shin) zan.shin++;
   zan.errs.push(err*1000);
+  zan.judges.push({b:zanT2B(songT), t:songT, kind:kind, rating:rating, err:Math.round(err*1000)});   // (for the result's ふりかえり)
   // the look of the cut (only the look): the knife comes down, the ring, a cut line in the dough
   if(part!=='head'){ zanKnifeStrike(zan.pKnife, kind==='tail'); zanCutMark(songT + err, kind==='tail', false); }
   state.cutFx.push({t:0, rating:rating==='PERFECT' ? 'JUST' : 'PERFECT'});
@@ -13359,6 +13417,8 @@ function zanMiss(n, part, t){
   zan.combo = 0;
   zan.miss++;
   zanBuzz(20);
+  var mt = zanTarget(n, part);
+  zan.judges.push({b:zanT2B(mt), t:mt, kind:zanKind(n, part), rating:'MISS', err:null});
   zan.slump = 260;                                   // the board tips (ずっこけ)
   showPopup('MISS');
   zanHitSound('MISS', zanKind(n, part), t || zanTarget(n, part));
@@ -13507,7 +13567,7 @@ function startZan(courseId, backing){
   try{ trick = loadStore().settings.zanTrick===true; }catch(e){}
   var buzz = zanBuzzAllowed();
   var notes = zanChart(song, tm, trick);
-  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), shin:0, trick:trick, buzz:buzz, fooled:0, trickFrom:song.sections.length>2 ? song.sections[2].from : 1e9, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
+  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), shin:0, judges:[], trick:trick, buzz:buzz, fooled:0, trickFrom:song.sections.length>2 ? song.sections[2].from : 1e9, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
          p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
@@ -13576,6 +13636,89 @@ function zanGrade(acc, miss){
   for(var i=0;i<ZAN_GRADES.length;i++){ var g = ZAN_GRADES[i]; if(acc>=g[1] && (!g[2] || miss===0)) return g[0]; }
   return '並';
 }
+// --- リザルトのふりかえり (only what is shown and the 苦手 counts: the score and the 完成度 are not touched) ---
+// the judgements by part of the song (sections[].from, in beats): how many, the Misses and the mean |ずれ| of the cuts
+function zanReview(song, judges){
+  var secs = [], i;
+  for(i=0;i<song.sections.length;i++){
+    var sc = song.sections[i], to = i + 1<song.sections.length ? song.sections[i + 1].from : song.end;
+    secs.push({key:sc.key, label:sc.label, from:sc.from, to:to, n:0, miss:0, errSum:0, hits:0});
+  }
+  for(i=0;i<judges.length;i++){
+    var j = judges[i], k = secs.length - 1;
+    while(k>0 && j.b < secs[k].from - 1e-6) k--;
+    var s = secs[k];
+    s.n++;
+    if(j.rating==='MISS') s.miss++;
+    else { s.hits++; s.errSum += Math.abs(j.err); }
+  }
+  return secs;
+}
+// 極上まであと: 完成度 is rounded, so 極上 (95%) needs (Perfect + OK×0.5) ≥ 94.5% of the cuts, and no Miss.
+// In half-points (Perfect 2, OK 1): an OK made Perfect is +1, a Miss made Perfect is +2.
+function zanGoalText(r){
+  if(r.grade==='極上') return '極上！ この調子で真・PERFECTを狙いましょう。';
+  if(!r.total) return '';
+  var have = r.perfect*2 + r.ok, need = Math.ceil(r.total*189/100);
+  if(r.miss>0){
+    var lack = need - (have + r.miss*2);
+    return '極上の条件は「Miss 0」です（今回 Miss ' + r.miss + '回）。' +
+           (lack>0 ? 'Missをなくしたうえで、OKをあと' + lack + '回Perfectにすれば極上です。' : 'Missをすべて切れていれば極上でした。');
+  }
+  return '極上まであと少し。OKをあと' + Math.max(1, need - have) + '回Perfectにすれば極上です。';
+}
+function zanRenderReview(secs, r, totals){
+  var box = document.getElementById('zan-review');
+  if(!box) return;
+  var played = secs.filter(function(s){ return s.n>0; }), i;
+  box.hidden = !played.length;
+  if(!played.length) return;
+  box.classList.toggle('is-calm', resultCountCalm());
+  document.getElementById('zan-goal').textContent = zanGoalText(r);
+  // the strip: the song in order, as wide as each part is long; the darker, the more Misses
+  var heat = document.getElementById('zan-heat'), list = document.getElementById('zan-heat-list');
+  heat.textContent = ''; list.textContent = '';
+  var weak = null;
+  for(i=0;i<played.length;i++){
+    var s = played[i], rate = s.miss/s.n;
+    if(s.miss>0 && (!weak || rate > weak.miss/weak.n || (rate===weak.miss/weak.n && s.miss>weak.miss))) weak = s;
+  }
+  var wobbly = null;                                 // no Miss at all: the part with the widest mean ずれ
+  if(!weak) for(i=0;i<played.length;i++){ var w = played[i]; if(w.hits && (!wobbly || w.errSum/w.hits > wobbly.errSum/wobbly.hits)) wobbly = w; }
+  for(i=0;i<played.length;i++){
+    var p = played[i], pr = p.miss/p.n, cell = document.createElement('i');
+    cell.style.flex = String(p.to - p.from);
+    cell.style.setProperty('--heat-c', p.miss ? 'var(--accent2-ink)' : 'var(--ok)');
+    cell.style.setProperty('--heat-a', p.miss ? String(0.25 + 0.75*Math.min(1, pr*3)) : '0.3');
+    cell.title = p.label;
+    heat.appendChild(cell);
+    var li = document.createElement('li'), name = document.createElement('span'), bar = document.createElement('span'), fill = document.createElement('b'), num = document.createElement('span');
+    if(p===weak) li.className = 'is-weak';
+    name.className = 'hl-name'; name.textContent = p.label;
+    bar.className = 'hl-bar'; fill.style.width = Math.round(pr*100) + '%'; bar.appendChild(fill);
+    num.className = 'hl-num'; num.textContent = 'Miss ' + p.miss + '/' + p.n + (p.hits ? '・ずれ±' + Math.round(p.errSum/p.hits) + 'ms' : '');
+    li.appendChild(name); li.appendChild(bar); li.appendChild(num);
+    list.appendChild(li);
+  }
+  document.getElementById('zan-weak').textContent = weak ? 'あなたの苦手は『' + weak.label + '』区間（Miss ' + weak.miss + '/' + weak.n + '）。区間ごとの印を見直してみましょう。'
+    : wobbly && wobbly.errSum/wobbly.hits >= 10 ? 'Missなし！ ずれがいちばん大きいのは『' + wobbly.label + '』区間（平均±' + Math.round(wobbly.errSum/wobbly.hits) + 'ms）です。'
+    : 'Missなし！ どの区間も、ずれは平均±10ms未満です。';
+  var topKey = '', topN = 0;
+  for(var k in totals) if(Object.prototype.hasOwnProperty.call(totals, k) && totals[k] > topN){ topN = totals[k]; topKey = k; }
+  var lab = '';
+  for(i=0;i<secs.length;i++) if(secs[i].key===topKey) lab = secs[i].label;
+  document.getElementById('zan-weak-total').textContent = topN && lab ? 'このコースで、これまでMissがいちばん多い区間は『' + lab + '』（累計' + topN + '回）。' : '';
+}
+// adds this song's Misses to zan.sectionMiss[course] (schema 14)
+function zanAddSectionMiss(store, cid, secs){
+  var o = store.zan.sectionMiss[cid] || {}, any = false;
+  for(var i=0;i<secs.length;i++){
+    if(!secs[i].miss || !/^[a-z]{1,16}$/.test(secs[i].key)) continue;
+    o[secs[i].key] = Math.min(STAT_MAX, (o[secs[i].key] || 0) + secs[i].miss);
+    any = true;
+  }
+  if(any || store.zan.sectionMiss[cid]) store.zan.sectionMiss[cid] = o;
+}
 function finishZan(){
   if(!zan || zan.ended) return;
   zan.ended = true;
@@ -13599,6 +13742,7 @@ function finishZan(){
   store.zan.best = Math.max(store.zan.best, zan.score);
   if(zanGradeRank(grade) > zanGradeRank(store.zan.bestGrade)) store.zan.bestGrade = grade;
   store.zan.lastCourse = cid;
+  zanAddSectionMiss(store, cid, zanReview(zan.song, zan.judges));   // 苦手の記録 (schema 14)
   var coinParts0 = zanCoinParts(store, acc, false);  // (today's challenge is added once it is checked, below)
   store.zan.totalScore = Math.min(STAT_MAX, store.zan.totalScore + zan.score);   // 称号の記録
   store.zan.maxCombo = Math.max(store.zan.maxCombo, zan.maxCombo);
@@ -13622,6 +13766,7 @@ function finishZan(){
   set('zan-r-score', String(zan.score)); set('zan-r-best', String(rec.best)); set('zan-r-perfect', String(zan.perfect));
   set('zan-r-ok', String(zan.ok)); set('zan-r-miss', String(zan.miss)); set('zan-r-combo', String(zan.maxCombo));
   set('zan-r-acc', acc + '%'); set('zan-r-err', '±' + avgErr + 'ms');
+  zanRenderReview(zanReview(zan.song, zan.judges), {perfect:zan.perfect, ok:zan.ok, miss:zan.miss, total:total, grade:grade}, store.zan.sectionMiss[cid] || {});
   zanLastResult = {score:zan.score, course:zan.course.name + '・' + zan.course.level, grade:grade, perfect:zan.perfect + '/' + total,
                    combo:zan.maxCombo, err:'±' + avgErr + 'ms'};
   var dailyJustCleared = zanCheckDailyClear({score:zan.score, perfect:zan.perfect, combo:zan.maxCombo, grade:grade});
