@@ -1559,8 +1559,8 @@ body{
       <h3 id="g-season-h" tabindex="-1">季節の見た目<span class="gsec-sub">季節</span></h3>
       <ul class="gpoints">
         <li><b>そばの花</b>9月1日〜10月31日は、リズム修行・斬の画面の下に白い花が咲くそば畑が広がり、ひょっこり客に「そば畑の農家」も加わります。</li>
-        <li><b>新そば</b>10月21日〜11月30日は、盤の生地が新そばの色になります（両方の期間が重なる10月下旬は新そば）。</li>
-        <li><b>決まり</b>見た目だけで、得点や判定は変わりません。期間はこの端末の日付（ローカル時刻）で決めています。</li>
+        <li><b>新そば</b>10月21日〜11月30日は、盤の生地が新そばの色になります（両方の期間が重なる10月下旬は新そば）。二八・十割・粗挽きは「新そばの特別な譜面」になり、師匠のお手本のリズムが変わります（区間の並びと曲はそのまま。記録はいつもの自己ベストに入ります）。</li>
+        <li><b>決まり</b>判定の幅や得点の計算は変わりません（新そばの期間は譜面だけが変わります）。期間はこの端末の日付（ローカル時刻）で決めています。</li>
       </ul>
       <p class="gnote gnote-soft">季節の目安：福井では秋そばが主流で、10月下旬〜11月上旬に収穫されます。そばの花は9〜10月に咲きます。</p>
     </section>
@@ -13101,6 +13101,50 @@ function zanWindows(course){
   ok = Math.max(ok, p); g = Math.max(g, ok);
   return {perfect:p, ok:ok, guard:g};
 }
+// 新そばの特別な譜面: while the 新そば period is open (zanSeason, this device's date), the first three courses' songs
+// are cut to these お手本 instead — the same parts, bars and music, only the rhythms of the calls differ (each part
+// keeps its number of bars). The records stay the same (one best per course); the chart has its own id, so a ゴースト
+// cut on the usual chart is not replayed on it (and the music is rendered for it apart).
+var ZAN_SHINSOBA_CALLS = {
+  nihachi:[
+    [0,1,3], [0,2,2.5,3], [0,1,1.5,2], [0,1,2,3],                                               // お手本
+    [0,0.5,1,2,3], [0,1,2,2.5,3], [0,1,1.5,2,3], [0,0.5,1,1.5,2],                               // 刻み
+    [{h:0,len:2},3], [0,1,2,3], [0,{h:1,len:2}], [0,1,1.5,2,3],                                 // タメ切り
+    [0,0.5,1,1.5,2,3], [0,1,1.5,2,2.5,3], [0,0.5,1,2,2.5,3], [0,0.5,1,1.5,2,2.5,3],             // 早切り
+    [0,1,2,2.5,3], [{h:0,len:3}]                                                                // 仕上げ
+  ],
+  juwari:[
+    [0,1.5,3], [0,1,2.5,3], [0.5,1,2,3], [0,1.5,2,3],                                           // お手本
+    [0,0.5,1.5,2.5,3], [0.5,1.5,2,3], [0,1.5,2,2.5,3.5], [0,1,1.5,2.5,3.5], [0.5,1,2,2.5,3],    // 裏拍
+    [{h:0,len:1.5},2,3], [0,{h:1.5,len:1.5}], [{h:0,len:3}], [0,0.5,1.5,2,3],                   // タメ切り
+    [0,0.5,1,1.5,2.5,3], [0,0.5,1.5,2,3,3.5], [0.5,1,1.5,2,3,3.5], [0,0.5,1,2,2.5,3], [0,1,1.5,2,2.5,3,3.5],   // 早切り
+    [0,1,2.5,3], [0,0.5,1.5,2,3], [0,1.5,{h:2,len:1.5}], [{h:0,len:3}]                          // 仕上げ
+  ],
+  arabiki:[
+    [0,1,2], [0,1,2,3], [0,0.5,1,2], [0,2,2.5,3],                                               // お手本
+    [0,0.5,1,2,3], [0,1,1.5,2,3], [0,0.5,1,1.5,2], [0,1,2,2.5,3,3.5], [0,0.5,1,2,2.5,3], [0,0.5,1,1.5,2,3],   // 刻み
+    [{h:0,len:1},2,2.5,3], [{h:0,len:2},{h:2.5,len:1}], [0,0.5,{h:1,len:2}], [{h:0,len:3}], [0,{h:1,len:1},{h:2.5,len:1}], [{h:0,len:1.5},2,3],   // 緩急
+    [0,0.5,1,1.5,2,2.5,3], [0,0.5,1,2,2.5,3,3.5], [0,1,1.5,2,2.5,3,3.5], [0,0.5,1.5,2,2.5,3], [0,0.5,1,1.5,2.5,3,3.5], [0,0.5,1,1.5,2,2.5,3,3.5],   // 早切り
+    [0,1,2,3], [0,0.5,1,2,3], [{h:0,len:1},{h:1.5,len:1.5}], [{h:0,len:3}]                      // 仕上げ
+  ]
+};
+var zanShinCache = {};
+// the song a course is cut to today (the 新そば chart in its period; it is built once and kept, so its id stays the same)
+function zanSongFor(course){
+  var base = course && ZAN_SONGS[course.song];
+  if(!base) return null;
+  var calls = ZAN_SHINSOBA_CALLS[base.id];
+  if(zanSeason()!=='shinsoba' || !calls || calls.length!==base.calls.length) return base;
+  if(!zanShinCache[base.id]){
+    var song = {};
+    for(var k in base) if(Object.prototype.hasOwnProperty.call(base, k)) song[k] = base[k];
+    song.id = base.id + '.shin';
+    song.calls = calls;
+    song.shinsoba = true;
+    zanShinCache[base.id] = song;
+  }
+  return zanShinCache[base.id];
+}
 function zanBpmLabel(c){ return c ? String(c.bpmLabel || c.bpm) : ''; }
 function zanPlayable(id){ var c = zanCourse(id); return !!(c && c.song && ZAN_SONGS[c.song]); }
 // --- the tempo map: beats ↔ seconds (song time) ---
@@ -13753,7 +13797,7 @@ function zanPracticeSong(song, key, speed){
 }
 function zanPracticeLaunch(courseId, key, speed){
   if(zanLaunching || !zanPlayable(courseId)) return;
-  var song = zanPracticeSong(ZAN_SONGS[zanCourse(courseId).song], key, speed);
+  var song = zanPracticeSong(zanSongFor(zanCourse(courseId)), key, speed);
   if(!song) return;
   var label = '';
   for(var i=0;i<song.sections.length;i++) if(song.sections[i].key===key) label = song.sections[i].label;
@@ -13793,7 +13837,7 @@ function zanEndPractice(quit){
 function renderZanPractice(){
   var course = zanCourse(zanSelectedCourse()), wrap = document.getElementById('zp-secs');
   if(!course || !wrap || !zanPlayable(course.id)) return;
-  var parts = zanPracticeParts(ZAN_SONGS[course.song]), i, has = false;
+  var parts = zanPracticeParts(zanSongFor(course)), i, has = false;
   for(i=0;i<parts.length;i++) if(parts[i].key===zanPracticeSel.key) has = true;
   if(!has) zanPracticeSel.key = parts.length ? parts[0].key : '';
   document.getElementById('zp-course').textContent = course.name;
@@ -13832,7 +13876,7 @@ document.getElementById('btn-practice-quit').addEventListener('click', function(
 var zanLaunching = false;
 function zanLaunch(courseId){
   if(zanLaunching || !zanPlayable(courseId)) return;
-  var song = ZAN_SONGS[zanCourse(courseId).song];
+  var song = zanSongFor(zanCourse(courseId));
   if(!audioEnabled || zanRenders[song.id]){ startZan(courseId, zanRenders[song.id] || null); return; }
   var btn = document.getElementById('btn-zan'), label = btn.textContent;
   zanLaunching = true;
@@ -13846,7 +13890,7 @@ function zanLaunch(courseId){
   });
 }
 function startZan(courseId, backing, practice){
-  var course = zanPlayable(courseId) ? zanCourse(courseId) : ZAN_COURSES[0], song = practice ? practice.song : ZAN_SONGS[course.song], tm = zanTempoOf(song);
+  var course = zanPlayable(courseId) ? zanCourse(courseId) : ZAN_COURSES[0], song = practice ? practice.song : zanSongFor(course), tm = zanTempoOf(song);
   stopDemoTaps();
   finishResultCount(true);
   state = freshState();
@@ -13880,7 +13924,7 @@ function startZan(courseId, backing, practice){
   applyModeLook('normal');
   modeTag.hidden = false;
   modeTag.textContent = practice ? '練習中（記録されません）・' + course.name + '「' + practice.label + '」' + zanSpeedLabel(practice.speed)
-                                 : '斬・' + course.name + '・♩=' + zanBpmLabel(course) + (season ? '・' + SEASONAL_MODES[season].name : '');
+                                 : '斬・' + course.name + '・♩=' + zanBpmLabel(course) + (season ? '・' + SEASONAL_MODES[season].name + (song.shinsoba ? '譜面' : '') : '');
   document.getElementById('btn-practice-quit').hidden = !practice;
   showScreen('game');                               // the usual music fades out; the song of 斬 takes over
   resize();
@@ -14630,7 +14674,7 @@ function zanPrepSelected(){
   clearTimeout(zanPrepTimer);
   zanPrepTimer = setTimeout(function(){
     var c = zanCourse(zanSelectedCourse());
-    if(audioEnabled && c && c.song && screens.title.classList.contains('active')) zanRenderBacking(ZAN_SONGS[c.song]);
+    if(audioEnabled && c && c.song && screens.title.classList.contains('active')) zanRenderBacking(zanSongFor(c));
   }, 1500);
 }
 function renderZanHome(){
@@ -14668,7 +14712,8 @@ function renderZanHome(){
   var season = zanSeason(), seEl = document.getElementById('zan-season');
   if(seEl){
     seEl.hidden = !season;
-    if(season) seEl.textContent = 'いまは「' + SEASONAL_MODES[season].name + '」の季節。斬の画面も季節の見た目になります（' + seasonState(season, localToday()).until + 'まで・得点や判定は変わりません）。';
+    if(season) seEl.textContent = 'いまは「' + SEASONAL_MODES[season].name + '」の季節。斬の画面も季節の見た目になります（' + seasonState(season, localToday()).until + 'まで・得点や判定は変わりません）。' +
+      (season==='shinsoba' ? '二八・十割・粗挽きは、新そばの特別な譜面で修行中（お手本のリズムが変わります。記録はいつもの自己ベストに入ります）。' : '');
   }
   var off = loadZanOffset(), lab = document.getElementById('zan-offset-label');
   if(lab) lab.textContent = 'ずれ補正 ' + (off>0 ? '+' : '') + off + 'ms';
