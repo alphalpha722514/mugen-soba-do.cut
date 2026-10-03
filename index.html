@@ -888,6 +888,17 @@ body{
 .rk-score{font-weight:900;font-variant-numeric:tabular-nums;}
 .rk-sub{grid-column:2 / -1;font-size:.7rem;color:var(--ink-soft);font-weight:700;}
 .practice-quit{display:block;margin:6px auto 0;}
+/* 一時停止とやり直し */
+.zan-pause-btn{position:absolute;top:8px;right:52px;z-index:5;background:rgba(0,0,0,0.15);border:none;border-radius:999px;font-size:.78rem;font-weight:900;line-height:1;padding:7px 10px;cursor:pointer;touch-action:manipulation;opacity:0.85;color:var(--ink);}
+.zan-pause-btn[hidden]{display:none;}
+.mode-tag{max-width:calc(100% - 112px);}
+.zan-pausebox{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(20,14,8,0.55);}
+.zan-pausebox[hidden]{display:none;}
+.zpb-card{width:100%;max-width:320px;background:var(--card);color:var(--ink);border-radius:16px;border:1px solid var(--line);box-shadow:0 10px 30px var(--shadow);padding:18px 18px 14px;display:grid;gap:10px;text-align:center;}
+.zpb-h{margin:0;font-family:var(--font-display);font-weight:400;font-size:1.3rem;}
+.zpb-h:focus{outline:none;}
+.zpb-main{margin:0;}
+.zpb-note{margin:0;font-size:.7rem;line-height:1.55;color:var(--ink-soft);}
 .practice-quit[hidden]{display:none;}
 .zan-season{margin:0;padding:4px 10px;border-radius:var(--radius);background:color-mix(in srgb,#c9a24a 16%,var(--card));font-size:.7rem;line-height:1.55;font-weight:700;}
 .zan-tools{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;font-size:.72rem;color:var(--ink-soft);}
@@ -1775,6 +1786,16 @@ body{
       <div id="satis-pop" class="satis-pop" aria-hidden="true"></div>
       <p id="serve-sr" class="vh" role="status"></p>
       <button id="btn-sound-toggle" class="sound-toggle">🔊</button>
+      <button id="btn-zan-pause" class="zan-pause-btn" type="button" aria-label="一時停止" title="一時停止（Esc / P）" hidden><span aria-hidden="true">❚❚</span></button>
+    </div>
+    <div id="zan-pausebox" class="zan-pausebox" role="dialog" aria-modal="true" aria-labelledby="zan-pause-h" hidden>
+      <div class="zpb-card">
+        <h3 id="zan-pause-h" class="zpb-h" tabindex="-1">一時停止</h3>
+        <button id="zpb-resume" class="btn-start zpb-main" type="button">再開</button>
+        <button id="zpb-retry" class="btn-small" type="button">最初からやり直す</button>
+        <button id="zpb-home" class="btn-small" type="button">コースを選び直す</button>
+        <p class="zpb-note">やり直す・選び直すと、この曲の記録は残りません。パソコンは R でやり直し、Esc か P で一時停止と再開。</p>
+      </div>
     </div>
     <p id="tap-hint" class="tap-hint">タップ / スペースキーでカット!</p>
     <button id="btn-practice-quit" class="btn-small practice-quit" type="button" hidden>練習をやめる</button>
@@ -1934,6 +1955,7 @@ body{
     <div id="zan-stats" class="result-stats zan-stats" hidden>
       <p>得点 <span id="zan-r-score">0</span></p>
       <p>自己ベスト <span id="zan-r-best">0</span></p>
+      <p>極・一閃（CRITICAL） <span id="zan-r-crit">0</span></p>
       <p>Perfect <span id="zan-r-perfect">0</span></p>
       <p>OK <span id="zan-r-ok">0</span></p>
       <p>Miss <span id="zan-r-miss">0</span></p>
@@ -4033,7 +4055,7 @@ function trayY(){ return H*0.62; }
 
 document.getElementById('screen-game').addEventListener('pointerdown', function(e){
   e.preventDefault();
-  if(state.phase==='zan' && !(e.target && e.target.closest && e.target.closest('.sound-toggle, .practice-quit'))) zanPress(e);   // judged on the song's clock
+  if(state.phase==='zan' && !(e.target && e.target.closest && e.target.closest('.sound-toggle, .practice-quit, .zan-pause-btn, .zan-pausebox')) && !(zan && zan.paused)) zanPress(e);   // judged on the song's clock
 });
 // 修行の画面では、長押しのメニュー（画像の保存など）を出さない
 document.getElementById('screen-game').addEventListener('contextmenu', function(e){ e.preventDefault(); });
@@ -4074,8 +4096,12 @@ document.addEventListener('touchend', function(e){
   document.addEventListener(type, function(e){ e.preventDefault(); }, {passive:false});
 });
 window.addEventListener('keydown', function(e){
+  if(state.phase==='zan' && zan && !zan.ended && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey){
+    if(e.code==='KeyR'){ e.preventDefault(); zanRetry(); return; }                       // やり直す
+    if(e.code==='Escape' || e.code==='KeyP'){ e.preventDefault(); if(zan.paused) zanResume(); else zanPause(); return; }   // 一時停止・再開
+  }
   if(e.code!=='Space') return;
-  if(state.phase==='zan'){ e.preventDefault(); if(!e.repeat) zanPress(e); }   // (on menus Space keeps activating the focused button)
+  if(state.phase==='zan'){ e.preventDefault(); if(!e.repeat && !(zan && zan.paused)) zanPress(e); }   // (on menus Space keeps activating the focused button)
 });
 
 rankBadge.addEventListener('click', function(){ openMypage(rankBadge); });
@@ -4911,7 +4937,7 @@ function showPopup(text){
   elPopup.textContent = text;
   elPopup.classList.toggle('is-long', long);
   elPopup.classList.toggle('is-calm', long && effectsPref.level==='low');
-  elPopup.style.color = text==='JUST!' ? '#ffd54a' : text==='真・PERFECT' || text.indexOf('殿様')===0 ? '#c8921a' : text==='PERFECT' ? 'var(--accent)' : text==='GOOD' ? 'var(--accent2)' : text==='OK' ? 'var(--dough)' : '#948a78';
+  elPopup.style.color = text==='JUST!' ? '#ffd54a' : text==='CRITICAL' || text.indexOf('殿様')===0 ? '#c8921a' : text==='PERFECT' ? 'var(--accent)' : text==='GOOD' ? 'var(--accent2)' : text==='OK' ? 'var(--dough)' : '#948a78';
   elPopup.classList.remove('show');
   void elPopup.offsetWidth;
   elPopup.classList.add('show');
@@ -13178,9 +13204,10 @@ document.addEventListener('keydown', function(e){
 // With no sound (🔇) the same clock runs on performance.now(). A song's beats become seconds through its tempo map, and
 // every note sits on its beat grid (whole, half and quarter beats).
 var ZAN_PERFECT = 0.035, ZAN_OK = 0.080, ZAN_GUARD = 0.12;   // seconds: Perfect ±35ms, OK ±80ms, a press further than ±120ms is a whiff
-                                  // (the defaults: each course sets its own in ZAN_COURSES — perfectMs / okMs / guardMs — read by zanWindows)
-var ZAN_SHIN = 0.015, ZAN_SHIN_MULT = 1.5;
-var ZAN_TONO_BONUS = 0.2, ZAN_TONO_BEATS = 16;   // 殿様ご来店: the combo multiplier +0.2 for the next 16 beats (two of your bars)   // 真・PERFECT: within ±15ms the cut's points are ×1.5 (still counted as a Perfect)
+                                  // (every course uses these since Ver 4.0; a course may still set perfectMs / okMs / guardMs, read by zanWindows)
+var ZAN_CRIT = 0.010, ZAN_CRIT_MULT = 1.5;   // 極・一閃 (CRITICAL): within ±10ms the cut's points are ×1.5 (counted as a Perfect too)
+var ZAN_STRICT_WIN = {crit:0.007, perfect:0.015, ok:0.040};   // 修行の心得「極・判定」: the windows squeezed
+var ZAN_TONO_BONUS = 0.2, ZAN_TONO_BEATS = 16;   // 殿様ご来店: the combo multiplier +0.2 for the next 16 beats (two of your bars)
 var ZAN_LATE_GRACE = 0.06;        // a passed note is called a Miss only this much after its OK window closes, so a tap
                                   // made in time but delivered a frame late is still judged (by its own timestamp)
 var ZAN_TRAVEL = 1.25;            // seconds a note takes from the right edge to the knife
@@ -13289,20 +13316,21 @@ var ZAN_SONGS = {
 };
 // the courses on the home screen (a course without a song yet is shown as 準備中). coinBonus: the course's coins on top
 var ZAN_COURSES = [
-  {id:'nihachi', name:'二八',   level:'初級', bpm:110, song:'nihachi', coinBonus:0,  perfectMs:35, okMs:80, guardMs:120, desc:'8分音符まで。素直なリズムで、まずはここから。'},
-  {id:'juwari',  name:'十割',   level:'中級', bpm:130, song:'juwari',  coinBonus:40, perfectMs:30, okMs:70, guardMs:105, desc:'裏拍（シンコペーション）が混じる。'},
-  {id:'arabiki', name:'粗挽き', level:'上級', bpm:155, song:'arabiki', coinBonus:80, perfectMs:25, okMs:60, guardMs:90,  desc:'速いテンポと、緩急のタメ切り。'},
-  {id:'uchihiki', name:'越前打挽き', level:'最上級', bpm:120, bpmLabel:'120→150', song:'uchihiki', coinBonus:120, perfectMs:22, okMs:55, guardMs:85, alwaysTrick:true,
+  {id:'nihachi', name:'二八',   level:'初級', bpm:110, song:'nihachi', coinBonus:0,  desc:'8分音符まで。素直なリズムで、まずはここから。'},
+  {id:'juwari',  name:'十割',   level:'中級', bpm:130, song:'juwari',  coinBonus:40, desc:'裏拍（シンコペーション）が混じる。'},
+  {id:'arabiki', name:'粗挽き', level:'上級', bpm:155, song:'arabiki', coinBonus:80,  desc:'速いテンポと、緩急のタメ切り。'},
+  {id:'uchihiki', name:'越前打挽き', level:'最上級', bpm:120, bpmLabel:'120→150', song:'uchihiki', coinBonus:120, alwaysTrick:true,
    desc:'♩=120から150へ加速。最初から師匠のイタズラ入り。'}
 ];
 function zanCourse(id){ for(var i=0;i<ZAN_COURSES.length;i++) if(ZAN_COURSES[i].id===id) return ZAN_COURSES[i]; return null; }
 // the course's judging windows in seconds (Perfect / OK / whiff). A course without its own gets the defaults above;
 // a window is never wider than the defaults and Perfect ≤ OK ≤ whiff. The 試し切り offset is taken off the input before.
-function zanWindows(course){
+function zanWindows(course, strict){
+  if(strict) return {crit:ZAN_STRICT_WIN.crit, perfect:ZAN_STRICT_WIN.perfect, ok:ZAN_STRICT_WIN.ok, guard:ZAN_GUARD};   // 極・判定
   function ms(v, def, lo){ return (typeof v==='number' && isFinite(v)) ? Math.max(lo, Math.min(def, v))/1000 : def/1000; }
-  var p = ms(course && course.perfectMs, ZAN_PERFECT*1000, ZAN_SHIN*1000), ok = ms(course && course.okMs, ZAN_OK*1000, 1), g = ms(course && course.guardMs, ZAN_GUARD*1000, 1);
+  var p = ms(course && course.perfectMs, ZAN_PERFECT*1000, ZAN_CRIT*1000), ok = ms(course && course.okMs, ZAN_OK*1000, 1), g = ms(course && course.guardMs, ZAN_GUARD*1000, 1);
   ok = Math.max(ok, p); g = Math.max(g, ok);
-  return {perfect:p, ok:ok, guard:g};
+  return {crit:ZAN_CRIT, perfect:p, ok:ok, guard:g};
 }
 // 新そばの特別な譜面: while the 新そば period is open (zanSeason, this device's date), the first three courses' songs
 // are cut to these お手本 instead — the same parts, bars and music, only the rhythms of the calls differ (each part
@@ -13760,7 +13788,7 @@ function zanCandidates(){
 }
 function zanPress(e){
   if(!zan || zan.ended) return;
-  if(zan.paused){ zanResume(); return; }
+  if(zan.paused) return;                             // (paused: the dialog's 再開 / Esc / P bring it back)
   zanEnsureAudio();
   var t = zanEventTime(e), list = zanCandidates(), best = null, bestErr = 1e9;
   for(var fi=zan.firstOpen;fi<zan.notes.length;fi++){   // 師匠のイタズラ: cutting where the master only feinted
@@ -13794,7 +13822,7 @@ function zanRelease(e){
 // --- judging ---
 function zanKind(n, part){ return n.type==='hold' ? part : n.type; }
 function zanHit(n, part, err){
-  var ae = Math.abs(err), rating = ae<=zan.win.perfect ? 'PERFECT' : 'OK', shin = ae<=ZAN_SHIN, kind = zanKind(n, part), songT = zanTarget(n, part);
+  var ae = Math.abs(err), rating = ae<=zan.win.perfect ? 'PERFECT' : 'OK', crit = ae<=zan.win.crit, kind = zanKind(n, part), songT = zanTarget(n, part);
   if(part==='head') n.headDone = true;
   else n.judged = true;
   if(n.res!=='M') n.res = rating==='PERFECT' && n.res!=='O' ? 'P' : 'O';   // the note's worst (a hold: of both ends)
@@ -13803,18 +13831,19 @@ function zanHit(n, part, err){
   zanBuzz(rating==='PERFECT' ? 10 : 6);             // 振動 (only the feel: the score is not touched)
   var tonoOn = !!(zan.tono && zanT2B(songT) < zan.tono.until);   // 殿様ご来店: +0.2 on top (the formula below is unchanged)
   var mult = 1 + Math.min(1, Math.floor(zan.combo/10)*0.1) + (tonoOn ? ZAN_TONO_BONUS : 0);   // ×1.0 → ×2.0 over 100 in a row
-  var base = ZAN_POINTS[kind][rating==='PERFECT' ? 0 : 1]*(shin ? ZAN_SHIN_MULT : 1);   // 真・PERFECT: ×1.5
+  var base = ZAN_POINTS[kind][rating==='PERFECT' ? 0 : 1]*(crit ? ZAN_CRIT_MULT : 1);   // 極・一閃: ×1.5
   zan.score += Math.round(base*mult*(zan.trick ? ZAN_TRICK_SCORE : 1));   // (イタズラ ×1.2)
   if(rating==='PERFECT') zan.perfect++; else zan.ok++;
-  if(shin) zan.shin++;
+  if(crit) zan.crit++;
   zan.errs.push(err*1000);
-  zan.judges.push({b:zanT2B(songT), t:songT, kind:kind, rating:rating, err:Math.round(err*1000), tono:tonoOn});   // (for the result's ふりかえり)
+  zan.judges.push({b:zanT2B(songT), t:songT, kind:kind, rating:rating, err:Math.round(err*1000), tono:tonoOn, crit:crit});   // (for the result's ふりかえり)
   // the look of the cut (only the look): the knife comes down, the ring, a cut line in the dough
   if(part!=='head'){ zanKnifeStrike(zan.pKnife, kind==='tail'); zanCutMark(songT + err, kind==='tail', false); }
-  state.cutFx.push({t:0, rating:rating==='PERFECT' ? 'JUST' : 'PERFECT'});
-  showPopup(shin ? '真・PERFECT' : rating==='PERFECT' ? 'PERFECT' : 'OK');
+  state.cutFx.push({t:0, rating:crit ? 'CRIT' : rating==='PERFECT' ? 'JUST' : 'PERFECT'});
+  showPopup(crit ? 'CRITICAL' : rating==='PERFECT' ? 'PERFECT' : 'OK');
   zanHitSound(rating, kind, songT);
-  if(rating==='PERFECT') zanPerfectFx(kind);
+  if(rating==='PERFECT') zanPerfectFx(kind, crit);
+  if(crit) zanCritChime();
   zanHud();
 }
 // 釣られた: the combo breaks (it is not a Miss and costs no points)
@@ -13847,20 +13876,32 @@ function zanMiss(n, part, t){
 }
 
 // --- juice: hit stop, brush strokes, the flash of the blade and flour in the air (looks only) ---
-function zanPerfectFx(kind){
+function zanPerfectFx(kind, crit){
   var calm = motionCalm(), now = performance.now();
-  if(!calm && !fxConf().still) zan.hitstopUntil = now + (kind==='tail' ? 45 : 28);   // 1〜2 frames of stillness
-  var word = kind==='tail' ? '一刀両断！' : ZAN_WORDS[zan.wordIdx++ % ZAN_WORDS.length];
+  if(!calm && !fxConf().still) zan.hitstopUntil = now + (kind==='tail' || crit ? 45 : 28);   // 1〜2 frames of stillness
+  var word = crit ? '極・一閃！' : kind==='tail' ? '一刀両断！' : ZAN_WORDS[zan.wordIdx++ % ZAN_WORDS.length];
   if(zan.texts.length>3) zan.texts.shift();
-  zan.texts.push({word:word, age:0, big:kind==='tail', rot:(Math.random() - 0.5)*0.24, x:0.5 + (Math.random() - 0.5)*0.3});
-  zan.flashes.push({age:0, big:kind==='tail'});
+  zan.texts.push({word:word, age:0, big:kind==='tail' || !!crit, gold:!!crit, rot:crit ? -0.06 : (Math.random() - 0.5)*0.24, x:crit ? 0.5 : 0.5 + (Math.random() - 0.5)*0.3});
+  zan.flashes.push({age:0, big:kind==='tail' || !!crit, rainbow:!!crit});
   if(effectsPref.particlesOn && !fxConf().still){
-    var n = calm ? 4 : (kind==='tail' ? 26 : 12);
+    var n = calm ? 4 : (kind==='tail' ? 26 : crit ? 22 : 12);
     for(var i=0;i<n && zan.parts.length<140;i++){
       var a = -Math.PI*0.5 + (Math.random() - 0.5)*Math.PI*1.4, sp = 60 + Math.random()*170;
-      zan.parts.push({x:judgeX(), y:laneY() + laneH()*0.5, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, age:0, life:420 + Math.random()*380, r:1 + Math.random()*2.2});
+      zan.parts.push({x:judgeX(), y:laneY() + laneH()*0.5, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, age:0, life:420 + Math.random()*380, r:1 + Math.random()*2.2,
+                      hue:crit ? (i*37 + Math.random()*30) % 360 : -1});   // 極・一閃: gold to rainbow
     }
   }
+}
+// 極・一閃: a clear wind-chime 「ちーん…」 over the cut (only while sound is on: 🔇 silences it with the rest)
+function zanCritChime(){
+  if(!audioEnabled) return;
+  try{
+    var ac = getAudioCtx();
+    if(!ac) return;
+    gachaTone(ac, 2637, 0.02, 1.1, 'sine', 0.05);
+    gachaTone(ac, 3951, 0.03, 0.8, 'sine', 0.026);
+    gachaTone(ac, 5274, 0.04, 0.5, 'sine', 0.012);
+  }catch(e){}
 }
 function zanHud(){
   elScore.textContent = fmtPoints(zan.score);
@@ -14029,7 +14070,7 @@ function zanEndPractice(quit){
   if(zan.bus){ var bus = zan.bus, track = zan.backingSrc; try{ var nw = bus.context.currentTime; bus.gain.cancelScheduledValues(nw); bus.gain.setValueAtTime(bus.gain.value, nw); bus.gain.linearRampToValueAtTime(0, nw + 0.6); }catch(e){} setTimeout(function(){ try{ if(track) track.stop(); }catch(e){} try{ bus.disconnect(); }catch(e){} }, 900); }
   zan.backingSrc = null;
   elCaption.classList.remove('show');
-  zanPracticeLast = {course:zan.course.name, label:zan.practice.label, speed:zan.practice.speed, perfect:zan.perfect, shin:zan.shin, ok:zan.ok, miss:zan.miss, quit:!!quit};
+  zanPracticeLast = {course:zan.course.name, label:zan.practice.label, speed:zan.practice.speed, perfect:zan.perfect, crit:zan.crit, ok:zan.ok, miss:zan.miss, quit:!!quit};
   document.getElementById('btn-practice-quit').hidden = true;
   state.phase = 'title';
   showScreen('title');
@@ -14059,7 +14100,7 @@ function renderZanPractice(){
   var last = document.getElementById('zp-last'), L = zanPracticeLast;
   last.hidden = !L;
   if(L) last.textContent = '前回の練習（' + L.course + '「' + L.label + '」' + (L.speed===1 ? '' : L.speed.toFixed(1) + '倍') + (L.quit ? '・途中まで' : '') + '）：Perfect ' + L.perfect +
-                           (L.shin ? '（うち真 ' + L.shin + '）' : '') + '・OK ' + L.ok + '・Miss ' + L.miss + '　記録には入りません';
+                           (L.crit ? '（うち極・一閃 ' + L.crit + '）' : '') + '・OK ' + L.ok + '・Miss ' + L.miss + '　記録には入りません';
 }
 document.getElementById('zp-secs').addEventListener('click', function(e){
   var b = e.target.closest && e.target.closest('.zp-sec');
@@ -14076,6 +14117,10 @@ document.querySelector('#zan-practice .zp-opts:not(#zp-secs)').addEventListener(
 });
 document.getElementById('btn-practice').addEventListener('click', function(){ zanPracticeLaunch(zanSelectedCourse(), zanPracticeSel.key, zanPracticeSel.speed); });
 document.getElementById('btn-practice-quit').addEventListener('click', function(){ zanEndPractice(true); });
+document.getElementById('btn-zan-pause').addEventListener('click', function(){ if(zan && !zan.ended){ if(zan.paused) zanResume(); else zanPause(); } });
+document.getElementById('zpb-resume').addEventListener('click', function(){ zanResume(); });
+document.getElementById('zpb-retry').addEventListener('click', function(){ zanRetry(); });
+document.getElementById('zpb-home').addEventListener('click', function(){ zanQuitToHome(); });
 
 var zanLaunching = false;
 function zanLaunch(courseId){
@@ -14116,7 +14161,7 @@ function startZan(courseId, backing, practice){
   var notes = zanChart(song, tm, trick, trickFrom);
   var ghost = null;                                  // ゴースト (looks only): this course's best, on the same chart
   try{ var gs = loadStore(); if(!practice && gs.settings.ghost===true) ghost = zanGhostLoad(gs.zan.courses[course.id].ghost, song, tm); }catch(e){ ghost = null; }
-  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), shin:0, judges:[], tono:null, ghost:ghost, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
+  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), crit:0, judges:[], tono:null, ghost:ghost, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
          p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
@@ -14130,6 +14175,8 @@ function startZan(courseId, backing, practice){
   modeTag.textContent = practice ? '練習中（記録されません）・' + course.name + '「' + practice.label + '」' + zanSpeedLabel(practice.speed)
                                  : '斬・' + course.name + '・♩=' + zanBpmLabel(course) + (season ? '・' + SEASONAL_MODES[season].name + (song.shinsoba ? '譜面' : '') : '');
   document.getElementById('btn-practice-quit').hidden = !practice;
+  document.getElementById('btn-zan-pause').hidden = false;
+  zanPauseBox(false);
   showScreen('game');                               // the usual music fades out; the song of 斬 takes over
   resize();
   zanEnsureAudio();
@@ -14314,7 +14361,7 @@ function zanReview(song, judges){
 // 極上まであと: 完成度 is rounded, so 極上 (95%) needs (Perfect + OK×0.5) ≥ 94.5% of the cuts, and no Miss.
 // In half-points (Perfect 2, OK 1): an OK made Perfect is +1, a Miss made Perfect is +2.
 function zanGoalText(r){
-  if(r.grade==='極上') return '極上！ この調子で真・PERFECTを狙いましょう。';
+  if(r.grade==='極上') return '極上！ この調子で極・一閃（±10ms）を狙いましょう。';
   if(!r.total) return '';
   var have = r.perfect*2 + r.ok, need = Math.ceil(r.total*189/100);
   if(r.miss>0){
@@ -14379,6 +14426,7 @@ function zanAddSectionMiss(store, cid, secs){
 function finishZan(){
   if(!zan || zan.ended) return;
   if(zan.practice){ zanEndPractice(false); return; }   // (区間練習 never reaches the records)
+  zanPauseBox(false);
   zan.ended = true;
   if(zan.timer){ clearInterval(zan.timer); zan.timer = 0; }
   zanChargeStop();
@@ -14423,7 +14471,7 @@ function finishZan(){
   resultDailyClear.classList.remove('show');
   resultSatisfactionBest.classList.remove('show');
   var set = function(id, v){ document.getElementById(id).textContent = v; };
-  set('zan-r-score', String(zan.score)); set('zan-r-best', String(rec.best)); set('zan-r-perfect', String(zan.perfect));
+  set('zan-r-score', String(zan.score)); set('zan-r-best', String(rec.best)); set('zan-r-crit', String(zan.crit)); set('zan-r-perfect', String(zan.perfect));
   set('zan-r-ok', String(zan.ok)); set('zan-r-miss', String(zan.miss)); set('zan-r-combo', String(zan.maxCombo));
   set('zan-r-acc', acc + '%'); set('zan-r-err', '±' + avgErr + 'ms');
   zanRenderReview(zanReview(zan.song, zan.judges), {perfect:zan.perfect, ok:zan.ok, miss:zan.miss, total:total, grade:grade}, store.zan.sectionMiss[cid] || {});
@@ -14448,15 +14496,55 @@ function zanPause(){
   zan.holding = null;                               // (a held タメ is let go; its 斬 can still be cut with a tap)
   zanChargeStop();
   if(zan.ac && zan.ac.state==='running'){ try{ zan.ac.suspend(); }catch(e){} }
-  elCaption.textContent = '一時停止中　タップで再開';
+  elCaption.textContent = '一時停止中';
   elCaption.classList.add('show');
   state.captionHideAt = null;
+  zanPauseBox(true);
+}
+// the pause dialog: 再開 / 最初からやり直す / コースを選び直す
+function zanPauseBox(show){
+  var box = document.getElementById('zan-pausebox');
+  if(!box) return;
+  box.hidden = !show;
+  if(show) focusEl(document.getElementById('zpb-resume'));
+}
+// stop the song where it is, recording nothing (やり直す・選び直す): the music fades, the clock runs again for the home
+function zanStopRun(){
+  if(!zan || zan.ended) return false;
+  zan.ended = true;
+  if(zan.timer){ clearInterval(zan.timer); zan.timer = 0; }
+  zanChargeStop();
+  if(zan.ac && zan.ac.state!=='running'){ try{ zan.ac.resume(); }catch(e){} }
+  if(zan.bus){ var bus = zan.bus, track = zan.backingSrc; try{ var nw = bus.context.currentTime; bus.gain.cancelScheduledValues(nw); bus.gain.setValueAtTime(bus.gain.value, nw); bus.gain.linearRampToValueAtTime(0, nw + 0.25); }catch(e){} setTimeout(function(){ try{ if(track) track.stop(); }catch(e){} try{ bus.disconnect(); }catch(e){} }, 400); }
+  zan.backingSrc = null;
+  elCaption.classList.remove('show');
+  zanPauseBox(false);
+  return true;
+}
+// やり直す: the same course (and the same practice, if it was one) from the top at once — its music is already made
+function zanRetry(){
+  if(!zan || zan.ended || state.phase!=='zan') return;
+  var cid = zan.course.id, practice = zan.practice, songId = zan.song.id;
+  if(!zanStopRun()) return;
+  startZan(cid, zanRenders[songId] || null, practice);
+}
+// 選び直す: back to the home (the course cards), nothing recorded
+function zanQuitToHome(){
+  if(!zan || state.phase!=='zan') return;
+  var wasPractice = !!zan.practice;
+  if(!zanStopRun()) return;
+  document.getElementById('btn-practice-quit').hidden = true;
+  state.phase = 'title';
+  showScreen('title');
+  renderHome();
+  focusEl(document.getElementById(wasPractice ? 'btn-practice' : 'btn-zan'));
 }
 function zanResume(){
   if(!zan || !zan.paused || zan.paused.resuming) return;
   var p = zan.paused, done = function(){ if(zan && zan.paused===p){ zan.p0 += performance.now() - p.at; zan.paused = null; } };
   p.resuming = true;
   elCaption.classList.remove('show');
+  zanPauseBox(false);
   var pr = null;
   if(zan.ac && zan.ac.state!=='running'){ try{ pr = zan.ac.resume(); }catch(e){} }
   if(pr && pr.then) pr.then(done, done); else done();
@@ -14659,7 +14747,7 @@ screens.result.addEventListener('pointerdown', function(){ if(zanShow.d && !zanS
 document.addEventListener('keydown', function(e){ if((e.key==='Escape' || e.key==='Enter' || e.key===' ') && zanShow.d && !zanShow.done && screens.result.classList.contains('active')) zanShowFinish(); });
 
 // --- drawing ---
-function zanDrawBrush(c, text, x, y, size, rot, alpha){
+function zanDrawBrush(c, text, x, y, size, rot, alpha, gold){
   c.save();
   c.globalAlpha = alpha;
   c.translate(x, y);
@@ -14669,9 +14757,13 @@ function zanDrawBrush(c, text, x, y, size, rot, alpha){
   c.textBaseline = 'middle';
   c.lineJoin = 'round';
   c.lineWidth = Math.max(3, size*0.14);
-  c.strokeStyle = 'rgba(255,250,236,0.95)';
+  c.strokeStyle = gold ? 'rgba(60,32,8,0.9)' : 'rgba(255,250,236,0.95)';
   c.strokeText(text, 0, 0);
-  c.fillStyle = '#7a1f14';
+  if(gold){                                          // 極・一閃: 黄金の筆文字
+    var g = c.createLinearGradient(0, -size*0.6, 0, size*0.6);
+    g.addColorStop(0, '#fff3b0'); g.addColorStop(0.45, '#f2c341'); g.addColorStop(0.55, '#c8921a'); g.addColorStop(1, '#f7dd7a');
+    c.fillStyle = g;
+  } else c.fillStyle = '#7a1f14';
   c.fillText(text, 0, 0);
   c.restore();
 }
@@ -14905,7 +14997,7 @@ function drawZan(){
   var ek = skinPart('effect');
   for(var f=0;f<state.cutFx.length;f++){
     var fx = state.cutFx[f], a = 1 - fx.t/400;
-    if(ek && fx.rating!=='DEMO'){
+    if(ek && fx.rating!=='DEMO' && fx.rating!=='CRIT'){
       guardedSkinDraw('effect', function(){ drawSkinRing(ctx, jx, y + h/2, fx, ek); });
       if(f>=state.cutFx.length - 4){                // only the newest cuts throw bits and show their extras
         guardedSkinDraw('effect', function(){ drawSkinOverlay(ctx, jx, y + h/2, fx, ek, y, h, W, false); });
@@ -14914,13 +15006,17 @@ function drawZan(){
       if(!skinFailed.effect) continue;
     }
     ctx.globalAlpha = Math.max(a, 0);
-    ctx.strokeStyle = fx.rating==='DEMO' ? '#c9a24a' : fx.rating==='JUST' ? '#ffd54a' : COLORS.accent;
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = fx.rating==='DEMO' ? '#c9a24a' : fx.rating==='CRIT' ? 'hsl(' + Math.round((fx.t*0.9) % 360) + ',90%,60%)' : fx.rating==='JUST' ? '#ffd54a' : COLORS.accent;
+    ctx.lineWidth = fx.rating==='CRIT' ? 3 : 2;
     ctx.beginPath(); ctx.arc(jx, y + h/2, 10 + fx.t/6, 0, Math.PI*2); ctx.stroke();
     ctx.globalAlpha = 1;
   }
   ctx.restore();
   zanDrawFx(jx, y, h);
+  if(beat>=5 && beat<8 && beat < zan.song.firstCall){   // カウントダウン 3・2・1 (on the 構え bars, before the first お手本)
+    var cdq = beat % 1, cdn = String(8 - Math.floor(beat));
+    zanDrawBrush(ctx, cdn, W*0.5, H*0.42, Math.min(W*0.22, 86)*(motionCalm() ? 1 : 1.15 - Math.min(0.15, cdq*0.3)), 0, cdq<0.7 ? 1 : (1 - cdq)/0.3, false);
+  }
   // the song's progress, along the top
   var prog = Math.max(0, Math.min(1, songT/zanB2T(zan.song.end)));
   ctx.fillStyle = 'rgba(40,30,15,0.12)'; ctx.fillRect(0, 0, W, 3);
@@ -14941,7 +15037,10 @@ function zanDrawFx(jx, y, h){
     ctx.translate(jx, y + h/2);
     ctx.rotate(-0.5);
     var gr = ctx.createLinearGradient(-len, 0, len, 0);
-    gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.5, 'rgba(255,252,236,1)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    if(fl.rainbow){                                   // 極・一閃: gold at the heart, the rainbow along the blade
+      gr.addColorStop(0, 'rgba(255,90,90,0)'); gr.addColorStop(0.25, 'rgba(255,200,80,0.9)'); gr.addColorStop(0.5, 'rgba(255,236,150,1)');
+      gr.addColorStop(0.7, 'rgba(120,220,170,0.9)'); gr.addColorStop(0.85, 'rgba(120,150,255,0.8)'); gr.addColorStop(1, 'rgba(200,120,255,0)');
+    } else { gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.5, 'rgba(255,252,236,1)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); }
     ctx.fillStyle = gr;
     ctx.fillRect(-len, -(fl.big ? 3 : 1.5), len*2, fl.big ? 6 : 3);
     ctx.restore();
@@ -14953,7 +15052,8 @@ function zanDrawFx(jx, y, h){
     if(p.age>p.life){ zan.parts.splice(i, 1); continue; }
     p.vy += 380*dt/1000; p.x += p.vx*dt/1000; p.y += p.vy*dt/1000;
     ctx.globalAlpha = 1 - p.age/p.life;
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = p.hue>=0 ? 'hsl(' + Math.round((p.hue + p.age*0.3) % 360) + ',90%,' + (p.age<p.life*0.3 ? 62 : 70) + '%)' : '#efe4c8';
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r*(p.hue>=0 ? 1.3 : 1), 0, Math.PI*2); ctx.fill();
   }
   ctx.globalAlpha = 1;
   // 筆文字
@@ -14963,7 +15063,7 @@ function zanDrawFx(jx, y, h){
     if(tx.age>tl){ zan.texts.splice(i, 1); continue; }
     var q = tx.age/tl, pop = q<0.18 ? 0.6 + q/0.18*0.55 : 1.15 - Math.min(0.15, (q - 0.18)*0.3);
     var size = Math.min(W*0.2, (tx.big ? 64 : 42))*pop;
-    zanDrawBrush(ctx, tx.word, W*tx.x, H*(tx.big ? 0.62 : 0.66), size, tx.rot, q<0.75 ? 1 : (1 - q)/0.25);
+    zanDrawBrush(ctx, tx.word, W*tx.x, H*(tx.big ? 0.62 : 0.66), tx.gold ? Math.min(W*0.14, 56)*pop : size, tx.rot, q<0.75 ? 1 : (1 - q)/0.25, tx.gold);
   }
 }
 // the in-game music of 斬 is its own; the usual BGM steps aside while it plays
