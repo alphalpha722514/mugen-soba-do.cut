@@ -844,6 +844,8 @@ body{
 .trick-opt[data-trick="on"][aria-pressed="true"]{background:color-mix(in srgb,var(--accent2-ink) 18%,var(--card));border-color:var(--accent2-ink);box-shadow:inset 0 0 0 1px var(--accent2-ink);}
 .zan-trick-note{flex:1 1 100%;margin:0;font-size:.68rem;line-height:1.55;color:var(--ink-soft);}
 .zan-trick-note b{color:var(--accent2-ink);}
+.zan-trick-forced{font-weight:700;color:var(--accent2-ink);}
+.zan-trick-forced[hidden]{display:none;}
 /* 区間練習 (records nothing) */
 .zan-practice{border-top:1px solid var(--line);padding-top:8px;}
 .zan-practice summary{cursor:pointer;font-weight:900;font-size:.88rem;display:flex;align-items:baseline;gap:8px;}
@@ -1337,6 +1339,11 @@ body{
           <span class="opt-desc">速いテンポと、長短のタメ切り（緩急）。</span>
           <span class="zan-cbest" data-zbest="arabiki">ベスト —</span>
         </button>
+        <button class="opt zan-course" type="button" data-course="uchihiki" aria-pressed="false">
+          <span class="opt-top"><span class="opt-name">越前打挽き</span><span class="tag">最上級</span><span class="tag">♩=120→150</span><span class="zan-today" data-today="uchihiki" hidden>今日の一曲 +100🪙</span></span>
+          <span class="opt-desc">曲の途中で♩=150へ加速。最初から師匠のイタズラ入りで、判定もいちばん厳しい。</span>
+          <span class="zan-cbest" data-zbest="uchihiki">ベスト —</span>
+        </button>
       </div>
       <p id="zan-season" class="zan-season" hidden></p>
       <div class="zan-trick" role="group" aria-labelledby="zan-trick-h">
@@ -1344,6 +1351,7 @@ body{
         <button class="btn-small trick-opt" type="button" data-trick="off" aria-pressed="true">ナシ</button>
         <button class="btn-small trick-opt" type="button" data-trick="on" aria-pressed="false">アリ</button>
         <p class="zan-trick-note">アリにすると、あなたの番でこま板が盤の一部を隠し、師匠がフェイント（振りかぶって切らない）もかけてきます。つられて切るとコンボが切れます。そのかわり<b>得点×1.2・コイン×1.2</b>。</p>
+        <p id="zan-trick-forced" class="zan-trick-note zan-trick-forced" hidden>越前打挽きは、この設定にかかわらず最初の小節から師匠のイタズラ入りです（得点×1.2・コイン×1.2）。</p>
       </div>
       <button id="btn-zan" class="btn-start zan-start" type="button">斬 修行開始</button>
       <p class="zan-tools"><button id="btn-calib" class="link-btn" type="button">試し切り（ずれ調整）</button><span id="zan-offset-label">ずれ補正 0ms</span></p>
@@ -1492,9 +1500,9 @@ body{
       <h3 id="g-zan-h" tabindex="-1">リズム修行・斬<span class="gsec-sub">メインモード</span></h3>
       <p class="gsec-lead">BGMの拍にぴったり合わせて蕎麦を切るリズムモードです。最初から最後まで、師匠が1小節お手本を切って見せ（金色の印）、次の小節であなたが同じリズムで切ります（赤い印）。</p>
       <ul class="gpoints">
-        <li><b>始め方</b>ホームのいちばん上でコースを選び、「斬 修行開始」を押します。二八（初級・♩=110・素直なリズム）、十割（中級・♩=130・裏拍が混じる）、粗挽き（上級・♩=155・長短のタメ切り）の3コース。どれもいちばん細かいリズムは半拍（8分音符）です。1曲は約80〜90秒です。</li>
+        <li><b>始め方</b>ホームのいちばん上でコースを選び、「斬 修行開始」を押します。二八（初級・♩=110・素直なリズム）、十割（中級・♩=130・裏拍が混じる）、粗挽き（上級・♩=155・長短のタメ切り）、越前打挽き（最上級・♩=120から曲の途中で150へ加速・最初から師匠のイタズラ入り）の4コース。どれもいちばん細かいリズムは半拍（8分音符）です。1曲は約80〜90秒です。</li>
         <li><b>切り方</b>タップ（パソコンはスペースキー）で切る「通常切り」と、「斬」の帯を長押しで溜めて「斬」の拍で離す「タメ切り」の2種類。切るのは蕎麦だけです。師匠も、あなたも、包丁をまな板まで切り下ろします。</li>
-        <li><b>判定</b>音の時計で測ります。Perfect・OKになるずれの幅はコースごとに違い、二八はPerfect±35ms・OK±80ms、十割は±30ms・±70ms、粗挽きは±25ms・±60msです。それより外か見逃しはMissです。ずれ±15ms以内は「真・PERFECT」で、その切りの点が1.5倍になります（Perfectとして数えます）。印のないところで空振りしても減点はありません。Perfectの音はその小節の和音にそろいます。</li>
+        <li><b>判定</b>音の時計で測ります。Perfect・OKになるずれの幅はコースごとに違い、二八はPerfect±35ms・OK±80ms、十割は±30ms・±70ms、粗挽きは±25ms・±60ms、越前打挽きは±22ms・±55msです。それより外か見逃しはMissです。ずれ±15ms以内は「真・PERFECT」で、その切りの点が1.5倍になります（Perfectとして数えます）。印のないところで空振りしても減点はありません。Perfectの音はその小節の和音にそろいます。</li>
         <li><b>完成度</b>Perfectは1、OKは0.5として数えた割合で「並・上・特上・極上」が決まります（極上は95%以上かつMissなし）。</li>
         <li><b>試し切り（ずれ調整）</b>音に対してタップがずれると感じたら、ホームの「試し切り」で「トン」の音に合わせて8回たたくと、ずれを測って判定をそろえます。イヤホンを使うときは、つけたまま測ってください。値はこの端末だけに保存します。</li>
         <li><b>一時停止</b>遊んでいる途中でほかのアプリに切り替えると止まり、画面をタップすると続きから再開します。</li>
@@ -1503,7 +1511,7 @@ body{
         <li><b>ふりかえり</b>リザルトに、極上まであと何回OKをPerfectにすればよいか（Missがあるときは「Miss 0」が条件であること）と、曲の区間ごとのMissの数とずれの帯が出ます。いちばんMissの多かった区間を「苦手」として示し、コースごとに区間のMissの累計を記録します。</li>
         <li><b>リザルト</b>切った蕎麦がざるに盛られ、大根おろし・ネギ・かつお節がのり、完成度に合ったお客さんが味わいます。最後に完成度の判子が押され、師匠がひと言。Perfectが多いほど麺がそろって艶やかに。タップで飛ばせます（演出「控えめ」などの設定では、はじめから仕上がった姿で出ます）。</li>
         <li><b>同時切り</b>曲の最後の1小節は、師匠とあなたが同じ拍でいっしょに切ります（お手本はありません。その直前の小節で師匠が切って見せたリズムです）。</li>
-        <li><b>師匠のイタズラ</b>ホームで「アリ」にすると、曲の2つ目のパート（刻み・裏拍）から、あなたの番でこま板が盤の一部を隠し、師匠がお手本の中で包丁を振りかぶって切らない「フェイント」をかけてきます。フェイントの拍につられて切るとコンボが切れます（Missには数えません）。そのかわり得点×1.2・コイン×1.2。記録は同じ自己ベストに入り、イタズラありで出したベストには「（イタズラ）」の印がつきます。</li>
+        <li><b>師匠のイタズラ</b>越前打挽きはいつも最初の小節からイタズラ入りです（得点×1.2・コイン×1.2）。ほかのコースは、ホームで「アリ」にすると、曲の2つ目のパート（刻み・裏拍）から、あなたの番でこま板が盤の一部を隠し、師匠がお手本の中で包丁を振りかぶって切らない「フェイント」をかけてきます。フェイントの拍につられて切るとコンボが切れます（Missには数えません）。そのかわり得点×1.2・コイン×1.2。記録は同じ自己ベストに入り、イタズラありで出したベストには「（イタズラ）」の印がつきます。</li>
         <li><b>今日の一曲</b>日替わりで1コースが「今日の一曲」に選ばれ、ホームのコースに印が出ます。そのコースを1曲遊ぶと、その日1回だけコイン+100。</li>
         <li><b>着せ替え</b>装備した器はリザルトの盛り付けに、包丁は盤の包丁に、演出は切ったときの輪と紙吹雪に、効果音は切る音・Perfectの音などに使われます（見た目と音だけで、得点や判定は変わりません）。</li>
         <li><b>記録とごほうび</b>得点と自己ベストはコースごとに記録されます。得点・コンボ・Perfect率が称号と限定アイテムの条件になり、1曲ごとにそば猪口コインがもらえます（難しいコースほど多め）。本日のチャレンジも斬で挑戦します。</li>
@@ -1545,7 +1553,7 @@ body{
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。自己ベスト・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で斬の自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
-        <li><b>そば猪口コイン</b>斬を1曲遊ぶごとに、修行120＋得点ぶん（得点÷100、最大50）＋完成度ぶん（完成度の％÷2、最大50）＋コースぶん（二八0・十割40・粗挽き80）。最大で二八220・十割260・粗挽き300。師匠のイタズラ「アリ」ならその合計の2割を上乗せ（コイン×1.2）。今日の一曲を遊ぶと+100、本日のチャレンジ達成で+500（どちらも1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。ホームやリザルトの「友達に共有」で共有すると、1日1回+200（共有ボーナス）。</li>
+        <li><b>そば猪口コイン</b>斬を1曲遊ぶごとに、修行120＋得点ぶん（得点÷100、最大50）＋完成度ぶん（完成度の％÷2、最大50）＋コースぶん（二八0・十割40・粗挽き80・越前打挽き120）。最大で二八220・十割260・粗挽き300・越前打挽き340。師匠のイタズラ「アリ」ならその合計の2割を上乗せ（コイン×1.2）。今日の一曲を遊ぶと+100、本日のチャレンジ達成で+500（どちらも1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。ホームやリザルトの「友達に共有」で共有すると、1日1回+200（共有ボーナス）。</li>
         <li><b>BGM</b>ホーム・リザルト・ガチャで、場面ごとの和風の音楽が流れます。斬ではコースごとの曲（三味線・笛・太鼓）が流れ、コンボが10・20・30と続くたびに、太鼓の裏打ち・手拍子・掛け声が重なります（音声ファイルは使わず、ブラウザの中で合成しています）。「記録と設定」で、効果音とは別にオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</li>
         <li><b>今日のクイズ</b>ホームの「今日のクイズ」で、越前そばと福井にちなんだ4択クイズが1日3問出ます（問題は日付で決まり、その日はみんな同じ3問）。1問正解ごとにそば札1枚、3問とも正解するとさらに2枚。全問正解で称号「越前通」、通算30問正解で称号「そば博士」がもらえます。</li>
         <li><b>限定アイテム</b>ガチャや交換所には出ない4種のアイテムが、斬やクイズの実績（最大30コンボ・累計スコア50,000点・斬を30曲・クイズ通算10問正解）で解放されます。図鑑の「限定」に、まだのものは「？？？」と解放の条件が出ます。</li>
@@ -3221,7 +3229,7 @@ function sanitizeBadges(raw){
 // zan: リズム修行・斬's own record — over all the songs (best, plays, best 完成度; a save from before the courses keeps
 // its best here) and by course (courses.<id>), with the course chosen last
 var ZAN_GRADE_NAMES = ['並','上','特上','極上'];
-var ZAN_COURSE_IDS = ['nihachi', 'juwari', 'arabiki'];   // 二八・十割・粗挽き (see ZAN_COURSES)
+var ZAN_COURSE_IDS = ['nihachi', 'juwari', 'arabiki', 'uchihiki'];   // 二八・十割・粗挽き・越前打挽き (see ZAN_COURSES)
 function sanitizeZanRec(raw){
   var z = isPlainObj(raw) ? raw : {};
   return {best:clampInt(z.best, 0, STAT_MAX), plays:clampInt(z.plays, 0, STAT_MAX), bestGrade:ZAN_GRADE_NAMES.indexOf(z.bestGrade)>=0 ? z.bestGrade : '',
@@ -12950,13 +12958,38 @@ var ZAN_SONGS = {
       [0,1,2,3], [0,0.5,1,1.5,2,3], [{h:0,len:1},{h:1.5,len:1},3], [{h:0,len:3}]             // 仕上げ
     ],
     music:{shami:['kizami', 'fever'], flute:['fever', 'final'], drive:true}
+  },
+  // 越前打挽き（最上級）: ♩=120 で始まり、「加速」から ♩=150（テンポ表の2つ目の区切り）。裏拍とタメの両方。
+  // 師匠のイタズラ（目隠し・フェイント）は最初の小節から（ZAN_COURSES の alwaysTrick）。拍の細かさは半拍まで。
+  uchihiki:{
+    id:'uchihiki', tempo:[{b:0, bpm:120}, {b:96, bpm:150}], firstCall:8, end:192, finale:[0,1,1.5,2,3],
+    chords:[[57,60,64],[53,57,60],[55,59,62],[52,56,59]],   // Am・F・G・E
+    sections:[
+      {from:0,   key:'ready',  label:'構え',     caption:'ヨー…'},
+      {from:8,   key:'call',   label:'お手本',   caption:'師匠のお手本 → 同じリズムで切る'},
+      {from:40,  key:'kizami', label:'裏刻み',   caption:'表と裏を刻み分けて'},
+      {from:72,  key:'tame',   label:'緩急',     caption:'溜めて、離して、また刻む'},
+      {from:96,  key:'fever',  label:'加速',     caption:'♩=150へ！ 速く細く'},
+      {from:144, key:'final',  label:'仕上げ',   caption:'最後まで気を抜かずに'},
+      {from:184, key:'unison', label:'同時切り', caption:'最後は師匠といっしょに！'}
+    ],
+    calls:[
+      [0,1,2,3], [0,1.5,2,3], [0,1,2,2.5,3], [0.5,1,2,3],                                   // お手本
+      [0,0.5,1.5,2,3], [0,1,1.5,2.5,3], [0.5,1.5,2,3,3.5], [0,0.5,1,1.5,2,3],               // 裏刻み
+      [{h:0,len:2},2.5,3], [0,{h:1,len:1.5},3], [{h:0,len:1},{h:2,len:1.5}],                 // 緩急
+      [0,0.5,1,2,2.5,3], [0,1,1.5,2,2.5,3.5], [0.5,1,1.5,2.5,3,3.5], [0,0.5,1,1.5,2,3], [0,1.5,2,2.5,3,3.5], [0,0.5,1,1.5,2,2.5,3],   // 加速
+      [0,1,2,3], [0,0.5,1.5,2,3], [{h:0,len:1},2,2.5,3], [0,1,{h:2,len:1.5}], [{h:0,len:3}]   // 仕上げ
+    ],
+    music:{shami:['kizami', 'fever', 'final'], syncShami:true, flute:['call', 'fever', 'final'], drive:true}
   }
 };
 // the courses on the home screen (a course without a song yet is shown as 準備中). coinBonus: the course's coins on top
 var ZAN_COURSES = [
   {id:'nihachi', name:'二八',   level:'初級', bpm:110, song:'nihachi', coinBonus:0,  perfectMs:35, okMs:80, guardMs:120, desc:'8分音符まで。素直なリズムで、まずはここから。'},
   {id:'juwari',  name:'十割',   level:'中級', bpm:130, song:'juwari',  coinBonus:40, perfectMs:30, okMs:70, guardMs:105, desc:'裏拍（シンコペーション）が混じる。'},
-  {id:'arabiki', name:'粗挽き', level:'上級', bpm:155, song:'arabiki', coinBonus:80, perfectMs:25, okMs:60, guardMs:90,  desc:'速いテンポと、緩急のタメ切り。'}
+  {id:'arabiki', name:'粗挽き', level:'上級', bpm:155, song:'arabiki', coinBonus:80, perfectMs:25, okMs:60, guardMs:90,  desc:'速いテンポと、緩急のタメ切り。'},
+  {id:'uchihiki', name:'越前打挽き', level:'最上級', bpm:120, bpmLabel:'120→150', song:'uchihiki', coinBonus:120, perfectMs:22, okMs:55, guardMs:85, alwaysTrick:true,
+   desc:'♩=120から150へ加速。最初から師匠のイタズラ入り。'}
 ];
 function zanCourse(id){ for(var i=0;i<ZAN_COURSES.length;i++) if(ZAN_COURSES[i].id===id) return ZAN_COURSES[i]; return null; }
 // the course's judging windows in seconds (Perfect / OK / whiff). A course without its own gets the defaults above;
@@ -12967,6 +13000,7 @@ function zanWindows(course){
   ok = Math.max(ok, p); g = Math.max(g, ok);
   return {perfect:p, ok:ok, guard:g};
 }
+function zanBpmLabel(c){ return c ? String(c.bpmLabel || c.bpm) : ''; }
 function zanPlayable(id){ var c = zanCourse(id); return !!(c && c.song && ZAN_SONGS[c.song]); }
 // --- the tempo map: beats ↔ seconds (song time) ---
 function zanTempoOf(song){
@@ -13004,10 +13038,14 @@ function zanSectionAt(b, song){
 // the chart: {b (beat), t / tt (the seconds of the cut / of a hold's release), type: demo | demohold (the master's) |
 // tap | hold (yours), len (hold, beats)}. Every note is a cut of soba (a hold is a タメ切り).
 function zanIsDemo(n){ return n.type==='demo' || n.type==='demohold' || n.type==='feint' || n.type==='fake'; }   // (not cut by you for points)
-function zanChart(song, tm, trick){
+function zanTrickFrom(song, course){
+  if(course && course.alwaysTrick) return song.firstCall;            // 越前打挽き: from the first お手本
+  return song.sections.length>2 ? song.sections[2].from : 1e9;      // (イタズラ: from the second part)
+}
+function zanChart(song, tm, trick, trickFrom){
   var notes = [];
   function add(b, type, len){ notes.push({b:b, t:zanB2T(b, tm), tt:zanB2T(b + (len || 0), tm), type:type, len:len || 0, judged:false, headDone:false}); }
-  var trickFrom = song.sections.length>2 ? song.sections[2].from : 1e9;   // (イタズラ: from the second part)
+  if(typeof trickFrom!=='number') trickFrom = zanTrickFrom(song, null);
   for(var i=0;i<song.calls.length;i++){
     var bar = song.firstCall + i*8, p = song.calls[i], used = [];
     for(var j=0;j<p.length;j++){
@@ -13718,9 +13756,11 @@ function startZan(courseId, backing, practice){
   state.phase = 'zan';
   var trick = false;
   try{ trick = !practice && loadStore().settings.zanTrick===true; }catch(e){}   // (区間練習: no イタズラ)
+  if(!practice && course.alwaysTrick) trick = true;  // 越前打挽き: always (×1.2 too)
+  var trickFrom = zanTrickFrom(song, practice ? null : course);
   var buzz = zanBuzzAllowed();
-  var notes = zanChart(song, tm, trick);
-  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), shin:0, judges:[], practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:song.sections.length>2 ? song.sections[2].from : 1e9, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
+  var notes = zanChart(song, tm, trick, trickFrom);
+  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), shin:0, judges:[], practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
          p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
@@ -13732,7 +13772,7 @@ function startZan(courseId, backing, practice){
   applyModeLook('normal');
   modeTag.hidden = false;
   modeTag.textContent = practice ? '練習中（記録されません）・' + course.name + '「' + practice.label + '」' + zanSpeedLabel(practice.speed)
-                                 : '斬・' + course.name + '・♩=' + course.bpm + (season ? '・' + SEASONAL_MODES[season].name : '');
+                                 : '斬・' + course.name + '・♩=' + zanBpmLabel(course) + (season ? '・' + SEASONAL_MODES[season].name : '');
   document.getElementById('btn-practice-quit').hidden = !practice;
   showScreen('game');                               // the usual music fades out; the song of 斬 takes over
   resize();
@@ -13912,7 +13952,7 @@ function finishZan(){
   screens.result.classList.add('is-zan');
   document.getElementById('zan-stats').hidden = false;
   resultMode.hidden = false;
-  resultMode.textContent = 'リズム修行・斬　' + zan.course.name + '（' + zan.course.level + '・♩=' + zan.course.bpm + '）' + (zan.trick ? '・イタズラ' : '');
+  resultMode.textContent = 'リズム修行・斬　' + zan.course.name + '（' + zan.course.level + '・♩=' + zanBpmLabel(zan.course) + '）' + (zan.trick ? '・イタズラ' : '');
   resultRank.textContent = '完成度: ' + grade + (grade==='極上' ? '蕎麦' : '');
   showNewTitles(newTitles);
   resultNewBest.classList.toggle('show', isNewBest);
@@ -14507,6 +14547,8 @@ function renderZanHome(){
   try{ trickOn = loadStore().settings.zanTrick===true; }catch(e){}
   var tOpts = document.querySelectorAll('.trick-opt');
   for(var ti=0;ti<tOpts.length;ti++) tOpts[ti].setAttribute('aria-pressed', (tOpts[ti].getAttribute('data-trick')==='on')===trickOn ? 'true' : 'false');
+  var forcedEl = document.getElementById('zan-trick-forced'), selC = zanCourse(sel);
+  if(forcedEl) forcedEl.hidden = !(selC && selC.alwaysTrick);
   var season = zanSeason(), seEl = document.getElementById('zan-season');
   if(seEl){
     seEl.hidden = !season;
