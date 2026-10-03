@@ -754,6 +754,9 @@ body{
   display:block;width:100%;max-width:240px;height:auto;border-radius:10px;
   border:1px solid var(--line);box-shadow:var(--card-shadow);background:#f3ecdc;
 }
+.share-preview.is-wide img{max-width:100%;}
+.card-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:100%;}
+.card-btns .btn-sub{flex:1 1 140px;padding:10px 6px;font-size:.86rem;white-space:nowrap;}
 .share-preview figcaption{font-size:.78rem;line-height:1.55;color:var(--ink-soft);text-align:center;word-break:auto-phrase;}
 #screen-result button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:3px;}
 
@@ -2004,11 +2007,16 @@ body{
     <button id="btn-restart" class="btn-main">もう一度挑戦</button>
     <div class="share-box">
       <button id="btn-share-result" class="btn-sub" type="button">友達に共有する（1日1回 +200🪙）</button>
-      <button id="btn-save-image" class="btn-sub" type="button">結果を画像で保存</button>
+      <button id="btn-save-image" class="btn-sub" type="button">カードを画像で保存</button>
+      <div class="card-btns">
+        <button id="btn-copy-image" class="btn-sub" type="button">クリップボードにコピー</button>
+        <button id="btn-share-image" class="btn-sub" type="button" hidden>画像で共有</button>
+        <button id="btn-share-x" class="btn-sub" type="button">Xで共有</button>
+      </div>
       <p id="share-msg" class="share-msg" role="status" aria-live="polite"></p>
       <button id="btn-download-image" class="btn-link" type="button" hidden>画像ファイルとしてダウンロード</button>
       <figure id="share-preview" class="share-preview" hidden>
-        <img id="share-preview-img" width="1080" height="1350" alt="結果カードの画像（称号と名前・得点・コース・完成度・Perfect・最大コンボ・平均のずれ・今回の腕前・累計スコア・日付）">
+        <img id="share-preview-img" width="1200" height="630" alt="一刀両断カードの画像（盛り付けたざるそば・包丁・判子・コース・完成度・得点・極・一閃／Perfect／OK／Miss・最大コンボ・平均のずれ・修行の心得・称号と名前・日付）">
         <figcaption>うまく保存できないときは、この画像を長押し（スマホ）か右クリック（パソコン）して保存できます。</figcaption>
       </figure>
     </div>
@@ -4207,6 +4215,7 @@ btnImport.addEventListener('click', function(){
 var resultCust = document.getElementById('result-cust');
 var btnSaveImage = document.getElementById('btn-save-image');
 var btnDownloadImage = document.getElementById('btn-download-image');
+var btnCopyImage = document.getElementById('btn-copy-image'), btnShareImage = document.getElementById('btn-share-image'), btnShareX = document.getElementById('btn-share-x');
 var shareMsg = document.getElementById('share-msg');
 var sharePreview = document.getElementById('share-preview');
 var sharePreviewImg = document.getElementById('share-preview-img');
@@ -4237,12 +4246,14 @@ function onResultShown(){
   sharePreview.hidden = true;
   sharePreviewImg.removeAttribute('src');
   setCardBusy(false);
+  btnShareImage.hidden = !cardCanShareFiles();
 }
 
 function readResultForCard(){
   if(screens.result.classList.contains('is-zan') && zanLastResult){   // リズム修行・斬's own card
     var zr = zanLastResult;
     return {zan:true, score:fmtPoints(zr.score), course:zr.course, grade:zr.grade, perfect:zr.perfect, combo:String(zr.combo), err:zr.err,
+            crit:zr.crit, perfectN:zr.perfectN, ok:zr.ok, miss:zr.miss, acc:zr.acc, trick:zr.trick, mods:zr.mods,
             tier:playTierName(zr.score), total:fmtPoints(titleMetrics(loadStore()).totalScore) + '点',
             newBest:resultNewBest.classList.contains('show'), who:cardIdentity(), mode:resultMode.textContent, date:cardInfo.date || new Date()};
   }
@@ -4675,6 +4686,172 @@ function drawResultCard(canvas, d){
   if(d.newBest) drawBestStamp(ctx, X0 + W - 108, heroTop + (d.who ? 64 : 22), 112);   // below the name line
 }
 
+// --- 一刀両断カード (リズム修行・斬): 1200×630 (the OGP size). The plating of the result (its 器 or the ざる, the noodles
+// and the toppings), your equipped 包丁 over it with the stroke of the cut, the score and the cuts, the 判子 and the date.
+var ZCARD_W = 1200, ZCARD_H = 630, ZCARD_BRUSH = '"Yuji Syuku",' + CARD_SERIF;
+function zanCardPlate(){
+  if(!zanShow.d) return null;
+  var cv = document.createElement('canvas');
+  zanShowPaint(1e9, {canvas:cv, cw:320, ch:178, dpr:3});
+  return cv.width>0 ? cv : null;
+}
+function zanCardKnife(k, x, y, s, rot){               // the blade with its edge along y = 0 (着せ替え: the equipped 包丁)
+  var keep = ctx, tk = skinPart('tool'), drawn = false;
+  k.save();
+  k.translate(x, y); k.rotate(rot); k.scale(s, s);
+  ctx = k;                                           // (guardedSkinDraw saves and restores ctx)
+  try{
+    if(tk) guardedSkinDraw('tool', function(){ drawn = drawToolBase(k, tk); });
+    if(!drawn){
+      k.fillStyle = '#d7dee0'; k.strokeStyle = '#7d8a8f'; k.lineWidth = 1.5;
+      k.beginPath(); k.moveTo(0, 2); k.lineTo(38, 2); k.lineTo(38, -42); k.lineTo(0, -42); k.closePath(); k.fill(); k.stroke();
+      k.fillStyle = 'rgba(255,255,255,0.85)'; k.fillRect(1, -1, 36, 1.2);
+      k.fillStyle = '#3f2c1d'; k.fillRect(4, -42, 30, 9);
+    }
+  }catch(e){}
+  ctx = keep;
+  k.restore();
+}
+function zanCardSeal(k, cx, cy, size, lines){         // the red 判子 (the words of the result's seal)
+  k.save();
+  k.translate(cx, cy); k.rotate(-0.14);
+  k.fillStyle = 'rgba(178,34,34,0.92)';
+  cardRoundRect(k, -size/2, -size/2, size, size, size*0.08); k.fill();
+  k.strokeStyle = '#fff4e6'; k.lineWidth = size*0.035;
+  cardRoundRect(k, -size/2 + size*0.08, -size/2 + size*0.08, size*0.84, size*0.84, size*0.05); k.stroke();
+  k.fillStyle = '#fff4e6'; k.textAlign = 'center'; k.textBaseline = 'middle';
+  if(lines.length>1){
+    k.font = cardFont('400', Math.round(size*0.34), ZCARD_BRUSH);
+    k.fillText(lines[0], 0, -size*0.19); k.fillText(lines[1], 0, size*0.21);
+  } else {
+    fitFont(k, lines[0], size*0.76, Math.round(size*(lines[0].length>2 ? 0.3 : 0.42)), 12, '400', ZCARD_BRUSH);
+    k.fillText(lines[0], 0, size*0.02);
+  }
+  k.restore();
+}
+function zanCardCell(k, x, y, w, h, label, value, tone){
+  k.save();
+  cardRoundRect(k, x, y, w, h, 14);
+  k.fillStyle = tone==='crit' ? '#fbefc8' : tone==='miss' ? '#f6e3dc' : '#f4ecd9';
+  k.fill();
+  k.strokeStyle = tone==='crit' ? '#c29a3c' : CARD_COL.panelLine; k.lineWidth = tone==='crit' ? 3 : 2;
+  k.stroke();
+  k.textAlign = 'center'; k.textBaseline = 'alphabetic';
+  k.fillStyle = tone==='crit' ? '#8a6414' : CARD_COL.label;
+  fitFont(k, label, w - 16, 21, 14, '700', CARD_SANS);
+  k.fillText(label, x + w/2, y + 32);
+  k.fillStyle = tone==='crit' ? '#6b4a08' : tone==='miss' ? '#8f2b1c' : CARD_COL.ink;
+  fitFont(k, value, w - 16, 44, 20, '700', CARD_SANS);
+  k.fillText(value, x + w/2, y + h - 18);
+  k.restore();
+}
+function drawZanCard(canvas, d){
+  canvas.width = ZCARD_W;
+  canvas.height = ZCARD_H;
+  var k = canvas.getContext('2d');
+  if(!k) throw new Error('canvas 2d is not available');
+  // 和紙
+  var g = k.createLinearGradient(0, 0, ZCARD_W, ZCARD_H);
+  g.addColorStop(0, CARD_COL.paperTop); g.addColorStop(1, CARD_COL.paperBottom);
+  k.fillStyle = g; k.fillRect(0, 0, ZCARD_W, ZCARD_H);
+  var rnd = cardRng(1729);
+  k.save(); k.strokeStyle = CARD_COL.fiber; k.lineWidth = 2; k.lineCap = 'round';
+  for(var i=0; i<200; i++){ var fx = rnd()*ZCARD_W, fy = rnd()*ZCARD_H, len = 12 + rnd()*30, an = rnd()*Math.PI; k.beginPath(); k.moveTo(fx, fy); k.lineTo(fx + Math.cos(an)*len, fy + Math.sin(an)*len); k.stroke(); }
+  k.restore();
+  k.strokeStyle = CARD_COL.green; k.lineWidth = 8; k.strokeRect(14, 14, ZCARD_W - 28, ZCARD_H - 28);
+  k.strokeStyle = CARD_COL.gold; k.lineWidth = 2; k.strokeRect(28, 28, ZCARD_W - 56, ZCARD_H - 56);
+
+  // left: the title, the plate, the knife and its stroke, the seal
+  k.textAlign = 'left'; k.textBaseline = 'alphabetic';
+  k.fillStyle = CARD_COL.green; k.font = cardFont('700', 26, CARD_SANS);
+  k.fillText('無限そば道・斬', 60, 78);
+  k.fillStyle = '#2a2118'; k.font = cardFont('400', 80, ZCARD_BRUSH);
+  k.fillText('一刀両断', 56, 160);
+  var plate = null;
+  try{ plate = zanCardPlate(); }catch(e){ plate = null; }
+  if(plate){
+    var sw = plate.width*0.8, sh = plate.height, sx = plate.width*0.06;   // (the plate sits left of the guest's place)
+    var dw = 520, dh = dw*sh/sw;
+    k.drawImage(plate, sx, 0, sw, sh, 52, 590 - dh, dw, dh);
+  }
+  k.save();                                          // the stroke of the cut: a gold slash across the plate
+  var sg = k.createLinearGradient(80, 560, 560, 210);
+  sg.addColorStop(0, 'rgba(242,195,65,0)'); sg.addColorStop(0.35, 'rgba(242,195,65,0.75)'); sg.addColorStop(0.7, 'rgba(255,248,214,0.95)'); sg.addColorStop(1, 'rgba(242,195,65,0)');
+  k.strokeStyle = sg; k.lineCap = 'round'; k.lineWidth = 7;
+  k.beginPath(); k.moveTo(80, 560); k.quadraticCurveTo(300, 420, 560, 210); k.stroke();
+  k.strokeStyle = 'rgba(255,255,255,0.8)'; k.lineWidth = 2;
+  k.beginPath(); k.moveTo(130, 528); k.quadraticCurveTo(320, 410, 520, 240); k.stroke();
+  k.restore();
+  zanCardKnife(k, 440, 372, 3.1, -0.62);
+  k.fillStyle = CARD_COL.label; k.textAlign = 'left';
+  fitFont(k, SHARE_URL.replace(/^https?:\/\//, '').replace(/\/$/, ''), 520, 16, 12, '700', CARD_SANS);
+  k.fillText(SHARE_URL.replace(/^https?:\/\//, '').replace(/\/$/, ''), 60, 596);
+  var show = ZAN_SHOW[d.grade] || ZAN_SHOW['並'];
+  zanCardSeal(k, 520, 112, 112, show.seal);
+
+  // right: the panel of numbers
+  var px = 620, py = 48, pw = ZCARD_W - px - 48, ph = ZCARD_H - py*2, ix = px + 30, iw = pw - 60;
+  k.save();
+  k.shadowColor = 'rgba(60,40,10,0.18)'; k.shadowBlur = 18; k.shadowOffsetY = 6;
+  cardRoundRect(k, px, py, pw, ph, 22); k.fillStyle = CARD_COL.panel; k.fill();
+  k.restore();
+  cardRoundRect(k, px, py, pw, ph, 22); k.strokeStyle = CARD_COL.panelLine; k.lineWidth = 2; k.stroke();
+  // the course and the 完成度
+  var chipW = 120, chipH = 50;
+  k.textAlign = 'left'; k.fillStyle = CARD_COL.ink;
+  fitFont(k, d.course, iw - chipW - 16, 34, 20, '700', CARD_SANS);
+  k.fillText(d.course, ix, py + 58);
+  cardRoundRect(k, ix + iw - chipW, py + 22, chipW, chipH, 25); k.fillStyle = CARD_COL.green; k.fill();
+  k.fillStyle = CARD_COL.onGreen; k.textAlign = 'center';
+  fitFont(k, d.grade, chipW - 20, 30, 18, '700', CARD_SANS);
+  k.fillText(d.grade, ix + iw - chipW/2, py + 58);
+  // イタズラ・修行の心得
+  var tags = [].concat(d.trick ? ['イタズラ'] : [], zanModLabels(d.mods)), tx = ix;
+  k.font = cardFont('700', 18, CARD_SANS); k.textAlign = 'left';
+  for(var ti=0; ti<tags.length; ti++){
+    var tw = k.measureText(tags[ti]).width + 22;
+    if(tx + tw > ix + iw) break;
+    cardRoundRect(k, tx, py + 78, tw, 30, 15); k.fillStyle = '#244a5c'; k.fill();
+    k.fillStyle = '#fff'; k.fillText(tags[ti], tx + 11, py + 99);
+    tx += tw + 8;
+  }
+  if(tags.length && d.mods && zanModsActive(d.mods) && tx + 70 < ix + iw){ k.fillStyle = CARD_COL.label; k.fillText('×' + zanModMult(d.mods).toFixed(2).replace(/0$/, ''), tx + 2, py + 99); }
+  // the score
+  var sy = py + 196;
+  k.fillStyle = CARD_COL.label; k.font = cardFont('700', 22, CARD_SANS); k.textAlign = 'left';
+  k.fillText('得点', ix, py + 140);
+  if(d.newBest){
+    k.fillStyle = '#b8321f'; k.font = cardFont('700', 22, CARD_SANS); k.textAlign = 'right';
+    k.fillText('自己ベスト更新！', ix + iw, py + 140);
+  }
+  k.textAlign = 'left'; k.fillStyle = CARD_COL.ink;
+  var ss = fitFont(k, d.score, iw - 60, 84, 40, '900', CARD_SANS);
+  k.fillText(d.score, ix, sy + 20);
+  var scw = k.measureText(d.score).width;
+  k.fillStyle = CARD_COL.label; k.font = cardFont('700', Math.round(ss*0.4), CARD_SANS);
+  k.fillText('点', ix + scw + 10, sy + 20);
+  // the cuts
+  var cy = py + 240, cw4 = (iw - 3*10)/4, ch = 96;
+  zanCardCell(k, ix, cy, cw4, ch, '極・一閃', String(d.crit || 0), 'crit');
+  zanCardCell(k, ix + (cw4 + 10), cy, cw4, ch, 'Perfect', String(d.perfectN || 0));
+  zanCardCell(k, ix + (cw4 + 10)*2, cy, cw4, ch, 'OK', String(d.ok || 0));
+  zanCardCell(k, ix + (cw4 + 10)*3, cy, cw4, ch, 'Miss', String(d.miss || 0), 'miss');
+  var cy2 = cy + ch + 12, cw3 = (iw - 2*10)/3;
+  zanCardCell(k, ix, cy2, cw3, ch - 6, '最大コンボ', d.combo);
+  zanCardCell(k, ix + (cw3 + 10), cy2, cw3, ch - 6, '完成度', (d.acc || 0) + '%');
+  zanCardCell(k, ix + (cw3 + 10)*2, cy2, cw3, ch - 6, '平均のずれ', d.err);
+  // who and when
+  var fy2 = py + ph - 26;
+  k.strokeStyle = CARD_COL.panelLine; k.lineWidth = 1.5; k.beginPath(); k.moveTo(ix, fy2 - 42); k.lineTo(ix + iw, fy2 - 42); k.stroke();
+  var who = d.who ? (d.who.title ? '〔' + d.who.title + '〕' : '') + d.who.name : '';
+  var dateText = formatCardDate(d.date);
+  k.textAlign = 'right'; k.fillStyle = CARD_COL.label; k.font = cardFont('700', 20, CARD_SANS);
+  if(dateText) k.fillText(dateText, ix + iw, fy2);
+  var dw2 = dateText ? k.measureText(dateText).width + 20 : 0;
+  k.textAlign = 'left'; k.fillStyle = CARD_COL.ink;
+  if(who){ fitFont(k, who, iw - dw2, 24, 14, '700', CARD_SANS); k.fillText(who, ix, fy2); }
+}
+
 function dataURLToBlob(url){
   var comma = url.indexOf(',');
   var bin = atob(url.slice(comma + 1));
@@ -4687,10 +4864,10 @@ function dataURLToBlob(url){
 function makeResultCard(){
   var d = readResultForCard();
   var canvas = document.createElement('canvas');
-  drawResultCard(canvas, d);
+  if(d.zan) drawZanCard(canvas, d); else drawResultCard(canvas, d);
   var dataUrl = canvas.toDataURL('image/png');
   if(typeof dataUrl !== 'string' || dataUrl.indexOf('data:image/png') !== 0) throw new Error('png encoding failed');
-  return {dataUrl:dataUrl, blob:dataURLToBlob(dataUrl), filename:cardFilename(d)};
+  return {dataUrl:dataUrl, blob:dataURLToBlob(dataUrl), filename:cardFilename(d), d:d, w:canvas.width, h:canvas.height};
 }
 
 // --- saving ---
@@ -4702,6 +4879,8 @@ function setCardBusy(b){
   cardBusy = b;
   btnSaveImage.disabled = b;
   btnDownloadImage.disabled = b;
+  btnCopyImage.disabled = b;
+  btnShareImage.disabled = b;
 }
 function getDownloads(){
   if(!downloadsPromise){
@@ -4761,52 +4940,106 @@ function deliverFile(blob, filename){
     setShareMsg('保存できませんでした。' + MSG_SAVE_BY_HAND, true);
   });
 }
+// Makes the card from the final numbers and shows it below the buttons (each button makes it again: it is quick).
+function cardForShare(){
+  finishResultCount();
+  if(zanShow.d && !zanShow.done) zanShowFinish();   // (the plate as it ends up)
+  btnDownloadImage.hidden = true;
+  var made = makeResultCard();
+  cardLast = {blob:made.blob, filename:made.filename};
+  sharePreviewImg.width = made.w;
+  sharePreviewImg.height = made.h;
+  sharePreviewImg.src = made.dataUrl;
+  sharePreview.classList.toggle('is-wide', made.w>made.h);
+  sharePreview.hidden = false;
+  return made;
+}
+var MSG_CARD_FAILED = '画像を作れませんでした。お使いのブラウザでは画像の作成に対応していない可能性があります。ゲームはこのまま続けられます。';
+function cardCanShareFiles(){
+  try{ return !!(navigator.share && navigator.canShare && typeof File==='function' && navigator.canShare({files:[new File([new Blob(['x'], {type:'image/png'})], 'card.png', {type:'image/png'})]})); }
+  catch(e){ return false; }
+}
+// copies the PNG to the clipboard (a promise), or null where the browser cannot
+function cardClipboardWrite(blob){
+  try{
+    if(navigator.clipboard && typeof navigator.clipboard.write==='function' && typeof ClipboardItem==='function'){
+      var w = navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+      if(w && typeof w.then==='function') return w;
+    }
+  }catch(e){}
+  return null;
+}
+// the words that go with the card on X and in the share sheet
+function cardShareText(d){
+  if(!d || !d.zan) return SHARE_TEXT;
+  var extra = [].concat(d.trick ? ['イタズラ'] : [], zanModLabels(d.mods));
+  return '無限そば道・斬『' + d.course + '』で ' + d.score + '点（完成度 ' + d.grade + '・極・一閃 ' + (d.crit || 0) + '）' + (extra.length ? '［' + extra.join('・') + '］' : '') + '！';
+}
 function onSaveImageClick(){
   if(cardBusy) return;
-  btnDownloadImage.hidden = true;
   var made;
-  try{
-    made = makeResultCard();
-  }catch(err){
-    setShareMsg('画像を作れませんでした。お使いのブラウザでは画像の作成に対応していない可能性があります。ゲームはこのまま続けられます。', true);
-    return;
-  }
-  cardLast = {blob:made.blob, filename:made.filename};
-  sharePreviewImg.src = made.dataUrl;
-  sharePreview.hidden = false;
-
-  // 1) share sheet where the browser can share image files
-  var file = null, canShareFile = false;
-  try{
-    file = new File([made.blob], made.filename, {type:'image/png'});
-    canShareFile = !!(navigator.share && navigator.canShare && navigator.canShare({files:[file]}));
-  }catch(e){ canShareFile = false; }
-  if(canShareFile){
-    setCardBusy(true);
-    var sharing;
-    try{ sharing = navigator.share({files:[file]}); }catch(e){ sharing = Promise.reject(e); }
-    Promise.resolve(sharing).then(function(){
-      setCardBusy(false);
-      setShareMsg('画像を共有しました。', false);
-    }, function(err){
-      setCardBusy(false);
-      if(err && err.name === 'AbortError'){
-        setShareMsg('共有をキャンセルしました。', false);
-        btnDownloadImage.hidden = false;
-        return;
-      }
-      deliverFile(made.blob, made.filename);   // 2) sharing refused here: download instead
-    });
-    return;
-  }
-  // 2) no file sharing: download
+  try{ made = cardForShare(); }catch(err){ setShareMsg(MSG_CARD_FAILED, true); return; }
   deliverFile(made.blob, made.filename);
+}
+function onCopyImageClick(){
+  if(cardBusy) return;
+  var made;
+  try{ made = cardForShare(); }catch(err){ setShareMsg(MSG_CARD_FAILED, true); return; }
+  var w = cardClipboardWrite(made.blob);
+  if(!w){ setShareMsg('この画面では画像をコピーできません。「カードを画像で保存」をお使いください。', true); return; }
+  setCardBusy(true);
+  w.then(function(){ setCardBusy(false); setShareMsg('カードの画像をコピーしました。貼り付けて使えます。', false); },
+         function(){ setCardBusy(false); setShareMsg('画像をコピーできませんでした。' + MSG_SAVE_BY_HAND, true); });
+}
+function onShareImageClick(){
+  if(cardBusy) return;
+  var made;
+  try{ made = cardForShare(); }catch(err){ setShareMsg(MSG_CARD_FAILED, true); return; }
+  var sharing;
+  try{
+    var file = new File([made.blob], made.filename, {type:'image/png'});
+    sharing = navigator.share({files:[file], title:'無限そば道・斬', text:cardShareText(made.d) + ' ' + SHARE_URL});
+  }catch(e){ sharing = Promise.reject(e); }
+  setCardBusy(true);
+  Promise.resolve(sharing).then(function(){
+    setCardBusy(false);
+    setShareMsg('カードを共有しました。', false);
+  }, function(err){
+    setCardBusy(false);
+    if(err && err.name === 'AbortError'){ setShareMsg('共有をキャンセルしました。', false); return; }
+    setShareMsg('共有できませんでした。「カードを画像で保存」をお使いください。', true);
+    btnDownloadImage.hidden = false;
+  });
+}
+// X: its post screen cannot take a picture from a link, so the card goes to the clipboard first (paste it there)
+function onShareXClick(){
+  if(cardBusy) return;
+  var made = null;
+  try{ made = cardForShare(); }catch(err){ made = null; }
+  var w = made ? cardClipboardWrite(made.blob) : null;
+  var url = 'https://x.com/intent/post?text=' + encodeURIComponent(cardShareText(made ? made.d : null)) + '&url=' + encodeURIComponent(SHARE_URL) + '&hashtags=' + encodeURIComponent('無限そば道');
+  var win = null;
+  try{ win = window.open(url, '_blank'); }catch(e){ win = null; }
+  if(win){ try{ win.opener = null; }catch(e){} }
+  var noPic = 'Xの投稿画面を開きました。画像は「カードを画像で保存」で保存してから添えてください。';
+  if(!win){ setShareMsg('Xを開けませんでした。ポップアップを許可するか、「カードを画像で保存」をお使いください。', true); return; }
+  if(!w){ setShareMsg(made ? noPic : MSG_CARD_FAILED, !made); return; }
+  w.then(function(){ setShareMsg('カードの画像をコピーしました。Xの投稿画面に貼り付けて（長押し→ペースト／Ctrl+V）添えてください。', false); },
+         function(){ setShareMsg(noPic, false); });
 }
 
 btnSaveImage.addEventListener('click', function(){
-  finishResultCount();                         // the picture is made from the final numbers
   try{ onSaveImageClick(); }
   catch(e){ setCardBusy(false); setShareMsg('画像を保存できませんでした。ゲームはこのまま続けられます。', true); }
+});
+btnCopyImage.addEventListener('click', function(){
+  try{ onCopyImageClick(); }catch(e){ setCardBusy(false); setShareMsg('画像をコピーできませんでした。' + MSG_SAVE_BY_HAND, true); }
+});
+btnShareImage.addEventListener('click', function(){
+  try{ onShareImageClick(); }catch(e){ setCardBusy(false); setShareMsg('共有できませんでした。「カードを画像で保存」をお使いください。', true); }
+});
+btnShareX.addEventListener('click', function(){
+  try{ onShareXClick(); }catch(e){ setShareMsg('Xを開けませんでした。「カードを画像で保存」をお使いください。', true); }
 });
 btnDownloadImage.addEventListener('click', function(){
   if(cardBusy || !cardLast) return;
@@ -14556,7 +14789,8 @@ function finishZan(){
   set('zan-r-acc', acc + '%'); set('zan-r-err', '±' + avgErr + 'ms');
   zanRenderReview(zanReview(zan.song, zan.judges), {perfect:zan.perfect, ok:zan.ok, miss:zan.miss, total:total, grade:grade}, store.zan.sectionMiss[cid] || {});
   zanLastResult = {score:zan.score, course:zan.course.name + '・' + zan.course.level, grade:grade, perfect:zan.perfect + '/' + total,
-                   combo:zan.maxCombo, err:'±' + avgErr + 'ms'};
+                   combo:zan.maxCombo, err:'±' + avgErr + 'ms', crit:zan.crit, perfectN:zan.perfect, ok:zan.ok, miss:zan.miss, acc:acc,
+                   trick:!!zan.trick, mods:zan.mods, newBest:isNewBest};
   var dailyJustCleared = zanCheckDailyClear({score:zan.score, perfect:zan.perfect, combo:zan.maxCombo, grade:grade});
   resultDailyClear.classList.toggle('show', dailyJustCleared);
   if(dailyJustCleared) coinParts0.challenge = COIN_CHALLENGE_BONUS;
@@ -14729,8 +14963,8 @@ function zanPlateBowl(t, d, cw, ch){
   return drew;
 }
 function zanEase(k){ k = Math.max(0, Math.min(1, k)); return 1 - (1 - k)*(1 - k); }
-function zanShowPaint(t){
-  var cv = zanShowCanvas, cw = cv.clientWidth || 320, ch = cv.clientHeight || 178, dpr = Math.min(2, window.devicePixelRatio || 1);
+function zanShowPaint(t, out){                      // (out {canvas, cw, ch, dpr}: the 一刀両断カード's plate — no guest, no seal)
+  var cv = out ? out.canvas : zanShowCanvas, cw = out ? out.cw : cv.clientWidth || 320, ch = out ? out.ch : cv.clientHeight || 178, dpr = out ? out.dpr : Math.min(2, window.devicePixelRatio || 1), card = !!out;
   if(cv.width!==Math.round(cw*dpr) || cv.height!==Math.round(ch*dpr)){ cv.width = Math.round(cw*dpr); cv.height = Math.round(ch*dpr); }
   var c = cv.getContext('2d');
   if(!c) return;
@@ -14742,7 +14976,7 @@ function zanShowPaint(t){
     var zx = cw*0.42, zy = ch*0.7, rx = Math.min(cw*0.26, 96), ry = ch*0.13;
     // 後光 behind the guest (特上・極上)
     var gx = cw*0.84, gr = Math.max(17, Math.min(24, cw*0.07)), gk = zanEase((t - 1200)/260), gy = ch - gr*1.45 + (1 - gk)*gr*3.4;
-    if(d.burst && t>1800){
+    if(d.burst && t>1800 && !card){
       c.save(); c.translate(gx, gy); c.rotate(t*0.0004);
       c.fillStyle = 'rgba(243,210,122,' + (0.35*zanEase((t - 1800)/300)).toFixed(3) + ')';
       for(var ry2=0; ry2<12; ry2++){ c.rotate(Math.PI/6); c.beginPath(); c.moveTo(0, 0); c.lineTo(-gr*0.4, -gr*3); c.lineTo(gr*0.4, -gr*3); c.closePath(); c.fill(); }
@@ -14781,7 +15015,7 @@ function zanShowPaint(t){
     if(p3>0){ c.fillStyle = '#c98a5e'; for(var kf=0; kf<6; kf++){ c.save(); c.translate(zx + rx*0.02 + (kf - 2.5)*7*p3, ny - 18 - (kf % 2)*4*p3); c.rotate(kf*0.9); c.fillRect(-4*p3, -2*p3, 8*p3, 4*p3); c.restore(); } }
     }
     // the guest tastes it
-    if(t>1200){
+    if(t>1200 && !card){
       var look = CUSTOMER_LOOKS[d.guest] || CUSTOMER_LOOKS.lover, tasting = t>1450 && t<1800;
       drawCustomerBody(look, gx, gy + gr*0.9, gr);
       c.save(); c.translate(gx, gy);
@@ -14800,14 +15034,14 @@ function zanShowPaint(t){
       }
     }
     // 桜吹雪 (特上・極上)
-    if(d.burst && t>1800 && !fxConf().still){
+    if(d.burst && t>1800 && !fxConf().still && !card){
       if(!zanShow.petals){ zanShow.petals = []; for(var pi=0; pi<(d.grade==='極上' ? 26 : 14); pi++) zanShow.petals.push({x:Math.random()*cw, y:-10 - Math.random()*ch, v:20 + Math.random()*30, s:2 + Math.random()*2.5, w:Math.random()*6}); }
       var pt = Math.min(t, 5200) - 1800;
       c.fillStyle = 'rgba(240,160,185,0.85)';
       for(var pj=0; pj<zanShow.petals.length; pj++){ var pp = zanShow.petals[pj], py = pp.y + pt*pp.v/1000*2.2; if(py>ch + 8) continue; c.save(); c.translate(pp.x + Math.sin(pt/400 + pp.w)*8, py); c.rotate(pt/500 + pp.w); c.beginPath(); c.ellipse(0, 0, pp.s*1.4, pp.s*0.8, 0, 0, Math.PI*2); c.fill(); c.restore(); }
     }
     // the seal comes down
-    if(t>2200){
+    if(t>2200 && !card){
       var sk = Math.min(1, (t - 2200)/140), scl = 2.1 - 1.1*zanEase(sk), shake = t<2400 && t>2340 ? Math.sin(t*0.9)*1.2 : 0;
       var lines = d.conf.seal, sz = lines.length>1 ? 58 : 50;
       c.save(); c.translate(cw*0.13 + shake, ch*0.32); c.rotate(-0.14); c.scale(scl, scl);
