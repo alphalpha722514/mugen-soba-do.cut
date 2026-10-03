@@ -36,6 +36,7 @@
   - ほかのアプリに切り替えると一時停止し（`zanPause`）、タップで続きから再開する。
   - 判定は音の時計（`zanNow`・入力の timeStamp）。判定の幅はコースごと（`ZAN_COURSES` の `perfectMs`・`okMs`・`guardMs`。二八 35/80/120・十割 30/70/105・粗挽き 25/60/90・越前打挽き 22/55/85。ないコースは `ZAN_PERFECT` などの既定値で、既定より広くしない）。曲の開始時に `zanWindows` で `zan.win` に入れ、判定・掃き出し・フェイント・盤の判定帯はすべてこれを使う。ずれ±15ms以内は真・PERFECT（`ZAN_SHIN`）で、その切りの基本点×1.5（`ZAN_SHIN_MULT`。Perfect に数え、回数は `zan.shin`）。コンボ倍率の式は変えない。得点と記録は `store.zan` に入れる。
   - 称号と限定アイテムの条件は、斬の記録（`zan.totalScore`・`maxCombo`・`bestPerfectRate`・`perfectClears`・`best`・`plays`）と図鑑・クイズで判定する（`titleMetrics`）。獲得済みの称号は条件に届かなくなっても消さない。
+  - 週の段位認定（`store.weekly` = `{weekKey: その週の月曜（端末の日付）, cleared, total: 合格した週の数}`・schema 14）：`zanWeeklyGoal(weekKey)` が週の月曜の日付から（`seedFromDate` を `zanMix` で混ぜて）コースと目標（grade・rate＝Perfect率・combo＝判定数の割合・score＝`ZAN_WEEKLY_SCORE`）を1つ決める。`finishZan` の中で称号の判定より前に `zanWeeklyCheck` で合格を数える（週に1回まで。区間練習は数えない）。合格した週の数で称号 `w_shodan`(1)・`w_sandan`(3)・`w_godan`(5)・`w_shihan`(10)（`TITLE_CATS` の weekly、`titleMetrics.weeklyClears`）。同期は週が同じなら合格はどちらか、違えば新しい週、`total` は大きいほう。ホームの「週の段位認定」カード（`renderWeekly`）。
   - 本日のチャレンジは斬で挑む（`conditionId` が `zan:<kind>:<value>`。kind は score・perfect・combo・grade、コースは自由、達成で500コイン）。以前の形（`<お客さん>:<点数>`）のチャレンジは、未クリアなら schema 13 への移行で作り直す。
   - ルール説明（`OB_SLIDES`）は斬の内容で、`ONBOARDING_VERSION` は 2（1 を見た人にも一度だけ出す）。リザルトの共有画像は斬でも作れる（コース・完成度・Perfect・最大コンボ・平均のずれ）。
   - そばの花・新そばの期間中は、斬の画面も季節の見た目にする（`zanSeason`。重なる期間は新そば）。判定の幅と得点の計算は変えない。

@@ -227,7 +227,7 @@ body{
 .challenge-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .challenge-label{margin:0;font-family:var(--font-display);font-weight:400;font-size:.88rem;letter-spacing:.1em;}
 .challenge-desc{margin:3px 0 0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;}
-#daily-desc{font-weight:900;font-size:1.02rem;line-height:1.35;}
+#daily-desc,#weekly-desc{font-weight:900;font-size:1.02rem;line-height:1.35;}
 .challenge-free{font-size:.68rem;font-weight:700;opacity:.75;}
 .chip{display:inline-flex;align-items:center;font-size:.68rem;font-weight:700;line-height:1.4;padding:2px 9px;border-radius:999px;white-space:nowrap;}
 .chip-todo{border:1px solid var(--plaque-ink);color:var(--plaque-ink);background:var(--plaque-chip);}
@@ -1423,6 +1423,14 @@ body{
       <p class="challenge-desc"><span id="daily-desc"></span><span id="challenge-free" class="challenge-free">どのコースでも</span></p>
     </section>
 
+    <section class="challenge weekly" aria-labelledby="weekly-label">
+      <div class="challenge-top">
+        <h2 id="weekly-label" class="challenge-label">週の段位認定</h2>
+        <span id="weekly-status" class="chip chip-todo">未認定</span>
+      </div>
+      <p class="challenge-desc"><span id="weekly-desc"></span><span id="weekly-note" class="challenge-free"></span></p>
+    </section>
+
     <section class="collect-row card" aria-labelledby="collect-label">
       <div class="collect-main">
         <h2 id="collect-label" class="collect-label">そば猪口コイン</h2>
@@ -1576,6 +1584,7 @@ body{
         <li><b>日替わり</b>この端末の日付が変わるたびに、リズム修行・斬の目標が1つ決まります（得点・Perfectの回数・コンボ・完成度のどれか）。</li>
         <li><b>クリア</b>斬で目標に届くとクリア。コースは自由です。クリアするとそば猪口コイン500枚がもらえます（1日1回）。</li>
         <li><b>記録</b>その日の最初のクリアが記録され、ホームのカードが「クリア済み」になります。同じ日は何度でも挑戦できます。</li>
+        <li><b>週の段位認定</b>毎週月曜（この端末の日付）に、コースと目標（完成度・Perfect率・コンボ・得点のどれか）が1つ決まります。そのコースで目標に届くと、その週は「合格」。合格した週の数で、ここでしか手に入らない称号「認定初段」（1週）・「認定三段」（3週）・「認定五段」（5週）・「認定師範」（10週）がもらえます。区間練習は数えません。</li>
       </ul>
     </section>
 
@@ -1593,7 +1602,7 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数・全Perfectのメダル・自己ベストのときの切り（ゴースト）・区間ごとのMissの累計、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラとゴーストのアリ・ナシ、番付に参加するかどうか、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
+        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数・全Perfectのメダル・自己ベストのときの切り（ゴースト）・区間ごとのMissの累計、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、週の段位認定（今週の合格と、合格した週の数）、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラとゴーストのアリ・ナシ、番付に参加するかどうか、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。自己ベスト・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で斬の自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
@@ -1908,6 +1917,7 @@ body{
     <p id="result-rankup" class="new-best-badge"></p>
     <p id="result-newbest" class="new-best-badge">🎉 自己ベスト更新!</p>
     <p id="result-dailyclear" class="new-best-badge">📅 本日のチャレンジ達成!</p>
+    <p id="result-weeklyclear" class="new-best-badge">🎖 週の段位認定に合格!</p>
     <p id="result-satisfaction-best" class="new-best-badge">😊 満足度ベスト更新!</p>
     <div class="result-stats">
       <p>得点 <span id="result-score">0</span></p>
@@ -2658,7 +2668,8 @@ var TITLE_CATS = [
   {id:'best',    label:'一撃の腕前', note:'斬1曲の最高得点で昇格します。'},
   {id:'skill',   label:'技の冴え',   note:'コンボとPerfectの正確さで獲得します。'},
   {id:'collect', label:'収集',       note:'図鑑に集めたアイテムで獲得します。'},
-  {id:'quiz',    label:'クイズ',     note:'1日3問の「越前そば＆福井クイズ」で獲得します。'}
+  {id:'quiz',    label:'クイズ',     note:'1日3問の「越前そば＆福井クイズ」で獲得します。'},
+  {id:'weekly',  label:'週の段位認定', note:'週替わりの段位認定に合格した週の数で獲得します（ここでしか手に入らない称号）。'}
 ];
 var TITLES_DATA = [
   {id:'t_nyumon',     cat:'total',   name:'そば入門',           need:{key:'totalScore', min:0}},
@@ -2684,7 +2695,11 @@ var TITLES_DATA = [
   {id:'c_freak',      cat:'collect', name:'図鑑フリーク',       need:{key:'collectPct', min:80}},
   {id:'c_complete',   cat:'collect', name:'越前図鑑コンプリート', need:{key:'collectPct', min:100}, top:true},
   {id:'q_echizentsu', cat:'quiz',    name:'越前通',             need:{key:'quizPerfect', min:1}},
-  {id:'q_hakase',     cat:'quiz',    name:'そば博士',           need:{key:'quizTotal', min:30}, top:true}
+  {id:'q_hakase',     cat:'quiz',    name:'そば博士',           need:{key:'quizTotal', min:30}, top:true},
+  {id:'w_shodan',     cat:'weekly',  name:'認定初段',           need:{key:'weeklyClears', min:1}},
+  {id:'w_sandan',     cat:'weekly',  name:'認定三段',           need:{key:'weeklyClears', min:3}},
+  {id:'w_godan',      cat:'weekly',  name:'認定五段',           need:{key:'weeklyClears', min:5}},
+  {id:'w_shihan',     cat:'weekly',  name:'認定師範',           need:{key:'weeklyClears', min:10}, top:true}
 ];
 var TITLE_BY_ID = {};
 (function(){ for(var i=0;i<TITLES_DATA.length;i++) TITLE_BY_ID[TITLES_DATA[i].id] = TITLES_DATA[i]; })();
@@ -2710,6 +2725,7 @@ function titleNeedText(t){
     case 'quizPerfect':   return n.min>1 ? ('クイズで3問全問正解を' + v + '日') : 'クイズで3問全問正解する';
     case 'quizTotal':     return 'クイズで通算' + v + '問正解';
     case 'plays':         return '斬を' + v + '曲遊ぶ';
+    case 'weeklyClears':  return '週の段位認定に' + v + '回合格';
   }
   return '';
 }
@@ -2722,7 +2738,8 @@ function titleMetrics(store){
     totalScore:z.totalScore || 0, highScore:z.best || 0, maxCombo:z.maxCombo || 0, bestJustRate:z.bestPerfectRate || 0,
     perfectClears:z.perfectClears || 0, plays:z.plays || 0,
     owned:owned, collectPct:total ? Math.floor(owned*100/total) : 0,
-    quizTotal:q.totalCorrect || 0, quizPerfect:q.perfectDays || 0
+    quizTotal:q.totalCorrect || 0, quizPerfect:q.perfectDays || 0,
+    weeklyClears:(store.weekly && store.weekly.total) || 0
   };
 }
 // Adds every title whose record has been reached; returns the ids that were new. Titles are never taken away.
@@ -3390,6 +3407,11 @@ function sanitizeSectionMiss(raw){
   }
   return out;
 }
+// weekly (schema 14): 週の段位認定 — the week (its Monday, this device's date), whether it was passed, and how many weeks
+function sanitizeWeekly(raw){
+  var w = isPlainObj(raw) ? raw : {};
+  return {weekKey:isDateStr(w.weekKey) ? w.weekKey : '', cleared:w.cleared===true && isDateStr(w.weekKey), total:clampInt(w.total, 0, STAT_MAX)};
+}
 function sanitizeRewards(raw){
   var r = isPlainObj(raw) ? raw : {};
   return {unlockedItems:sanitizeIdList(r.unlockedItems, 200), unlockedTitles:sanitizeIdList(r.unlockedTitles, 200)};
@@ -3468,7 +3490,7 @@ function defaultStore(){
   g.titles = ['t_nyumon'];                        // everyone starts as そば入門, wearing it
   g.equippedTitle = g.equipped.title = 't_nyumon';
   return { schema:SCHEMA_VERSION, updatedAt:Date.now(), bests:{}, daily:null, stats:sanitizeStats(null), lastStyle:DEFAULT_STYLE, satisfaction:{}, seasonal:{}, lastPlayedSeasonal:null, gacha:g, settings:defaultSettings(), profile:sanitizeProfile(null), recordsClearedAt:0,
-           quiz:sanitizeQuiz(null), badges:sanitizeBadges(null), rewards:sanitizeRewards(null), zan:sanitizeZan(null) };
+           quiz:sanitizeQuiz(null), badges:sanitizeBadges(null), rewards:sanitizeRewards(null), zan:sanitizeZan(null), weekly:sanitizeWeekly(null) };
 }
 
 function sanitizeFlatBests(raw){
@@ -3575,6 +3597,7 @@ function coerceStore(obj){
   out.badges = sanitizeBadges(obj.badges);
   out.rewards = sanitizeRewards(obj.rewards);
   out.zan = sanitizeZan(obj.zan);
+  out.weekly = sanitizeWeekly(obj.weekly);                // 週の段位認定 (schema 14; older saves: none yet)
   out.recordsClearedAt = clampInt(obj.recordsClearedAt, 0, 1e15);   // when 「記録を消す」 was last used while logged in (0: never)
   if(!(typeof obj.schema==='number' && obj.schema>=11)) migrateToTitles(out, obj);   // 段位 → 称号 (schema 10 and before)
   evaluateTitles(out);
@@ -3742,6 +3765,66 @@ function importStoreString(text){
 
 
 // 斬: does this song clear today's challenge? (r: score, perfect, combo, grade)
+// --- 週の段位認定: each week (from Monday, this device's date) one course and one goal, the same for everyone that
+// week. Passing it once in the week counts (store.weekly); the weeks passed earn the 「認定」 titles. 区間練習 never counts.
+var ZAN_WEEKLY_SCORE = {nihachi:[9000, 12000], juwari:[13000, 17000], arabiki:[17000, 23000], uchihiki:[18000, 24000]};
+var ZAN_WEEKLY_RATE = [85, 90, 95], ZAN_WEEKLY_COMBO = [0.5, 0.7, 0.9];
+function zanWeekKey(){
+  var d = new Date();
+  d.setDate(d.getDate() - (d.getDay() + 6) % 7);
+  var m = String(d.getMonth() + 1), day = String(d.getDate());
+  return d.getFullYear() + '-' + (m.length<2 ? '0' + m : m) + '-' + (day.length<2 ? '0' + day : day);
+}
+// spreads a date's seed (whose low bits change little from week to week) over all its bits
+function zanMix(h){
+  h = (h ^ (h >>> 16)) >>> 0; h = Math.imul(h, 0x45d9f3b) >>> 0; h = (h ^ (h >>> 16)) >>> 0; h = Math.imul(h, 0x45d9f3b) >>> 0;
+  return (h ^ (h >>> 16)) >>> 0;
+}
+var zanJudgeCounts = {};
+function zanJudgeCount(song){                       // how many judgements a song has (タメ切り: 2)
+  if(!zanJudgeCounts[song.id]){
+    var n = zanChart(song, zanTempoOf(song), false), c = 0;
+    for(var i=0;i<n.length;i++) if(n[i].type==='tap') c++; else if(n[i].type==='hold') c += 2;
+    zanJudgeCounts[song.id] = c;
+  }
+  return zanJudgeCounts[song.id];
+}
+// this week's test: {course, kind (grade | rate | combo | score), value}
+function zanWeeklyGoal(weekKey){
+  var seed = zanMix(seedFromDate((weekKey || zanWeekKey()) + '|weekly')), cid = ZAN_COURSE_IDS[seed % ZAN_COURSE_IDS.length], c = zanCourse(cid);
+  var kinds = ['grade', 'rate', 'combo', 'score'], kind = kinds[zanMix(seed + 1) % kinds.length], pick = zanMix(seed + 2);
+  var value = kind==='grade' ? ['特上', '極上'][pick % 2] : kind==='rate' ? ZAN_WEEKLY_RATE[pick % 3] : kind==='score' ? ZAN_WEEKLY_SCORE[cid][pick % 2] : ZAN_WEEKLY_COMBO[pick % 3];
+  return {course:cid, name:c ? c.name : '', kind:kind, value:value};
+}
+function zanWeeklyText(g){
+  if(g.kind==='grade') return g.name + 'で完成度「' + g.value + '」以上';
+  if(g.kind==='rate') return g.name + 'でPerfect率' + g.value + '%以上';
+  if(g.kind==='score') return g.name + 'で' + fmtPoints(g.value) + '点以上';
+  var c = zanCourse(g.course);
+  return g.name + 'で' + Math.ceil(zanJudgeCount(zanSongFor(c))*g.value) + 'コンボ以上';
+}
+// called by finishZan on its store, before the titles are judged: true when the test was passed just now
+function zanWeeklyCheck(store, r){
+  var wk = zanWeekKey(), g = zanWeeklyGoal(wk), w = store.weekly;
+  if(w.weekKey!==wk){ w.weekKey = wk; w.cleared = false; }
+  if(w.cleared || r.course!==g.course || !r.total) return false;
+  var ok = g.kind==='grade' ? zanGradeRank(r.grade)>=zanGradeRank(g.value) : g.kind==='rate' ? Math.floor(r.perfect*100/r.total)>=g.value
+         : g.kind==='score' ? r.score>=g.value : r.combo>=Math.ceil(r.total*g.value);
+  if(!ok) return false;
+  w.cleared = true;
+  w.total = Math.min(STAT_MAX, w.total + 1);
+  return true;
+}
+function renderWeekly(){
+  var el = document.getElementById('weekly-desc');
+  if(!el || typeof ZAN_COURSES==='undefined' || !ZAN_COURSES || typeof ZAN_SONGS==='undefined' || !ZAN_SONGS) return;   // (the home is drawn once before this part of the script has run)
+  var store = loadStore(), wk = zanWeekKey(), g = zanWeeklyGoal(wk), done = store.weekly.weekKey===wk && store.weekly.cleared;
+  el.textContent = zanWeeklyText(g);
+  var st = document.getElementById('weekly-status');
+  st.textContent = done ? '合格' : '未認定';
+  st.className = 'chip ' + (done ? 'chip-done' : 'chip-todo');
+  document.getElementById('weekly-note').textContent = '月曜に替わります・合格 ' + store.weekly.total + '週';
+}
 function zanCheckDailyClear(r){
   var store = loadStore();
   if(!store.daily || store.daily.cleared) return false;
@@ -3771,6 +3854,7 @@ function renderRankAndDaily(){
   var cleared = !!store.daily.cleared;
   elDailyStatus.textContent = cleared ? 'クリア済み' : '未クリア';
   elDailyStatus.className = 'chip ' + (cleared ? 'chip-done' : 'chip-todo');
+  renderWeekly();
 }
 
 // ---------- Home screen ----------
@@ -10530,6 +10614,7 @@ function mergeStores(localRaw, cloudRaw){
     var R = L.recordsClearedAt>C.recordsClearedAt ? L : C;
     out.bests = R.bests; out.seasonal = R.seasonal; out.satisfaction = R.satisfaction; out.stats = R.stats;
     out.daily = R.daily; out.lastPlayedSeasonal = R.lastPlayedSeasonal; out.recordsClearedAt = R.recordsClearedAt;
+    out.weekly = R.weekly;
     out.zan = R.zan;
   } else {
     out.bests = mergeMaxNested(L.bests, C.bests);
@@ -10538,6 +10623,9 @@ function mergeStores(localRaw, cloudRaw){
     for(k in out.stats){ if(Object.prototype.hasOwnProperty.call(out.stats, k)) out.stats[k] = Math.max(L.stats[k], C.stats[k]); }
     if(L.daily && C.daily && L.daily.date===C.daily.date) out.daily.cleared = L.daily.cleared || C.daily.cleared;
     else if(C.daily && (!L.daily || C.daily.date>L.daily.date)) out.daily = C.daily;
+    out.weekly = {weekKey:L.weekly.weekKey, cleared:L.weekly.cleared, total:Math.max(L.weekly.total, C.weekly.total)};   // 週の段位認定
+    if(C.weekly.weekKey===L.weekly.weekKey) out.weekly.cleared = L.weekly.cleared || C.weekly.cleared;
+    else if(C.weekly.weekKey>L.weekly.weekKey){ out.weekly.weekKey = C.weekly.weekKey; out.weekly.cleared = C.weekly.cleared; }
     if(!out.lastPlayedSeasonal) out.lastPlayedSeasonal = C.lastPlayedSeasonal;
   }
   var g = out.gacha, lg = L.gacha, cg = C.gacha;
@@ -14320,9 +14408,11 @@ function finishZan(){
     store.zan.bestPerfectRate = Math.max(store.zan.bestPerfectRate, Math.floor(zan.perfect*100/total));
     if(zan.perfect===total){ store.zan.perfectClears = Math.min(STAT_MAX, store.zan.perfectClears + 1); rec.perfect = true; }   // (+ the course's 全Perfectメダル)
   }
+  var weeklyJust = zanWeeklyCheck(store, {course:cid, score:zan.score, perfect:zan.perfect, combo:zan.maxCombo, grade:grade, total:total});   // 週の段位認定
   var newTitles = evaluateTitles(store);
   saveStoreObj(store);
   state.phase = 'result';
+  document.getElementById('result-weeklyclear').classList.toggle('show', weeklyJust);
   screens.result.classList.add('is-zan');
   document.getElementById('zan-stats').hidden = false;
   resultMode.hidden = false;
@@ -14941,6 +15031,7 @@ function renderZanHome(){
   var off = loadZanOffset(), lab = document.getElementById('zan-offset-label');
   if(lab) lab.textContent = 'ずれ補正 ' + (off>0 ? '+' : '') + off + 'ms';
   renderZanPractice();
+  renderWeekly();
 }
 document.querySelector('.zan-courses').addEventListener('click', function(e){
   var b = e.target.closest('.zan-course');
