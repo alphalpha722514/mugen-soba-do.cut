@@ -1366,6 +1366,12 @@ body{
         <p class="zan-trick-note">アリにすると、あなたの番でこま板が盤の一部を隠し、師匠がフェイント（振りかぶって切らない）もかけてきます。つられて切るとコンボが切れます。そのかわり<b>得点×1.2・コイン×1.2</b>。</p>
         <p id="zan-trick-forced" class="zan-trick-note zan-trick-forced" hidden>越前打挽きは、この設定にかかわらず最初の小節から師匠のイタズラ入りです（得点×1.2・コイン×1.2）。</p>
       </div>
+      <div class="zan-trick zan-ghost" role="group" aria-labelledby="zan-ghost-h">
+        <span id="zan-ghost-h" class="zan-trick-h">ゴースト</span>
+        <button class="btn-small trick-opt ghost-opt" type="button" data-ghost="off" aria-pressed="true">ナシ</button>
+        <button class="btn-small trick-opt ghost-opt" type="button" data-ghost="on" aria-pressed="false">アリ</button>
+        <p id="zan-ghost-note" class="zan-trick-note">アリにすると、そのコースで自己ベストを出したときの包丁が、半透明の青い包丁であなたの包丁と一緒に切ります（見た目だけで、得点や判定は変わりません）。</p>
+      </div>
       <button id="btn-zan" class="btn-start zan-start" type="button">斬 修行開始</button>
       <p class="zan-tools"><button id="btn-calib" class="link-btn" type="button">試し切り（ずれ調整）</button><span id="zan-offset-label">ずれ補正 0ms</span></p>
       <details id="zan-practice" class="zan-practice">
@@ -1520,6 +1526,7 @@ body{
         <li><b>試し切り（ずれ調整）</b>音に対してタップがずれると感じたら、ホームの「試し切り」で「トン」の音に合わせて8回たたくと、ずれを測って判定をそろえます。イヤホンを使うときは、つけたまま測ってください。値はこの端末だけに保存します。</li>
         <li><b>一時停止</b>遊んでいる途中でほかのアプリに切り替えると止まり、画面をタップすると続きから再開します。</li>
         <li><b>ひょっこり客</b>あなたの番の1小節が終わるたびに、画面の下からお客さんが顔を出して、その小節の出来（全部Perfect・OKまじり・Missあり）に反応します。全部Perfectの小節が2回続くと蕎麦奉行、4回でお姫様、6回で殿様が来店します。殿様が来店すると「殿様ご来店！ 倍率UP」と出て、そこからあなたの番2小節ぶん（16拍）、コンボ倍率が+0.2されます。蕎麦奉行・お姫様とふつうのお客さんは見た目だけで、得点は変わりません。</li>
+        <li><b>ゴースト</b>ホームで「ゴースト」をアリにすると、そのコースで自己ベストを出したときの包丁が、半透明の青い包丁であなたの包丁と一緒に切ります。自分のベストより早いか遅いかが見えます（見た目だけで、得点や判定は変わりません）。ゴーストは自己ベストを更新したときに残ります。</li>
         <li><b>区間練習</b>ホームの「区間練習」で、選んだコースの1区間（お手本・刻み・タメ切り など）だけを3回くり返して練習できます。速さは0.8倍・0.9倍・1.0倍。得点・ベスト・コイン・称号・チャレンジには入りません（師匠のイタズラはなし）。途中でやめるときは画面下の「練習をやめる」。終わるとホームに、その練習のPerfect・OK・Missが出ます。</li>
         <li><b>ふりかえり</b>リザルトに、極上まであと何回OKをPerfectにすればよいか（Missがあるときは「Miss 0」が条件であること）と、曲の区間ごとのMissの数とずれの帯が出ます。いちばんMissの多かった区間を「苦手」として示し、コースごとに区間のMissの累計を記録します。</li>
         <li><b>リザルト</b>切った蕎麦がざるに盛られ、大根おろし・ネギ・かつお節がのり、完成度に合ったお客さんが味わいます。最後に完成度の判子が押され、師匠がひと言。Perfectが多いほど麺がそろって艶やかに。タップで飛ばせます（演出「控えめ」などの設定では、はじめから仕上がった姿で出ます）。</li>
@@ -1562,7 +1569,7 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数・全Perfectのメダル・区間ごとのMissの累計、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラのアリ・ナシ、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
+        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数・全Perfectのメダル・自己ベストのときの切り（ゴースト）・区間ごとのMissの累計、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラとゴーストのアリ・ナシ、効果音のオン・オフ、BGMのオン・オフと音量、振動のオン・オフ、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
         <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。自己ベスト・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
         <li><b>リセット</b>「記録を消す」で斬の自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
@@ -3193,7 +3200,7 @@ function withEffectsDefaults(st){
   }
   return out;
 }
-function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}}; }
+function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}, ghost:false}; }
 // settings.onboarding (the first-run rules guide) and settings.lastShareDate (the day the 共有ボーナス was last paid).
 // A save without them gets them; a player who has already played is not shown the guide again (it is in 記録と設定).
 function isDateStr(v){ return typeof v==='string' && /^\d{4}-\d{2}-\d{2}$/.test(v); }
@@ -3209,6 +3216,7 @@ function withDailyDefaults(st, played){
   out.sound = snd;
   // settings.haptics.on: 振動 (on unless a save turned it off; anything else there is dropped)
   out.haptics = {on:!(isPlainObj(out.haptics) && out.haptics.on===false)};
+  out.ghost = out.ghost===true;                      // ゴースト (アリ/ナシ, off unless turned on)
   return out;
 }
 // quiz: today's 3 questions (answered = [{id, choice, ok}] in the order asked), all the right answers ever and the
@@ -3261,11 +3269,57 @@ function sanitizeZan(raw){
     var cr = cs[ZAN_COURSE_IDS[i]];
     out.courses[ZAN_COURSE_IDS[i]] = sanitizeZanRec(cr);
     out.courses[ZAN_COURSE_IDS[i]].perfect = isPlainObj(cr) && cr.perfect===true;   // 全Perfectメダル (schema 14; older saves: false)
+    out.courses[ZAN_COURSE_IDS[i]].ghost = sanitizeGhost(isPlainObj(cr) ? cr.ghost : null);   // ゴースト (schema 14; older saves: null)
   }
   out.lastCourse = ZAN_COURSE_IDS.indexOf(z.lastCourse)>=0 ? z.lastCourse : '';
   out.todayDone = typeof z.todayDone==='string' && /^\d{4}-\d{2}-\d{2}$/.test(z.todayDone) ? z.todayDone : '';   // 今日の一曲: the day its bonus was paid
   out.sectionMiss = sanitizeSectionMiss(z.sectionMiss);
   return out;
+}
+// --- ゴースト: the best's cuts, replayed by a see-through knife beside yours. Only a look: judging and scores never read it.
+function zanGhostOf(song, judges){
+  var cuts = [];
+  for(var i=0;i<judges.length && cuts.length<ZAN_GHOST_MAX;i++){
+    var j = judges[i];
+    if(j.rating==='MISS') continue;
+    cuts.push([Math.round(j.b*4), Math.max(-300, Math.min(300, j.err)), j.kind==='head' ? 1 : j.kind==='tail' ? 2 : 0]);
+  }
+  return cuts.length ? {chart:song.id, cuts:cuts} : null;
+}
+function zanGhostLoad(g, song, tm){
+  if(!g || g.chart!==song.id) return null;          // (a best cut on another chart is not replayed)
+  var cuts = [];
+  for(var i=0;i<g.cuts.length;i++) cuts.push({t:zanB2T(g.cuts[i][0]/4, tm) + g.cuts[i][1]/1000, type:g.cuts[i][2]});
+  cuts.sort(function(a, b){ return a.t - b.t; });
+  return {cuts:cuts, idx:0, knife:zanKnife()};
+}
+// the ghost knife's pose at song time songT (its cuts land on their own times, like the master's)
+function zanGhostPose(songT, dtK, h, still){
+  var g = zan.ghost, k = g.knife, c;
+  while(g.idx<g.cuts.length && g.cuts[g.idx].t - ZAN_KNIFE.down/1000 <= songT){
+    c = g.cuts[g.idx++];
+    if(c.type!==1) zanKnifeStrike(k, c.type===2, c.t*1000 - ZAN_KNIFE.down);
+  }
+  var next = 9, charge = false;
+  if(g.idx<g.cuts.length){ c = g.cuts[g.idx]; next = c.t - songT; charge = c.type===2 && g.idx>0 && g.cuts[g.idx - 1].type===1; }
+  var pose = zanKnifePose(k, songT*1000, dtK, h, charge ? 'charge' : next, still);
+  pose.smear = 0; pose.impact = 0;                   // (no stroke trail or slit: only the blade, see-through)
+  return pose;
+}
+// zan.courses.<id>.ghost (schema 14): the cuts of that course's best, {chart: the song it was cut on, cuts: [[beat×4, ずれ ms,
+// 0 tap / 1 タメの頭 / 2 タメの斬], …]} — at most ZAN_GHOST_MAX; anything malformed makes it null (no ghost)
+var ZAN_GHOST_MAX = 400;
+function sanitizeGhost(raw){
+  if(!isPlainObj(raw) || typeof raw.chart!=='string' || !/^[a-z0-9~._-]{1,40}$/.test(raw.chart) || !Array.isArray(raw.cuts)) return null;
+  var cuts = [];
+  for(var i=0;i<raw.cuts.length && cuts.length<ZAN_GHOST_MAX;i++){
+    var c = raw.cuts[i];
+    if(!Array.isArray(c) || c.length<3) continue;
+    var q = Number(c[0]), e = Number(c[1]), k = Number(c[2]);
+    if(!(isFinite(q) && q>=0 && q<=4000 && Math.floor(q)===q) || !(isFinite(e) && Math.abs(e)<=300) || [0,1,2].indexOf(k)<0) continue;
+    cuts.push([q, Math.round(e), k]);
+  }
+  return cuts.length ? {chart:raw.chart, cuts:cuts} : null;
 }
 // zan.sectionMiss (schema 14): {courseId: {sectionKey: Misses so far}} — a course or key that is not a plain name is dropped
 function sanitizeSectionMiss(raw){
@@ -10420,7 +10474,7 @@ function mergeStores(localRaw, cloudRaw){
     zanMax(out.zan, L.zan, C.zan);
     ['totalScore', 'maxCombo', 'bestPerfectRate', 'perfectClears'].forEach(function(k){ out.zan[k] = Math.max(L.zan[k], C.zan[k]); });
     out.zan.courses = {};
-    for(var zc=0;zc<ZAN_COURSE_IDS.length;zc++){ var zid = ZAN_COURSE_IDS[zc]; out.zan.courses[zid] = {}; zanMax(out.zan.courses[zid], L.zan.courses[zid], C.zan.courses[zid]); out.zan.courses[zid].perfect = L.zan.courses[zid].perfect || C.zan.courses[zid].perfect; }
+    for(var zc=0;zc<ZAN_COURSE_IDS.length;zc++){ var zid = ZAN_COURSE_IDS[zc]; out.zan.courses[zid] = {}; zanMax(out.zan.courses[zid], L.zan.courses[zid], C.zan.courses[zid]); out.zan.courses[zid].perfect = L.zan.courses[zid].perfect || C.zan.courses[zid].perfect; out.zan.courses[zid].ghost = C.zan.courses[zid].best > L.zan.courses[zid].best ? C.zan.courses[zid].ghost : L.zan.courses[zid].ghost; }
     out.zan.lastCourse = L.zan.lastCourse || C.zan.lastCourse;
     out.zan.todayDone = C.zan.todayDone>L.zan.todayDone ? C.zan.todayDone : L.zan.todayDone;
     out.zan.sectionMiss = {};                         // 苦手の記録: the larger count of each part (like the other counters)
@@ -13812,7 +13866,9 @@ function startZan(courseId, backing, practice){
   var trickFrom = zanTrickFrom(song, practice ? null : course);
   var buzz = zanBuzzAllowed();
   var notes = zanChart(song, tm, trick, trickFrom);
-  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), shin:0, judges:[], tono:null, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
+  var ghost = null;                                  // ゴースト (looks only): this course's best, on the same chart
+  try{ var gs = loadStore(); if(!practice && gs.settings.ghost===true) ghost = zanGhostLoad(gs.zan.courses[course.id].ghost, song, tm); }catch(e){ ghost = null; }
+  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), shin:0, judges:[], tono:null, ghost:ghost, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
          p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
@@ -13984,7 +14040,7 @@ function finishZan(){
   var grade = zanGrade(acc, zan.miss);
   var isNewBest = false, store = loadStore(), cid = zan.course.id, rec = store.zan.courses[cid];
   rec.plays = Math.min(STAT_MAX, rec.plays + 1);
-  if(zan.score > rec.best){ rec.best = zan.score; rec.bestTrick = zan.trick; isNewBest = true; }
+  if(zan.score > rec.best){ rec.best = zan.score; rec.bestTrick = zan.trick; isNewBest = true; rec.ghost = zanGhostOf(zan.song, zan.judges); }   // (+ its ゴースト)
   if(zanGradeRank(grade) > zanGradeRank(rec.bestGrade)) rec.bestGrade = grade;
   store.zan.plays = Math.min(STAT_MAX, store.zan.plays + 1);          // (and over all the courses)
   store.zan.best = Math.max(store.zan.best, zan.score);
@@ -14281,7 +14337,7 @@ function zanKnifePose(k, nowMs, dt, h, next, still){
   pose.lift = k.lift;
   return pose;
 }
-function zanDrawKnife(jx, y, h, pose, master, nowP){
+function zanDrawKnife(jx, y, h, pose, master, nowP, ghost){
   var edgeY = y - pose.lift, tremble = pose.charge ? Math.sin(nowP*0.07)*0.9 : 0, BW = 38, BH = 44;
   ctx.save();
   if(pose.smear && !fxConf().still){                 // the stroke: the blade's trail as it comes down
@@ -14309,17 +14365,17 @@ function zanDrawKnife(jx, y, h, pose, master, nowP){
     ctx.fillStyle = 'rgba(255,214,120,' + (0.3 + 0.15*Math.sin(nowP*0.02)).toFixed(3) + ')';
     ctx.fillRect(-4, -BH - 4, BW + 8, BH + 10);
   }
-  var tk = master ? null : skinPart('tool'), drawn = false;   // 着せ替え: your equipped knife (the master keeps his own)
+  var tk = master || ghost ? null : skinPart('tool'), drawn = false;   // 着せ替え: your equipped knife (the master keeps his own)
   if(tk) guardedSkinDraw('tool', function(){ drawn = drawToolBase(ctx, tk); });
   if(!drawn){
-    ctx.fillStyle = '#d7dee0';
-    ctx.strokeStyle = '#7d8a8f';
+    ctx.fillStyle = ghost ? '#8cc4d8' : '#d7dee0';   // (ゴースト: a pale blue blade)
+    ctx.strokeStyle = ghost ? '#2f6f86' : '#7d8a8f';
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(0, 2); ctx.lineTo(BW, 2); ctx.lineTo(BW, -BH + 2); ctx.lineTo(0, -BH + 2); ctx.closePath();
     ctx.fill(); ctx.stroke();
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
     ctx.fillRect(1, -1, BW - 2, 1.2);                // the edge
-    ctx.fillStyle = master ? '#2c2016' : '#3f2c1d';
+    ctx.fillStyle = ghost ? '#2f6f86' : master ? '#2c2016' : '#3f2c1d';
     ctx.fillRect(4, -BH + 2, 30, 9);                 // the handle along the top
     if(master){ ctx.fillStyle = '#c9a24a'; ctx.fillRect(16, -BH + 2, 4, 9); }
   }
@@ -14484,6 +14540,7 @@ function drawZan(){
   else {
     if(finale){ ctx.save(); ctx.globalAlpha = 0.55; zanDrawKnife(jx, y, h, mPose, true, nowP); ctx.restore(); }   // 同時切り: the master's knife beside yours
     zanDrawKnife(jx, y, h, pPose, false, nowP);
+    if(zan.ghost && playing){ var gPose = zanGhostPose(songT, dtK, h, still); ctx.save(); ctx.globalAlpha = 0.5; zanDrawKnife(jx, y, h, gPose, false, nowP, true); ctx.restore(); }   // ゴースト (over yours, see-through)
   }
   if(playing) zanDrawTurn(jx, y, h, beat, masterTurn, finale);
   zanDrawPeeks(nowP, still);
@@ -14597,8 +14654,15 @@ function renderZanHome(){
   }
   var trickOn = false;
   try{ trickOn = loadStore().settings.zanTrick===true; }catch(e){}
-  var tOpts = document.querySelectorAll('.trick-opt');
+  var tOpts = document.querySelectorAll('.trick-opt[data-trick]');
   for(var ti=0;ti<tOpts.length;ti++) tOpts[ti].setAttribute('aria-pressed', (tOpts[ti].getAttribute('data-trick')==='on')===trickOn ? 'true' : 'false');
+  var ghostOn = false, selRec = null;
+  try{ var hs = loadStore(); ghostOn = hs.settings.ghost===true; selRec = hs.zan.courses[sel]; }catch(e){}
+  var gOpts = document.querySelectorAll('.ghost-opt');
+  for(var gi=0;gi<gOpts.length;gi++) gOpts[gi].setAttribute('aria-pressed', (gOpts[gi].getAttribute('data-ghost')==='on')===ghostOn ? 'true' : 'false');
+  var gNote = document.getElementById('zan-ghost-note'), selCourse = zanCourse(sel);
+  if(gNote) gNote.textContent = 'アリにすると、そのコースで自己ベストを出したときの包丁が、半透明の青い包丁であなたの包丁と一緒に切ります（見た目だけで、得点や判定は変わりません）。' +
+    (ghostOn && !(selRec && selRec.ghost) ? (selCourse ? selCourse.name : '') + 'には、まだゴーストがありません（次に自己ベストを出すと残ります）。' : '');
   var forcedEl = document.getElementById('zan-trick-forced'), selC = zanCourse(sel);
   if(forcedEl) forcedEl.hidden = !(selC && selC.alwaysTrick);
   var season = zanSeason(), seEl = document.getElementById('zan-season');
@@ -14617,10 +14681,16 @@ document.querySelector('.zan-courses').addEventListener('click', function(e){
   renderZanHome();
 });
 document.getElementById('btn-zan').addEventListener('click', function(){ wakeAudio(); zanLaunch(zanSelectedCourse()); });
-document.querySelector('.zan-trick').addEventListener('click', function(e){   // 師匠のイタズラ: アリ / ナシ (kept in settings.zanTrick)
+document.querySelector('.zan-trick:not(.zan-ghost)').addEventListener('click', function(e){   // 師匠のイタズラ: アリ / ナシ (kept in settings.zanTrick)
   var b = e.target.closest('.trick-opt');
   if(!b) return;
   try{ var store = loadStore(); store.settings.zanTrick = b.getAttribute('data-trick')==='on'; saveStoreObj(store); }catch(err){}
+  renderZanHome();
+});
+document.querySelector('.zan-ghost').addEventListener('click', function(e){   // ゴースト: アリ / ナシ (settings.ghost)
+  var b = e.target.closest('.ghost-opt');
+  if(!b) return;
+  try{ var store = loadStore(); store.settings.ghost = b.getAttribute('data-ghost')==='on'; saveStoreObj(store); }catch(err){}
   renderZanHome();
 });
 

@@ -11,6 +11,7 @@
 - 既存のゲーム性（斬のスコア計算と判定、そば猪口コイン、ガチャの排出率（画面に常に表示・合計100%）、そば札と交換所、季節の見た目）を壊したり省略したりしない。ガチャに天井（pity）と1日のコイン獲得上限は設けない。
 - セーブデータは localStorage の `echizenSoba.v1`（schema 14）。項目を足すときは古いセーブを読んでも壊れないようにし、斬の自己ベスト・コイン・そば札・図鑑・装備を消さない。
   - schema 14 で `zan.sectionMiss`（`{コースid: {区間key: Missの累計}}`、区間keyは英小文字のみ・上限 STAT_MAX）を足した。13 のセーブは `echizenSoba.v1.backup-s13` に控えを取り、空の `{}` で始める。同期では区間ごとに大きいほうを取る。Ver 3.0 で保存構造を足すとき（コースのメダル・ゴースト・週次など）は、この schema 14 の中で既定値を補う形で足す。
+  - `zan.courses.<id>.ghost`（schema 14）：そのコースの自己ベストを出したときの切り `{chart: 曲id, cuts: [[拍×4, ずれms, 0通常/1タメの頭/2タメの斬], …]}`（最大 `ZAN_GHOST_MAX`=400、壊れていれば null）。新しいベストのときだけ書き替え、同期ではベストが大きいほうのゴーストを取る。`settings.ghost`（既定 false）がアリで、曲（`chart`）が同じときだけ、半透明の青い包丁であなたの包丁の上に重ねて再生する（`zanGhostLoad`・`zanGhostPose`）。見た目だけで判定・得点に関わらない。区間練習では出さない。
   - `zan.courses.<id>.perfect`（schema 14・真偽値）：そのコースを全部Perfectで終えたことがある（全Perfectメダル）。`true` 以外は false。同期はどちらかが true なら true。全体の回数 `zan.perfectClears` とは別物。マイページの「研鑽度」（`zanKen`・`zanKenBar`）はコースの回数 `plays` から出す見た目だけ（10／30／50／100回で 見習い→一人前→熟練→達人→名人）。
   - schema 13 で自由修行を廃止した（`retireFreeMode`）。schema 12 以前のセーブは `echizenSoba.v1.backup-s12` に控えを取り、自由修行の記録（`bests`・`seasonal`・`satisfaction`・`stats`・前回のそば粉と季節モード、その日の未クリアの旧形式チャレンジ）を空にする。獲得済みの称号・限定品・コイン・そば札・図鑑・装備は残す。`bests` などの入れ物は古い版との読み書きのために空のまま残す。
   - `settings.zanTrick`（師匠のイタズラのアリ・ナシ）、`zan.courses.<id>.bestTrick`（そのベストがイタズラありか）、`zan.todayDone`（今日の一曲のコインを払った日）。
