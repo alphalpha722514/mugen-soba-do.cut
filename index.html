@@ -836,16 +836,16 @@ body{
 .zan-cbest{font-size:.68rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
 .zan-soon{margin-left:auto;font-size:.62rem;font-weight:700;line-height:1.5;padding:1px 7px;border-radius:999px;background:var(--muted-fill);color:var(--ink-soft);white-space:nowrap;}
 .zan-start{width:100%;}
+.zan-today{margin-left:auto;font-size:.62rem;font-weight:900;line-height:1.5;padding:1px 7px;border-radius:999px;background:#c9a24a;color:#2c1d08;white-space:nowrap;}
+.zan-today[hidden]{display:none;}
+.zan-trick{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;}
+.zan-trick-h{font-size:.82rem;font-weight:900;}
+.trick-opt[aria-pressed="true"]{background:var(--sel);border-color:var(--accent-ink);box-shadow:inset 0 0 0 1px var(--accent-ink);}
+.trick-opt[data-trick="on"][aria-pressed="true"]{background:color-mix(in srgb,var(--accent2-ink) 18%,var(--card));border-color:var(--accent2-ink);box-shadow:inset 0 0 0 1px var(--accent2-ink);}
+.zan-trick-note{flex:1 1 100%;margin:0;font-size:.68rem;line-height:1.55;color:var(--ink-soft);}
+.zan-trick-note b{color:var(--accent2-ink);}
 .zan-season{margin:0;padding:4px 10px;border-radius:var(--radius);background:color-mix(in srgb,#c9a24a 16%,var(--card));font-size:.7rem;line-height:1.55;font-weight:700;}
 .zan-tools{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;font-size:.72rem;color:var(--ink-soft);}
-/* home: 自由修行 (the older score attack), folded under the main mode */
-.free-mode{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--card-shadow);}
-.free-mode > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:10px var(--pad-x);font-size:.84rem;font-weight:900;}
-.free-mode > summary::-webkit-details-marker{display:none;}
-.free-mode > summary::before{content:"";flex:0 0 auto;width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .2s;}
-.free-mode[open] > summary::before{transform:rotate(45deg);}
-.free-sub{font-size:.68rem;font-weight:700;color:var(--ink-soft);}
-.free-body{display:flex;flex-direction:column;gap:var(--gap,10px);padding:0 var(--pad-x) 12px;}
 /* 試し切り */
 .calib-pad{font:inherit;width:100%;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
   border-radius:var(--radius);border:2px solid var(--accent2-ink);background:var(--sel);color:var(--ink);cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
@@ -1287,22 +1287,28 @@ body{
       <p class="zan-sub">師匠が1小節お手本を切って見せたら、次の小節であなたが同じリズムで切る。BGMの拍にぴったり合わせて切るリズムモード（1曲 約80〜90秒）。</p>
       <div class="zan-courses" role="group" aria-label="コースを選ぶ">
         <button class="opt zan-course" type="button" data-course="nihachi" aria-pressed="true">
-          <span class="opt-top"><span class="opt-name">二八</span><span class="tag">初級</span><span class="tag">♩=110</span></span>
+          <span class="opt-top"><span class="opt-name">二八</span><span class="tag">初級</span><span class="tag">♩=110</span><span class="zan-today" data-today="nihachi" hidden>今日の一曲 +100🪙</span></span>
           <span class="opt-desc">8分音符まで。素直なリズムで、まずはここから。</span>
           <span class="zan-cbest" data-zbest="nihachi">ベスト —</span>
         </button>
         <button class="opt zan-course" type="button" data-course="juwari" aria-pressed="false">
-          <span class="opt-top"><span class="opt-name">十割</span><span class="tag">中級</span><span class="tag">♩=130</span></span>
+          <span class="opt-top"><span class="opt-name">十割</span><span class="tag">中級</span><span class="tag">♩=130</span><span class="zan-today" data-today="juwari" hidden>今日の一曲 +100🪙</span></span>
           <span class="opt-desc">裏拍（シンコペーション）が混じる。「ンタッ」のリズムをまねして。</span>
           <span class="zan-cbest" data-zbest="juwari">ベスト —</span>
         </button>
         <button class="opt zan-course" type="button" data-course="arabiki" aria-pressed="false">
-          <span class="opt-top"><span class="opt-name">粗挽き</span><span class="tag">上級</span><span class="tag">♩=155</span></span>
+          <span class="opt-top"><span class="opt-name">粗挽き</span><span class="tag">上級</span><span class="tag">♩=155</span><span class="zan-today" data-today="arabiki" hidden>今日の一曲 +100🪙</span></span>
           <span class="opt-desc">速いテンポと、長短のタメ切り（緩急）。</span>
           <span class="zan-cbest" data-zbest="arabiki">ベスト —</span>
         </button>
       </div>
       <p id="zan-season" class="zan-season" hidden></p>
+      <div class="zan-trick" role="group" aria-labelledby="zan-trick-h">
+        <span id="zan-trick-h" class="zan-trick-h">師匠のイタズラ</span>
+        <button class="btn-small trick-opt" type="button" data-trick="off" aria-pressed="true">ナシ</button>
+        <button class="btn-small trick-opt" type="button" data-trick="on" aria-pressed="false">アリ</button>
+        <p class="zan-trick-note">アリにすると、あなたの番でこま板が盤の一部を隠し、師匠がフェイント（振りかぶって切らない）もかけてきます。つられて切るとコンボが切れます。そのかわり<b>得点×1.2・コイン×1.2</b>。</p>
+      </div>
       <button id="btn-zan" class="btn-start zan-start" type="button">斬 修行開始</button>
       <p class="zan-tools"><button id="btn-calib" class="link-btn" type="button">試し切り（ずれ調整）</button><span id="zan-offset-label">ずれ補正 0ms</span></p>
     </section>
@@ -1312,128 +1318,8 @@ body{
         <h2 id="challenge-label" class="challenge-label">本日のチャレンジ</h2>
         <span id="daily-status" class="chip chip-todo">未クリア</span>
       </div>
-      <p class="challenge-desc"><span id="daily-desc"></span><span id="challenge-free" class="challenge-free">どのコースでも</span><span id="challenge-mode-note" class="challenge-free" hidden>期間限定モードは対象外</span></p>
+      <p class="challenge-desc"><span id="daily-desc"></span><span id="challenge-free" class="challenge-free">どのコースでも</span></p>
     </section>
-
-    <details id="free-mode" class="free-mode">
-      <summary>自由修行<span class="free-sub">そば粉×お客さんのスコアアタック</span></summary>
-      <div class="free-body">
-    <section class="mode-row" aria-labelledby="mode-label">
-      <h2 id="mode-label" class="vh">モード（期間限定モードは端末の日付で開きます）</h2>
-      <div class="mode-seg" role="group" aria-labelledby="mode-label">
-        <button class="mode-opt" type="button" data-mode="normal" aria-pressed="true">
-          <span class="mode-name">通常</span>
-          <span class="mode-sub">いつでも</span>
-        </button>
-        <button class="mode-opt" type="button" data-mode="hana" aria-pressed="false" disabled>
-          <span class="mode-name"><svg class="lock-ic" viewBox="0 0 10 12" aria-hidden="true" focusable="false"><path d="M3 5.2V3.6a2 2 0 0 1 4 0v1.6" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="5" width="8" height="6.4" rx="1.3" fill="currentColor"/></svg><svg class="mode-ic" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><g fill="#fff" stroke="#b79aa3" stroke-width=".7"><circle cx="6" cy="2.9" r="2.1"/><circle cx="9" cy="5.1" r="2.1"/><circle cx="7.9" cy="8.6" r="2.1"/><circle cx="4.1" cy="8.6" r="2.1"/><circle cx="3" cy="5.1" r="2.1"/></g><circle cx="6" cy="6" r="1.5" fill="#d98aa0"/></svg>そばの花</span>
-          <span class="mode-sub">9月1日頃に開放</span>
-        </button>
-        <button class="mode-opt" type="button" data-mode="shinsoba" aria-pressed="false" disabled>
-          <span class="mode-name"><svg class="lock-ic" viewBox="0 0 10 12" aria-hidden="true" focusable="false"><path d="M3 5.2V3.6a2 2 0 0 1 4 0v1.6" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="5" width="8" height="6.4" rx="1.3" fill="currentColor"/></svg><span class="shin-ic" aria-hidden="true">新</span>新そば</span>
-          <span class="mode-sub">10月21日頃に開放</span>
-        </button>
-      </div>
-      <button id="help-season" class="help-btn" type="button" aria-label="期間限定モードを遊び方で見る" title="期間限定モードを見る">?</button>
-    </section>
-    <p id="mode-note" class="mode-note" role="status" aria-live="polite"></p>
-
-    <div class="summary-bar" role="status" aria-live="polite">
-      <span class="summary-label">選択中</span>
-      <span id="summary-mode" class="summary-mode" hidden></span>
-      <span id="summary-flour" class="summary-val is-empty">そば粉 未選択</span>
-      <span class="summary-x" aria-hidden="true">×</span>
-      <span id="summary-cust" class="summary-val is-empty">お客さん 未選択</span>
-    </div>
-
-    <section id="step1" class="step" data-state="open">
-      <div class="step-h-row">
-        <h2 class="step-h">
-          <button id="step1-head" class="step-head" type="button" aria-expanded="true" aria-controls="step1-body">
-            <span class="step-num">STEP 1</span>
-            <span class="step-title">そば粉を選ぶ</span>
-            <span id="step1-choice" class="step-choice"></span>
-          </button>
-        </h2>
-        <button id="help-flour" class="help-btn" type="button" aria-label="そば粉の違いを遊び方で見る" title="そば粉の違いを見る">?</button>
-      </div>
-      <div id="step1-body" class="step-body">
-        <div class="flour-list">
-          <button class="opt flour-opt" type="button" data-style="二八" aria-pressed="false">
-            <span class="opt-top"><span class="opt-name">二八</span><span class="tag">得点×1.0</span><span class="tag">基準</span><span class="last-tag" hidden>前回</span></span>
-            <span class="opt-desc">小麦粉を加えた、扱いやすく安定した標準の配合。</span>
-          </button>
-          <button class="opt flour-opt" type="button" data-style="十割" aria-pressed="false">
-            <span class="opt-top"><span class="opt-name">十割</span><span class="tag tag-strong">得点×1.5</span><span class="tag">判定きびしめ</span><span class="tag">ミス減点</span><span class="last-tag" hidden>前回</span></span>
-            <span class="opt-desc">そば粉だけで打つ、香り豊かだが切れやすい玄人向けの配合。</span>
-          </button>
-          <button class="opt flour-opt" type="button" data-style="挽きぐるみ" aria-pressed="false">
-            <span class="opt-top"><span class="opt-name">挽きぐるみ</span><span class="tag">得点×0.85</span><span class="tag tag-strong">香りボーナス</span><span class="last-tag" hidden>前回</span></span>
-            <span class="opt-desc">甘皮まで丸ごと挽いた、香り高く滋味のある粉。安定志向。</span>
-            <span class="opt-note">挽きぐるみは香りが立ちやすい。成功を続けると香りが貯まり、得点に上乗せされる。</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <section id="step2" class="step" data-state="locked">
-      <div class="step-h-row">
-        <h2 class="step-h">
-          <button id="step2-head" class="step-head" type="button" aria-expanded="false" aria-controls="step2-body" disabled>
-            <span class="step-num">STEP 2</span>
-            <span class="step-title">お客さんを選ぶ</span>
-            <span id="step2-choice" class="step-choice">STEP 1 のあとで</span>
-          </button>
-        </h2>
-        <button id="help-cust" class="help-btn" type="button" aria-label="お客さんの違いを遊び方で見る" title="お客さんの違いを見る">?</button>
-      </div>
-      <div id="step2-body" class="step-body" hidden>
-        <p class="step-hint">満足度（0〜100）は、難しいお客さんほど厳しめ。</p>
-        <div class="cust-grid">
-          <button class="opt cust-card" type="button" data-tier="beginner" aria-pressed="false">
-            <span class="cust-top"><span class="cust-icon" aria-hidden="true">📷</span><span class="cust-name">観光客</span><span class="lvl" data-lvl="1"><span class="vh">要求の厳しさ </span>易</span></span>
-            <span class="cust-quote">おろしそば、初めて食べます!楽しみだなあ</span>
-            <span class="cust-rec"><span class="tier-best" data-best="beginner">ベスト —</span><span class="sat-best" data-sat="beginner">満足 —</span></span>
-          </button>
-          <button class="opt cust-card" type="button" data-tier="lover" aria-pressed="false">
-            <span class="cust-top"><span class="cust-icon" aria-hidden="true">🧑‍🦳</span><span class="cust-name">地元の常連</span><span class="lvl" data-lvl="2"><span class="vh">要求の厳しさ </span>中</span></span>
-            <span class="cust-quote">おろしはたっぷり、ネギは細かく、節はケチらんでくれよ</span>
-            <span class="cust-rec"><span class="tier-best" data-best="lover">ベスト —</span><span class="sat-best" data-sat="lover">満足 —</span></span>
-          </button>
-          <button class="opt cust-card" type="button" data-tier="regular" aria-pressed="false">
-            <span class="cust-top"><span class="cust-icon" aria-hidden="true">🧐</span><span class="cust-name">そば通</span><span class="lvl" data-lvl="3"><span class="vh">要求の厳しさ </span>難</span></span>
-            <span class="cust-quote">茹で加減と、出す間合いで蕎麦の真価がわかる</span>
-            <span class="cust-rec"><span class="tier-best" data-best="regular">ベスト —</span><span class="sat-best" data-sat="regular">満足 —</span></span>
-          </button>
-          <button class="opt cust-card" type="button" data-tier="enthusiast" aria-pressed="false">
-            <span class="cust-top"><span class="cust-icon" aria-hidden="true">🌶️</span><span class="cust-name">辛味大根マニア</span><span class="lvl" data-lvl="4"><span class="vh">要求の厳しさ </span>最難</span></span>
-            <span class="cust-quote">辛味大根のピリッとした加減が命よ。ちょうどいい辛さでなきゃ許さん</span>
-            <span class="cust-tags"><span class="tag tag-spice">辛さゲージ厳守</span></span>
-            <span class="cust-rec"><span class="tier-best" data-best="enthusiast">ベスト —</span><span class="sat-best" data-sat="enthusiast">満足 —</span></span>
-          </button>
-          <button class="opt cust-card is-limited" type="button" data-tier="farmer" aria-pressed="false" hidden>
-            <span class="cust-top"><span class="cust-icon" aria-hidden="true">🧑‍🌾</span><span class="cust-name">そば畑の農家</span><span class="tag tag-limited">期間限定</span><span class="lvl" data-lvl="2"><span class="vh">要求の厳しさ </span>中</span></span>
-            <span class="cust-quote">畑はいま、そばの花ざかり。この花が実れば、秋の新そばだ</span>
-            <span class="cust-rec"><span class="tier-best" data-best="farmer">限定ベスト —</span></span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <div class="start-row">
-      <svg class="bowl-mini" viewBox="0 0 64 36" aria-hidden="true" focusable="false">
-        <path class="b" d="M4 15 Q32 46 60 15 Z"/>
-        <ellipse class="br" cx="32" cy="15" rx="28" ry="6"/>
-        <path class="n" d="M12 15 q6 -5 12 0 M23 14 q8 -6 15 1 M36 15 q6 -5 12 -1"/>
-        <path class="c" d="M40 13 L58 2 M43 15 L61 4"/>
-      </svg>
-      <div class="start-col">
-        <button id="btn-start" class="btn-start" type="button" disabled>修行開始</button>
-        <p id="start-hint" class="start-hint">STEP 1・2 を選ぶと始められます</p>
-      </div>
-    </div>
-      </div>
-    </details>
 
     <section class="collect-row card" aria-labelledby="collect-label">
       <div class="collect-main">
@@ -1485,7 +1371,7 @@ body{
             <button class="btn-small fx-opt" type="button" data-level="low" aria-pressed="false">控えめ</button>
           </div>
           <label class="fx-check"><input id="fx-particles" type="checkbox" checked> 紙吹雪やキラキラを出す</label>
-          <p class="save-note">1杯出したあとの演出の強さです（得点や満足度は変わりません）。演出は画面をタップすると飛ばせます。</p>
+          <p class="save-note">切ったときやリザルトの演出の強さです（得点は変わりません）。「控えめ」ではリザルトの数え上げや盛り付けを省いてすぐ表示します。演出は画面をタップすると飛ばせます。</p>
         </div>
         <div class="vis-row" role="group" aria-labelledby="bgm-title">
           <span id="bgm-title" class="backup-title">BGM（音楽）</span>
@@ -1510,7 +1396,7 @@ body{
         <div class="clear-row">
           <button id="btn-clear" class="btn-small btn-danger" type="button">記録を消す</button>
           <div id="clear-confirm" class="clear-confirm" hidden>
-            <p class="clear-q">自己ベスト・限定ベスト・リズム修行・斬のベスト・累計スコアなどの戦績・満足度・チャレンジの達成をすべて消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備・獲得した称号・名前・クイズの成績は残ります）。ログイン中は、クラウドとほかの端末の戦績も消えます。</p>
+            <p class="clear-q">リズム修行・斬の自己ベスト・累計スコアなどの戦績と、本日のチャレンジの達成を消します。元に戻せません（そば猪口コイン・そば札・図鑑・装備・獲得した称号・名前・クイズの成績は残ります）。ログイン中は、クラウドとほかの端末の戦績も消えます。</p>
             <div class="clear-actions">
               <button id="btn-clear-yes" class="btn-small btn-danger-solid" type="button">消す</button>
               <button id="btn-clear-no" class="btn-small" type="button">やめる</button>
@@ -1537,12 +1423,9 @@ body{
     </div>
     <nav class="guide-toc" aria-label="遊び方の目次">
       <button class="toc-chip" type="button" data-goto="g-zan">リズム修行・斬</button>
-      <button class="toc-chip" type="button" data-goto="g-play">自由修行</button>
-      <button class="toc-chip" type="button" data-goto="g-flour">そば粉</button>
-      <button class="toc-chip" type="button" data-goto="g-cust">お客さん</button>
       <button class="toc-chip" type="button" data-goto="g-rank">称号</button>
       <button class="toc-chip" type="button" data-goto="g-daily">チャレンジ</button>
-      <button class="toc-chip" type="button" data-goto="g-season">期間限定</button>
+      <button class="toc-chip" type="button" data-goto="g-season">季節</button>
       <button class="toc-chip" type="button" data-goto="g-rec">記録</button>
     </nav>
 
@@ -1558,130 +1441,18 @@ body{
         <li><b>一時停止</b>遊んでいる途中でほかのアプリに切り替えると止まり、画面をタップすると続きから再開します。</li>
         <li><b>ひょっこり客</b>あなたの番の1小節が終わるたびに、画面の下からお客さんが顔を出して、その小節の出来（全部Perfect・OKまじり・Missあり）に反応します。全部Perfectの小節が2回続くと蕎麦奉行、4回でお姫様、6回で殿様が来店します（見た目だけで、得点は変わりません）。</li>
         <li><b>リザルト</b>切った蕎麦がざるに盛られ、大根おろし・ネギ・かつお節がのり、完成度に合ったお客さんが味わいます。最後に完成度の判子が押され、師匠がひと言。Perfectが多いほど麺がそろって艶やかに。タップで飛ばせます（演出「控えめ」などの設定では、はじめから仕上がった姿で出ます）。</li>
-        <li><b>記録とごほうび</b>得点と自己ベストはコースごとに記録されます。得点・コンボ・Perfect率は自由修行の記録と合わせて称号と限定アイテムの条件になり、そば猪口コインもコースの係数でもらえます。本日のチャレンジも斬で挑戦します。</li>
+        <li><b>同時切り</b>曲の最後の1小節は、師匠とあなたが同じ拍でいっしょに切ります（お手本はありません。その直前の小節で師匠が切って見せたリズムです）。</li>
+        <li><b>師匠のイタズラ</b>ホームで「アリ」にすると、曲の後半から、あなたの番でこま板が盤の一部を隠し、師匠がお手本の中で包丁を振りかぶって切らない「フェイント」をかけてきます。フェイントの拍につられて切るとコンボが切れます（Missには数えません）。そのかわり得点×1.2・コイン×1.2。記録は同じ自己ベストに入り、イタズラありで出したベストには「（イタズラ）」の印がつきます。</li>
+        <li><b>今日の一曲</b>日替わりで1コースが「今日の一曲」に選ばれ、ホームのコースに印が出ます。そのコースを1曲遊ぶと、その日1回だけコイン+100。</li>
+        <li><b>着せ替え</b>装備した器はリザルトの盛り付けに、包丁は盤の包丁に、演出は切ったときの輪と紙吹雪に、効果音は切る音・Perfectの音などに使われます（見た目と音だけで、得点や判定は変わりません）。</li>
+        <li><b>記録とごほうび</b>得点と自己ベストはコースごとに記録されます。得点・コンボ・Perfect率が称号と限定アイテムの条件になり、1曲ごとにそば猪口コインがもらえます（難しいコースほど多め）。本日のチャレンジも斬で挑戦します。</li>
         <li><b>季節</b>そばの花・新そばの期間中は、斬の画面も季節の見た目になります（得点や判定は変わりません）。</li>
       </ul>
     </section>
 
-    <section id="g-play" class="gsec" aria-labelledby="g-play-h">
-      <h3 id="g-play-h" tabindex="-1">自由修行のあそびかた<span class="gsec-sub">そば粉×お客さん</span></h3>
-      <p class="gnote">ホームの「自由修行」を開くと遊べる、従来のスコアアタックです。</p>
-      <p class="gsec-lead">師匠のお手本と同じリズムで、スペースキーかタップで蕎麦を切ります。ピタリのタイミングほど細い麺、ズレるほど太い麺になります。</p>
-      <ol class="flow">
-        <li class="flow-card">
-          <svg class="flow-ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
-          <span class="flow-verb">見る</span>
-          <span class="flow-text">師匠が6回刻むお手本。金色の印が流れる。</span>
-        </li>
-        <li class="flow-card">
-          <svg class="flow-ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 10h12v10H4z"/><path d="M8 10V5h12"/></svg>
-          <span class="flow-verb">切る</span>
-          <span class="flow-text">同じリズムで赤茶色の印が来る。包丁の線に重なった瞬間に切る。</span>
-        </li>
-        <li class="flow-card">
-          <svg class="flow-ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12h18a9 8 0 0 1-18 0z"/><path d="M9 21h6"/><path d="M13 3l-3 8M18 4l-4 7"/></svg>
-          <span class="flow-verb">出す</span>
-          <span class="flow-text">盛り付け→出汁かけ→お客さんの反応。タップで飛ばせる。</span>
-        </li>
-      </ol>
-      <p class="gnote">選んだお客さんが5人続けて来店し、5杯出したら修行終了です。1杯ごとにテンポが少し速くなります。</p>
-      <div class="table-scroll">
-        <table class="gtable judge-table">
-          <caption class="vh">判定と得点</caption>
-          <colgroup><col class="c-head"><col><col></colgroup>
-          <thead>
-            <tr><th scope="col">判定</th><th scope="col">得点</th><th scope="col">麺の太さ</th></tr>
-          </thead>
-          <tbody>
-            <tr><th scope="row">JUST!</th><td class="num">100×2</td><td>いちばん細い</td></tr>
-            <tr><th scope="row">PERFECT</th><td class="num">100</td><td>細い</td></tr>
-            <tr><th scope="row">GOOD</th><td class="num">60</td><td>ふつう</td></tr>
-            <tr><th scope="row">OK</th><td class="num">30</td><td>太い</td></tr>
-            <tr><th scope="row">MISS</th><td class="num">0</td><td>切れない</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <ul class="gpoints">
-        <li><b>JUST!</b>判定帯のまん中にある白い帯で切ると、その1回の得点が2倍。</li>
-        <li><b>コンボ</b>成功が続くと倍率が1回ごとに+0.1倍（最大5.0倍）。MISSで0に戻る。</li>
-        <li><b>空振り</b>印のないところでタップしても減点はありません。</li>
-      </ul>
-      <p class="formula">1回の得点 ＝ 判定の点 × コンボ倍率 × JUST（2倍）× そば粉の係数 × 香り</p>
-    </section>
-
-    <section id="g-flour" class="gsec" aria-labelledby="g-flour-h">
-      <h3 id="g-flour-h" tabindex="-1">そば粉タイプ<span class="gsec-sub">STEP 1</span></h3>
-      <div class="table-scroll">
-        <table id="flour-table" class="gtable compare">
-          <caption class="vh">そば粉3種の比較</caption>
-          <colgroup><col class="c-head"><col><col><col></colgroup>
-          <thead>
-            <tr>
-              <td class="corner"></td>
-              <th scope="col" data-col="二八">二八<small>そば粉8割・小麦粉2割の配合</small></th>
-              <th scope="col" data-col="十割">十割<small>小麦粉を入れず、そば粉だけ</small></th>
-              <th scope="col" data-col="挽きぐるみ">挽きぐるみ<small>実の甘皮まで一緒に挽いた粉</small></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><th scope="row">得点の係数</th><td class="num" data-col="二八">×1.0</td><td class="num" data-col="十割">×1.5</td><td class="num" data-col="挽きぐるみ">×0.85</td></tr>
-            <tr><th scope="row">判定の幅</th><td data-col="二八">そのまま</td><td data-col="十割"><b>3/4に狭い</b></td><td data-col="挽きぐるみ">そのまま</td></tr>
-            <tr><th scope="row">MISSのとき</th><td data-col="二八">コンボ0</td><td data-col="十割">コンボ0<br><b>−40点</b></td><td data-col="挽きぐるみ">コンボ0</td></tr>
-            <tr><th scope="row">香り</th><td data-col="二八">なし</td><td data-col="十割">なし</td><td data-col="挽きぐるみ"><b>あり</b><br>最大+60%</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="gnote"><b>香りボーナス</b>　挽きぐるみだけ、成功するたびに香りが1回+4%（ゲージは約+7）貯まり、貯まった分だけ次からの得点が上がります（最大+60%）。香りは時間とともに抜け、満タンからでも約9秒で0になります。</p>
-      <p class="gnote">十割の−40点で合計が0点より下がることはありません。判定の幅が狭くなる分、JUSTの白い帯も細くなります。</p>
-      <p class="gnote gnote-soft">期間限定の新そばモードでは、得点・判定の幅・香りのルールが変わります（「期間限定モード」を参照）。</p>
-    </section>
-
-    <section id="g-cust" class="gsec" aria-labelledby="g-cust-h">
-      <h3 id="g-cust-h" tabindex="-1">お客さん<span class="gsec-sub">STEP 2</span></h3>
-      <div class="table-scroll">
-        <table id="cust-table" class="gtable compare cust-table">
-          <caption class="vh">お客さん4人の比較</caption>
-          <colgroup><col class="c-head"><col><col><col><col></colgroup>
-          <thead>
-            <tr>
-              <td class="corner"></td>
-              <th scope="col" data-col="beginner"><span class="th-ic" aria-hidden="true">📷</span>観光客</th>
-              <th scope="col" data-col="lover"><span class="th-ic" aria-hidden="true">🧑‍🦳</span>地元の<wbr>常連</th>
-              <th scope="col" data-col="regular"><span class="th-ic" aria-hidden="true">🧐</span>そば通</th>
-              <th scope="col" data-col="enthusiast"><span class="th-ic" aria-hidden="true">🌶️</span>辛味大根<wbr>マニア</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><th scope="row">厳しさ</th><td data-col="beginner"><span class="lvl" data-lvl="1">易</span></td><td data-col="lover"><span class="lvl" data-lvl="2">中</span></td><td data-col="regular"><span class="lvl" data-lvl="3">難</span></td><td data-col="enthusiast"><span class="lvl" data-lvl="4">最難</span></td></tr>
-            <tr><th scope="row">リズム</th><td data-col="beginner">一定</td><td data-col="lover">複雑</td><td data-col="regular">複雑</td><td data-col="enthusiast">複雑</td></tr>
-            <tr><th scope="row">判定の幅</th><td data-col="beginner">広い</td><td data-col="lover">広い</td><td data-col="regular">狭い</td><td data-col="enthusiast">狭い</td></tr>
-            <tr><th scope="row">駒板</th><td data-col="beginner">ふつう</td><td data-col="lover">ふつう</td><td data-col="regular">ふつう</td><td data-col="enthusiast"><b>大きい</b></td></tr>
-            <tr><th scope="row">満足度</th><td data-col="beginner">ゆるめ</td><td data-col="lover">ふつう</td><td data-col="regular">厳しめ</td><td data-col="enthusiast">厳しめ</td></tr>
-            <tr><th scope="row">辛味<wbr>メーター</th><td data-col="beginner">なし</td><td data-col="lover">なし</td><td data-col="regular">なし</td><td data-col="enthusiast"><b>あり</b></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <ul class="gpoints">
-        <li><b>判定の幅</b>観光客・地元の常連はPERFECT ±90ms／切れる範囲 ±380ms、そば通・辛味大根マニアは ±45ms／±220ms。十割ではさらに3/4になります。</li>
-        <li><b>駒板</b>大きいと、流れてくる印が包丁の手前で板に隠れます。</li>
-        <li><b>満足度</b>切った麺の判定が良いほど上がり、ズレるほど下がります。厳しいお客さんほど下がり幅が大きい。</li>
-        <li><b>反応</b>出汁をかけたあと、お客さんが1杯の満足度に合わせて反応します（55未満でがっくり、55以上でうなずき、70以上で笑顔、90以上で大喜び）。演出は画面をタップすると飛ばせて、飛ばしても満足度はそのとき加わり「満足度 ○」と出ます。</li>
-      </ul>
-      <div class="spice-note">
-        <p class="spice-title">辛味大根メーター（辛味大根マニアのときだけ）</p>
-        <p>盛り付けの前にメーターが出ます。左右に動く印が緑の帯（目標±12）に入った瞬間にタップ。4秒たつと自動で決まります。外すとズレの大きさに応じて、その1杯の満足度が最大40下がります。得点は変わりません。</p>
-      </div>
-      <details class="gdetails">
-        <summary>満足度の計算（くわしく）</summary>
-        <p>1杯の満足度 ＝ 100 −（100 − 判定の平均）× 厳しさ。厳しさは観光客0.6、地元の常連1.0、そば通1.3、辛味大根マニア1.3です。判定の平均は、その1杯で切れた麺のPERFECT 100・GOOD 60・OK 30の平均で、MISSは入りません。</p>
-        <p>リザルトの「お客さんの満足度」は5杯の平均です。お客さんごとの最高値が記録され、ホームのカードに「満足 ○/100」で出ます。リザルトの「満足させたお客さん」は、判定の平均が55以上だった人数です。</p>
-      </details>
-      <p class="gnote gnote-soft">台詞にあるトッピング（おろし・削り節・ネギ）の好みは、お客さんの個性を表す演出です。トッピングの量を操作したり判定したりする仕組みはありません。</p>
-    </section>
-
     <section id="g-rank" class="gsec" aria-labelledby="g-rank-h">
       <h3 id="g-rank-h" tabindex="-1">称号</h3>
-      <p class="gnote">5つの系統の称号（クイズの称号を含む）があり、条件を満たすと獲得します。獲得した称号はなくならず（「記録を消す」でも残ります）、マイページで好きな1つを身につけられます。身につけた称号は名前と一緒に、リザルトと共有画像に出ます。期間限定モードの得点は称号の記録に入りません。</p>
+      <p class="gnote">5つの系統の称号（クイズの称号を含む）があり、条件を満たすと獲得します。獲得した称号はなくならず（「記録を消す」でも残ります）、マイページで好きな1つを身につけられます。身につけた称号は名前と一緒に、リザルトと共有画像に出ます。</p>
       <div id="title-guide" class="title-guide"></div>
       <p class="gnote"><b>今回の腕前</b>　リザルトの「今回の腕前」は、その1回の得点が届いた「一撃の腕前」の称号の名前です。</p>
     </section>
@@ -1696,35 +1467,12 @@ body{
     </section>
 
     <section id="g-season" class="gsec" aria-labelledby="g-season-h">
-      <h3 id="g-season-h" tabindex="-1">期間限定モード<span class="gsec-sub">季節</span></h3>
-      <p class="gsec-lead">季節に合わせて開く特別なモードです。ホームの「モード」で選ぶと、通常モードとは別枠で遊べます。</p>
-      <div class="table-scroll">
-        <table id="season-table" class="gtable compare season-table">
-          <caption class="vh">期間限定モードの比較</caption>
-          <colgroup><col class="c-head"><col><col></colgroup>
-          <thead>
-            <tr>
-              <td class="corner"></td>
-              <th scope="col" data-col="hana">そばの花<small>そばの花が咲くころ</small></th>
-              <th scope="col" data-col="shinsoba">新そば<small>収穫したての新そばのころ</small></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><th scope="row">遊べる期間</th><td class="num" data-col="hana">9月1日〜10月31日</td><td class="num" data-col="shinsoba">10月21日〜11月30日</td></tr>
-            <tr><th scope="row">背景</th><td data-col="hana">白い花が咲くそば畑</td><td data-col="shinsoba">「新そば」の札と香りの湯気</td></tr>
-            <tr><th scope="row">限定の要素</th><td data-col="hana"><b>限定のお客さん</b><br>そば畑の農家</td><td data-col="shinsoba"><b>限定の条件</b><br>得点×1.5・判定4/5</td></tr>
-            <tr><th scope="row">香り</th><td data-col="hana">通常どおり（挽きぐるみ）</td><td data-col="shinsoba"><b>どのそば粉でも</b><br>PERFECT以上の<br>ときだけ貯まり<br>MISSで0に</td></tr>
-            <tr><th scope="row">記録</th><td data-col="hana">限定ベスト</td><td data-col="shinsoba">限定ベスト</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <h3 id="g-season-h" tabindex="-1">季節の見た目<span class="gsec-sub">季節</span></h3>
       <ul class="gpoints">
-        <li><b>そば畑の農家</b>そばの花モードだけに来るお客さん。短い間と長い間がはっきりしたリズムで、PERFECT ±70ms／切れる範囲 ±300ms、満足度の厳しさは1.0です。</li>
-        <li><b>新そばの条件</b>得点はそば粉の係数にさらに×1.5。判定の幅は4/5（十割ならさらに3/4）。香りはどのそば粉でも貯まり（最大+60%）、PERFECT以上のときだけ増えて、MISSで0に戻ります。</li>
-        <li><b>記録</b>結果はモード×お客さんごとの「限定ベスト」にだけ記録されます。通常の自己ベスト・称号の記録・本日のチャレンジ・満足度の記録には入りません。</li>
+        <li><b>そばの花</b>9月1日〜10月31日は、リズム修行・斬の画面の下に白い花が咲くそば畑が広がり、ひょっこり客に「そば畑の農家」も加わります。</li>
+        <li><b>新そば</b>10月21日〜11月30日は、盤の生地が新そばの色になります（両方の期間が重なる10月下旬は新そば）。</li>
+        <li><b>決まり</b>見た目だけで、得点や判定は変わりません。期間はこの端末の日付（ローカル時刻）で決めています。</li>
       </ul>
-      <p class="gnote"><b>期間の決め方</b>　この端末の日付（ローカル時刻）で判定しています。期間外のモードは押せず、「◯月◯日頃に開放」と表示されます。日付が読み取れないときは期間外として扱います。</p>
-      <p class="gnote">リズム修行・斬は、期間中は画面が季節の見た目になります（そばの花の期間はそば畑、新そばの期間は新そばの色。両方の期間が重なる10月下旬は新そば）。得点や判定は変わりません。</p>
       <p class="gnote gnote-soft">季節の目安：福井では秋そばが主流で、10月下旬〜11月上旬に収穫されます。そばの花は9〜10月に咲きます。</p>
     </section>
 
@@ -1732,14 +1480,14 @@ body{
       <h3 id="g-rec-h" tabindex="-1">記録について</h3>
       <p class="rec-callout">記録はこの端末のブラウザ内に保存されます。マイページでユーザー名とパスワードを登録してログインすると、クラウドにも写しを保存して、ほかの端末と同期できます。</p>
       <ul class="gpoints">
-        <li><b>保存されるもの</b>自己ベスト（そば粉×お客さん）、称号の記録（累計スコア・1回の最高得点・最大コンボ・JUST!率）と獲得した称号、名前、満足度の最高値、本日のチャレンジの達成、限定ベスト（期間限定モード×お客さん）と前回遊んだ期間限定モード、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、前回のそば粉、リズム修行・斬のコースごとの自己ベストと完成度・前回のコース、試し切りのずれ補正（この端末だけ）、効果音のオン・オフ、BGMのオン・オフと音量、描画の細かさ、お客さんの反応の演出、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
+        <li><b>保存されるもの</b>リズム修行・斬の記録（コースごとの自己ベストと完成度・イタズラの印・遊んだ回数、全コースの累計スコア・最高得点・最大コンボ・Perfect率・全部Perfectの回数、前回のコース、今日の一曲を受け取った日）、獲得した称号、名前、本日のチャレンジの達成、そば猪口コイン（持っている枚数と今日の獲得数）、そば札、図鑑（集めたアイテム・装備・称号）とガチャを引いた回数、試し切りのずれ補正（この端末だけ）、師匠のイタズラのアリ・ナシ、効果音のオン・オフ、BGMのオン・オフと音量、描画の細かさ、演出の設定、クイズの成績、ルール説明を見たかどうか、共有ボーナスを受け取った日、新着の赤丸。</li>
         <li><b>引っ越し</b>マイページでログインして同期するか、ホーム最下部「記録と設定」のバックアップで書き出し、移した先で読み込みます。</li>
-        <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。スコア・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
-        <li><b>リセット</b>「記録を消す」で自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
-        <li><b>そば猪口コイン</b>1回遊ぶごとに120〜220。内訳は、修行120＋得点ぶん（得点×お客さんの係数÷100、最大50）＋満足度ぶん（5杯の平均満足度÷2、最大50）。お客さんの係数は観光客1.0・地元の常連1.2・そば通1.5・辛味大根マニア2.0・そば畑の農家1.2。本日のチャレンジ達成で+500（1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。ホームやリザルトの「友達に共有」で共有すると、1日1回+200（共有ボーナス）。</li>
-        <li><b>BGM</b>ホーム・修行・リザルト・ガチャで、場面ごとの和風の音楽が流れます（音声ファイルは使わず、ブラウザの中で合成しています）。修行中はコンボが10・20・30・40と続くたびに、三味線・篠笛・締太鼓・箏が1つずつ重なります。「記録と設定」で、効果音とは別にオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</li>
+        <li><b>同期のしかた</b>ログイン中は、修行の終わり・ガチャ・交換・設定の変更のあとと「今すぐ同期」で、この端末とクラウドの記録をまとめます。自己ベスト・コンボ・累計はそれぞれ大きいほう、図鑑・アイテム・称号は両方を合わせたものになります。コインとそば札は、端末ごとに増えた分と使った分を記録して合算するので、使った分が同期で戻ったり、ほかの端末で稼いだ分が消えたりしません。パスワードはそのまま送らず、端末の中でSHA-256のハッシュにしてから使います。メールアドレスなどの個人情報は使いません。マイページの「アカウントを削除」で、クラウドのアカウントと記録を消せます（この端末の記録は残ります）。</li>
+        <li><b>リセット</b>「記録を消す」で斬の自己ベストや累計スコアなどの戦績が初期状態に戻ります（効果音・描画・演出の設定、そば猪口コイン・そば札・図鑑と装備、獲得した称号と名前、クイズの成績はそのまま）。ログイン中に消すと、クラウドとほかの端末の戦績も次の同期で同じように消えます。</li>
+        <li><b>そば猪口コイン</b>斬を1曲遊ぶごとに、修行120＋得点ぶん（得点÷100、最大50）＋完成度ぶん（完成度の％÷2、最大50）＋コースぶん（二八0・十割40・粗挽き80）。最大で二八220・十割260・粗挽き300。師匠のイタズラ「アリ」ならその合計の2割を上乗せ（コイン×1.2）。今日の一曲を遊ぶと+100、本日のチャレンジ達成で+500（どちらも1日1回、端末の日付で判定）。端数は切り捨て、1日にもらえる数に上限はありません。獲得した枚数と内訳はリザルトに出ます。ホームやリザルトの「友達に共有」で共有すると、1日1回+200（共有ボーナス）。</li>
+        <li><b>BGM</b>ホーム・リザルト・ガチャで、場面ごとの和風の音楽が流れます。斬ではコースごとの曲（三味線・笛・太鼓）が流れ、コンボが10・20・30と続くたびに、太鼓の裏打ち・手拍子・掛け声が重なります（音声ファイルは使わず、ブラウザの中で合成しています）。「記録と設定」で、効果音とは別にオン・オフと音量を変えられます。🔇（消音）のときは BGM も鳴りません。</li>
         <li><b>今日のクイズ</b>ホームの「今日のクイズ」で、越前そばと福井にちなんだ4択クイズが1日3問出ます（問題は日付で決まり、その日はみんな同じ3問）。1問正解ごとにそば札1枚、3問とも正解するとさらに2枚。全問正解で称号「越前通」、通算30問正解で称号「そば博士」がもらえます。</li>
-        <li><b>限定アイテム</b>ガチャや交換所には出ない4種のアイテムが、修行やクイズの実績（最大30コンボ・累計スコア50,000点・修行30回・クイズ通算10問正解）で解放されます。図鑑の「限定」に、まだのものは「？？？」と解放の条件が出ます。</li>
+        <li><b>限定アイテム</b>ガチャや交換所には出ない4種のアイテムが、斬やクイズの実績（最大30コンボ・累計スコア50,000点・斬を30曲・クイズ通算10問正解）で解放されます。図鑑の「限定」に、まだのものは「？？？」と解放の条件が出ます。</li>
         <li><b>ガチャと図鑑</b>ホームの「ガチャを引く」で、コインを使って越前・福井にちなんだアイテムを引けます（1回500・10連4,500）。確率はガチャ画面にいつも表示しています（天井はありません）。被ったアイテムは「そば札」に変わり、「交換所」でまだ持っていないアイテムと交換できます。集めたアイテムは「図鑑」で見られ、「着せ替え」で器・麺・包丁・背景・演出の色・効果音・称号を着せ替えられます（見た目と音だけで、得点や判定は変わりません）。</li>
       </ul>
       <p class="save-note"><a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a></p>
@@ -1942,7 +1690,7 @@ body{
         <div class="mp-cell"><dt>最長コンボ</dt><dd id="mp-combo">0</dd></div>
         <div class="mp-cell"><dt>図鑑収集率</dt><dd id="mp-collect">0%</dd></div>
       </dl>
-      <p class="mp-zan-sum">最高スコア・累計スコア・最長コンボは、リズム修行・斬と自由修行を合わせた記録です（称号もこの記録で決まります）。</p>
+      <p class="mp-zan-sum">最高スコア・累計スコア・最長コンボは、リズム修行・斬の記録です（称号もこの記録で決まります）。</p>
       <p class="mp-titles-line"><span id="mp-title-count">獲得した称号 0 / 0</span>
         <button id="mp-title-list" class="btn-small" type="button" aria-haspopup="dialog">称号の一覧</button></p>
     </section>
@@ -2057,7 +1805,7 @@ body{
       <p id="share-msg" class="share-msg" role="status" aria-live="polite"></p>
       <button id="btn-download-image" class="btn-link" type="button" hidden>画像ファイルとしてダウンロード</button>
       <figure id="share-preview" class="share-preview" hidden>
-        <img id="share-preview-img" width="1080" height="1350" alt="結果カードの画像（称号と名前・得点・お客さん・そば粉・満足度・最大コンボ・最大倍率・今回の腕前・累計スコア・日付）">
+        <img id="share-preview-img" width="1080" height="1350" alt="結果カードの画像（称号と名前・得点・コース・完成度・Perfect・最大コンボ・平均のずれ・今回の腕前・累計スコア・日付）">
         <figcaption>うまく保存できないときは、この画像を長押し（スマホ）か右クリック（パソコン）して保存できます。</figcaption>
       </figure>
     </div>
@@ -2257,16 +2005,9 @@ const ART = {
 (function(){
 'use strict';
 
-// ---------- Constants ----------
-var TOTAL_CUSTOMERS = 5;
 var PATTERN_LENGTH = 6;
-var LEAD_IN = 1000;
 var BASE_UNIT_START = 230;
-var BASE_UNIT_STEP = 14;
-var BASE_UNIT_MIN = 150;
-var TRAVEL_MS = 1600;
 var MIN_THICK = 5;
-var MAX_THICK = 26;
 var TIERS = {
   beginner:  {label:'蕎麦ビギナー', pool:[2],       perfectMs:90, goodMs:190, hitWindowMs:380, boardWidth:74},
   lover:     {label:'蕎麦好き',     pool:[1,2,2,3], perfectMs:90, goodMs:190, hitWindowMs:380, boardWidth:74},
@@ -2323,12 +2064,7 @@ var CHARACTERS = {
     }
   }
 };
-var SPICE_TOLERANCE = 12;
-var SPICE_PERIOD = 0.004;
-var SPICE_TIMEOUT = 4000;
-var SPICE_RESULT_PAUSE = 700;
 var DEFAULT_STYLE = '二八';
-var STYLE_ORDER = ['二八','十割','挽きぐるみ'];
 var STYLES = {
   '二八': {
     desc:'小麦粉を加えた、扱いやすく安定した標準の配合。',
@@ -2343,14 +2079,8 @@ var STYLES = {
     scoreMult:0.85, missPenalty:0, timingMult:1.0, hasAroma:true
   }
 };
-var AROMA_GAIN = 0.04;
 var AROMA_MAX = 0.6;
-var AROMA_DECAY = 0.00007;
 
-// ---------- Limited-time season modes ----------
-// Opened only by this device's local date. Seasons follow the facts: in Fukui autumn soba is the main
-// crop and is harvested from late October to early November; soba flowers bloom in September–October.
-var SEASONAL_ORDER = ['hana','shinsoba'];
 var SEASONAL_MODES = {
   hana: {
     name:'そばの花', title:'そばの花モード',
@@ -2363,23 +2093,6 @@ var SEASONAL_MODES = {
     from:{m:10, d:21}, to:{m:11, d:30},
     blurb:'得点×1.5・判定の幅4/5。香りはどのそば粉でも貯まるが、PERFECT以上のときだけで、MISSで0に戻る。記録は限定ベストへ。',
     rules:{scoreMult:1.5, timingMult:0.8, aromaAll:true, aromaNeedsPerfect:true, aromaResetOnMiss:true}
-  }
-};
-// the guest who only comes in そばの花モード
-var SEASON_TIERS = {
-  farmer:{label:'そば畑の農家', pool:[1,1,3], perfectMs:70, goodMs:150, hitWindowMs:300, boardWidth:74}
-};
-var SEASON_CHARACTERS = {
-  farmer: {
-    name:'そば畑の農家', icon:'🧑‍🌾', mode:'hana',
-    quote:'畑はいま、そばの花ざかり。この花が実れば、秋の新そばだ',
-    toppingStrictness:1.0,
-    hasSpiceMeter:false,
-    comments:{
-      high:['いい切り口だ。畑の苦労が報われるよ','この細さ、花の季節にふさわしい一杯だ'],
-      mid:['うん、悪くない。粉の良さは出てるよ','まずまずだね。新そばの頃にはもっと上手くなるさ'],
-      low:['せっかくの粉だ、もう少し丁寧に頼むよ','太さがまちまちだな。畑の手間を思い出してくれ']
-    }
   }
 };
 function isSeasonalMode(id){
@@ -2427,30 +2140,11 @@ var elCustomers = document.getElementById('hud-customers');
 var elPopup = document.getElementById('popup');
 var elCaption = document.getElementById('serving-caption');
 var elServeBubble = document.getElementById('serve-bubble');
-var elSbWho = document.getElementById('sb-who');
-var elSbText = document.getElementById('sb-text');
 var elSbStars = document.getElementById('sb-stars');
 var elSatisPop = document.getElementById('satis-pop');
 var elServeSr = document.getElementById('serve-sr');
 var aromaGaugeWrap = document.getElementById('aroma-gauge-wrap');
-var aromaValueEl = document.getElementById('aroma-value');
-var aromaGaugeFill = document.getElementById('aroma-gauge-fill');
-var aromaPopupEl = document.getElementById('aroma-popup');
 var btnSoundToggle = document.getElementById('btn-sound-toggle');
-var flourOpts = document.querySelectorAll('.flour-opt');
-var custCards = document.querySelectorAll('.cust-card');
-var step1El = document.getElementById('step1');
-var step2El = document.getElementById('step2');
-var step1Head = document.getElementById('step1-head');
-var step2Head = document.getElementById('step2-head');
-var step1Body = document.getElementById('step1-body');
-var step2Body = document.getElementById('step2-body');
-var step1Choice = document.getElementById('step1-choice');
-var step2Choice = document.getElementById('step2-choice');
-var summaryFlour = document.getElementById('summary-flour');
-var summaryCust = document.getElementById('summary-cust');
-var btnStart = document.getElementById('btn-start');
-var startHint = document.getElementById('start-hint');
 var rankBadge = document.getElementById('rank-badge');
 var btnHowto = document.getElementById('btn-howto');
 var btnHowtoBack = document.getElementById('btn-howto-back');
@@ -2458,8 +2152,6 @@ var btnHowtoHome = document.getElementById('btn-howto-home');
 var clearConfirm = document.getElementById('clear-confirm');
 var btnClearYes = document.getElementById('btn-clear-yes');
 var btnClearNo = document.getElementById('btn-clear-no');
-var helpFlour = document.getElementById('help-flour');
-var helpCust = document.getElementById('help-cust');
 var guideTitle = document.getElementById('guide-title');
 var tocChips = document.querySelectorAll('.toc-chip');
 var titleGuide = document.getElementById('title-guide');
@@ -2470,35 +2162,23 @@ var btnImport = document.getElementById('btn-import');
 var saveIo = document.getElementById('save-io');
 var saveMsg = document.getElementById('save-msg');
 var resultScore = document.getElementById('result-score');
-var resultCustomers = document.getElementById('result-customers');
 var resultCombo = document.getElementById('result-combo');
 var resultMultiplier = document.getElementById('result-multiplier');
 var resultAroma = document.getElementById('result-aroma');
 var resultSatisfaction = document.getElementById('result-satisfaction');
 var resultSatisfactionBest = document.getElementById('result-satisfaction-best');
 var resultRank = document.getElementById('result-rank');
-var resultBest = document.getElementById('result-best');
 var resultNewBest = document.getElementById('result-newbest');
-var tierBestEls = document.querySelectorAll('.tier-best');
 var elRankName = document.getElementById('rank-name');
 var elDailyDesc = document.getElementById('daily-desc');
 var elDailyStatus = document.getElementById('daily-status');
-var satBestEls = document.querySelectorAll('.sat-best');
-var resultDanName = document.getElementById('result-dan-name');
 var resultStyle = document.getElementById('result-style');
 var resultRankUp = document.getElementById('result-rankup');
 var resultDailyClear = document.getElementById('result-dailyclear');
-var modeOpts = document.querySelectorAll('.mode-opt');
-var modeNote = document.getElementById('mode-note');
-var helpSeason = document.getElementById('help-season');
-var summaryMode = document.getElementById('summary-mode');
 var challengeEl = document.querySelector('.challenge');
-var challengeModeNote = document.getElementById('challenge-mode-note');
-var farmerCard = document.querySelector('.cust-card[data-tier="farmer"]');
 var aromaLabelEl = document.getElementById('aroma-label');
 var modeTag = document.getElementById('mode-tag');
 var resultMode = document.getElementById('result-mode');
-var resultBestLabel = document.getElementById('result-best-label');
 var coinBox = document.getElementById('coin-box');
 var coinGain = document.getElementById('coin-gain');
 var coinBreakdown = document.getElementById('coin-breakdown');
@@ -2507,8 +2187,11 @@ var coinStatus = document.getElementById('coin-status');
 
 // ---------- Persistent Store (robust localStorage layer) ----------
 var STORE_KEY = 'echizenSoba.v1';
-var SCHEMA_VERSION = 12;   // 10 → 11: 段位 becomes 称号 (stats, profile, gacha.equippedTitle); 11 → 12: the daily quiz, red dots,
-                           // reward-only items and settings.onboarding / lastShareDate. Older saves are carried over by coerceStore
+var SCHEMA_VERSION = 13;   // 10 → 11: 段位 becomes 称号 (stats, profile, gacha.equippedTitle); 11 → 12: the daily quiz, red dots,
+                           // reward-only items and settings.onboarding / lastShareDate; 12 → 13: the 自由修行 is retired — its
+                           // records (bests, seasonal, satisfaction, stats) are cleared and the titles are judged on リズム修行・斬
+                           // alone; titles, 限定 items, coins, そば札, the 図鑑 and the equipment stay. Older saves are carried over
+                           // by coerceStore (each kept first as echizenSoba.v1.backup-s<its schema>)
 var LEGACY_KEYS = ['soba-dojo-bests','bestScores','soba-best','sobaBests'];
 var ONBOARDING_VERSION = 2;   // settings.onboarding.version: the rules guide a player has seen (2: リズム修行・斬; a player who saw 1 sees it once more)
 var QUIZ_PER_DAY = 3;         // the daily quiz: three questions a day, the same three for everyone on that date
@@ -2652,7 +2335,7 @@ var GACHA_CATALOG = [
   {id:'taniguchiya_age', name:'谷口屋のお揚げ・黄金フリット', rarity:'jo', category:'演出', applyTo:'effect',
    desc:'坂井市丸岡町竹田の谷口屋は、分厚い油揚げで知られる老舗。揚げたての黄金色と、あたたかな湯気。'},
   {id:'millstone_sound', name:'お祭り和太鼓', rarity:'jo', category:'SE', applyTo:'sound',
-   desc:'祭り囃子の和太鼓。切るたびにドドン！と腹に響き、JUST!では「ハッ！」と掛け声が入る。'},
+   desc:'祭り囃子の和太鼓。切るたびにドドン！と腹に響き、Perfectでは「ハッ！」と掛け声が入る。'},
   {id:'wooden_board', name:'越前がにポコポコ', rarity:'jo', category:'SE', applyTo:'sound',
    desc:'越前がにの甲羅をたたくような、木琴とウッドブロックの軽やかな音。コンボが続くとメロディになる。'},
   // ---- 特上 (26) ----
@@ -2815,13 +2498,13 @@ function gachaOwnedCount(g, rarity){
 // Earned titles are kept in store.gacha.titles (with the 図鑑 completion title), so they are never lost, even when
 // the play records are cleared. One earned title can be worn: store.gacha.equippedTitle.
 // Records (store.stats unless noted): totalScore (the sum of every normal game's score), highScore (the best single
-// game), maxCombo, bestJustRate (the best JUST! rate in one game, %), perfectClears (games where every judgement was
-// JUST!), owned / collectPct (items in the 図鑑, from store.gacha.owned). Limited-time modes keep only their own
+// game), maxCombo, bestJustRate (the best Perfect rate in one game, %), perfectClears (games where every judgement was
+// Perfect), owned / collectPct (items in the 図鑑, from store.gacha.owned). Limited-time modes keep only their own
 // bests, so they do not count here either.
 var TITLE_CATS = [
-  {id:'total',   label:'累計スコア', note:'リズム修行・斬と自由修行（通常モード）で遊んだ得点の合計で昇格します。'},
-  {id:'best',    label:'一撃の腕前', note:'1回の修行（斬・自由修行）の最高得点で昇格します。'},
-  {id:'skill',   label:'技の冴え',   note:'コンボと正確さ（自由修行はJUST!、斬はPerfect）で獲得します。'},
+  {id:'total',   label:'累計スコア', note:'リズム修行・斬で遊んだ得点の合計で昇格します。'},
+  {id:'best',    label:'一撃の腕前', note:'斬1曲の最高得点で昇格します。'},
+  {id:'skill',   label:'技の冴え',   note:'コンボとPerfectの正確さで獲得します。'},
   {id:'collect', label:'収集',       note:'図鑑に集めたアイテムで獲得します。'},
   {id:'quiz',    label:'クイズ',     note:'1日3問の「越前そば＆福井クイズ」で獲得します。'}
 ];
@@ -2866,27 +2549,26 @@ function titleNeedText(t){
   var n = t.need, v = fmtPoints(n.min);
   switch(n.key){
     case 'totalScore':    return n.min>0 ? '累計スコア ' + v + '点' : 'はじめから';
-    case 'highScore':     return '1回の得点 ' + v + '点';
+    case 'highScore':     return '1曲の得点 ' + v + '点';
     case 'maxCombo':      return '最大' + v + 'コンボ';
-    case 'bestJustRate':  return '1回の修行でJUST!率（斬はPerfect率）' + v + '%以上';
-    case 'perfectClears': return 'すべての判定をJUST!（斬はPerfect）で修行を終える';
+    case 'bestJustRate':  return '1曲でPerfect率' + v + '%以上';
+    case 'perfectClears': return 'すべての判定をPerfectで1曲を終える';
     case 'owned':         return 'アイテムを' + v + '種集める';
     case 'collectPct':    return '図鑑を' + v + '%集める';
     case 'quizPerfect':   return n.min>1 ? ('クイズで3問全問正解を' + v + '日') : 'クイズで3問全問正解する';
     case 'quizTotal':     return 'クイズで通算' + v + '問正解';
-    case 'plays':         return '修行（斬・自由修行）を' + v + '回終える';
+    case 'plays':         return '斬を' + v + '曲遊ぶ';
   }
   return '';
 }
-// the records the titles (and the 限定 items) are judged on, all whole numbers: リズム修行・斬 (store.zan) and the
-// 自由修行 (store.stats) together — the sums of both, or the better of the two
+// the records the titles (and the 限定 items) are judged on, all whole numbers: リズム修行・斬's (store.zan), the 図鑑
+// and the quiz. (bestJustRate is 斬's best Perfect rate; the names are kept from the 自由修行's days.)
 function titleMetrics(store){
-  var st = store.stats || {}, g = store.gacha, q = store.quiz || {}, z = store.zan || {};
+  var g = store.gacha, q = store.quiz || {}, z = store.zan || {};
   var owned = g ? gachaOwnedCount(g) : 0, total = GACHA_CATALOG.length;
   return {
-    totalScore:(st.totalScore || 0) + (z.totalScore || 0), highScore:Math.max(st.highScore || 0, z.best || 0),
-    maxCombo:Math.max(st.maxCombo || 0, z.maxCombo || 0), bestJustRate:Math.max(st.bestJustRate || 0, z.bestPerfectRate || 0),
-    perfectClears:(st.perfectClears || 0) + (z.perfectClears || 0), plays:(st.plays || 0) + (z.plays || 0),
+    totalScore:z.totalScore || 0, highScore:z.best || 0, maxCombo:z.maxCombo || 0, bestJustRate:z.bestPerfectRate || 0,
+    perfectClears:z.perfectClears || 0, plays:z.plays || 0,
     owned:owned, collectPct:total ? Math.floor(owned*100/total) : 0,
     quizTotal:q.totalCorrect || 0, quizPerfect:q.perfectDays || 0
   };
@@ -2944,46 +2626,46 @@ function migrateToTitles(out, obj){
 // missing or broken falls back to the game's original look and sound.
 var EQUIP_SLOT_LABELS = {bowl:'器', noodle:'麺', tool:'道具', bg:'背景', effect:'演出', sound:'音', title:'称号'};
 var EQUIP_SLOT_NOTES = {
-  bowl:'盛り付けの器の色と模様が変わります。',
-  noodle:'麺と生地の色・質感が変わります（新そばモードでは新そばの色のまま）。',
-  tool:'包丁の見た目と、JUST!のときの刃の音が変わります。',
+  bowl:'リザルトで蕎麦を盛り付ける器になります（何も装備しないときは竹ざる）。',
+  noodle:'麺と生地の色・質感が変わります（新そばの季節は新そばの色のまま）。',
+  tool:'包丁の見た目と、Perfectのときの刃の音が変わります。',
   bg:'プレイ画面の背景が変わります（ARTに画像があればその画像）。',
-  effect:'切ったときの輪と紙吹雪、お客さんが喜んだときのキラキラと紙吹雪の色が変わります。',
+  effect:'切ったときの輪と紙吹雪の色や形が変わります。',
   sound:'切る音などの効果音が変わります（コンボで音階が上がるのはそのまま）。',
   title:'マイページ・リザルト・共有画像に、名前と一緒に表示されます。'
 };
 // item-specific notes (shown in the 図鑑 detail view instead of the slot's note)
 var SKIN_NOTES = {
-  knife_board_sound:'切るたびに、包丁とまな板のトン、トンという乾いた音。JUST!では「チン」と澄んだ音が重なります。',
-  millstone_sound:'切るたびに和太鼓が「ドドン」、JUST!では「ハッ！」の掛け声。1杯の始まりと仕上がりにも太鼓が鳴ります。',
-  wooden_board:'切るたびに木琴のような「ポコ」。JUST!では「ポコポコ」と2つ鳴ります。',
-  ryusen_crash_sound:'切るたびに澄んだ金属音。JUST!ではガラスが弾けるような音が重なります。',
-  dino_beat_sound:'切るたびに低いキックが「ズシン」。JUST!ではスネアとシンバルが鳴ります。',
-  mochi_poyo_sound:'切るたびに「モチッ」と弾み、JUST!では「ポヨヨン」と跳ねます。',
+  knife_board_sound:'切るたびに、包丁とまな板のトン、トンという乾いた音。Perfectでは「チン」と澄んだ音が重なります。',
+  millstone_sound:'切るたびに和太鼓が「ドドン」、Perfectでは「ハッ！」の掛け声。曲の始まりとリザルトの判子にも太鼓が鳴ります。',
+  wooden_board:'切るたびに木琴のような「ポコ」。Perfectでは「ポコポコ」と2つ鳴ります。',
+  ryusen_crash_sound:'切るたびに澄んだ金属音。Perfectではガラスが弾けるような音が重なります。',
+  dino_beat_sound:'切るたびに低いキックが「ズシン」。Perfectではスネアとシンバルが鳴ります。',
+  mochi_poyo_sound:'切るたびに「モチッ」と弾み、Perfectでは「ポヨヨン」と跳ねます。',
   retro8bit_sound:'切るたびにピコピコの和音が駆け上がり、MISSのときもレトロゲーム風の音になります。',
-  slurp_sound:'切るたびに水の弾ける音。お客さんが食べるときには、ツルンとすする音が鳴ります。',
-  forging_hammer_sound:'切るたびに槌の音。JUST!では宝石のような「キーン」が長く残ります。',
-  eisei_orchestra_sound:'切るたびに琴とシンセの和音。JUST!では鈴が、1杯の仕上がりには華やかなファンファーレが鳴ります。',
-  echizen_knife:'刃に波の刃文が入り、JUST!のとき刃がチンと鳴ります。',
-  echizen_sickle:'刃先が鎌の形になり、JUST!のときシュッと風を切る音が鳴ります。',
-  tsuchime_blade:'刃に鎚目が入り、JUST!のとき刃が長く澄んで鳴ります。',
-  ryusen_knife:'刃に流れる地紋と乱れ刃の刃文が入り、JUST!のとき刃が高く長く鳴ります。',
-  dig_hammer_knife:'柄が化石の骨になり、刃にハンマーの刻印が入ります。JUST!のとき槌の音が鳴ります。',
-  crab_knife:'刃先が細く尖った小ぶりの包丁になり、JUST!のとき刃がチンと鳴ります。',
-  dino_roar_fx:'JUST!のとき画面が揺れて衝撃波が走り、恐竜の足跡と化石のかけらが散ります（演出が「控えめ」か動きを減らす設定では揺れません）。',
-  yellow_tag_aura:'JUST!のとき黄色いタグがさっと横切り、金色の光線が広がります。',
+  slurp_sound:'切るたびに水の弾ける音。リザルトでお客さんが味わうときには、ツルンとすする音が鳴ります。',
+  forging_hammer_sound:'切るたびに槌の音。Perfectでは宝石のような「キーン」が長く残ります。',
+  eisei_orchestra_sound:'切るたびに琴とシンセの和音。Perfectでは鈴が、リザルトの判子には華やかなファンファーレが鳴ります。',
+  echizen_knife:'刃に波の刃文が入り、Perfectのとき刃がチンと鳴ります。',
+  echizen_sickle:'刃先が鎌の形になり、Perfectのときシュッと風を切る音が鳴ります。',
+  tsuchime_blade:'刃に鎚目が入り、Perfectのとき刃が長く澄んで鳴ります。',
+  ryusen_knife:'刃に流れる地紋と乱れ刃の刃文が入り、Perfectのとき刃が高く長く鳴ります。',
+  dig_hammer_knife:'柄が化石の骨になり、刃にハンマーの刻印が入ります。Perfectのとき槌の音が鳴ります。',
+  crab_knife:'刃先が細く尖った小ぶりの包丁になり、Perfectのとき刃がチンと鳴ります。',
+  dino_roar_fx:'Perfectのとき画面が揺れて衝撃波が走り、恐竜の足跡と化石のかけらが散ります（演出が「控えめ」か動きを減らす設定では揺れません）。',
+  yellow_tag_aura:'Perfectのとき黄色いタグがさっと横切り、金色の光線が広がります。',
   fossil_aura:'切ったところから骨と地層のかけらがゆっくり舞い上がります。',
-  raptor_slash:'JUST!のとき、三本爪の光の線がレーンを引き裂きます。',
-  yokan_slice:'JUST!のとき、四角く切り分ける直線が走り、黒糖色の角切りが散ります。',
+  raptor_slash:'Perfectのとき、三本爪の光の線が盤を引き裂きます。',
+  yokan_slice:'Perfectのとき、四角く切り分ける直線が走り、黒糖色の角切りが散ります。',
   guji_scales:'切るたびに金色のうろこがパチパチとはじけます。',
   habutae_powder:'白い粉がふわりと舞い、ゆっくり落ちていきます。',
-  crab_bubbles:'切ったところや喜んだお客さんのまわりに、下から泡が湧き上がります。',
+  crab_bubbles:'切ったところに、下から泡が湧き上がります。',
   kamisho_taro_aura:'切ったところと盛り付けた麺のまわりに、もっちりした白いオーラが広がります。',
   taniguchiya_age:'黄金色の揚げのかけらがはじけ、あたたかな湯気が立ちます。',
   heshiko_amber:'切ったところに琥珀色の光がにじみます。',
   tomitsu_kintoki:'蜜色の光とほんのりとした湯気が立ちます。',
-  hakase_tanzaku:'切ったところから越前和紙の短冊が舞い、JUST!のとき金色の光線が広がります。',
-  kaiden_knife:'刃に流れる地紋と波の刃文が入り、JUST!のとき刃が高く長く鳴ります。'
+  hakase_tanzaku:'切ったところから越前和紙の短冊が舞い、Perfectのとき金色の光線が広がります。',
+  kaiden_knife:'刃に流れる地紋と波の刃文が入り、Perfectのとき刃が高く長く鳴ります。'
 };
 
 // ---- 1アイテム＝1パレット ----
@@ -3468,11 +3150,12 @@ var ZAN_GRADE_NAMES = ['並','上','特上','極上'];
 var ZAN_COURSE_IDS = ['nihachi', 'juwari', 'arabiki'];   // 二八・十割・粗挽き (see ZAN_COURSES)
 function sanitizeZanRec(raw){
   var z = isPlainObj(raw) ? raw : {};
-  return {best:clampInt(z.best, 0, STAT_MAX), plays:clampInt(z.plays, 0, STAT_MAX), bestGrade:ZAN_GRADE_NAMES.indexOf(z.bestGrade)>=0 ? z.bestGrade : ''};
+  return {best:clampInt(z.best, 0, STAT_MAX), plays:clampInt(z.plays, 0, STAT_MAX), bestGrade:ZAN_GRADE_NAMES.indexOf(z.bestGrade)>=0 ? z.bestGrade : '',
+          bestTrick:z.bestTrick===true};            // the best was cut with 師匠のイタズラ (アリ)
 }
 function sanitizeZan(raw){
   var z = isPlainObj(raw) ? raw : {}, out = sanitizeZanRec(z), cs = isPlainObj(z.courses) ? z.courses : {};
-  // the 称号 records of 斬 (added to those of the 自由修行): the sum of scores, the longest combo, the best Perfect
+  // the 称号 records of 斬: the sum of scores, the longest combo, the best Perfect
   // rate (%) of one song and the songs cut all Perfect
   out.totalScore = clampInt(z.totalScore, 0, STAT_MAX);
   out.maxCombo = clampInt(z.maxCombo, 0, STAT_MAX);
@@ -3481,6 +3164,7 @@ function sanitizeZan(raw){
   out.courses = {};
   for(var i=0;i<ZAN_COURSE_IDS.length;i++) out.courses[ZAN_COURSE_IDS[i]] = sanitizeZanRec(cs[ZAN_COURSE_IDS[i]]);
   out.lastCourse = ZAN_COURSE_IDS.indexOf(z.lastCourse)>=0 ? z.lastCourse : '';
+  out.todayDone = typeof z.todayDone==='string' && /^\d{4}-\d{2}-\d{2}$/.test(z.todayDone) ? z.todayDone : '';   // 今日の一曲: the day its bonus was paid
   return out;
 }
 function sanitizeRewards(raw){
@@ -3671,9 +3355,22 @@ function coerceStore(obj){
   out.recordsClearedAt = clampInt(obj.recordsClearedAt, 0, 1e15);   // when 「記録を消す」 was last used while logged in (0: never)
   if(!(typeof obj.schema==='number' && obj.schema>=11)) migrateToTitles(out, obj);   // 段位 → 称号 (schema 10 and before)
   evaluateTitles(out);
+  if(!(typeof obj.schema==='number' && obj.schema>=13)) retireFreeMode(out);       // 自由修行の記録を消す (schema 12 and before)
   return out;
 }
 
+// The move to schema 13: the 自由修行's own records go (its bests, 限定ベスト, 満足度 and the play records), so the titles
+// and 限定 items are earned on リズム修行・斬 from now on. What was earned stays: the titles (judged just before), the
+// 限定 items, coins, そば札, the 図鑑 and the equipment. A 本日のチャレンジ of the 自由修行 not yet cleared today becomes 斬's.
+function retireFreeMode(out){
+  out.bests = {};
+  out.seasonal = {};
+  out.satisfaction = {};
+  out.stats = sanitizeStats(null);
+  out.lastPlayedSeasonal = null;
+  out.lastStyle = DEFAULT_STYLE;
+  if(out.daily && !parseConditionId(out.daily.conditionId).zan && !out.daily.cleared) out.daily = null;
+}
 function safeParseStore(raw){
   try{ return coerceStore(JSON.parse(raw)); }catch(e){ return defaultStore(); }
 }
@@ -3780,7 +3477,6 @@ function clearAllBests(){
   fresh.recordsClearedAt = SyncManager.isLoggedIn() ? Date.now() : keep.recordsClearedAt;
   ensureDailyFresh(fresh);
   saveStoreObj(fresh);
-  renderBests();
   renderRankAndDaily();
 }
 
@@ -3817,23 +3513,10 @@ function importStoreString(text){
   coerced.gacha.ledger = loadStore().gacha.ledger;
   ensureDailyFresh(coerced);
   saveStoreObj(coerced);
-  renderBests();
   renderRankAndDaily();
   return {ok:true, message:'読み込みました'};
 }
 
-function checkDailyClear(tierKey, score){
-  var store = loadStore();
-  if(store.daily && !store.daily.cleared){
-    var cond = parseConditionId(store.daily.conditionId);
-    if(!cond.zan && tierKey===cond.tier && score>=cond.threshold){
-      store.daily.cleared = true;
-      saveStoreObj(store);
-      return true;
-    }
-  }
-  return false;
-}
 
 // 斬: does this song clear today's challenge? (r: score, perfect, combo, grade)
 function zanCheckDailyClear(r){
@@ -3850,87 +3533,9 @@ function zanCheckDailyClear(r){
   saveStoreObj(store);
   return true;
 }
-// One finished normal game into the 称号 records; returns the titles it earned.
-function recordPlay(score, maxCombo, justCount, noteCount){
-  var store = loadStore(), st = store.stats;
-  st.totalScore = Math.min(STAT_MAX, st.totalScore + Math.max(0, Math.floor(score)));
-  st.highScore = Math.max(st.highScore, Math.floor(score));
-  st.maxCombo = Math.max(st.maxCombo, maxCombo);
-  st.plays = Math.min(STAT_MAX, st.plays + 1);
-  if(noteCount>0){
-    st.bestJustRate = Math.max(st.bestJustRate, Math.floor(justCount*100/noteCount));
-    if(justCount===noteCount) st.perfectClears = Math.min(STAT_MAX, st.perfectClears + 1);
-  }
-  var got = evaluateTitles(store);
-  saveStoreObj(store);
-  return got;
-}
-function recordMaxCombo(combo){
-  var store = loadStore();
-  if(combo>store.stats.maxCombo){
-    store.stats.maxCombo = combo;
-    saveStoreObj(store);
-    return true;
-  }
-  return false;
-}
 
-function recordSatisfaction(characterId, score){
-  var store = loadStore();
-  if(!store.satisfaction) store.satisfaction = {};
-  if(!store.satisfaction[characterId] || score>store.satisfaction[characterId]){
-    store.satisfaction[characterId] = score;
-    saveStoreObj(store);
-    return true;
-  }
-  return false;
-}
 
-// ---------- Best scores (per-viewer, saved in this browser) ----------
-var pendingStyle = DEFAULT_STYLE;
-var pendingMode = 'normal';   // 'normal' or a limited-time mode id (SEASONAL_MODES)
-function loadBests(style){
-  var store = loadStore();
-  return (store.bests && store.bests[style]) ? store.bests[style] : {};
-}
-function saveBest(style, tierKey, score){
-  var store = loadStore();
-  if(!store.bests[style]) store.bests[style] = {};
-  var isNew = false;
-  if(!store.bests[style][tierKey] || score>store.bests[style][tierKey]){
-    store.bests[style][tierKey] = score;
-    isNew = true;
-    saveStoreObj(store);
-  }
-  return isNew;
-}
-function renderBests(){
-  // A limited-time mode shows its own best slot; normal bests are never mixed in.
-  var seasonal = isSeasonalMode(pendingMode) ? pendingMode : null;
-  var store = loadStore();
-  var bests = seasonal ? (store.seasonal[seasonal] || {}) : loadBests(pendingStyle);
-  for(var i=0;i<tierBestEls.length;i++){
-    var key = tierBestEls[i].getAttribute('data-best');
-    tierBestEls[i].textContent = (seasonal ? '限定ベスト ' : 'ベスト ') + (bests[key] ? bests[key] : '—');
-  }
-  var sat = store.satisfaction || {};
-  for(var j=0;j<satBestEls.length;j++){
-    var sk = satBestEls[j].getAttribute('data-sat');
-    satBestEls[j].textContent = '満足 ' + (typeof sat[sk]==='number' ? (sat[sk]+'/100') : '—');
-    satBestEls[j].hidden = !!seasonal;
-  }
-}
-function applyStyleSelection(style, persist){
-  pendingStyle = STYLES[style] ? style : DEFAULT_STYLE;
-  if(persist){
-    var store = loadStore();
-    if(store.lastStyle!==pendingStyle){
-      store.lastStyle = pendingStyle;
-      saveStoreObj(store);
-    }
-  }
-  renderBests();
-}
+   // 'normal' or a limited-time mode id (SEASONAL_MODES)
 function renderRankAndDaily(){
   var store = loadStore();
   var worn = equippedTitleName(store.gacha);          // the home badge: the worn 称号, and it opens the マイページ
@@ -3938,173 +3543,28 @@ function renderRankAndDaily(){
 
   var cond = parseConditionId(store.daily.conditionId);
   elDailyDesc.textContent = dailyCondText(cond);
-  document.getElementById('challenge-free').textContent = cond.zan ? 'どのコースでも' : '自由修行・そば粉は自由';
+  document.getElementById('challenge-free').textContent = cond.zan ? 'どのコースでも' : '';
   challengeEl.classList.toggle('is-zan', !!cond.zan);
   var cleared = !!store.daily.cleared;
   elDailyStatus.textContent = cleared ? 'クリア済み' : '未クリア';
   elDailyStatus.className = 'chip ' + (cleared ? 'chip-done' : 'chip-todo');
 }
 
-// ---------- Home screen: step flow (UI only; game rules live elsewhere) ----------
-// STEP 1 (flour) must be chosen before STEP 2 (customer) opens; start needs both.
-var home = {style:null, tier:null, open:1, mode:'normal', modeMsg:''};
+// ---------- Home screen ----------
+var home = {style:null, tier:null, open:1, mode:'normal', modeMsg:''};   // (the retired 自由修行's choices; unused)
 
 function prefersReducedMotion(){
   try{ return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; }
 }
-function setStepState(stepEl, headEl, bodyEl, st){
-  stepEl.setAttribute('data-state', st);
-  headEl.setAttribute('aria-expanded', st==='open' ? 'true' : 'false');
-  headEl.disabled = (st==='locked');
-  bodyEl.hidden = (st!=='open');
-}
-function setChoice(el, value){
-  el.textContent = '';
-  if(!value) return;
-  var v = document.createElement('span');
-  v.className = 'choice-val';
-  v.textContent = value;
-  var e = document.createElement('span');
-  e.className = 'choice-edit';
-  e.textContent = '変更';
-  el.appendChild(v);
-  el.appendChild(e);
-}
-function customerLabel(tier){
-  var ch = CHARACTERS[tier] || SEASON_CHARACTERS[tier];
-  return ch ? (ch.icon+' '+ch.name) : '';
-}
-function fillHomeCards(){
-  // Card texts come from the same data the game uses, so they never drift apart.
-  for(var i=0;i<custCards.length;i++){
-    var ch = CHARACTERS[custCards[i].getAttribute('data-tier')] || SEASON_CHARACTERS[custCards[i].getAttribute('data-tier')];
-    if(!ch) continue;
-    custCards[i].querySelector('.cust-icon').textContent = ch.icon;
-    custCards[i].querySelector('.cust-name').textContent = ch.name;
-    custCards[i].querySelector('.cust-quote').textContent = ch.quote;
-  }
-  for(var j=0;j<flourOpts.length;j++){
-    var st = STYLES[flourOpts[j].getAttribute('data-style')];
-    if(st) flourOpts[j].querySelector('.opt-desc').textContent = st.desc;
-  }
-}
+// The home: リズム修行・斬 on top, then the coins, the daily quiz and share, the guide and the settings. (The older
+// 自由修行 — そば粉×お客さんのスコアアタック — was retired with schema 13; its engine below is no longer reached.)
 function renderHome(){
-  renderSeasonUI();
-  var lastStyle = loadStore().lastStyle;
-  for(var i=0;i<flourOpts.length;i++){
-    var s = flourOpts[i].getAttribute('data-style');
-    flourOpts[i].setAttribute('aria-pressed', home.style===s ? 'true' : 'false');
-    flourOpts[i].querySelector('.last-tag').hidden = !(home.style===null && s===lastStyle);
-  }
-  for(var j=0;j<custCards.length;j++){
-    custCards[j].setAttribute('aria-pressed', home.tier===custCards[j].getAttribute('data-tier') ? 'true' : 'false');
-  }
-
-  if(!home.style || home.open===1){
-    setStepState(step1El, step1Head, step1Body, 'open');
-    setChoice(step1Choice, '');
-  } else {
-    setStepState(step1El, step1Head, step1Body, 'done');
-    setChoice(step1Choice, home.style);
-  }
-
-  if(!home.style){
-    setStepState(step2El, step2Head, step2Body, 'locked');
-    step2Choice.textContent = 'STEP 1 のあとで';
-  } else if(home.open===2){
-    setStepState(step2El, step2Head, step2Body, 'open');
-    setChoice(step2Choice, '');
-  } else if(home.tier){
-    setStepState(step2El, step2Head, step2Body, 'done');
-    setChoice(step2Choice, customerLabel(home.tier));
-  } else {
-    setStepState(step2El, step2Head, step2Body, 'ready');
-    step2Choice.textContent = '未選択';
-  }
-
-  summaryFlour.textContent = home.style || 'そば粉 未選択';
-  summaryFlour.classList.toggle('is-empty', !home.style);
-  summaryCust.textContent = home.tier ? customerLabel(home.tier) : 'お客さん 未選択';
-  summaryCust.classList.toggle('is-empty', !home.tier);
-
-  var ready = !!(home.style && home.tier);
-  btnStart.disabled = !ready;
-  startHint.textContent = ready ? '5人のお客さんに出したら修行終了'
-    : (home.style ? 'STEP 2 でお客さんを選ぶと始められます' : 'STEP 1・2 を選ぶと始められます');
-  if(ready && isSeasonalMode(home.mode)) startHint.textContent = SEASONAL_MODES[home.mode].title + '・記録は限定ベストへ';
   renderCollectRow();
-}
-function revealEl(el){
-  try{ el.scrollIntoView({block:'nearest', behavior: prefersReducedMotion() ? 'auto' : 'smooth'}); }catch(e){}
 }
 function focusEl(el){
   if(!el) return;
   try{ el.focus({preventScroll:true}); }catch(e){ try{ el.focus(); }catch(e2){} }
 }
-function chooseFlour(style){
-  if(!STYLES[style]) return;
-  home.style = style;
-  applyStyleSelection(style, true);
-  home.open = 2;
-  renderHome();
-  var target = home.tier ? step2El.querySelector('.cust-card[data-tier="'+home.tier+'"]') : custCards[0];
-  focusEl(target);
-  revealEl(step2El);
-}
-function chooseCustomer(tier){
-  if(!home.style || !(CHARACTERS[tier] || (home.mode==='hana' && SEASON_CHARACTERS[tier]))) return;
-  var wasReady = !!home.tier;
-  home.tier = tier;
-  renderHome();
-  if(!wasReady && !prefersReducedMotion()){
-    btnStart.classList.remove('just-ready');
-    void btnStart.offsetWidth;
-    btnStart.classList.add('just-ready');
-  }
-  revealEl(btnStart);
-}
-
-// ---------- Home: limited-time mode choice (UI only; opened by the device's local date) ----------
-function renderSeasonUI(){
-  var today = localToday();
-  var last = null;
-  try{ last = loadStore().lastPlayedSeasonal; }catch(e){ last = null; }
-  for(var i=0;i<modeOpts.length;i++){
-    var id = modeOpts[i].getAttribute('data-mode');
-    if(!isSeasonalMode(id)){ modeOpts[i].disabled = false; continue; }
-    var st = seasonState(id, today);
-    modeOpts[i].disabled = !st.open;
-    modeOpts[i].querySelector('.mode-sub').textContent = st.open ? ('〜' + st.until + (last===id ? '・前回' : '')) : st.opens;
-  }
-  if(isSeasonalMode(home.mode) && !seasonState(home.mode, today).open){
-    home.modeMsg = '「' + SEASONAL_MODES[home.mode].name + '」の期間が終わったため、通常モードに戻しました。';
-    setMode('normal');
-  }
-  for(var j=0;j<modeOpts.length;j++){
-    modeOpts[j].setAttribute('aria-pressed', modeOpts[j].getAttribute('data-mode')===home.mode ? 'true' : 'false');
-  }
-  var m = isSeasonalMode(home.mode) ? SEASONAL_MODES[home.mode] : null;
-  modeNote.textContent = home.modeMsg || (m ? m.blurb : (today ? '' : '端末の日付を読み取れないため、期間限定モードは期間外として扱っています。'));
-  summaryMode.hidden = !m;
-  summaryMode.textContent = m ? m.name : '';
-  var dly = loadStore().daily, dailyOld = !!(dly && !parseConditionId(dly.conditionId).zan);   // (a 自由修行 challenge left from before: not in limited modes)
-  challengeEl.classList.toggle('is-off', !!m && dailyOld);
-  challengeModeNote.hidden = !(m && dailyOld);
-  farmerCard.hidden = home.mode!=='hana';
-}
-function setMode(modeId){
-  home.mode = isSeasonalMode(modeId) ? modeId : 'normal';
-  pendingMode = home.mode;
-  if(home.mode!=='hana' && home.tier==='farmer') home.tier = null;   // the farmer only comes in そばの花モード
-  renderBests();
-}
-function chooseMode(modeId){
-  if(isSeasonalMode(modeId) && !seasonState(modeId, localToday()).open){ renderHome(); return; }
-  home.modeMsg = '';
-  if(home.mode!==modeId) setMode(modeId);
-  renderHome();
-}
-
 // ---------- How-to page (UI only) ----------
 var guideOpener = null;
 function fmtPoints(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
@@ -4178,8 +3638,6 @@ function closeGuide(){
   focusEl(guideOpener || btnHowto);
 }
 
-fillHomeCards();
-applyStyleSelection(loadStore().lastStyle || DEFAULT_STYLE, false);
 renderRankAndDaily();
 renderHome();
 
@@ -4199,12 +3657,8 @@ if(window.matchMedia){
   try{ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', refreshColors); }catch(e){}
 }
 
-var STRAND_FILLS = ['#8a8268','#7d765f','#615c4a'];
-var STRAND_FILLS_SOAK = ['#4a2f1c','#5c3c24','#3f2814'];
 var STRAND_FILLS_SHIN = ['#8b9268','#7c865e','#5f6a48'];   // 新そば: a faint green in the dough and noodles
 var SHINSOBA_DOUGH = '#8a8f67';
-var STRAND_OUTLINE = '#332f24';
-var STRAND_OUTLINE_SOAK = '#20140b';
 
 // ---------- State ----------
 var state = freshState();
@@ -4268,82 +3722,11 @@ function laneY(){ return H*0.30; }
 function laneH(){ return H*0.15; }
 function judgeX(){ return W*0.22; }
 function trayY(){ return H*0.62; }
-function bowlCX(){ return W*0.5; }
-function bowlCY(){ return H*0.40; }
 
-// ---------- Pattern helpers ----------
-function generateGaps(baseUnit){
-  var arr = [];
-  for(var i=0;i<PATTERN_LENGTH-1;i++){
-    var pool = state.rhythmPool;
-    arr.push(pool[Math.floor(Math.random()*pool.length)] * baseUnit);
-  }
-  return arr;
-}
-function computeTargetTimes(startTime, gaps){
-  var times = [startTime+LEAD_IN];
-  for(var i=0;i<gaps.length;i++){
-    times.push(times[times.length-1]+gaps[i]);
-  }
-  return times;
-}
-function spawnStageNotes(isDemo, startTime){
-  var times = computeTargetTimes(startTime, state.pattern);
-  state.notes = [];
-  for(var i=0;i<times.length;i++){
-    state.notes.push({targetTime:times[i], judged:false, isDemo:isDemo, beat:i});
-  }
-}
-function startRound(){
-  state.pattern = generateGaps(state.baseUnit);
-  state.cutZoneWidth = 20;
-  if(state.roundsPlayed===0){
-    state.roundStage = 'intro';
-    state.notes = [];
-    state.introUntil = performance.now()+2400;
-    elCaption.textContent = state.character.icon+' '+state.character.name+':「'+state.character.quote+'」';
-    elCaption.classList.add('show');
-    state.captionHideAt = null;
-  } else {
-    state.roundStage = 'demo';
-    spawnStageNotes(true, performance.now());
-    elCaption.textContent = 'お手本';
-    elCaption.classList.add('show');
-    state.captionHideAt = null;
-  }
-  equipSfx('round');   // 着せ替え: e.g. the 和太鼓's 「ドン、ドン」 as each bowl begins
-}
 
-// ---------- Input ----------
-function onCut(){
-  if(state.phase==='serving' && state.serving && state.serving.stage==='spice' && !state.serving.spiceLocked){
-    lockSpice();
-    return;
-  }
-  if(state.phase==='serving'){ skipServing(); return; }   // a tap while serving skips the show
-  if(state.phase!=='playing' || state.roundStage!=='play') return;
-  var now = performance.now();
-  var best=null,bestErr=Infinity;
-  for(var i=0;i<state.notes.length;i++){
-    var n = state.notes[i];
-    if(n.judged) continue;
-    var err = Math.abs(now-n.targetTime);
-    if(err<bestErr){ bestErr=err; best=n; }
-  }
-  if(best && bestErr<=state.hitWindowMs){
-    best.judged = true;
-    registerHit(bestErr);
-  }
-}
 document.getElementById('screen-game').addEventListener('pointerdown', function(e){
   e.preventDefault();
-  if(state.phase==='zan'){                          // リズム修行・斬: judged on the song's clock (its own rules)
-    if(!(e.target && e.target.closest && e.target.closest('.sound-toggle'))) zanPress(e);
-    return;
-  }
-  // while a bowl is being served, the 🔊 button only switches the sound (it does not skip the show)
-  if(state.phase==='serving' && state.serving && state.serving.stage!=='spice' && e.target && e.target.closest && e.target.closest('.sound-toggle')) return;
-  onCut();
+  if(state.phase==='zan' && !(e.target && e.target.closest && e.target.closest('.sound-toggle'))) zanPress(e);   // judged on the song's clock
 });
 // 修行の画面では、長押しのメニュー（画像の保存など）を出さない
 document.getElementById('screen-game').addEventListener('contextmenu', function(e){ e.preventDefault(); });
@@ -4385,57 +3768,11 @@ document.addEventListener('touchend', function(e){
 });
 window.addEventListener('keydown', function(e){
   if(e.code!=='Space') return;
-  if(state.phase==='zan'){ e.preventDefault(); if(!e.repeat) zanPress(e); return; }
-  // Space cuts only while a game is running; on menus it keeps activating the focused button.
-  if(state.phase!=='playing' && state.phase!=='serving') return;
-  e.preventDefault();
-  if(e.repeat) return;
-  onCut();
+  if(state.phase==='zan'){ e.preventDefault(); if(!e.repeat) zanPress(e); }   // (on menus Space keeps activating the focused button)
 });
 
-for(var fi=0; fi<flourOpts.length; fi++){
-  flourOpts[fi].addEventListener('click', function(e){
-    chooseFlour(e.currentTarget.getAttribute('data-style'));
-  });
-}
-for(var ci=0; ci<custCards.length; ci++){
-  custCards[ci].addEventListener('click', function(e){
-    chooseCustomer(e.currentTarget.getAttribute('data-tier'));
-  });
-}
-step1Head.addEventListener('click', function(){
-  if(home.style && home.open!==1){
-    home.open = 1;
-    renderHome();
-    focusEl(step1El.querySelector('.flour-opt[aria-pressed="true"]'));
-  }
-});
-step2Head.addEventListener('click', function(){
-  if(home.style && home.open!==2){
-    home.open = 2;
-    renderHome();
-    revealEl(step2El);
-  }
-});
-btnStart.addEventListener('click', function(){
-  if(!(home.style && home.tier)) return;
-  // a limited-time mode starts only while today (device date) is inside its period
-  if(isSeasonalMode(home.mode) && !seasonState(home.mode, localToday()).open){ renderHome(); return; }
-  if(pendingStyle!==home.style) applyStyleSelection(home.style, false);
-  wakeAudio();   // the first お手本 comes before any cut, and iPhone lets sound start only inside a tap like this one
-  startGame(home.tier, home.mode);
-});
 rankBadge.addEventListener('click', function(){ openMypage(rankBadge); });
 btnHowto.addEventListener('click', function(){ openGuide(null, null, null, btnHowto); });
-// ? beside each step: open the how-to at that comparison, highlighting what is currently chosen
-helpFlour.addEventListener('click', function(){ openGuide('g-flour', 'flour-table', home.style, helpFlour); });
-helpCust.addEventListener('click', function(){ openGuide('g-cust', 'cust-table', home.tier, helpCust); });
-for(var mi=0; mi<modeOpts.length; mi++){
-  modeOpts[mi].addEventListener('click', function(e){
-    chooseMode(e.currentTarget.getAttribute('data-mode'));
-  });
-}
-helpSeason.addEventListener('click', function(){ openGuide('g-season', 'season-table', isSeasonalMode(home.mode) ? home.mode : null, helpSeason); });
 for(var gi=0; gi<tocChips.length; gi++){
   tocChips[gi].addEventListener('click', function(e){
     scrollToGuideSection(e.currentTarget.getAttribute('data-goto'), true);
@@ -5117,54 +4454,7 @@ function showScreen(name){
 // ---------- Flow ----------
 var loopStarted=false;
 var lastTs=0;
-function startGame(tierKey, modeId){
-  var freeMode = document.getElementById('free-mode');
-  if(freeMode) freeMode.open = true;                // back home, the 自由修行 stays open where it was played
-  // limited-time modes only while the device date is inside their period; anything else plays normally
-  var mode = (isSeasonalMode(modeId) && seasonState(modeId, localToday()).open) ? modeId : 'normal';
-  var tier = TIERS[tierKey] || (mode==='hana' && SEASON_TIERS[tierKey]) || TIERS.regular;
-  var style = STYLES[pendingStyle] ? pendingStyle : DEFAULT_STYLE;
-  var styleConf = modeStyleConf(STYLES[style], mode);
-  stopDemoTaps();
-  state = freshState();
-  resetServeShow();
-  state.skin = resolveSkin();   // 着せ替え: the equipped look and sound for this game (anything invalid = the original)
-  skinFailed = {};
-  prewarmSkin();
-  state.mode = mode;
-  state.tier = tierKey || 'regular';
-  state.character = CHARACTERS[state.tier] || (mode==='hana' && SEASON_CHARACTERS[state.tier]) || CHARACTERS.regular;
-  state.style = style;
-  state.styleConf = styleConf;
-  state.aromaBonus = 0;
-  state.rhythmPool = tier.pool;
-  state.perfectMs = tier.perfectMs * styleConf.timingMult;
-  state.goodMs = tier.goodMs * styleConf.timingMult;
-  state.hitWindowMs = tier.hitWindowMs * styleConf.timingMult;
-  state.boardWidth = tier.boardWidth;
-  aromaGaugeWrap.classList.toggle('locked', !styleConf.hasAroma);
-  aromaGaugeWrap.hidden = false;                 // (リズム修行・斬 hides it)
-  document.getElementById('hud-third-label').textContent = '客数';
-  document.getElementById('tap-hint').textContent = 'タップ / スペースキーでカット!';
-  aromaGaugeFill.style.width = '0%';
-  aromaValueEl.textContent = '0';
-  applyModeLook(mode);
-  state.phase = 'playing';
-  showScreen('game');
-  resize();
-  startRound();
-  lastTs = 0;
-  if(!loopStarted){
-    loopStarted = true;
-    requestAnimationFrame(loop);
-  }
-}
 
-var JUST_RATIO = 0.35;
-function comboMultiplier(combo){
-  if(combo<=0) return 1.0;
-  return Math.min(1 + 0.1*(combo-1), 5.0);
-}
 
 var audioCtx = null;
 function getAudioCtx(){
@@ -5306,114 +4596,8 @@ function playJustSound(){
   playSfx('cutShaki', 1, 0);
   playSfx('justPon', 1, JUST_POP_DELAY);
 }
-function playAromaSound(){
-  if(!audioEnabled) return;
-  var ctx2 = getAudioCtx();
-  if(!ctx2) return;
-  try{
-    if(ctx2.state==='suspended'){ ctx2.resume(); }
-    var osc = ctx2.createOscillator();
-    var gain = ctx2.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(620, ctx2.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(520, ctx2.currentTime+0.12);
-    gain.gain.setValueAtTime(0.09, ctx2.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime+0.16);
-    osc.connect(gain);
-    gain.connect(sfxOut(ctx2));
-    osc.start();
-    osc.stop(ctx2.currentTime+0.18);
-  }catch(e){}
-}
-function showAromaPopup(gainDisplay){
-  aromaPopupEl.textContent = '+香り '+gainDisplay;
-  aromaPopupEl.classList.remove('show');
-  aromaPopupEl.classList.remove('lost');
-  void aromaPopupEl.offsetWidth;
-  aromaPopupEl.classList.add('show');
-}
-function playSpiceSound(success){
-  if(!audioEnabled) return;
-  var ctx2 = getAudioCtx();
-  if(!ctx2) return;
-  try{
-    if(ctx2.state==='suspended'){ ctx2.resume(); }
-    var osc = ctx2.createOscillator();
-    var gain = ctx2.createGain();
-    osc.type = success ? 'sine' : 'sawtooth';
-    if(success){
-      osc.frequency.setValueAtTime(700, ctx2.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1100, ctx2.currentTime+0.1);
-    } else {
-      osc.frequency.setValueAtTime(300, ctx2.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(170, ctx2.currentTime+0.15);
-    }
-    gain.gain.setValueAtTime(0.13, ctx2.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime+0.2);
-    osc.connect(gain);
-    gain.connect(sfxOut(ctx2));
-    osc.start();
-    osc.stop(ctx2.currentTime+0.22);
-  }catch(e){}
-}
 
-function registerHit(err){
-  var rating, points;
-  if(err<=state.perfectMs){ rating='PERFECT'; points=100; }
-  else if(err<=state.goodMs){ rating='GOOD'; points=60; }
-  else { rating='OK'; points=30; }
 
-  state.combo++;
-  state.maxCombo = Math.max(state.maxCombo, state.combo);
-  var multiplier = comboMultiplier(state.combo);
-  state.maxMultiplier = Math.max(state.maxMultiplier, multiplier);
-
-  var isJust = err<=(state.perfectMs*JUST_RATIO);
-  var styleMult = state.styleConf.scoreMult;
-  var aromaMult = state.styleConf.hasAroma ? (1+state.aromaBonus) : 1;
-  var finalPoints = Math.round(points * multiplier * (isJust?2:1) * styleMult * aromaMult);
-  var pointsWithoutAroma = Math.round(points * multiplier * (isJust?2:1) * styleMult * 1);
-  state.score += finalPoints;
-  state.aromaScoreTotal += (finalPoints - pointsWithoutAroma);
-  state.hitCount++;
-  if(isJust) state.justCount++;
-
-  if(state.styleConf.hasAroma && (!state.styleConf.aromaNeedsPerfect || rating==='PERFECT')){
-    var beforeAroma = state.aromaBonus;
-    state.aromaBonus = Math.min(state.aromaBonus + AROMA_GAIN, AROMA_MAX);
-    var aromaDelta = state.aromaBonus - beforeAroma;
-    if(aromaDelta>0){
-      state.aromaFlash = 260;
-      showAromaPopup(Math.round((aromaDelta/AROMA_MAX)*100));
-      playAromaSound();
-    }
-  }
-
-  var clampedErr = Math.min(err, state.hitWindowMs);
-  var thickness = MIN_THICK + (clampedErr/state.hitWindowMs)*(MAX_THICK-MIN_THICK);
-  state.knifeChop = 140;
-  state.lastCutThickness = thickness;
-  state.cutFx.push({t:0, rating: isJust ? 'JUST' : rating});
-  state.batch.push({thickness:thickness, points:points, seed:Math.random()});
-  showPopup(isJust ? 'JUST!' : rating);
-  playCutSounds(isJust, state.combo);   // the cut on the combo's note (and a JUST!'s 合いの手); 着せ替え changes the sound only
-  cutImpactFx(isJust ? 'JUST' : rating, state.combo);   // オノマトペ, the JUST! bounce, the combo flurry (looks only)
-}
-
-function onMiss(){
-  state.missCount++;
-  state.combo = 0;
-  if(state.styleConf.missPenalty){
-    state.score = Math.max(0, state.score - state.styleConf.missPenalty);
-  }
-  if(state.styleConf.aromaResetOnMiss && state.aromaBonus>0){
-    state.aromaBonus = 0;   // 新そばモード: a MISS lets the aroma escape
-    showAromaLost();
-  }
-  showPopup('MISS');
-  playMissSound();
-  cutImpactFx('MISS', 0);
-}
 
 function showPopup(text){
   elPopup.textContent = text;
@@ -5423,176 +4607,16 @@ function showPopup(text){
   elPopup.classList.add('show');
 }
 
-// ---------- 切った瞬間の演出（見た目だけ。得点・判定には関係しない） ----------
-// オノマトペ: a word for the cut, popping up beside the board (they alternate sides); the JUST! bounce of the play
-// area; and every 10 in a row, a flurry of 桜 petals and sparkles from both edges. 描画「軽量」, 演出「控えめ」 and
-// prefers-reduced-motion calm the motion (no bounce; the words only fade; no flurry); 紙吹雪オフ turns the flurry off.
-var ONOMATO = {JUST:['ズバッ！','ピッタリ！','極上！'], PERFECT:['シャキッ！','イイネ！'], GOOD:['トントン'], OK:['トン'], MISS:['グニャ…','スカッ']};
-var impactLayer = document.getElementById('impact-layer');
-var playWrap = canvas.parentNode;
-var onomatoPool = [], onomatoNext = 0, onomatoSide = 0;
 function motionCalm(){
   var fc = fxConf();
   return fc.still || visualDetail==='low' || effectsPref.level==='low';
 }
-function cutImpactFx(kind, combo){
-  try{
-    showOnomato(kind);
-    if(kind==='JUST') justBounce();
-    if(combo>0 && combo % 10===0) comboFlurry();
-  }catch(e){}
-}
-function showOnomato(kind){
-  var words = ONOMATO[kind];
-  if(!impactLayer || !words) return;
-  if(onomatoPool.length<4){ var sp = document.createElement('span'); impactLayer.appendChild(sp); onomatoPool.push(sp); }
-  var el = onomatoPool[onomatoNext % onomatoPool.length];
-  onomatoNext++;
-  onomatoSide = 1 - onomatoSide;
-  el.className = 'onomato r-' + kind.toLowerCase();
-  el.textContent = words[Math.floor(Math.random()*words.length)];
-  el.style.left = (onomatoSide ? 26 + Math.random()*12 : 62 + Math.random()*12) + '%';
-  el.style.top = (54 + Math.random()*12) + '%';
-  el.style.setProperty('--rot', (Math.random()*16 - 8).toFixed(1) + 'deg');
-  void el.offsetWidth;                              // restart the pop even when the same word comes again
-  el.classList.add('go');
-}
-function justBounce(){
-  if(!playWrap || motionCalm()) return;
-  playWrap.classList.remove('just-bounce');
-  void playWrap.offsetWidth;
-  playWrap.classList.add('just-bounce');
-}
-function comboFlurry(){
-  if(!impactLayer || !effectsPref.particlesOn || fxConf().still) return;
-  if(impactLayer.querySelectorAll('.flurry').length>40) return;
-  var w = impactLayer.clientWidth, h = impactLayer.clientHeight;
-  if(!(w>0 && h>0)) return;
-  var n = (visualDetail==='low' || effectsPref.level==='low') ? 8 : effectsPref.level==='high' ? 22 : 16;
-  for(var i=0;i<n;i++){
-    var left = i % 2===0, el = document.createElement('span');
-    var spark = i % 3===2;
-    el.className = 'flurry' + (spark ? ' spark' : (i % 4===1 ? ' alt' : ''));
-    if(spark) el.textContent = '✦';
-    var x0 = left ? -10 : w + 4, y0 = h*(0.2 + Math.random()*0.6);
-    el.style.left = x0 + 'px';
-    el.style.top = y0 + 'px';
-    el.style.setProperty('--dx', ((left ? 1 : -1)*w*(0.25 + Math.random()*0.3)).toFixed(0) + 'px');
-    el.style.setProperty('--dy', (-h*(0.1 + Math.random()*0.3)).toFixed(0) + 'px');
-    el.style.setProperty('--spin', (Math.random()*540 - 270).toFixed(0) + 'deg');
-    el.style.animationDelay = (Math.random()*0.18).toFixed(2) + 's';
-    impactLayer.appendChild(el);
-    (function(node){ setTimeout(function(){ if(node.parentNode) node.parentNode.removeChild(node); }, 1300); })(el);
-  }
-}
 
-function pickComment(tier){
-  var pool = state.character.comments[tier];
-  return pool[Math.floor(Math.random()*pool.length)];
-}
 
-function beginServing(){
-  state.phase = 'serving';
-  playFinishSound();   // the bowl's last cut is in: the closing fanfare
-  if(state.character.hasSpiceMeter){
-    state.serving = {
-      stage:'spice', t:0, result:null,
-      spiceTarget: 30+Math.random()*40,
-      spiceLocked:false, spiceLockedAt:0, spiceResult:null
-    };
-  } else {
-    state.serving = {stage:'plate', t:0, result:null};
-    startPlating(state.serving);
-  }
-}
 
-// ---------- 提供: ① 盛り付け → ② だしをかける → ③ お客さんの反応 ----------
-// ① plate: the noodles rise into the bowl and the toppings go on; ② pour: the dashi is poured (its sound follows the
-// stream); ③ react: 0.3 s after the pour the customer reacts and speaks. A tap skips the rest at any point.
-// The bowl's satisfaction is worked out when plating starts (the same formula as before) but is only added to the
-// game, and shown, when ③ ends or the show is skipped.
-var SERVE_PLATE_MS = 1000, SERVE_POUR_MS = 900, SERVE_REACT_MS = 1800, SERVE_SAY_AT = 300;
-var SERVE_SKIP_GRACE = 250;          // taps this soon after plating starts are the last cuts, not a skip
-function startPlating(s){
-  s.stage = 'plate'; s.t = 0; s.clock = 0;
-  s.pourCued = false; s.said = false; s.committed = false;
-  prepareServeResult(s);
-  serveFx = [];
-  hideServeBubble();
-  elSatisPop.classList.remove('show');
-  elCaption.classList.remove('show');
-  state.captionHideAt = null;
-}
-// satisfaction → the customer's reaction: miss (below 55), ok (55+), good (70+), just (90+, the best)
-function reactionTier(sat){ return sat>=90 ? 'just' : sat>=70 ? 'good' : sat>=55 ? 'ok' : 'miss'; }
-function prepareServeResult(s){
-  var avg = 0;
-  for(var i=0;i<state.batch.length;i++) avg += state.batch[i].points;
-  avg = state.batch.length ? avg/state.batch.length : 0;
-  var satisfaction = 100 - (100-avg)*state.character.toppingStrictness;
-  if(state.character.hasSpiceMeter && s.spiceResult && !s.spiceResult.success){
-    satisfaction -= Math.min(40, s.spiceResult.diff*0.8);
-  }
-  satisfaction = Math.max(0, Math.min(100, Math.round(satisfaction)));
-  // the words follow the same satisfaction as the face, so a smile never comes with a complaint
-  var tier = satisfaction>=85 ? 'high' : satisfaction>=55 ? 'mid' : 'low';
-  var stars = tier==='high' ? '★★★' : tier==='mid' ? '★★' : '★';
-  s.result = {face:state.character.icon, text:pickComment(tier), stars:stars, satisfaction:satisfaction, reaction:reactionTier(satisfaction)};
-}
-// the bowl's satisfaction goes into the game exactly once, and is shown as it does
-function commitSatisfaction(s){
-  if(!s || s.committed || !s.result) return;
-  s.committed = true;
-  state.satisfactionSum += s.result.satisfaction;
-  state.satisfactionRounds++;
-  showSatisfactionPop(s.result.satisfaction, s.result.reaction);
-}
-// ③ has ended, or a tap skipped the show: add the satisfaction, clear the show, and bring on the next bowl
-function finishServing(){
-  var s = state.serving;
-  if(state.phase!=='serving' || !s || s.stage==='spice') return;
-  stopPourSound();
-  commitSatisfaction(s);
-  hideServeBubble();
-  serveFx = [];
-  advanceRoundAfterServing();
-}
-function skipServing(){
-  var s = state.serving;
-  if(state.phase!=='serving' || !s || s.stage==='spice' || s.clock<SERVE_SKIP_GRACE) return false;
-  finishServing();
-  return true;
-}
+          // taps this soon after plating starts are the last cuts, not a skip
 
-function lockSpice(){
-  var s = state.serving;
-  s.spiceLocked = true;
-  s.spiceLockedAt = s.t;
-  var marker = 50+50*Math.sin(s.t*SPICE_PERIOD);
-  var diff = Math.abs(marker-s.spiceTarget);
-  var success = diff<=SPICE_TOLERANCE;
-  s.spiceResult = {value:marker, success:success, diff:diff};
-  state.spiceFlash = 300;
-  playSpiceSound(success);
-}
 
-function advanceRoundAfterServing(){
-  var avg = 0;
-  for(var i=0;i<state.batch.length;i++) avg += state.batch[i].points;
-  avg = state.batch.length ? avg/state.batch.length : 0;
-  if(avg>=55) state.satisfiedCustomers++;
-  state.roundsPlayed++;
-  state.batch = [];
-  state.cutFx = [];
-  state.serving = null;
-  if(state.roundsPlayed>=TOTAL_CUSTOMERS){
-    endGame();
-    return;
-  }
-  state.baseUnit = Math.max(BASE_UNIT_MIN, state.baseUnit-BASE_UNIT_STEP);
-  state.phase = 'playing';
-  startRound();
-}
 
 // 新しい称号: the titles this game earned, by name, on the result
 function showNewTitles(ids){
@@ -5601,109 +4625,12 @@ function showNewTitles(ids){
   resultRankUp.textContent = names.length ? ('🏅 新しい称号' + names.join('') + 'を獲得!') : '';
   resultRankUp.classList.toggle('show', names.length>0);
 }
-function endGame(){
-  state.phase = 'result';
-  resultScore.textContent = state.score;
-  resultCustomers.textContent = state.satisfiedCustomers + '人';
-  resultCombo.textContent = state.maxCombo;
-  resultMultiplier.textContent = 'x' + state.maxMultiplier.toFixed(1);
-  resultStyle.textContent = state.style;
-  resultAroma.textContent = state.aromaScoreTotal;
-  var satisfactionAvg = state.satisfactionRounds ? Math.round(state.satisfactionSum/state.satisfactionRounds) : 0;
-  resultSatisfaction.textContent = satisfactionAvg;
-  setResultMode(state.mode);
-  screens.result.classList.remove('is-zan');       // the bowl's numbers (not those of リズム修行・斬)
-  document.getElementById('zan-stats').hidden = true;
-  zanShowStop(true);                                // (the 斬 result show is not for the bowl)
-  if(isSeasonalMode(state.mode)){ endSeasonalGame(); return; }   // limited modes keep only their own record
-  var isNewSatisfactionBest = recordSatisfaction(state.tier, satisfactionAvg);
-  resultSatisfactionBest.classList.toggle('show', isNewSatisfactionBest);
-  recordMaxCombo(state.maxCombo);
-  // 称号の記録: the score, combo and JUST! rate of this game (read only; nothing here changes the score)
-  var newTitles = recordPlay(state.score, state.maxCombo, state.justCount, state.hitCount + state.missCount);
 
-  var isNewBest = saveBest(state.style, state.tier, state.score);
-  var dailyJustCleared = checkDailyClear(state.tier, state.score);
-  var storeAfter = loadStore();
-
-  var styleBests = storeAfter.bests[state.style] || {};
-  resultBest.textContent = styleBests[state.tier] || state.score;
-  resultNewBest.classList.toggle('show', isNewBest);
-  showNewTitles(newTitles);
-  resultDailyClear.classList.toggle('show', dailyJustCleared);
-  renderBests();
-  renderRankAndDaily();
-
-  resultRank.textContent = '今回の腕前: ' + playTierName(state.score);
-  showCoinsForGame(dailyJustCleared);
-  showEquipOnResult();
-  showScreen('result');
-  var rewards = claimRewards();               // 限定 items whose record this game reached (looks only)
-  startResultCount(isNewBest, function(){ showRewards(rewards, btnRestart); });   // the numbers roll in, then the news
-}
-
-// ---------- Limited-time modes: rules, records and looks ----------
-// Normal games never take these branches: they keep the flour's own settings object as before.
-function modeStyleConf(base, mode){
-  var r = isSeasonalMode(mode) ? SEASONAL_MODES[mode].rules : null;
-  if(!r) return base;
-  return {
-    desc:base.desc,
-    scoreMult:base.scoreMult * r.scoreMult,
-    missPenalty:base.missPenalty,
-    timingMult:base.timingMult * r.timingMult,
-    hasAroma:base.hasAroma || !!r.aromaAll,
-    aromaNeedsPerfect:!!r.aromaNeedsPerfect,
-    aromaResetOnMiss:!!r.aromaResetOnMiss
-  };
-}
 function applyModeLook(mode){
   var m = isSeasonalMode(mode) ? SEASONAL_MODES[mode] : null;
   modeTag.hidden = !m;
   modeTag.textContent = m ? ('期間限定・' + m.name) : '';
   aromaLabelEl.textContent = mode==='shinsoba' ? '新そばの香り' : '香り';
-}
-function setResultMode(mode){
-  var m = isSeasonalMode(mode) ? SEASONAL_MODES[mode] : null;
-  resultMode.hidden = !m;
-  resultMode.textContent = m ? ('期間限定・' + m.title) : '';
-  resultBestLabel.textContent = m ? '限定ベスト' : '自己ベスト';
-}
-// Limited modes write only to store.seasonal[mode][tier]; normal bests, rank, daily challenge,
-// satisfaction and combo records are left untouched.
-function saveSeasonalBest(modeId, tierKey, score){
-  var store = loadStore();
-  if(!store.seasonal[modeId]) store.seasonal[modeId] = {};
-  var slot = store.seasonal[modeId];
-  var isNew = !Object.prototype.hasOwnProperty.call(slot, tierKey) || score>slot[tierKey];
-  if(isNew) slot[tierKey] = score;
-  store.lastPlayedSeasonal = modeId;
-  saveStoreObj(store);
-  return isNew;
-}
-function endSeasonalGame(){
-  var isNewBest = saveSeasonalBest(state.mode, state.tier, state.score);
-  var store = loadStore();
-  var slot = store.seasonal[state.mode] || {};
-  resultBest.textContent = Object.prototype.hasOwnProperty.call(slot, state.tier) ? slot[state.tier] : state.score;
-  resultNewBest.classList.toggle('show', isNewBest);
-  showNewTitles([]);
-  resultDailyClear.classList.remove('show');
-  resultSatisfactionBest.classList.remove('show');
-  renderBests();
-  renderRankAndDaily();
-  resultRank.textContent = '今回の腕前: ' + playTierName(state.score);
-  showCoinsForGame(false);   // limited modes earn coins too (no daily challenge there)
-  showEquipOnResult();
-  showScreen('result');
-  startResultCount(isNewBest, null);
-}
-function showAromaLost(){
-  aromaPopupEl.textContent = '香りが飛んだ…';
-  aromaPopupEl.classList.remove('show');
-  aromaPopupEl.classList.add('lost');
-  void aromaPopupEl.offsetWidth;
-  aromaPopupEl.classList.add('show');
 }
 
 // --- looks (drawn behind the lane) ---
@@ -5831,7 +4758,7 @@ function awardCoins(parts){
   if(g.dailyEarned.date!==today) g.dailyEarned = {date:today, amount:0, challenge:false};
   var challengeRepeat = false;
   if(parts.challenge && g.dailyEarned.challenge){ parts.challenge = 0; challengeRepeat = true; }
-  var total = parts.base + parts.scorePart + parts.satPart + parts.challenge;
+  var total = parts.base + parts.scorePart + parts.satPart + parts.challenge + (parts.course || 0) + (parts.trick || 0) + (parts.today || 0);
   var granted = Math.max(0, Math.min(total, COIN_MAX - g.currency));   // only the wallet's own ceiling
   g.currency += granted;
   g.dailyEarned.amount = Math.min(COIN_MAX, g.dailyEarned.amount + granted);
@@ -5847,6 +4774,9 @@ function renderCoinResult(r, satLabel){
     '得点 ' + p.scorePart + '（' + fmtPoints(p.score) + '点×' + (p.rate10/10).toFixed(1) + '÷' + COIN_SCORE_STEP + (p.scorePart>=COIN_SCORE_MAX ? '・上限' + COIN_SCORE_MAX : '') + '）',
     (satLabel || '満足度') + ' ' + p.satPart + '（' + p.sat + '÷' + COIN_SAT_DIV + '）'
   ];
+  if(p.course) items.push('コース' + (p.courseName ? '（' + p.courseName + '）' : '') + ' ' + p.course);
+  if(p.trick) items.push('師匠のイタズラ ' + p.trick);
+  if(p.today) items.push('今日の一曲 ' + p.today);
   if(p.challenge) items.push('本日のチャレンジ達成 ' + p.challenge);
   coinBreakdown.textContent = '（' + items.join(' ＋ ') + '）';
   var notes = [];
@@ -5855,17 +4785,6 @@ function renderCoinResult(r, satLabel){
   coinNote.textContent = notes.join(' ');
   coinStatus.textContent = '所持 ' + fmtPoints(r.balance) + '🪙 ・ 本日の獲得 ' + fmtPoints(r.today);
   coinBox.hidden = false;
-}
-function gameSatisfactionAvg(){
-  return state.satisfactionRounds ? Math.round(state.satisfactionSum/state.satisfactionRounds) : 0;
-}
-// Never lets a coin problem get in the way of the result screen.
-function showCoinsForGame(challengeCleared){
-  try{
-    renderCoinResult(awardCoins(coinParts(state.score, state.tier, gameSatisfactionAvg(), challengeCleared)));
-  }catch(e){
-    coinBox.hidden = true;
-  }
 }
 
 // ---------- そば猪口ガチャ・図鑑: pulling, the opening effect and the collection ----------
@@ -7160,8 +6079,6 @@ var equipHead = document.getElementById('equip-h');
 var zukanTitleEquip = document.getElementById('zukan-title-equip');
 var zmEquip = document.getElementById('zm-equip');
 var zmEquipNote = document.getElementById('zm-equip-note');
-var resultTitleChip = document.getElementById('result-title-chip');
-var resultEquip = document.getElementById('result-equip');
 var zmCurrentId = null;
 var zmOpenerId = null;
 var skinFailed = {};          // a slot whose drawing threw once goes back to the original look for the rest of the game
@@ -7320,26 +6237,6 @@ function comboPitch(combo){
   return Math.pow(2, COMBO_SCALE[(n - 1) % COMBO_SCALE.length]/12);
 }
 var JUST_POP_DELAY = 0.045;   // JUST!: the cut, then the 合いの手 right on its heels (a double attack)
-// every successful cut: the equipped sound item's cut (or the game's 「シャキッ」) on the combo's note; a JUST! adds
-// the item's 合いの手 (or the game's 小鼓 「ポン！」) and the equipped blade's ring. Looks and sound only.
-function playCutSounds(isJust, combo){
-  try{
-    var snd = skinPart('sound'), tool = skinPart('tool'), r = comboPitch(combo);
-    playSfx(snd && snd.cut ? snd.cut : 'cutShaki', r, 0);
-    if(isJust){
-      playSfx(snd && snd.just ? snd.just : 'justPon', r, JUST_POP_DELAY);
-      if(tool && tool.just) playSfx(tool.just, 1, 0);
-    }
-  }catch(e){}
-}
-// the bowl is done (the last cut): a 和風ファンファーレ, or the sound item's own
-function playFinishSound(){
-  try{ var snd = skinPart('sound'); playSfx(snd && snd.finish ? snd.finish : 'finishFanfare', 1, 0); }catch(e){}
-}
-// a MISS: the pitch drops away (ズッコケ), or the sound item's own
-function playMissSound(){
-  try{ var snd = skinPart('sound'); playSfx(snd && snd.miss ? snd.miss : 'missDrop', 1, 0); }catch(e){}
-}
 // 師匠のお手本: a dry 「トン」 of a knife on the wooden まな板. It is the master's own sound whatever sound item is
 // equipped, so the demonstration always sounds the same and stands apart from the player's cuts. Each tap is booked on
 // the audio clock a moment before its mark reaches the line, so it lands right on the beat; the booked taps are kept,
@@ -7349,25 +6246,10 @@ var DEMO_TAP_VOICES = [
   {t:'tone', wave:'sine', f:930, f2:700, dur:0.045, vol:0.11, atk:0.001, p:1},      // the knock of the wood
   {t:'noise', filter:'lowpass', f:3400, f2:800, dur:0.028, vol:0.08, atk:0.001}     // the blade's dry click
 ];
-var DEMO_TAP_LEAD_MS = 120;          // how far ahead a tap is booked
-var DEMO_TAP_LATE_MS = 60;           // a mark passed longer ago than this (the tab was hidden) stays silent
-var DEMO_TAP_PITCH = [1, 0.94];      // トン、トン: every other tap a touch lower, like a hand on a real board
+          // how far ahead a tap is booked
+           // a mark passed longer ago than this (the tab was hidden) stays silent
+      // トン、トン: every other tap a touch lower, like a hand on a real board
 var demoTaps = [];
-function playDemoTap(delayMs, beat){
-  if(!audioEnabled) return;
-  var ac = getAudioCtx();
-  if(!ac) return;
-  try{
-    if(ac.state==='suspended') ac.resume();
-    var at = Math.max(0, delayMs)/1000, r = DEMO_TAP_PITCH[(beat||0) % DEMO_TAP_PITCH.length], now = ac.currentTime;
-    demoTaps = (demoTaps || []).filter(function(t){ return t.until > now; });
-    for(var i=0;i<DEMO_TAP_VOICES.length;i++){
-      var v = DEMO_TAP_VOICES[i];
-      var node = v.t==='tone' ? sfxToneVoice(ac, v, at, r) : sfxNoiseVoice(ac, v, at, r);
-      if(node) demoTaps.push({node:node, until:now + at + v.dur + 0.06});
-    }
-  }catch(e){}
-}
 // inside a tap: make the audio ready (a silent blip unlocks iPhone's Safari), so a sound booked later can play. Never while 🔇.
 function wakeAudio(){
   if(!audioEnabled) return;
@@ -7391,13 +6273,6 @@ function stopDemoTaps(){
 }
 document.addEventListener('visibilitychange', function(){ if(document.hidden) stopDemoTaps(); });
 window.addEventListener('pagehide', stopDemoTaps);
-// event: 'round' (each bowl begins), 'serve' (the customer eats) — moments only some sound items have
-function equipSfx(event){
-  try{
-    var snd = skinPart('sound');
-    if(snd && snd[event]) playSfx(snd[event], 1, 0);
-  }catch(e){}
-}
 function previewEquipSound(it){
   try{
     var table = it ? SKIN_TABLES[it.applyTo] : null;
@@ -8334,7 +7209,7 @@ function paintToolHandle(g, tk){
 
 // --- ② 演出: one base for every 演出 (drawSkinRing + drawCutBits); the palette picks the colours, the shape of the
 // bits, the sparkle and the ring. The bits follow settings.effects (level and particlesOn) and are capped. ---
-var CUT_BITS_MAX = 18, CUT_FX_RECENT = 4, SERVE_FX_MAX = 96;
+var CUT_BITS_MAX = 18;
 // The bits, each drawn round (0, 0) at about 9 units across for s = 1
 var BIT_SHAPES = {
   strip:function(c, s, col){ c.fillStyle = col; c.fillRect(-4.5*s, -2*s, 9*s, 4*s); },
@@ -8673,20 +7548,6 @@ function drawSkinOverlay(c, cx, cy, fx, ek, top, h, w, force){
     c.restore();
   }
   c.restore();
-}
-function drawNoodleAura(cx, cy, col, k){
-  if(k<=0) return;
-  var t = lookTime(performance.now()), pulse = 0.85 + 0.15*Math.sin(t*2.4);
-  ctx.save();
-  ctx.translate(cx, cy + 20);
-  ctx.scale(1, 0.42);
-  var g = ctx.createRadialGradient(0, 0, 50, 0, 0, 118*pulse);
-  g.addColorStop(0, rgbaHex(col, 0));
-  g.addColorStop(0.55, rgbaHex(col, 0.42*k));
-  g.addColorStop(1, rgbaHex(col, 0));
-  ctx.fillStyle = g;
-  ctx.beginPath(); ctx.arc(0, 0, 118*pulse, 0, Math.PI*2); ctx.fill();
-  ctx.restore();
 }
 // how far the play area is shaken by the newest JUST! of a 演出 that shakes (none on 控えめ or with reduced motion)
 function skinShake(){
@@ -10124,32 +8985,6 @@ BG_SCENES.dinoForest = function(g, W, H, b, q){ // 太古の勝山: a fern fores
   sceneDino(g, W*0.62, H*0.9, s*1.2, '#3e3428');
 };
 
-// --- result: the equipped title beside 段位, what was equipped, and the effect colour on the score panel ---
-function showEquipOnResult(){
-  try{
-    var sk = state.skin || {};
-    var tname = sk.title ? sk.title.name : '';
-    resultTitleChip.hidden = true;                   // the worn 称号 has its own row now
-    resultDanName.textContent = tname || 'なし';
-    var names = [];
-    for(var i=0;i<GACHA_SLOTS.length;i++){
-      var slot = GACHA_SLOTS[i];
-      if(slot==='title' || !sk[slot]) continue;
-      var it = gachaItem(sk[slot].id);
-      if(it) names.push(it.name);
-    }
-    resultEquip.hidden = !names.length;
-    resultEquip.textContent = names.length ? ('装備：' + names.join('・')) : '';
-    var fx = sk.effect;
-    screens.result.classList.toggle('has-fx', !!fx);
-    if(fx) screens.result.style.setProperty('--fx-accent', fx.ring);
-    else screens.result.style.removeProperty('--fx-accent');
-  }catch(e){
-    resultTitleChip.hidden = true;
-    resultEquip.hidden = true;
-    screens.result.classList.remove('has-fx');
-  }
-}
 
 // --- 図鑑: 装備する / 外す ---
 function setEquipMsg(res, name, slot, equipping){
@@ -10694,7 +9529,7 @@ function tryKisekaeSounds(){
   if(sk.tool && sk.tool.just) seq.push(sk.tool.just);
   if(!seq.length){
     playJustSound();
-    setKisekaeMsg('音のアイテム（音・道具）は装備していません。いまはJUST!の音だけです。');
+    setKisekaeMsg('音のアイテム（音・道具）は装備していません。いまはPerfectの音だけです。');
     return;
   }
   for(i=0;i<seq.length;i++) (function(name, at){ setTimeout(function(){ playSkinSound(name); }, at); })(seq[i], i*480);
@@ -11458,6 +10293,7 @@ function mergeStores(localRaw, cloudRaw){
   out.rewards.unlockedTitles = unionList(L.rewards.unlockedTitles, C.rewards.unlockedTitles);
   if(L.recordsClearedAt===C.recordsClearedAt){       // リズム修行・斬: the larger best, the better 完成度 (over all, and by course)
     var zanMax = function(o, l, c){
+      o.bestTrick = c.best>l.best ? c.bestTrick : l.bestTrick;
       o.best = Math.max(l.best, c.best);
       o.plays = Math.max(l.plays, c.plays);
       o.bestGrade = ZAN_GRADE_NAMES.indexOf(c.bestGrade) > ZAN_GRADE_NAMES.indexOf(l.bestGrade) ? c.bestGrade : l.bestGrade;
@@ -11467,6 +10303,7 @@ function mergeStores(localRaw, cloudRaw){
     out.zan.courses = {};
     for(var zc=0;zc<ZAN_COURSE_IDS.length;zc++){ var zid = ZAN_COURSE_IDS[zc]; out.zan.courses[zid] = {}; zanMax(out.zan.courses[zid], L.zan.courses[zid], C.zan.courses[zid]); }
     out.zan.lastCourse = L.zan.lastCourse || C.zan.lastCourse;
+    out.zan.todayDone = C.zan.todayDone>L.zan.todayDone ? C.zan.todayDone : L.zan.todayDone;
   }
   // seen the guide on either device: seen; the 共有ボーナス: the later day it was paid (so it is paid once a day)
   var obL = out.settings.onboarding, obC = C.settings.onboarding;
@@ -11628,7 +10465,7 @@ function renderMypage(){
   var worn = equippedTitleName(g);
   mpEls['mp-title-name'].textContent = worn || '称号なし';
   mpEls['mp-title-btn'].setAttribute('aria-label', '称号（いまは「' + (worn || 'なし') + '」）。押すと付け替えられます');
-  mpEls['mp-high'].textContent = fmtPoints(m.highScore);      // 斬と自由修行を合わせて (as the titles are judged)
+  mpEls['mp-high'].textContent = fmtPoints(m.highScore);      // 斬の記録 (as the titles are judged)
   mpEls['mp-total'].textContent = fmtPoints(m.totalScore);
   mpEls['mp-combo'].textContent = fmtPoints(m.maxCombo);
   renderMypageZan(store.zan);
@@ -11651,7 +10488,7 @@ function renderMypageZan(z){
     var c = ZAN_COURSES[i], r = z.courses[c.id], li = document.createElement('li'), ok = zanPlayable(c.id);
     li.classList.toggle('is-soon', !ok);
     var b = document.createElement('b'); b.textContent = c.name;
-    var best = document.createElement('span'); best.className = 'mz-best'; best.textContent = r.best>0 ? fmtPoints(r.best) + '点' : '—';
+    var best = document.createElement('span'); best.className = 'mz-best'; best.textContent = r.best>0 ? fmtPoints(r.best) + '点' + (r.bestTrick ? '（イタズラ）' : '') : '—';
     var sub = document.createElement('span'); sub.className = 'mz-sub';
     sub.textContent = ok ? (c.level + '・完成度 ' + (r.bestGrade || '—') + '・' + fmtPoints(r.plays) + '回') : (c.level + '・準備中');
     li.appendChild(b); li.appendChild(best); li.appendChild(sub);
@@ -11927,126 +10764,7 @@ window.addEventListener('resize', function(){
   if(screens.kisekae.classList.contains('active')) drawKisekaePreview();
 });
 
-// ---------- Update ----------
-function update(dt, now){
-  if(state.phase==='playing'){
-    if(state.roundStage==='intro'){
-      if(now>=state.introUntil){
-        state.roundStage = 'demo';
-        spawnStageNotes(true, now);
-        elCaption.textContent = 'お手本';
-      }
-    } else if(state.roundStage==='demo'){
-      for(var i=0;i<state.notes.length;i++){
-        var n = state.notes[i];
-        if(!n.judged && !n.tapBooked && now>=n.targetTime-DEMO_TAP_LEAD_MS){
-          n.tapBooked = true;   // 師匠のトン: booked on the audio clock to land on the mark
-          if(now-n.targetTime<=DEMO_TAP_LATE_MS) playDemoTap(n.targetTime-now, n.beat);
-        }
-        if(!n.judged && now>=n.targetTime){
-          n.judged = true;
-          state.knifeChop = 140;
-          state.lastCutThickness = MIN_THICK+2;
-          state.cutFx.push({t:0, rating:'DEMO'});
-        }
-      }
-      state.notes = state.notes.filter(function(nn){ return !nn.judged; });
-      if(state.notes.length===0){
-        state.roundStage = 'play';
-        spawnStageNotes(false, now);
-        elCaption.textContent = 'あなたの番!';
-        state.captionHideAt = now+900;
-      }
-    } else if(state.roundStage==='play'){
-      for(var j=0;j<state.notes.length;j++){
-        var n2 = state.notes[j];
-        if(!n2.judged && now-n2.targetTime>state.hitWindowMs){
-          n2.judged = true;
-          onMiss();
-        }
-      }
-      state.notes = state.notes.filter(function(nn){ return !nn.judged; });
-      if(state.notes.length===0 && !state.pendingServe){
-        state.pendingServe = true;
-        state.pendingServeAt = now+420;
-      }
-    }
 
-    var targetZoneWidth = 20 + state.batch.length*35;
-    state.cutZoneWidth += (targetZoneWidth-state.cutZoneWidth)*0.15;
-
-    if(state.captionHideAt && now>=state.captionHideAt){
-      elCaption.classList.remove('show');
-      state.captionHideAt = null;
-    }
-
-    if(state.knifeChop>0) state.knifeChop -= dt;
-
-    if(state.pendingServe && now>=state.pendingServeAt){
-      state.pendingServe = false;
-      beginServing();
-    }
-  } else if(state.phase==='serving'){
-    updateServing(dt);
-  }
-
-  for(var k=0;k<state.cutFx.length;k++) state.cutFx[k].t += dt;
-  state.cutFx = state.cutFx.filter(function(fx){ return fx.t<400; });
-
-  if(state.styleConf && state.styleConf.hasAroma){
-    state.aromaBonus = Math.max(0, state.aromaBonus - AROMA_DECAY*dt);
-    var aromaPct = (state.aromaBonus/AROMA_MAX)*100;
-    aromaGaugeFill.style.width = aromaPct+'%';
-    aromaValueEl.textContent = Math.round(aromaPct);
-    if(state.aromaFlash>0){
-      state.aromaFlash -= dt;
-      aromaGaugeFill.classList.add('flash');
-      if(state.aromaFlash<=0) aromaGaugeFill.classList.remove('flash');
-    }
-  }
-
-  if(state.spiceFlash>0){ state.spiceFlash -= dt; }
-
-  elScore.textContent = state.score;
-  elCombo.textContent = state.combo + (state.combo>=2 ? (' (x'+comboMultiplier(state.combo).toFixed(1)+')') : '');
-  elCustomers.textContent = Math.min(state.roundsPlayed+1, TOTAL_CUSTOMERS) + '/' + TOTAL_CUSTOMERS;
-}
-
-function updateServing(dt){
-  var s = state.serving;
-  s.t += dt;
-  if(s.stage==='spice'){
-    if(!s.spiceLocked){
-      if(s.t>=SPICE_TIMEOUT){ lockSpice(); }
-    } else if(s.t-s.spiceLockedAt>=SPICE_RESULT_PAUSE){
-      startPlating(s);
-    }
-    return;
-  }
-  s.clock += dt;
-  if(s.stage==='plate'){
-    if(s.t>=SERVE_PLATE_MS){ s.stage = 'pour'; s.t -= SERVE_PLATE_MS; }
-  } else if(s.stage==='pour'){
-    if(!s.pourCued && s.t>=POUR_STREAM_FROM){     // ② the sound starts with the stream and ends with it
-      s.pourCued = true;
-      playPourSound(POUR_STREAM_TO - s.t);
-    }
-    if(s.t>=SERVE_POUR_MS){
-      s.stage = 'react'; s.t -= SERVE_POUR_MS;
-      equipSfx('serve');   // 着せ替え: e.g. the 水ようかん's slurp as the customer eats
-    }
-  } else if(s.stage==='react'){
-    if(!s.said && s.t>=SERVE_SAY_AT){             // ③ 0.3 s after the pour: the reaction, the words, the sound
-      s.said = true;
-      startReactionFx(s);
-      showServeBubble(s);
-      playReactionSound(s.result.reaction);
-    }
-    if(s.said) typeServeBubble(s);
-    if(s.t>=SERVE_REACT_MS){ finishServing(); return; }
-  }
-  if(serveFx.length) updateServeFx(dt);
-}
 
 // ---------- Render ----------
 function render(){
@@ -12058,34 +10776,9 @@ function render(){
   drawEquippedBg();   // 着せ替え: the equipped background (nothing is drawn when none is equipped)
   if(state.mode==='hana') drawFlowerField(performance.now());
   else if(state.mode==='shinsoba') drawShinsobaLook(performance.now());
-  if(state.phase==='zan'){ drawZan(); return; }
-  if(state.phase==='playing'){
-    var shake = skinShake();                       // 着せ替えの演出: a JUST! can shake the play area (looks only)
-    if(shake){ ctx.save(); ctx.translate(shake.x, shake.y); drawLane(); ctx.restore(); }
-    else drawLane();
-  } else if(state.phase==='serving'){
-    drawServing();
-  }
+  if(state.phase==='zan') drawZan();
 }
 
-function drawMaster(jx, topY){
-  ctx.save();
-  ctx.translate(jx, topY-46);
-  ctx.fillStyle = '#3d5a63';
-  ctx.beginPath();
-  ctx.moveTo(-16,34); ctx.quadraticCurveTo(0,14,16,34); ctx.lineTo(16,44); ctx.lineTo(-16,44); ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = '#e8c39e';
-  ctx.beginPath();
-  ctx.arc(0,4,13,0,Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle = COLORS.accent2;
-  ctx.fillRect(-13,-3,26,6);
-  ctx.beginPath();
-  ctx.moveTo(13,-1); ctx.lineTo(23,-7); ctx.lineTo(21,3); ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-}
 
 function drawKomaitaAndKnife(jx, y, h){
   var progress = state.knifeChop>0 ? (140-state.knifeChop)/140 : 1;
@@ -12140,132 +10833,7 @@ function drawKomaitaAndKnife(jx, y, h){
   ctx.restore();
 }
 
-function drawLane(){
-  var y = laneY(), h = laneH();
-  ctx.fillStyle = COLORS.board;
-  ctx.fillRect(0, y-6, W, h+12);
 
-  var jx = judgeX();
-  var now = performance.now();
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(0,y,W,h);
-  ctx.clip();
-  var nskLane = state.mode==='shinsoba' ? null : skinPart('noodle');   // 着せ替え: the equipped noodles tint the dough
-  ctx.fillStyle = state.mode==='shinsoba' ? SHINSOBA_DOUGH : (nskLane ? nskLane.dough : COLORS.dough);
-  ctx.fillRect(0,y,W,h);
-  if(nskLane) guardedSkinDraw('noodle', function(){ drawDoughGrain(ctx, nskLane, 0, y, W, h); });
-
-  ctx.strokeStyle = nskLane ? nskLane.doughDark : COLORS.doughDark;
-  ctx.globalAlpha = 0.5;
-  ctx.lineWidth = 1;
-  for(var sx=jx-5; sx>jx-state.cutZoneWidth; sx-=5){
-    ctx.beginPath();
-    ctx.moveTo(sx, y+2);
-    ctx.lineTo(sx, y+h-2);
-    ctx.stroke();
-  }
-
-  ctx.lineWidth = 2.5;
-  var folds = [0.26,0.52,0.78];
-  for(var fi=0; fi<folds.length; fi++){
-    var fy = y + h*folds[fi];
-    ctx.beginPath();
-    ctx.moveTo(jx, fy);
-    ctx.quadraticCurveTo((jx+W)/2, fy+5, W, fy-4);
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
-
-  var pxPerMs = (W-jx)/TRAVEL_MS;
-  var barHalf = state.hitWindowMs*pxPerMs;
-  var barGrad = ctx.createLinearGradient(jx-barHalf, 0, jx+barHalf, 0);
-  barGrad.addColorStop(0, 'rgba(255,224,158,0)');
-  barGrad.addColorStop(0.5, 'rgba(255,224,158,0.6)');
-  barGrad.addColorStop(1, 'rgba(255,224,158,0)');
-  ctx.fillStyle = barGrad;
-  ctx.fillRect(jx-barHalf, y, barHalf*2, h);
-
-  var justHalf = (state.perfectMs*JUST_RATIO)*pxPerMs;
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.fillRect(jx-justHalf, y, justHalf*2, h);
-
-  for(var i=0;i<state.notes.length;i++){
-    var n = state.notes[i];
-    var remain = n.targetTime - now;
-    var nx = jx + (remain/TRAVEL_MS)*(W-jx);
-    if(nx<-20 || nx>W+20) continue;
-    ctx.fillStyle = n.isDemo ? '#c9a24a' : COLORS.accent2;
-    ctx.fillRect(nx-3, y-4, 6, h+8);
-  }
-  ctx.restore();
-
-  if(state.roundStage==='demo'){
-    drawMaster(jx-40, y);
-  }
-
-  drawKomaitaAndKnife(jx, y, h);
-
-  var ek = skinPart('effect');   // ② 演出 (着せ替え: the equipped colours; none = the original)
-  for(var f=0;f<state.cutFx.length;f++){
-    var fx = state.cutFx[f];
-    if(ek && fx.rating!=='DEMO'){
-      guardedSkinDraw('effect', function(){ drawSkinRing(ctx, jx, y+h/2, fx, ek); });
-      if(f>=state.cutFx.length - CUT_FX_RECENT){                // only the newest cuts throw bits and show their extras
-        guardedSkinDraw('effect', function(){ drawSkinOverlay(ctx, jx, y+h/2, fx, ek, y, h, W, false); });
-        guardedSkinDraw('effect', function(){ drawCutBits(jx, y+h/2, fx, ek); });
-      }
-      if(!skinFailed.effect) continue;
-    }
-    var a = 1-fx.t/400;
-    ctx.globalAlpha = Math.max(a,0);
-    ctx.strokeStyle = fx.rating==='DEMO' ? '#c9a24a' : fx.rating==='JUST' ? '#ffd54a' : COLORS.accent;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(jx, y+h/2, 10+fx.t/6, 0, Math.PI*2);
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-  }
-}
-
-function drawSpiceMeter(){
-  var s = state.serving;
-  var cx = W*0.5, cy = H*0.42;
-  var barW = W*0.7, barH = 22;
-  var barX = cx-barW/2, barY = cy;
-
-  ctx.fillStyle = COLORS.card;
-  ctx.fillRect(0,0,W,H);
-
-  ctx.font = '15px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillStyle = COLORS.accent2;
-  ctx.fillText('🌶️ 辛味の加減をタップで決めろ!', cx, cy-50);
-
-  ctx.fillStyle = 'rgba(0,0,0,0.08)';
-  ctx.fillRect(barX, barY, barW, barH);
-
-  var tolPx = (SPICE_TOLERANCE/100)*barW;
-  var targetPx = barX + (s.spiceTarget/100)*barW;
-  ctx.fillStyle = 'rgba(120,200,120,0.45)';
-  ctx.fillRect(targetPx-tolPx, barY, tolPx*2, barH);
-
-  var markerPos = s.spiceLocked ? s.spiceResult.value : (50+50*Math.sin(s.t*SPICE_PERIOD));
-  var markerPx = barX + (markerPos/100)*barW;
-  ctx.strokeStyle = state.spiceFlash>0 ? (s.spiceResult&&s.spiceResult.success?'#4caf50':'#e05656') : COLORS.accent;
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(markerPx, barY-8);
-  ctx.lineTo(markerPx, barY+barH+8);
-  ctx.stroke();
-
-  if(s.spiceLocked){
-    ctx.font = 'bold 16px sans-serif';
-    ctx.fillStyle = s.spiceResult.success ? '#4caf50' : '#e05656';
-    ctx.fillText(s.spiceResult.success ? 'ちょうどいい辛さだ!' : 'ズレてしまった…', cx, cy+50);
-  }
-}
 
 // ---------- 越前おろしそば: the noodles, tsuyu and toppings in the bowl (drawing only) ----------
 // Nothing here changes a score, a judgement, the aroma or a customer's satisfaction; it only reads them.
@@ -12296,11 +10864,6 @@ function safeDraw(fn){
   ctx.save();
   try{ fn(); }catch(e){}
   ctx.restore();
-}
-// 香り: how strongly the bowl shows it, 0..1 (only a high gauge shows; the gauge itself is only read)
-function aromaStrength(){
-  if(!state.styleConf || !state.styleConf.hasAroma) return 0;
-  return Math.max(0, Math.min(1, (state.aromaBonus/AROMA_MAX - 0.35)/0.65));
 }
 // the pieces of this bowl, as a short key (a new bowl, or a change of look, lays everything out again)
 function batchKey(pieces){
@@ -12509,28 +11072,6 @@ function drawNoodleHeap(bundles, cx, cy, look, soak, liftT, shine, sc){
     }
   }
 }
-// 光沢: with a high aroma, a few points of light twinkle on top of the heap ('high' only)
-function drawHeapGlints(bundles, cx, cy, k){
-  var tops = [];
-  for(var b=0;b<bundles.length;b++){
-    var S = bundles[b].strands[0], mid = Math.floor(S.xs.length/2);
-    tops.push({x:cx + S.xs[mid], y:cy + S.ys[mid] - S.w*0.3});
-  }
-  tops.sort(function(a, b){ return a.y - b.y; });
-  var t = lookTime(performance.now());
-  ctx.lineCap = 'round';
-  for(var i=0;i<Math.min(4, tops.length);i++){
-    var tw = 0.5 + 0.5*Math.sin(t*3 + i*1.7), r = 1.2 + 1.2*tw, x = tops[i].x, y = tops[i].y;
-    ctx.strokeStyle = 'rgba(255,250,235,' + (0.55*k).toFixed(3) + ')';
-    ctx.lineWidth = 0.7;
-    ctx.beginPath();
-    ctx.moveTo(x - r, y); ctx.lineTo(x + r, y);
-    ctx.moveTo(x, y - r*0.7); ctx.lineTo(x, y + r*0.7);
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(255,255,255,' + ((0.6 + 0.3*tw)*k).toFixed(3) + ')';
-    ctx.beginPath(); ctx.arc(x, y, 0.8, 0, Math.PI*2); ctx.fill();
-  }
-}
 // the plain bowl's front lip catching the light (an equipped 器 draws its own rim)
 function drawBowlLip(cx, cy){
   ctx.strokeStyle = 'rgba(255,236,205,0.4)';
@@ -12724,97 +11265,10 @@ function drawToppings(set, cx, cy, clock){
   ctx.globalAlpha = 1;
 }
 
-function canvasIsDark(){
-  var m = /^#([0-9a-f]{6})$/i.exec(COLORS.card || '');
-  if(!m) return false;
-  var v = parseInt(m[1], 16);
-  return (0.299*((v >> 16) & 255) + 0.587*((v >> 8) & 255) + 0.114*(v & 255)) < 110;
-}
-// 香りの湯気: soft wisps rising from the bowl while the aroma gauge is high (none on 'low')
-function drawAromaSteam(cx, cy, k, n){
-  if(k<=0 || !n) return;
-  var t = lookTime(performance.now());
-  var dark = canvasIsDark();
-  var layers = dark ? [['255,250,240', 0.05, 11], ['255,250,240', 0.08, 6], ['255,255,255', 0.4, 2.6]]
-                   : [['120,106,90', 0.07, 11], ['150,138,122', 0.1, 6], ['255,255,255', 0.75, 2.6]];
-  ctx.lineCap = 'round';
-  for(var i=0;i<n;i++){
-    var bx = cx - 6 + (i - (n - 1)/2)*15 + Math.sin(i*2.3)*3;
-    var y0 = cy + 4 - (i%2)*3, y1 = cy - 34 - (i%3)*8 + Math.sin(t*0.8 + i)*4;
-    var ph = t*1.25 + i*1.9, sway = 5 + (i%2)*3, h = y0 - y1;
-    for(var L=0; L<layers.length; L++){
-      var col = layers[L][0], A = layers[L][1]*k;
-      var g = ctx.createLinearGradient(0, y0, 0, y1);
-      g.addColorStop(0, 'rgba(' + col + ',0)');
-      g.addColorStop(0.25, 'rgba(' + col + ',' + A.toFixed(3) + ')');
-      g.addColorStop(0.7, 'rgba(' + col + ',' + (A*0.55).toFixed(3) + ')');
-      g.addColorStop(1, 'rgba(' + col + ',0)');
-      ctx.strokeStyle = g;
-      ctx.lineWidth = layers[L][2];
-      ctx.beginPath();
-      ctx.moveTo(bx, y0);
-      ctx.bezierCurveTo(bx + Math.sin(ph)*sway, y0 - h*0.35, bx - Math.sin(ph + 1.3)*sway, y0 - h*0.7, bx + Math.sin(ph + 2.4)*sway*0.6, y1);
-      ctx.stroke();
-    }
-  }
-}
 
-// ---------- ② だし: the stream and its sound, kept in step ----------
-// The stream runs from POUR_STREAM_FROM to POUR_STREAM_TO (ms into ②), swelling in and fading out; pourLevel() is that
-// curve, and the pouring sound is started when the stream starts, lasts until it ends and follows the same swell.
-var POUR_STREAM_FROM = 150, POUR_STREAM_TO = 780, POUR_FADE_IN = 100, POUR_FADE_OUT = 80;
-function pourLevel(t){
-  if(t<POUR_STREAM_FROM || t>=POUR_STREAM_TO) return 0;
-  return Math.max(0, Math.min(1, (t - POUR_STREAM_FROM)/POUR_FADE_IN, (POUR_STREAM_TO - t)/POUR_FADE_OUT));
-}
 // the pouring sound: noise through a band-pass filter (whose note rises a little as the bowl fills), a softer low
 // splash under it, and a quick flutter for the trickle. Silent while 🔇; a skip or 🔇 stops it at once.
 var pourVoice = null;
-function playPourSound(ms){
-  if(!audioEnabled || !(ms>40)) return;
-  var ac = getAudioCtx();
-  if(!ac) return;
-  try{
-    if(ac.state==='suspended'){ ac.resume(); }
-    stopPourSound();
-    var t0 = ac.currentTime, dur = ms/1000;
-    var up = Math.min(POUR_FADE_IN/1000, dur*0.3), down = Math.min(POUR_FADE_OUT/1000, dur*0.3);
-    var src = ac.createBufferSource();
-    src.buffer = sfxNoiseBuffer(ac);
-    var band = ac.createBiquadFilter();
-    band.type = 'bandpass';
-    band.Q.setValueAtTime(1.3, t0);
-    band.frequency.setValueAtTime(760, t0);
-    band.frequency.exponentialRampToValueAtTime(1350, t0 + dur);
-    var low = ac.createBiquadFilter();
-    low.type = 'bandpass';
-    low.Q.setValueAtTime(0.8, t0);
-    low.frequency.setValueAtTime(320, t0);
-    var lowGain = ac.createGain();
-    lowGain.gain.setValueAtTime(0.55, t0);
-    var trem = ac.createGain();
-    trem.gain.setValueAtTime(0.82, t0);
-    var lfo = ac.createOscillator(), depth = ac.createGain();
-    lfo.frequency.setValueAtTime(13, t0);
-    depth.gain.setValueAtTime(0.18, t0);
-    lfo.connect(depth);
-    depth.connect(trem.gain);
-    var env = ac.createGain();
-    env.gain.setValueAtTime(0.0001, t0);
-    env.gain.exponentialRampToValueAtTime(0.2, t0 + up);
-    env.gain.setValueAtTime(0.2, Math.max(t0 + up, t0 + dur - down));
-    env.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    src.connect(band); band.connect(trem);
-    src.connect(low); low.connect(lowGain); lowGain.connect(trem);
-    trem.connect(env);
-    env.connect(sfxOut(ac));
-    src.start(t0);
-    src.stop(t0 + dur + 0.02);
-    lfo.start(t0);
-    lfo.stop(t0 + dur + 0.02);
-    pourVoice = {src:src, lfo:lfo, env:env, until:t0 + dur};
-  }catch(e){}
-}
 function stopPourSound(){
   var v = pourVoice;
   pourVoice = null;
@@ -12828,75 +11282,6 @@ function stopPourSound(){
     v.src.stop(now + 0.05);
     v.lfo.stop(now + 0.05);
   }catch(e){}
-}
-// the ladle tips, pours and rights itself, then fades away while the customer reacts
-function drawDashiPour(cx, cy, s){
-  if(s.stage!=='pour' && s.stage!=='react') return;
-  var t = s.t, tilt, alpha = 1;
-  if(s.stage==='pour') tilt = t<250 ? t/250 : t<POUR_STREAM_TO ? 1 : 1 - 0.45*Math.min(1, (t - POUR_STREAM_TO)/120);
-  else{ tilt = 0.55; alpha = Math.max(0, 1 - t/SERVE_SAY_AT); }
-  if(alpha<=0) return;
-  ctx.globalAlpha = alpha;
-  ctx.save();
-  ctx.translate(cx+72, cy-66);
-  ctx.rotate(-0.85*tilt);
-  ctx.fillStyle = '#37474f';
-  ctx.beginPath();
-  ctx.ellipse(0,0,24,17,0,0,Math.PI*2);
-  ctx.fill();
-  ctx.fillRect(-4,-28,8,18);
-  ctx.restore();
-  ctx.globalAlpha = 1;
-  if(s.stage==='pour'){
-    var a = pourLevel(t);
-    if(a>0) drawDashiStream(cx, cy, t, a);
-  }
-}
-// the stream of dashi: it leaves the ladle's lip going sideways and falls in an arc, wide at the top and thinning as it
-// falls; a light edge, drops riding down it, and rings where it lands. a = how strongly it is running (pourLevel).
-function drawDashiStream(cx, cy, t, a){
-  var x0 = cx+56, y0 = cy-56, qx = cx+20, qy = cy-54, x2 = cx+8 + Math.sin(t*0.02)*1.2, y2 = cy+8;
-  var n = 14, left = [], right = [], i, u, m, px, py, tx, ty, tl, w;
-  for(i=0;i<=n;i++){
-    u = i/n; m = 1 - u;
-    px = m*m*x0 + 2*m*u*qx + u*u*x2;
-    py = m*m*y0 + 2*m*u*qy + u*u*y2;
-    tx = 2*m*(qx - x0) + 2*u*(x2 - qx);
-    ty = 2*m*(qy - y0) + 2*u*(y2 - qy);
-    tl = Math.sqrt(tx*tx + ty*ty) || 1;
-    w = a*(3.2 - 1.6*u + 0.35*Math.sin(t*0.03 + u*9));
-    left.push([px - ty/tl*w, py + tx/tl*w]);
-    right.push([px + ty/tl*w, py - tx/tl*w]);
-  }
-  ctx.beginPath();
-  ctx.moveTo(left[0][0], left[0][1]);
-  for(i=1;i<=n;i++) ctx.lineTo(left[i][0], left[i][1]);
-  for(i=n;i>=0;i--) ctx.lineTo(right[i][0], right[i][1]);
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(146,86,34,' + (0.85*a).toFixed(3) + ')';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,226,182,' + (0.6*a).toFixed(3) + ')';
-  ctx.lineWidth = 1;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo((left[1][0] + x0)/2, (left[1][1] + y0)/2);
-  for(i=2;i<n;i++) ctx.lineTo(left[i][0]*0.6 + right[i][0]*0.4, left[i][1]*0.6 + right[i][1]*0.4);
-  ctx.stroke();
-  ctx.fillStyle = 'rgba(255,232,196,' + (0.85*a).toFixed(3) + ')';
-  for(i=0;i<4;i++){
-    u = (t*0.0021 + i*0.25) % 1; m = 1 - u;
-    ctx.beginPath();
-    ctx.arc(m*m*x0 + 2*m*u*qx + u*u*x2, m*m*y0 + 2*m*u*qy + u*u*y2, 1.1, 0, Math.PI*2);
-    ctx.fill();
-  }
-  ctx.lineWidth = 1;
-  for(var k=0;k<2;k++){
-    var ph = (t*0.0035 + k*0.5) % 1, rr = 3 + 12*ph;
-    ctx.strokeStyle = 'rgba(255,236,205,' + ((1 - ph)*0.6*a).toFixed(3) + ')';
-    ctx.beginPath();
-    ctx.ellipse(x2, y2 + 3, rr, rr*0.32, 0, 0, Math.PI*2);
-    ctx.stroke();
-  }
 }
 // two '#rrggbb' colours mixed (t = 0 → a, 1 → b): the noodles darken as the dashi soaks in
 function mixHex(a, b, t){
@@ -12923,7 +11308,6 @@ var CUSTOMER_LOOKS = {
   hime:      {skin:'#f8dcc4', hair:'#1f1a18', brow:'#1f1a18', top:'#c2416b', trim:'#f3d27a', hat:'hime',      hatColor:'#ec9fbb', acc:'furisode'},
   tono:      {skin:'#f2cfa8', hair:'#1f1a18', brow:'#1f1a18', top:'#5b3f8a', trim:'#f1ece0', hat:'chonmage',  hatColor:null,      acc:'kamishimo'}
 };
-function customerGeom(){ return {x:W*0.19, y:H*0.775, r:Math.max(20, Math.min(32, W*0.082))}; }
 // settings.effects plus prefers-reduced-motion → how much moves and sparkles
 function fxConf(){
   var lv = effectsPref.level, still = !!(reducedMotionMQ && reducedMotionMQ.matches);
@@ -12932,53 +11316,6 @@ function fxConf(){
     motion:still ? 0 : (lv==='high' ? 1.2 : lv==='low' ? 0.5 : 1),
     rays:lv!=='low', flash:lv==='high' && !still, pulse:lv==='high' && !still, still:still
   };
-}
-// where the customer's head is and how their face looks at this moment (rt: ms since the reaction began)
-function customerPose(s, tier, rt, fc){
-  var m = fc.motion, p = {dy:0, bodyDy:0, tilt:0, face:'wait', blink:false, arms:0, sweat:false, gloom:0};
-  if(s.stage!=='react'){
-    p.dy = Math.sin(s.clock*0.005)*0.8*m;
-    p.blink = (s.clock % 2300)<110;
-    return p;
-  }
-  if(rt<0){ p.face = 'taste'; p.dy = 1.5*m; return p; }
-  var k = s.result.satisfaction;
-  if(tier==='miss'){                 // ガクッ: the head drops, bounces a little, then keeps sinking
-    var depth = (10 + 6*Math.min(1, (55 - k)/55))*m;
-    if(rt<100) p.dy = depth*(rt/100)*(rt/100);
-    else if(rt<220) p.dy = depth - depth*0.25*Math.sin(Math.PI*(rt - 100)/120);
-    else p.dy = depth + 3*m*Math.min(1, (rt - 220)/1100);
-    p.bodyDy = p.dy*0.45;
-    p.tilt = -0.1*Math.min(1, rt/100)*(m>0 ? 1 : 0);
-    p.face = 'miss'; p.sweat = true; p.gloom = Math.min(1, rt/150);
-  } else if(tier==='ok'){            // two nods
-    var ph = rt/340;
-    p.dy = ph<2 ? 4*m*Math.sin(Math.PI*(ph % 1)) : 0;
-    p.face = 'ok';
-    p.blink = ph<2 && (ph % 1)>0.35 && (ph % 1)<0.65;
-  } else if(tier==='good'){          // a smile and a little hop
-    var hop = (4 + 3*Math.max(0, (k - 70)/20))*m;
-    p.dy = rt<300 ? -hop*Math.sin(Math.PI*rt/300) : 0;
-    p.face = 'good';
-  } else {                           // just: arms up, two jumps
-    var jump = (10 + 6*Math.max(0, (k - 90)/10))*m, q = rt/340;
-    p.dy = q<2 ? -jump*Math.sin(Math.PI*(q % 1)) : 0;
-    p.bodyDy = p.dy*0.6;
-    p.arms = rt<1300 ? Math.min(1, rt/90) : Math.max(0, 1 - (rt - 1300)/200);
-    p.face = 'just';
-  }
-  return p;
-}
-function drawCustomer(g, p){
-  var look = CUSTOMER_LOOKS[state.tier] || CUSTOMER_LOOKS.lover, r = g.r;
-  var top = g.y + r*0.9 + p.bodyDy;
-  drawCustomerBody(look, g.x, top, r);
-  if(p.arms>0) drawCustomerArms(look, g.x, top, g.y + p.dy, r, p.arms);
-  ctx.save();
-  ctx.translate(g.x, g.y + p.dy);
-  ctx.rotate(p.tilt);
-  drawCustomerHead(look, r, p);
-  ctx.restore();
 }
 function drawCustomerBody(look, x, top, r){
   ctx.fillStyle = look.top;
@@ -13054,23 +11391,6 @@ function drawCustomerBody(look, x, top, r){
     ctx.stroke();
     ctx.fillStyle = '#f5f2ea';
     ctx.fillRect(x + r*0.36, top + r*0.1, r*0.26, r*0.7);
-  }
-}
-function drawCustomerArms(look, x, top, headY, r, k){
-  for(var sd=-1; sd<=1; sd+=2){
-    var sx = x + sd*r*0.95, sy = top + r*0.25;
-    var hx = x + sd*r*(0.95 + 0.45*k), hy = sy + (headY - r*0.45 - sy)*k;
-    ctx.strokeStyle = look.top;
-    ctx.lineWidth = r*0.42;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(sx, sy);
-    ctx.lineTo(hx, hy);
-    ctx.stroke();
-    ctx.fillStyle = look.skin;
-    ctx.beginPath();
-    ctx.arc(hx, hy - r*0.12, r*0.22, 0, Math.PI*2);
-    ctx.fill();
   }
 }
 function drawCustomerHead(look, r, p){
@@ -13308,78 +11628,7 @@ function drawCustomerFace(look, r, p){
     ctx.beginPath(); ctx.arc(ox, my - r*0.12, r*0.16, 0.2*Math.PI, 0.8*Math.PI); ctx.stroke();
   }
 }
-// a top result: soft rays behind the customer
-function drawJustRays(g, rt, fc){
-  var a = Math.min(1, rt/200)*(rt>1250 ? Math.max(0, 1 - (rt - 1250)/300) : 1);
-  if(a<=0) return;
-  var R = g.r*3.4, rot = fc.still ? 0 : rt/1000*0.6;
-  ctx.save();
-  ctx.translate(g.x, g.y - g.r*0.1);
-  ctx.rotate(rot);
-  var gr = ctx.createRadialGradient(0, 0, g.r*0.4, 0, 0, R);
-  gr.addColorStop(0, 'rgba(255,205,90,' + (0.42*a).toFixed(3) + ')');
-  gr.addColorStop(1, 'rgba(255,205,90,0)');
-  ctx.fillStyle = gr;
-  for(var i=0;i<12;i++){
-    var a0 = i*Math.PI/6;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.arc(0, 0, R, a0, a0 + Math.PI/13);
-    ctx.closePath();
-    ctx.fill();
-  }
-  ctx.restore();
-}
-// 称賛マーク: a red 「絶品」 seal pressed onto the scene (with a ring that spreads from it on 強め)
-function drawPraiseStamp(rt, fc){
-  var x = W*0.19, y = H*0.19, R = Math.max(20, Math.min(30, W*0.08));
-  var p = fc.still ? 1 : Math.min(1, rt/170), sc = 1.9 - 0.9*(1 - (1 - p)*(1 - p));
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(-0.2);
-  ctx.scale(sc, sc);
-  ctx.globalAlpha = fc.still ? Math.min(1, rt/120) : Math.min(1, rt/60);
-  ctx.fillStyle = '#c8322a';
-  ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI*2); ctx.fill();
-  ctx.strokeStyle = '#fbeee0';
-  ctx.lineWidth = Math.max(1.2, R*0.06);
-  ctx.beginPath(); ctx.arc(0, 0, R*0.82, 0, Math.PI*2); ctx.stroke();
-  ctx.fillStyle = '#fbeee0';
-  ctx.font = cardFont('700', Math.round(R*0.62), CARD_SERIF);
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('絶品', 0, R*0.04);
-  ctx.restore();
-  if(fc.pulse && rt>170 && rt<700){
-    var q = (rt - 170)/530;
-    ctx.strokeStyle = 'rgba(200,50,42,' + (0.5*(1 - q)).toFixed(3) + ')';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(x, y, R*(1 + 0.8*q), 0, Math.PI*2); ctx.stroke();
-  }
-}
-// miss: a comic 「ガクッ」 beside the head
-function drawGakuText(g, rt, fc){
-  var a = rt<1200 ? Math.min(1, rt/80) : Math.max(0, 1 - (rt - 1200)/300);
-  if(a<=0) return;
-  var drop = fc.still ? 0 : -6*Math.max(0, 1 - rt/140);
-  ctx.save();
-  ctx.globalAlpha = a;
-  ctx.translate(g.x - g.r*1.55, g.y - g.r*1.55 + drop);
-  ctx.rotate(-0.1);
-  ctx.font = cardFont('900', Math.round(g.r*0.62), CARD_SANS);
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = COLORS.card;
-  ctx.strokeText('ガクッ', 0, 0);
-  ctx.fillStyle = '#4f5f86';
-  ctx.fillText('ガクッ', 0, 0);
-  ctx.restore();
-}
 
-// particles for the reaction: little sparkles (good, just) and confetti (just); none when switched off.
-// An equipped 演出 (着せ替え) colours them; with none equipped they keep their original colours.
-var serveFx = [];
 var CONFETTI_COLS = ['#e05a47','#f2b134','#5aa05a','#4a90c2','#e889a8','#f08a3c'];
 function hexRgb(hex){
   var m = /^#([0-9a-f]{6})$/i.exec(String(hex || '').trim());
@@ -13404,41 +11653,6 @@ function skinSparkColor(ek){
     if(v>bestV){ bestV = v; best = list[i]; }
   }
   return best;
-}
-function startReactionFx(s){
-  serveFx = [];
-  var fc = fxConf(), tier = s.result.reaction, k = s.result.satisfaction;
-  if(!fc.parts || (tier!=='good' && tier!=='just')) return;
-  var g = customerGeom(), cx = bowlCX(), cy = bowlCY(), i, a, rr;
-  var ek = skinPart('effect');
-  var sparkCol = ek ? skinSparkColor(ek) : '#f5b82e', glintCol = ek ? sparkCol : '#ffd54a';
-  var confCols = (ek && ek.bits && ek.bits.length) ? ek.bits : CONFETTI_COLS;
-  var sparks = tier==='good' ? Math.round((3 + 4*Math.max(0, (k - 70)/20))*fc.parts) : Math.round(6*fc.parts);
-  for(i=0;i<sparks;i++){
-    a = Math.random()*Math.PI*2; rr = g.r*(1.3 + Math.random()*0.8);
-    serveFx.push({kind:'spark', x:g.x + Math.cos(a)*rr, y:g.y - g.r*0.35 + Math.sin(a)*rr*0.8, vx:0, vy:fc.still ? 0 : -10,
-                  g:0, rot:0, vr:0, size:3 + Math.random()*3, col:sparkCol, age:-i*70, life:700 + Math.random()*300, spark:ek ? ek.spark : null});
-  }
-  if(tier!=='just') return;
-  var grav = ek ? skinNum(ek.grav, 1) : 1, spin = ek ? skinNum(ek.spin, 1) : 1;
-  var n = Math.round((16 + 24*Math.max(0, (k - 90)/10))*fc.parts);
-  for(i=0;i<n;i++){
-    var p = {kind:'confetti', x:cx + (Math.random() - 0.5)*40, y:cy + 4, vx:(Math.random() - 0.5)*320, vy:-(260 + Math.random()*230),
-             g:640*grav, rot:Math.random()*6, vr:(Math.random() - 0.5)*14*spin, size:2.5 + Math.random()*2.5,
-             col:confCols[i % confCols.length], age:-Math.random()*120, life:1100 + Math.random()*450,
-             shape:ek ? bitShapeName(ek, i) : null, sw:(ek && grav<1) ? 40*(1 - grav) : 0};   // light bits (花かつお, 和紙) flutter as they fall
-    if(ek && ek.rise){ p.x = cx + (Math.random() - 0.5)*220; p.y = cy + 90 + Math.random()*40; p.vx = (Math.random() - 0.5)*30; p.vy = -(120 + Math.random()*160); p.g = -30; }   // bubbles well up
-    else if(ek && grav<0){ p.vx *= 0.4; p.vy = -(60 + Math.random()*90); p.g = 120*grav; }   // fossil dust drifts upward
-    if(fc.still){ p.x = cx + (Math.random() - 0.5)*200; p.y = cy - 70 + Math.random()*90; p.vx = p.vy = p.g = p.vr = 0; }
-    serveFx.push(p);
-  }
-  var st = Math.round(4*fc.parts);
-  for(i=0;i<st;i++){                               // a few glints round the seal
-    a = Math.random()*Math.PI*2; rr = 26 + Math.random()*14;
-    serveFx.push({kind:'spark', x:W*0.19 + Math.cos(a)*rr, y:H*0.19 + Math.sin(a)*rr, vx:0, vy:0, g:0, rot:0, vr:0,
-                  size:3 + Math.random()*2.5, col:glintCol, age:-120 - i*60, life:650, spark:ek ? ek.spark : null});
-  }
-  if(serveFx.length>SERVE_FX_MAX) serveFx.length = SERVE_FX_MAX;   // a cap on how many are alive at once
 }
 // The particles themselves, shared with the gacha's capsule opening: each is {kind:'spark'|'confetti', x, y,
 // vx, vy (px per second), g (gravity), rot, vr, size, col, age (ms; below 0 = not yet), life}.
@@ -13489,70 +11703,16 @@ function drawFxParts(c, list, still){
   }
   c.globalAlpha = 1;
 }
-function updateServeFx(dt){ serveFx = fxStep(serveFx, dt); }
-function drawServeFx(still){ drawFxParts(ctx, serveFx, still); }
-// the customer, and everything around their reaction
-function drawCustomerScene(s){
-  var g = customerGeom(), fc = fxConf(), tier = s.result ? s.result.reaction : 'ok';
-  var rt = s.stage==='react' ? s.t - SERVE_SAY_AT : -1, said = s.stage==='react' && s.said && rt>=0;
-  if(said && tier==='just' && fc.rays) drawJustRays(g, rt, fc);
-  ctx.globalAlpha = Math.min(1, s.clock/220);      // steps in as the bowl is plated
-  drawCustomer(g, customerPose(s, tier, said ? rt : -1, fc));
-  ctx.globalAlpha = 1;
-  if(!said) return;
-  if(tier==='miss') drawGakuText(g, rt, fc);
-  if(tier==='just') drawPraiseStamp(rt, fc);
-  drawServeFx(fc.still);
-  if(tier==='just' && fc.flash && rt<180){
-    ctx.fillStyle = 'rgba(255,248,225,' + (0.35*(1 - rt/180)).toFixed(3) + ')';
-    ctx.fillRect(0, 0, W, H);
-  }
-}
 
-// ③ the words: a speech bubble whose text types itself out; the ★ appear when it is done
-function showServeBubble(s){
-  var r = s.result, ch = state.character;
-  s.sayLen = r.text.length;
-  s.charMs = Math.max(26, Math.min(55, Math.floor(700/Math.max(1, s.sayLen))));
-  s.typed = -1;
-  elSbWho.textContent = ch.icon + ' ' + ch.name;
-  elSbText.textContent = '';
-  elSbStars.textContent = r.stars;
-  elSbStars.classList.remove('show');
-  elServeBubble.setAttribute('data-tier', r.reaction);
-  elServeBubble.classList.add('show');
-  elServeSr.textContent = ch.name + '「' + r.text + '」' + r.stars;
-}
-function typeServeBubble(s){
-  var n = Math.min(s.sayLen, Math.floor((s.t - SERVE_SAY_AT)/s.charMs) + 1);
-  if(n===s.typed) return;
-  s.typed = n;
-  elSbText.textContent = s.result.text.slice(0, n);
-  if(n>=s.sayLen) elSbStars.classList.add('show');
-}
 function hideServeBubble(){
   elServeBubble.classList.remove('show');
   elSbStars.classList.remove('show');
-}
-// 「満足度 ○」 when the bowl's satisfaction goes in
-function showSatisfactionPop(value, tier){
-  elSatisPop.textContent = '';
-  elSatisPop.appendChild(document.createTextNode('満足度 '));
-  var b = document.createElement('b');
-  b.textContent = String(value);
-  elSatisPop.appendChild(b);
-  elSatisPop.setAttribute('data-tier', tier);
-  elSatisPop.classList.remove('show');
-  void elSatisPop.offsetWidth;
-  elSatisPop.classList.add('show');
-  elServeSr.textContent = '満足度 ' + value;
 }
 function resetServeShow(){
   stopPourSound();
   hideServeBubble();
   elSatisPop.classList.remove('show');
   elServeSr.textContent = '';
-  serveFx = [];
 }
 // ③ sounds: a comic droop (miss), two soft nods (ok), a little chime (good), cheering and a fanfare (just)
 function playReactionSound(tier){
@@ -13582,66 +11742,13 @@ function playReactionSound(tier){
   }catch(e){}
 }
 
-function drawServing(){
-  var s = state.serving;
-  if(s.stage==='spice'){
-    drawSpiceMeter();
-    return;
-  }
-  var cx = bowlCX(), cy = bowlCY();
-  var conf = detailConf();
-  var poured = (s.stage==='pour' || s.stage==='react');
-  var clock = s.clock;                               // ms since plating began: the toppings go on while plating
-  var aromaK = aromaStrength();
-
-  drawServingBowl(cx, cy);   // ③ 器 (着せ替え: the original bowl when none is equipped)
-  if(!skinPart('bowl')) safeDraw(function(){ drawBowlLip(cx, cy); });
-  if(poured) safeDraw(function(){ drawTsuyuPool(cx, cy, s.stage==='pour' ? Math.max(0, Math.min(1, (s.t - 200)/650)) : 1, conf); });
-
-  var pieces = state.batch;
-  // the noodles take on the dashi while it is poured
-  var soak = s.stage==='react' ? 1 : s.stage==='pour' ? Math.max(0, Math.min(1, (s.t - 450)/400)) : 0;
-  var nsk = state.mode==='shinsoba' ? null : skinPart('noodle');   // ③ 麺 (着せ替え; 新そばモード keeps its own colours)
-
-  if(pieces.length){
-    var look = noodleLook(nsk);
-    var liftT = s.stage==='plate' ? s.t : null;
-    var shine = Math.min(0.6, look.shine + 0.1*soak + aromaK*0.22);
-    var heap = function(){
-      var bundles = heapLayout(pieces, conf, look);
-      ctx.beginPath();
-      ctx.ellipse(cx, cy+32, 100, 26, 0, 0, Math.PI*2);          // the bowl's opening...
-      ctx.moveTo(cx-94, cy+32);
-      ctx.ellipse(cx, cy+32, 94, 50, 0, Math.PI, Math.PI*2);     // ...and the mound rising over it
-      ctx.closePath();
-      ctx.clip();
-      drawNoodleHeap(bundles, cx, cy, look, soak, liftT, shine, heapScale(pieces.length));
-      if(conf.glints && liftT===null && aromaK>0.25) drawHeapGlints(bundles, cx, cy, aromaK);
-    };
-    if(nsk) guardedSkinDraw('noodle', heap);
-    else safeDraw(heap);
-    var set = toppingLayout(pieces, conf);
-    safeDraw(function(){ drawToppings(set, cx, cy, clock); });
-    var ekAura = skinPart('effect');                 // 着せ替えの演出: a soft white aura wrapping the served noodles
-    if(ekAura && ekAura.aura) guardedSkinDraw('effect', function(){ drawNoodleAura(cx, cy, ekAura.aura, Math.min(1, clock/500)); });
-    var steamK = nsk ? Math.min(1, aromaK*skinNum(nsk.steam, 1)) : aromaK;   // 着せ替えの麺: how readily the steam shows (looks only)
-    if(poured && aromaK>0 && conf.steam) safeDraw(function(){ drawAromaSteam(cx, cy, steamK*Math.min(1, (s.stage==='pour' ? s.t : 300)/300), conf.steam); });
-  }
-
-  safeDraw(function(){ drawDashiPour(cx, cy, s); });      // ② the ladle and the stream of dashi
-  safeDraw(function(){ drawCustomerScene(s); });          // ③ the customer and their reaction
-}
 
 // ---------- Loop ----------
 function loop(ts){
   if(!lastTs) lastTs = ts;
   var dt = Math.min(ts-lastTs, 50);
   lastTs = ts;
-  if(state.phase==='playing' || state.phase==='serving'){
-    update(dt, ts);
-  } else if(state.phase==='zan'){
-    zanUpdate(dt);
-  }
+  if(state.phase==='zan') zanUpdate(dt);
   render();
   requestAnimationFrame(loop);
 }
@@ -13710,9 +11817,9 @@ function rewardCondText(cond){
     case 'maxCombo':      return '最大' + v + 'コンボ達成で解放';
     case 'totalScore':    return '累計スコア' + v + '点で解放';
     case 'quizTotal':     return 'クイズ通算' + v + '問正解で解放';
-    case 'plays':         return '修行' + v + '回で解放';
-    case 'highScore':     return '1回の得点' + v + '点で解放';
-    case 'perfectClears': return 'すべての判定をJUST!で修行を終えると解放';
+    case 'plays':         return '斬を' + v + '曲遊ぶと解放';
+    case 'highScore':     return '1曲の得点' + v + '点で解放';
+    case 'perfectClears': return 'すべての判定をPerfectで1曲を終えると解放';
     case 'quizPerfect':   return 'クイズ3問全問正解で解放';
   }
   return '';
@@ -14122,7 +12229,7 @@ function openOnboarding(opener){
   document.body.style.overflow = 'hidden';
   focusEl(obEls['ob-h']);
 }
-// 修行を始める (or Esc): remember the choice of 「次回から表示しない」, then on to STEP 1 of the home
+// 修行を始める (or Esc): remember the choice of 「次回から表示しない」, then on to the start of 斬
 function closeOnboarding(){
   if(obEls['onboard'].hidden) return;
   obEls['onboard'].hidden = true;
@@ -14134,11 +12241,7 @@ function closeOnboarding(){
   }catch(e){}
   if(obPendingRewards){ var pr = obPendingRewards; obPendingRewards = null; showRewards(pr, null); return; }
   if(obOpener){ focusEl(obOpener); obOpener = null; return; }
-  if(screens.title.classList.contains('active')){
-    var first = document.querySelector('.flour-opt[aria-pressed="true"]') || document.querySelector('.flour-opt');
-    focusEl(first);
-    revealEl(step1El);
-  }
+  if(screens.title.classList.contains('active')) focusEl(document.getElementById('btn-zan'));
 }
 obEls['ob-prev'].addEventListener('click', function(){ if(obIndex>0){ obIndex--; renderOnboarding(); focusEl(obEls['ob-h']); } });
 obEls['ob-next'].addEventListener('click', function(){
@@ -14649,12 +12752,18 @@ var ZAN_LEAD = 1.0;               // seconds before beat 0 when the song starts
 var ZAN_POINTS = {tap:[100,50], head:[50,25], tail:[300,150]};   // [Perfect, OK]
 var ZAN_GRADES = [['極上',95,true],['特上',85,false],['上',70,false],['並',0,false]];   // [name, 完成度 %, no Miss needed]
 var ZAN_WORDS = ['一閃！','極上！','斬！'];
+// 師匠のイタズラ (アリ/ナシ, settings.zanTrick): from the second part of the song, in your turn the こま板 covers part of the
+// board, and now and then the master winds up and does not cut (フェイント) — cutting there too (釣られた) breaks the combo.
+// アリ: the points ×1.2 and the coins ×1.2 (the best goes to the same record, marked イタズラ).
+var ZAN_TRICK_SCORE = 1.2, ZAN_TRICK_COIN = 0.2;
+var ZAN_TRICK_HIDE = [0.34, 0.66];   // the part of the board (from the knife to the right edge) the こま板 covers
+var ZAN_TODAY_BONUS = 100;           // 今日の一曲: once a day for finishing that course
 // the songs. tempo: [{b, bpm}] (that bpm from beat b on); calls: the master's bars in order — a number is a beat in
 // the bar, {h, len} a hold (タメ切り) from beat h for len beats; each is answered by the player in the next bar.
 // The whole song is お手本 → あなたの番, to the last bar. sections: the music's parts (key) and the captions.
 var ZAN_SONGS = {
   nihachi:{
-    id:'nihachi', tempo:[{b:0, bpm:110}], firstCall:8, end:156,
+    id:'nihachi', tempo:[{b:0, bpm:110}], firstCall:8, end:160, finale:[0,1,2,3],
     chords:[[62,64,69],[67,71,74],[69,71,76],[64,67,71]],   // the bar's chord (陽音階): D・G・A・Em, every 4 bars
     sections:[
       {from:0,   key:'ready',  label:'構え',     caption:'ヨー…'},
@@ -14662,7 +12771,8 @@ var ZAN_SONGS = {
       {from:40,  key:'kizami', label:'刻み',     caption:'半拍の「トトン」もまねして'},
       {from:72,  key:'tame',   label:'タメ切り', caption:'師匠と同じく、長押しで溜めて離す！'},
       {from:104, key:'fever',  label:'早切り',   caption:'細く速く、トトトン！'},
-      {from:136, key:'final',  label:'仕上げ',   caption:'最後は大タメ！'}
+      {from:136, key:'final',  label:'仕上げ',   caption:'最後は大タメ！'},
+      {from:152, key:'unison', label:'同時切り', caption:'最後は師匠といっしょに！'}
     ],
     calls:[
       [0,2], [0,1,2,3], [0,1,2], [0,2,3],                                        // お手本
@@ -14675,7 +12785,7 @@ var ZAN_SONGS = {
   },
   // 十割（中級）: 裏拍（シンコペーション）が混じる。短調寄りの和音で、三味線が裏を刻む
   juwari:{
-    id:'juwari', tempo:[{b:0, bpm:130}], firstCall:8, end:188,
+    id:'juwari', tempo:[{b:0, bpm:130}], firstCall:8, end:192, finale:[0,1.5,2,3],
     chords:[[62,65,69],[58,62,65],[60,64,67],[57,61,64]],   // Dm・B♭・C・A
     sections:[
       {from:0,   key:'ready',  label:'構え',     caption:'ヨー…'},
@@ -14683,7 +12793,8 @@ var ZAN_SONGS = {
       {from:40,  key:'kizami', label:'裏拍',     caption:'裏拍の「ンタッ」もまねして'},
       {from:80,  key:'tame',   label:'タメ切り', caption:'溜めて、半拍で離すタメも！'},
       {from:112, key:'fever',  label:'早切り',   caption:'裏も表も、トトトン！'},
-      {from:152, key:'final',  label:'仕上げ',   caption:'最後は大タメ！'}
+      {from:152, key:'final',  label:'仕上げ',   caption:'最後は大タメ！'},
+      {from:184, key:'unison', label:'同時切り', caption:'最後は師匠といっしょに！'}
     ],
     calls:[
       [0,1,2,3], [0,1.5,2,3], [0,1,2.5,3], [0.5,1,2,3],                                       // お手本
@@ -14696,7 +12807,7 @@ var ZAN_SONGS = {
   },
   // 粗挽き（上級）: 速いテンポと、長短のタメ切り（緩急）。太鼓が毎拍で押す
   arabiki:{
-    id:'arabiki', tempo:[{b:0, bpm:155}], firstCall:8, end:220,
+    id:'arabiki', tempo:[{b:0, bpm:155}], firstCall:8, end:224, finale:[0,0.5,1,2,3],
     chords:[[64,67,71],[60,64,67],[62,66,69],[59,62,66]],   // Em・C・D・Bm
     sections:[
       {from:0,   key:'ready',  label:'構え',     caption:'ヨー…'},
@@ -14704,7 +12815,8 @@ var ZAN_SONGS = {
       {from:40,  key:'kizami', label:'刻み',     caption:'速い刻みも、まねして'},
       {from:88,  key:'tame',   label:'緩急',     caption:'短いタメ・長いタメを使い分けて！'},
       {from:136, key:'fever',  label:'早切り',   caption:'速く細く、トトトトトン！'},
-      {from:184, key:'final',  label:'仕上げ',   caption:'最後は大タメ！'}
+      {from:184, key:'final',  label:'仕上げ',   caption:'最後は大タメ！'},
+      {from:216, key:'unison', label:'同時切り', caption:'最後は師匠といっしょに！'}
     ],
     calls:[
       [0,2], [0,1,2,3], [0,1,2,2.5], [0,2,3],                                                 // お手本
@@ -14716,11 +12828,11 @@ var ZAN_SONGS = {
     music:{shami:['kizami', 'fever'], flute:['fever', 'final'], drive:true}
   }
 };
-// the courses on the home screen (a course without a song yet is shown as 準備中). coin: the coin rate (as the 修行's お客さん)
+// the courses on the home screen (a course without a song yet is shown as 準備中). coinBonus: the course's coins on top
 var ZAN_COURSES = [
-  {id:'nihachi', name:'二八',   level:'初級', bpm:110, song:'nihachi', coin:'beginner', desc:'8分音符まで。素直なリズムで、まずはここから。'},
-  {id:'juwari',  name:'十割',   level:'中級', bpm:130, song:'juwari',  coin:'lover',    desc:'裏拍（シンコペーション）が混じる。'},
-  {id:'arabiki', name:'粗挽き', level:'上級', bpm:155, song:'arabiki', coin:'regular',  desc:'速いテンポと、緩急のタメ切り。'}
+  {id:'nihachi', name:'二八',   level:'初級', bpm:110, song:'nihachi', coinBonus:0,  desc:'8分音符まで。素直なリズムで、まずはここから。'},
+  {id:'juwari',  name:'十割',   level:'中級', bpm:130, song:'juwari',  coinBonus:40, desc:'裏拍（シンコペーション）が混じる。'},
+  {id:'arabiki', name:'粗挽き', level:'上級', bpm:155, song:'arabiki', coinBonus:80, desc:'速いテンポと、緩急のタメ切り。'}
 ];
 function zanCourse(id){ for(var i=0;i<ZAN_COURSES.length;i++) if(ZAN_COURSES[i].id===id) return ZAN_COURSES[i]; return null; }
 function zanPlayable(id){ var c = zanCourse(id); return !!(c && c.song && ZAN_SONGS[c.song]); }
@@ -14759,17 +12871,30 @@ function zanSectionAt(b, song){
 }
 // the chart: {b (beat), t / tt (the seconds of the cut / of a hold's release), type: demo | demohold (the master's) |
 // tap | hold (yours), len (hold, beats)}. Every note is a cut of soba (a hold is a タメ切り).
-function zanIsDemo(n){ return n.type==='demo' || n.type==='demohold'; }
-function zanChart(song, tm){
+function zanIsDemo(n){ return n.type==='demo' || n.type==='demohold' || n.type==='feint' || n.type==='fake'; }   // (not cut by you for points)
+function zanChart(song, tm, trick){
   var notes = [];
   function add(b, type, len){ notes.push({b:b, t:zanB2T(b, tm), tt:zanB2T(b + (len || 0), tm), type:type, len:len || 0, judged:false, headDone:false}); }
+  var trickFrom = song.sections.length>2 ? song.sections[2].from : 1e9;   // (イタズラ: from the second part)
   for(var i=0;i<song.calls.length;i++){
-    var bar = song.firstCall + i*8, p = song.calls[i];
+    var bar = song.firstCall + i*8, p = song.calls[i], used = [];
     for(var j=0;j<p.length;j++){
       var c = p[j];
-      if(typeof c==='number'){ add(bar + c, 'demo'); add(bar + 4 + c, 'tap'); }
-      else { add(bar + c.h, 'demohold', c.len); add(bar + 4 + c.h, 'hold', c.len); }
+      if(typeof c==='number'){ add(bar + c, 'demo'); add(bar + 4 + c, 'tap'); used.push([c, c]); }
+      else { add(bar + c.h, 'demohold', c.len); add(bar + 4 + c.h, 'hold', c.len); used.push([c.h, c.h + c.len]); }
     }
+    if(trick && bar>=trickFrom && i % 3===1){        // フェイント: on a free beat, half a beat clear of every cut
+      var spots = [1, 2, 3, 1.5, 2.5, 3.5];
+      for(var k=0;k<spots.length;k++){
+        var f = spots[k], clear = true;
+        for(var u=0;u<used.length;u++) if(f>used[u][0] - 0.5 && f<used[u][1] + 0.5) clear = false;
+        if(clear){ add(bar + f, 'feint'); add(bar + 4 + f, 'fake'); break; }
+      }
+    }
+  }
+  if(song.finale){                                   // 同時切り: the last bar, the master and you together
+    var fb = song.firstCall + song.calls.length*8;
+    for(var fj=0;fj<song.finale.length;fj++){ add(fb + song.finale[fj], 'demo'); add(fb + song.finale[fj], 'tap'); }
   }
   notes.sort(function(a, c){ return a.t - c.t; });
   return notes;
@@ -14780,6 +12905,7 @@ function zanMasterEvents(notes){
   for(var i=0;i<notes.length;i++){
     var n = notes[i];
     if(n.type==='demo') ev.push({t:n.t, kind:'tap'});
+    else if(n.type==='feint') ev.push({t:n.t, kind:'feint'});
     else if(n.type==='demohold'){ ev.push({t:n.t, kind:'head'}); ev.push({t:n.tt, kind:'tail', from:n.t}); }
   }
   ev.sort(function(a, c){ return a.t - c.t; });
@@ -14800,6 +12926,7 @@ function zanMasterTurn(b){
   return k < song.calls.length*2 && k % 2===0;
 }
 function zanCallsEnd(){ return zan.song.firstCall + zan.song.calls.length*8; }
+function zanFinaleBar(){ return zan.song.finale ? zanCallsEnd() : -1; }   // the beat where the 同時切り begins (-1: none)
 var zan = null;
 var zanLastResult = null;                            // the last song's numbers, for the result card
 // the song time the player hears now (seconds since beat 0)
@@ -14901,8 +13028,8 @@ function zanBackingStep(ac, out, song, tm, q, t){
   }
   if(sec.key==='fever' && q % 2===1) bgmShime(ac, out, t, 0.025);
   if(mus.flute && mus.flute.indexOf(sec.key)>=0 && (q4===0 || q4===6 || q4===12)) bgmFlute(ac, out, chord[(bar + q4) % 3] + 12, t, spb*0.9, 0.035);
-  if(mus.drive && (sec.key==='fever' || sec.key==='final') && (q4===4 || q4===12)) bgmTaiko(ac, out, t, 0.12);   // 粗挽き: 太鼓が毎拍
-  if(sec.key==='final' && q4===0) for(var c=0;c<chord.length;c++) bgmKoto(ac, out, chord[c], t + c*0.03, 0.04, 1.6);
+  if(mus.drive && (sec.key==='fever' || sec.key==='final' || sec.key==='unison') && (q4===4 || q4===12)) bgmTaiko(ac, out, t, 0.12);   // 粗挽き: 太鼓が毎拍
+  if((sec.key==='final' || sec.key==='unison') && q4===0) for(var c=0;c<chord.length;c++) bgmKoto(ac, out, chord[c], t + c*0.03, 0.04, 1.6);
 }
 function zanScheduleStep(ac, q){                    // q: the step in sixteenths since beat 0
   var b = q/4, songT = zanB2T(b), t = zanCtxAt(songT), out = zan.bus, song = zan.song;
@@ -14912,7 +13039,7 @@ function zanScheduleStep(ac, q){                    // q: the step in sixteenths
   // the master's cuts (お手本) are sound effects: they follow 🔊 even with the music off
   for(var i=zan.demoIdx;i<zan.mEvents.length && zan.mEvents[i].t<=songT + 1e-6;i++){
     var ev = zan.mEvents[i], at = t - ac.currentTime;
-    if(Math.abs(ev.t - songT)<1e-6){
+    if(ev.kind!=='feint' && Math.abs(ev.t - songT)<1e-6){   // (a フェイント is silent)
       for(var v=0;v<DEMO_TAP_VOICES.length;v++){ var dv = DEMO_TAP_VOICES[v]; if(dv.t==='tone') sfxToneVoice(ac, dv, at, 1); else sfxNoiseVoice(ac, dv, at, 1); }
       if(ev.kind==='tail'){                         // the master's 斬: a deep thud under the knock
         gachaTone(ac, 110, at, 0.4, 'sine', 0.13, 50);
@@ -15038,8 +13165,12 @@ function zanHitSound(rating, kind, songT){
     if(ac.state==='suspended') ac.resume();
     var chord = zan.song.chords[Math.floor(Math.max(0, zanT2B(songT))/4) % zan.song.chords.length];
     var note = chord[zan.combo % 3] + 12*(Math.floor(zan.combo/3) % 2);
+    var snd = skinPart('sound'), tool = skinPart('tool');   // 着せ替え: the sound item's cut / 合いの手 / miss and the blade's ring
+    if(rating!=='MISS' && snd && snd.cut) playSfx(snd.cut, comboPitch(zan.combo), 0);
     if(rating==='PERFECT'){
-      sfxNoiseVoice(ac, {filter:'bandpass', f:5200, f2:1300, q:1.1, dur:0.06, vol:0.13, atk:0.001}, 0);   // ズバッ
+      if(snd && snd.just) playSfx(snd.just, comboPitch(zan.combo), JUST_POP_DELAY);
+      if(tool && tool.just) playSfx(tool.just, 1, 0);
+      if(!(snd && snd.cut)) sfxNoiseVoice(ac, {filter:'bandpass', f:5200, f2:1300, q:1.1, dur:0.06, vol:0.13, atk:0.001}, 0);   // ズバッ
       if(kind==='tail'){
         gachaTone(ac, 110, 0, 0.5, 'sine', 0.2, 46);                                                   // ドン
         sfxNoiseVoice(ac, {filter:'bandpass', f:3000, f2:700, q:0.8, dur:0.22, vol:0.14, atk:0.002}, 0);
@@ -15049,8 +13180,10 @@ function zanHitSound(rating, kind, songT){
         gachaTone(ac, mtof(note), 0, 0.32, 'triangle', 0.08);
       }
     } else if(rating==='OK'){
-      sfxNoiseVoice(ac, {filter:'lowpass', f:700, f2:250, dur:0.09, vol:0.11, atk:0.002}, 0);          // ドスッ
+      if(!(snd && snd.cut)) sfxNoiseVoice(ac, {filter:'lowpass', f:700, f2:250, dur:0.09, vol:0.11, atk:0.002}, 0);   // ドスッ
       gachaTone(ac, 150, 0, 0.1, 'sine', 0.1, 90);
+    } else if(snd && snd.miss){
+      playSfx(snd.miss, 1, 0);
     } else {
       gachaTone(ac, 170, 0, 0.18, 'triangle', 0.16, 105);                                              // バコン！
       sfxNoiseVoice(ac, {filter:'lowpass', f:1000, f2:220, dur:0.14, vol:0.14, atk:0.002}, 0);
@@ -15112,6 +13245,11 @@ function zanPress(e){
   if(zan.paused){ zanResume(); return; }
   zanEnsureAudio();
   var t = zanEventTime(e), list = zanCandidates(), best = null, bestErr = 1e9;
+  for(var fi=zan.firstOpen;fi<zan.notes.length;fi++){   // 師匠のイタズラ: cutting where the master only feinted
+    var fk = zan.notes[fi];
+    if(fk.t - t > 0.5) break;
+    if(fk.type==='fake' && !fk.judged && Math.abs(t - fk.t)<=ZAN_OK){ zanFooled(fk); return; }
+  }
   for(var i=0;i<list.length;i++){
     var err = t - zanTarget(list[i][0], list[i][1]);
     if(Math.abs(err) < Math.abs(bestErr)){ bestErr = err; best = list[i]; }
@@ -15145,7 +13283,7 @@ function zanHit(n, part, err){
   zan.combo++;
   zan.maxCombo = Math.max(zan.maxCombo, zan.combo);
   var mult = 1 + Math.min(1, Math.floor(zan.combo/10)*0.1);   // ×1.0 → ×2.0 over 100 in a row
-  zan.score += Math.round(ZAN_POINTS[kind][rating==='PERFECT' ? 0 : 1]*mult);
+  zan.score += Math.round(ZAN_POINTS[kind][rating==='PERFECT' ? 0 : 1]*mult*(zan.trick ? ZAN_TRICK_SCORE : 1));   // (イタズラ ×1.2)
   if(rating==='PERFECT') zan.perfect++; else zan.ok++;
   zan.errs.push(err*1000);
   // the look of the cut (only the look): the knife comes down, the ring, a cut line in the dough
@@ -15154,6 +13292,17 @@ function zanHit(n, part, err){
   showPopup(rating==='PERFECT' ? 'PERFECT' : 'OK');
   zanHitSound(rating, kind, songT);
   if(rating==='PERFECT') zanPerfectFx(kind);
+  zanHud();
+}
+// 釣られた: the combo breaks (it is not a Miss and costs no points)
+function zanFooled(n){
+  n.judged = true;
+  zan.combo = 0;
+  zan.fooled++;
+  zanKnifeStrike(zan.pKnife, false);
+  zanCutMark(n.t, false, false);
+  showPopup('釣られた！');
+  if(audioEnabled){ try{ var ac = getAudioCtx(); if(ac) gachaTone(ac, 520, 0, 0.18, 'triangle', 0.1, 300); }catch(e){} }
   zanHud();
 }
 function zanMiss(n, part, t){
@@ -15262,6 +13411,18 @@ function zanDrawPeeks(nowP, still){
   }
 }
 
+// 今日の一曲: one course a day, the same for everyone on that date; finishing it pays ZAN_TODAY_BONUS once that day
+function zanTodayCourse(){ return ZAN_COURSE_IDS[seedFromDate(todayStr() + '|zan') % ZAN_COURSE_IDS.length]; }
+function zanCoinParts(store, acc, dailyJustCleared){
+  var p = coinParts(zan.score, 'beginner', acc, dailyJustCleared);
+  p.course = zan.course.coinBonus || 0;
+  p.trick = zan.trick ? Math.round(ZAN_TRICK_COIN*(p.base + p.scorePart + p.satPart + p.course)) : 0;
+  p.today = 0;
+  if(zan.course.id===zanTodayCourse() && store.zan.todayDone!==todayStr()){ p.today = ZAN_TODAY_BONUS; store.zan.todayDone = todayStr(); }
+  p.courseName = zan.course.name;
+  return p;
+}
+
 // --- start, frame, end ---
 // from the home screen: the song's music is rendered first (仕込み), then the song begins
 var zanLaunching = false;
@@ -15295,8 +13456,10 @@ function startZan(courseId, backing){
   state.style = DEFAULT_STYLE;
   state.styleConf = STYLES[DEFAULT_STYLE];
   state.phase = 'zan';
-  var notes = zanChart(song, tm);
-  zan = {course:course, song:song, tempo:tm, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
+  var trick = false;
+  try{ trick = loadStore().settings.zanTrick===true; }catch(e){}
+  var notes = zanChart(song, tm, trick);
+  zan = {course:course, song:song, tempo:tm, trick:trick, fooled:0, trickFrom:song.sections.length>2 ? song.sections[2].from : 1e9, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
          p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
@@ -15320,6 +13483,7 @@ function startZan(courseId, backing){
 function zanUpdate(dt){
   if(!zan || zan.ended) return;
   var now = zanNow();
+  if(zan.lastBeat<0 && zanT2B(now)>=0){ try{ var sr = skinPart('sound'); if(sr && sr.round) playSfx(sr.round, 1, 0); }catch(e){} }   // 着せ替えの音: 曲の始まり
   zan.lastBeat = zanT2B(now);
   // the master's cuts (お手本), the misses that went by, the hold let go too late
   for(var i=zan.firstOpen;i<zan.notes.length;i++){
@@ -15327,6 +13491,8 @@ function zanUpdate(dt){
     if(n.t > now + 0.2) break;
     if(n.judged) continue;
     if(n.type==='demo'){ if(now>=n.t){ n.judged = true; zanCutMark(n.t, false, true); state.cutFx.push({t:0, rating:'DEMO'}); } continue; }
+    if(n.type==='feint'){ if(now>=n.t) n.judged = true; continue; }
+    if(n.type==='fake'){ if(now>n.t + ZAN_OK + ZAN_LATE_GRACE) n.judged = true; continue; }
     if(n.type==='demohold'){
       if(now>=n.t) n.headDone = true;
       if(now>=zanTarget(n, 'tail')){ n.judged = true; zanCutMark(zanTarget(n, 'tail'), true, true); state.cutFx.push({t:0, rating:'DEMO'}); }
@@ -15379,13 +13545,14 @@ function finishZan(){
   var grade = zanGrade(acc, zan.miss);
   var isNewBest = false, store = loadStore(), cid = zan.course.id, rec = store.zan.courses[cid];
   rec.plays = Math.min(STAT_MAX, rec.plays + 1);
-  if(zan.score > rec.best){ rec.best = zan.score; isNewBest = true; }
+  if(zan.score > rec.best){ rec.best = zan.score; rec.bestTrick = zan.trick; isNewBest = true; }
   if(zanGradeRank(grade) > zanGradeRank(rec.bestGrade)) rec.bestGrade = grade;
   store.zan.plays = Math.min(STAT_MAX, store.zan.plays + 1);          // (and over all the courses)
   store.zan.best = Math.max(store.zan.best, zan.score);
   if(zanGradeRank(grade) > zanGradeRank(store.zan.bestGrade)) store.zan.bestGrade = grade;
   store.zan.lastCourse = cid;
-  store.zan.totalScore = Math.min(STAT_MAX, store.zan.totalScore + zan.score);   // 称号の記録 (with the 自由修行's)
+  var coinParts0 = zanCoinParts(store, acc, false);  // (today's challenge is added once it is checked, below)
+  store.zan.totalScore = Math.min(STAT_MAX, store.zan.totalScore + zan.score);   // 称号の記録
   store.zan.maxCombo = Math.max(store.zan.maxCombo, zan.maxCombo);
   if(total>0){
     store.zan.bestPerfectRate = Math.max(store.zan.bestPerfectRate, Math.floor(zan.perfect*100/total));
@@ -15397,7 +13564,7 @@ function finishZan(){
   screens.result.classList.add('is-zan');
   document.getElementById('zan-stats').hidden = false;
   resultMode.hidden = false;
-  resultMode.textContent = 'リズム修行・斬　' + zan.course.name + '（' + zan.course.level + '・♩=' + zan.course.bpm + '）';
+  resultMode.textContent = 'リズム修行・斬　' + zan.course.name + '（' + zan.course.level + '・♩=' + zan.course.bpm + '）' + (zan.trick ? '・イタズラ' : '');
   resultRank.textContent = '完成度: ' + grade + (grade==='極上' ? '蕎麦' : '');
   showNewTitles(newTitles);
   resultNewBest.classList.toggle('show', isNewBest);
@@ -15411,7 +13578,8 @@ function finishZan(){
                    combo:zan.maxCombo, err:'±' + avgErr + 'ms'};
   var dailyJustCleared = zanCheckDailyClear({score:zan.score, perfect:zan.perfect, combo:zan.maxCombo, grade:grade});
   resultDailyClear.classList.toggle('show', dailyJustCleared);
-  try{ renderCoinResult(awardCoins(coinParts(zan.score, zan.course.coin, acc, dailyJustCleared)), '完成度'); }catch(e){ coinBox.hidden = true; }
+  if(dailyJustCleared) coinParts0.challenge = COIN_CHALLENGE_BONUS;
+  try{ renderCoinResult(awardCoins(coinParts0), '完成度'); }catch(e){ coinBox.hidden = true; }
   showScreen('result');
   zanShowStart({grade:grade, rate:total ? zan.perfect/total : 0, allPerfect:total>0 && zan.perfect===total});
   var rewards = claimRewards();                     // 限定 items whose record this song reached (looks only)
@@ -15458,6 +13626,8 @@ function zanShowStart(d){
                bubble:d.allPerfect && conf.bubbleAll ? conf.bubbleAll : conf.bubble, burst:d.grade==='極上' || d.grade==='特上'};
   zanShow.played = {};
   zanShow.done = false;
+  zanShow.batch = [];                                // the cut noodles for a 器: clean cuts are thin, rough ones thick
+  for(var bi=0; bi<6; bi++) zanShow.batch.push({thickness:Math.round(6 + (1 - zanShow.d.rate)*(4 + (bi % 3))), points:100, seed:(bi*0.37 + 0.11) % 1});
   zanShow.petals = null;
   zanShowEl.hidden = false;
   zanShowLine.textContent = '師匠「' + conf.master + '」';
@@ -15496,9 +13666,45 @@ function zanShowSound(kind, i){
   try{
     if(kind==='drop') sfxNoiseVoice(ac, {filter:'bandpass', f:3600, f2:900, q:0.9, dur:0.16, vol:0.09, atk:0.003}, 0);         // シャキッ
     else if(kind==='pop') gachaTone(ac, 620 + i*90, 0, 0.12, 'sine', 0.08, 360 + i*60);                                          // ポンッ
-    else if(kind==='slurp') sfxNoiseVoice(ac, {filter:'lowpass', f:900, f2:2600, dur:0.32, vol:0.05, atk:0.04}, 0);              // ズズッ
-    else if(kind==='seal'){ gachaTone(ac, 120, 0, 0.32, 'sine', 0.16, 60); sfxNoiseVoice(ac, {filter:'lowpass', f:900, f2:200, dur:0.12, vol:0.1, atk:0.002}, 0); }   // ドンッ
+    else if(kind==='slurp'){ var ss = skinPart('sound'); if(ss && ss.serve) playSfx(ss.serve, 1, 0); else sfxNoiseVoice(ac, {filter:'lowpass', f:900, f2:2600, dur:0.32, vol:0.05, atk:0.04}, 0); }   // ズズッ
+    else if(kind==='seal'){ gachaTone(ac, 120, 0, 0.32, 'sine', 0.16, 60); sfxNoiseVoice(ac, {filter:'lowpass', f:900, f2:200, dur:0.12, vol:0.1, atk:0.002}, 0); var sf = skinPart('sound'); if(sf && sf.finish) playSfx(sf.finish, 1, 0.05); }   // ドンッ
   }catch(e){}
+}
+// 着せ替えの器: with a 器 equipped, the noodles are served in it — in tsuyu, with 大根おろし・かつお節・ネギ — drawn by the
+// same code as the 着せ替え preview (the equipped 麺 too). The cut noodles are as thin as the song was even (Perfect rate).
+function zanPlateBowl(t, d, cw, ch){
+  if(!skinPart('bowl')) return false;
+  var drew = false;
+  guardedSkinDraw('bowl', function(){
+    var sc = Math.min(0.74, cw*0.56/230), conf = detailConf(), nk = zanEase((t - 120)/320);
+    ctx.save();
+    ctx.translate(cw*0.42, ch*0.3);
+    ctx.scale(sc, sc);
+    drawServingBowl(0, 0);
+    safeDraw(function(){ drawTsuyuPool(0, 0, 1, conf); });
+    var pieces = zanShow.batch, nsk = state.mode==='shinsoba' ? null : skinPart('noodle'), look = noodleLook(nsk);
+    if(t>=120){
+      var heap = function(){
+        var bundles = heapLayout(pieces, conf, look);
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(0, 32, 100, 26, 0, 0, Math.PI*2);
+        ctx.moveTo(-94, 32);
+        ctx.ellipse(0, 32, 94, 50, 0, Math.PI, Math.PI*2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.translate(0, -(1 - nk)*80);             // the noodles drop in
+        drawNoodleHeap(bundles, 0, 0, look, 0.6, null, Math.min(0.6, look.shine + 0.1 + 0.3*d.rate), heapScale(pieces.length));
+        ctx.restore();
+      };
+      if(nsk) guardedSkinDraw('noodle', heap); else safeDraw(heap);
+    }
+    var set = toppingLayout(pieces, conf);
+    safeDraw(function(){ drawToppings(set, 0, 0, (t - 40)*1.0); });   // おろし ≈0.6 s, かつお節 0.72 s, ネギ 0.8 s
+    ctx.restore();
+    drew = true;
+  });
+  return drew;
 }
 function zanEase(k){ k = Math.max(0, Math.min(1, k)); return 1 - (1 - k)*(1 - k); }
 function zanShowPaint(t){
@@ -15520,6 +13726,7 @@ function zanShowPaint(t){
       for(var ry2=0; ry2<12; ry2++){ c.rotate(Math.PI/6); c.beginPath(); c.moveTo(0, 0); c.lineTo(-gr*0.4, -gr*3); c.lineTo(gr*0.4, -gr*3); c.closePath(); c.fill(); }
       c.restore();
     }
+    if(!zanPlateBowl(t, d, cw, ch)){                // (no 器 equipped: the ざる)
     // the ざる
     c.fillStyle = '#6e5634';
     c.beginPath(); c.ellipse(zx, zy + ry*0.35, rx*1.04, ry*1.05, 0, 0, Math.PI*2); c.fill();
@@ -15550,6 +13757,7 @@ function zanShowPaint(t){
     if(p1>0){ c.fillStyle = '#f7f4ec'; c.beginPath(); c.ellipse(zx + rx*0.25, ny - 10, 16*p1, 9*p1, 0, 0, Math.PI*2); c.fill(); c.fillStyle = 'rgba(200,190,170,0.6)'; c.beginPath(); c.ellipse(zx + rx*0.25 + 3*p1, ny - 8, 6*p1, 3*p1, 0, 0, Math.PI*2); c.fill(); }
     if(p2>0){ c.fillStyle = '#5f9e3a'; for(var ng=0; ng<7; ng++){ c.beginPath(); c.arc(zx - rx*0.15 + (ng % 4)*6*p2, ny - 12 + Math.floor(ng/4)*5*p2, 2.6*p2, 0, Math.PI*2); c.fill(); } }
     if(p3>0){ c.fillStyle = '#c98a5e'; for(var kf=0; kf<6; kf++){ c.save(); c.translate(zx + rx*0.02 + (kf - 2.5)*7*p3, ny - 18 - (kf % 2)*4*p3); c.rotate(kf*0.9); c.fillRect(-4*p3, -2*p3, 8*p3, 4*p3); c.restore(); } }
+    }
     // the guest tastes it
     if(t>1200){
       var look = CUSTOMER_LOOKS[d.guest] || CUSTOMER_LOOKS.lover, tasting = t>1450 && t<1800;
@@ -15622,7 +13830,7 @@ function zanCutMark(t, big, m){ zan.cuts.push({t:t, big:big, m:m}); if(zan.cuts.
 // (next: seconds to the next cut, or 'charge' while a タメ is held, when it is lifted high)
 function zanKnifePose(k, nowMs, dt, h, next, still){
   var K = ZAN_KNIFE, low = -(h - 4), target = K.rest, stay = k.big ? K.stayBig : K.stay, s = nowMs - k.strikeAt;
-  if(next==='charge') target = K.charge;
+  if(next==='charge' || next==='windup') target = K.charge;
   else if(!still && next>0 && next<0.3) target = K.rest + (K.ready - K.rest)*(1 - next/0.3);
   var pose = {lift:0, smear:0, impact:0, from:k.from, big:k.big, charge:next==='charge'};
   if(s>=0 && s<K.down){ var q = s/K.down; k.lift = k.from + (low - k.from)*q*q; pose.smear = 1; }
@@ -15676,6 +13884,32 @@ function zanDrawKnife(jx, y, h, pose, master, nowP){
   }
   ctx.restore();
 }
+// 目隠し (師匠のイタズラ): a こま板 laid over part of the board in your turn; the marks pass under it (it slides in and out)
+function zanDrawKomaita(jx, y, h, beat){
+  var span = W - jx, x0 = jx + span*ZAN_TRICK_HIDE[0], x1 = jx + span*ZAN_TRICK_HIDE[1];
+  var turnStart = zan.song.firstCall + Math.floor((beat + 0.2 - zan.song.firstCall)/4)*4;
+  var k = Math.min(1, (beat - (turnStart - 0.2))/0.35, (turnStart + 3.8 - beat)/0.35);
+  if(k<=0) return;
+  var slide = (1 - k)*(h + 20);
+  ctx.save();
+  ctx.translate(0, -slide);
+  ctx.globalAlpha = Math.min(1, k*1.4);
+  ctx.fillStyle = 'rgba(40,26,12,0.25)';
+  ctx.fillRect(x0 + 3, y - 6, x1 - x0, h + 16);      // its shadow
+  ctx.fillStyle = '#d9c69c';
+  ctx.fillRect(x0, y - 9, x1 - x0, h + 16);
+  ctx.strokeStyle = 'rgba(138,111,66,0.45)';
+  ctx.lineWidth = 1;
+  for(var g=0; g<5; g++){ var gy = y - 4 + g*(h + 8)/5; ctx.beginPath(); ctx.moveTo(x0 + 4, gy); ctx.bezierCurveTo(x0 + (x1 - x0)*0.35, gy - 3, x0 + (x1 - x0)*0.7, gy + 3, x1 - 4, gy - 1); ctx.stroke(); }
+  ctx.strokeStyle = '#8a6f42';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x0, y - 9, x1 - x0, h + 16);
+  ctx.fillStyle = 'rgba(122,31,20,0.75)';
+  ctx.font = '700 ' + Math.round(Math.min(18, h*0.3)) + 'px "Yuji Syuku","Hiragino Mincho ProN",serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('イタズラ', (x0 + x1)/2, y + h/2);
+  ctx.restore();
+}
 // the master: in his turn his arm brings the knife down; in yours he folds his arms and watches
 function zanDrawMaster(jx, y, h, pose, nowP){
   var mx = Math.max(22, jx - 50), bob = pose ? pose.impact*3 : 0, top = y - 46 + bob;
@@ -15702,14 +13936,14 @@ function zanDrawMaster(jx, y, h, pose, nowP){
   ctx.restore();
 }
 // whose turn, and the beats of the bar, under the board
-function zanDrawTurn(jx, y, h, beat, masterTurn){
+function zanDrawTurn(jx, y, h, beat, masterTurn, finale){
   var ty = y + h + 24, inBar = beat>=0 ? Math.floor(beat) % 4 : -1;
   ctx.save();
   ctx.font = '700 15px "Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic Medium",sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = masterTurn ? '#8a6a22' : COLORS.accent2;
-  ctx.fillText(masterTurn ? '師匠のお手本　よく見て聴く' : 'あなたの番　同じリズムで！', W/2, ty);
+  ctx.fillText(finale ? '最後は師匠といっしょに！' : masterTurn ? '師匠のお手本　よく見て聴く' : 'あなたの番　同じリズムで！', W/2, ty);
   for(var d=0;d<4;d++){
     ctx.beginPath(); ctx.arc(W/2 + (d - 1.5)*16, ty + 18, 4, 0, Math.PI*2);
     ctx.fillStyle = d<=inBar ? (masterTurn ? '#c9a24a' : COLORS.accent2) : 'rgba(60,40,22,0.18)';
@@ -15726,7 +13960,9 @@ function drawZan(){
   var beat = zanT2B(songT), ph = beat>=0 ? beat - Math.floor(beat) : 1;
   var bounce = still ? 0 : (calm ? 0.6 : 2)*Math.exp(-ph*7);   // 1拍ごとのバウンス
   var tilt = zan.slump>0 && !still ? Math.sin((260 - zan.slump)/260*Math.PI)*0.03 : 0;
+  var shake = skinShake();                           // 着せ替えの演出: a Perfect can shake the play area (looks only)
   ctx.save();
+  if(shake) ctx.translate(shake.x, shake.y);
   ctx.translate(0, -bounce);
   if(tilt){ ctx.translate(jx, y + h); ctx.rotate(tilt); ctx.translate(-jx, -(y + h)); }
   // the board and the dough
@@ -15734,7 +13970,7 @@ function drawZan(){
   ctx.fillRect(0, y - 6, W, h + 12);
   ctx.save();
   ctx.beginPath(); ctx.rect(0, y, W, h); ctx.clip();
-  var nsk = state.mode==='shinsoba' ? null : skinPart('noodle');   // (新そばの季節: the new soba's colour, as in the 自由修行)
+  var nsk = state.mode==='shinsoba' ? null : skinPart('noodle');   // (新そばの季節: the new soba's colour)
   ctx.fillStyle = state.mode==='shinsoba' ? SHINSOBA_DOUGH : (nsk ? nsk.dough : COLORS.dough);
   ctx.fillRect(0, y, W, h);
   var pxs = (W - jx)/ZAN_TRAVEL;
@@ -15763,7 +13999,7 @@ function drawZan(){
   for(var i=zan.firstOpen;i<zan.notes.length;i++){
     var n = zan.notes[i];
     if(n.t - songT > ZAN_TRAVEL + 0.2) break;
-    if(n.judged) continue;
+    if(n.judged || n.type==='feint' || n.type==='fake') continue;   // (a フェイント has no mark)
     var nx = jx + (n.t - songT)*pxs, demo = zanIsDemo(n);
     if(n.type==='hold' || n.type==='demohold'){
       var tx = jx + (zanTarget(n, 'tail') - songT)*pxs, held = zan.holding===n || (demo && n.headDone);
@@ -15788,21 +14024,40 @@ function drawZan(){
   var mk = zan.mKnife;                               // the master's cut lands right on its beat
   while(zan.mDrawIdx<zan.mEvents.length && zan.mEvents[zan.mDrawIdx].t - ZAN_KNIFE.down/1000 <= songT){
     var me = zan.mEvents[zan.mDrawIdx++];
-    if(me.kind!=='head') zanKnifeStrike(mk, me.kind==='tail', (me.t*1000 - ZAN_KNIFE.down));
+    if(me.kind==='tap' || me.kind==='tail') zanKnifeStrike(mk, me.kind==='tail', (me.t*1000 - ZAN_KNIFE.down));   // (a フェイント only winds up)
   }
-  var mNext = 9, mCharge = false;
-  for(var mi=zan.mDrawIdx;mi<zan.mEvents.length;mi++){ if(zan.mEvents[mi].kind!=='head'){ mNext = zan.mEvents[mi].t - songT; mCharge = zan.mEvents[mi].kind==='tail' && songT>=zan.mEvents[mi].from; break; } }
-  var mPose = zanKnifePose(mk, songT*1000, dtK, h, mCharge ? 'charge' : mNext, still);
+  var mNext = 9, mCharge = false, mWind = false;
+  for(var mi=zan.mDrawIdx;mi<zan.mEvents.length;mi++){
+    var mv = zan.mEvents[mi];
+    if(mv.kind==='head') continue;
+    mNext = mv.t - songT; mCharge = mv.kind==='tail' && songT>=mv.from; mWind = mv.kind==='feint' && mNext<0.3;
+    break;
+  }
+  var mPose = zanKnifePose(mk, songT*1000, dtK, h, mCharge ? 'charge' : mWind ? 'windup' : mNext, still);
   var pPose = zanKnifePose(zan.pKnife, nowP, dtK, h, zan.holding ? 'charge' : nextIn, still);
-  var playing = beat < zanCallsEnd();
-  if(playing) zanDrawMaster(jx, y, h, masterTurn ? mPose : null, nowP);
+  var fin = zanFinaleBar(), finale = fin>=0 && beat>=fin - 0.2 && beat<fin + 4;
+  var playing = beat < zanCallsEnd() || finale;
+  if(zan.trick && !masterTurn && !finale && beat>=zan.trickFrom - 0.2 && playing) zanDrawKomaita(jx, y, h, beat);   // 目隠し
+  if(playing) zanDrawMaster(jx, y, h, masterTurn || finale ? mPose : null, nowP);
   if(masterTurn && playing) zanDrawKnife(jx, y, h, mPose, true, nowP);
-  else zanDrawKnife(jx, y, h, pPose, false, nowP);
-  if(playing) zanDrawTurn(jx, y, h, beat, masterTurn);
+  else {
+    if(finale){ ctx.save(); ctx.globalAlpha = 0.55; zanDrawKnife(jx, y, h, mPose, true, nowP); ctx.restore(); }   // 同時切り: the master's knife beside yours
+    zanDrawKnife(jx, y, h, pPose, false, nowP);
+  }
+  if(playing) zanDrawTurn(jx, y, h, beat, masterTurn, finale);
   zanDrawPeeks(nowP, still);
-  // rings of the cuts
+  // rings of the cuts (着せ替えの演出: the equipped item's ring, bits and extras on your cuts)
+  var ek = skinPart('effect');
   for(var f=0;f<state.cutFx.length;f++){
     var fx = state.cutFx[f], a = 1 - fx.t/400;
+    if(ek && fx.rating!=='DEMO'){
+      guardedSkinDraw('effect', function(){ drawSkinRing(ctx, jx, y + h/2, fx, ek); });
+      if(f>=state.cutFx.length - 4){                // only the newest cuts throw bits and show their extras
+        guardedSkinDraw('effect', function(){ drawSkinOverlay(ctx, jx, y + h/2, fx, ek, y, h, W, false); });
+        guardedSkinDraw('effect', function(){ drawCutBits(jx, y + h/2, fx, ek); });
+      }
+      if(!skinFailed.effect) continue;
+    }
     ctx.globalAlpha = Math.max(a, 0);
     ctx.strokeStyle = fx.rating==='DEMO' ? '#c9a24a' : fx.rating==='JUST' ? '#ffd54a' : COLORS.accent;
     ctx.lineWidth = 2;
@@ -15891,8 +14146,18 @@ function renderZanHome(){
     cards[i].disabled = !ok;
     cards[i].setAttribute('aria-pressed', ok && id===sel ? 'true' : 'false');
     var bestEl = cards[i].querySelector('.zan-cbest'), rec = z && z.courses[id];
-    if(bestEl) bestEl.textContent = rec && rec.best>0 ? ('ベスト ' + fmtPoints(rec.best) + (rec.bestGrade ? '・完成度 ' + rec.bestGrade : '')) : 'ベスト —';
+    if(bestEl) bestEl.textContent = rec && rec.best>0 ? ('ベスト ' + fmtPoints(rec.best) + (rec.bestTrick ? '（イタズラ）' : '') + (rec.bestGrade ? '・完成度 ' + rec.bestGrade : '')) : 'ベスト —';
+    var todayEl = cards[i].querySelector('.zan-today');
+    if(todayEl){
+      var isToday = id===zanTodayCourse(), done = !!(z && z.todayDone===todayStr());
+      todayEl.hidden = !isToday;
+      todayEl.textContent = done ? '今日の一曲（受け取り済み）' : '今日の一曲 +' + ZAN_TODAY_BONUS + '🪙';
+    }
   }
+  var trickOn = false;
+  try{ trickOn = loadStore().settings.zanTrick===true; }catch(e){}
+  var tOpts = document.querySelectorAll('.trick-opt');
+  for(var ti=0;ti<tOpts.length;ti++) tOpts[ti].setAttribute('aria-pressed', (tOpts[ti].getAttribute('data-trick')==='on')===trickOn ? 'true' : 'false');
   var season = zanSeason(), seEl = document.getElementById('zan-season');
   if(seEl){
     seEl.hidden = !season;
@@ -15908,6 +14173,12 @@ document.querySelector('.zan-courses').addEventListener('click', function(e){
   renderZanHome();
 });
 document.getElementById('btn-zan').addEventListener('click', function(){ wakeAudio(); zanLaunch(zanSelectedCourse()); });
+document.querySelector('.zan-trick').addEventListener('click', function(e){   // 師匠のイタズラ: アリ / ナシ (kept in settings.zanTrick)
+  var b = e.target.closest('.trick-opt');
+  if(!b) return;
+  try{ var store = loadStore(); store.settings.zanTrick = b.getAttribute('data-trick')==='on'; saveStoreObj(store); }catch(err){}
+  renderZanHome();
+});
 
 // --- 試し切り: the player taps along to 8 knocks (after 4 to count in); the median lateness is the offset ---
 var CALIB_BPM = 100, CALIB_COUNT = 4, CALIB_TAPS = 8;
