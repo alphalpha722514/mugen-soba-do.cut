@@ -1,8 +1,9 @@
 // 無限そば道・斬 同期サーバー（Cloudflare Workers + KV。KV のバインド名は DB）
 // 公開中: https://soba-sync.yfhmbvzk72.workers.dev （Cloudflare の Worker「soba-sync」の「コードを編集」に、この中身を貼って「デプロイ」）
 // POST /register・/login {user, hash} → {ok, user, token} ／ GET・PUT /save（Bearer トークン） ／ DELETE /account {hash}
-// 番付（参加した人だけ）: POST /ranking（Bearer・判定の記録つき。サーバーで得点を計算し直す） ／ GET /ranking?course=&period=week|all
-// （Bearer があれば自分の行に me:true） ／ DELETE /ranking（Bearer。番付から自分を消す。アカウント削除でも消える）
+// 番付（参加した人だけ）: POST /ranking（Bearer・判定の記録つき。サーバーで得点を計算し直す。pub:false なら全体には載せず、group:合言葉 の
+// クラス番付だけに載せる） ／ GET /ranking?course=&period=week|all[&group=合言葉]（Bearer があれば自分の行に me:true）
+// ／ DELETE /ranking[?scope=global | ?group=合言葉]（Bearer。番付から自分を消す。指定なしは全部。アカウント削除でも全部消える）
 const MAX_CHARS = 512 * 1024;            // 1人分のセーブの上限
 const TOKEN_TTL = 60 * 60 * 24 * 180;    // ログインの有効期限: 180日
 const USER_RE = /^[A-Za-z0-9_\-ぁ-ゖァ-ヺー一-鿿々]{3,16}$/;
@@ -22,6 +23,11 @@ const RANK_COURSES = {                        // 曲ごとの判定の数（同�
 const RANK_WIN = {crit: 10, perfect: 35, ok: 80};          // 判定の幅（ms・全コース共通）。極・一閃は ±10
 const RANK_WIN_STRICT = {crit: 7, perfect: 15, ok: 40};    // 修行の心得「極・判定」
 const RANK_SPEED_MULT = {'1': 1, '1.2': 1.1, '1.5': 1.2};  // 修行の心得「速切り」の倍率（極・判定・心眼は ×1.1）
+// クラス番付（合言葉）: 同じ合言葉の人だけの番付。合言葉は6文字（I・O・0・1 は使わない）。誰が入ったかは本人の記録を消すためにだけ覚える
+const GROUP_RE = /^[A-HJ-NP-Z2-9]{6}$/;
+const RANK_GROUP_TTL = 60 * 60 * 24 * 180;   // 合言葉の全期間の番付は、最後の記録から180日で消える
+const RANK_GROUPS_MAX = 5;                    // 1人が覚えておく合言葉の数（古いものから忘れる。その番付は期限で消える）
+function groupOf(v) { return typeof v === 'string' && GROUP_RE.test(v) ? v : ''; }
 const RANK_POINTS = [[100, 50], [50, 25], [300, 150]];   // [通常, タメの頭, タメの斬] の [Perfect, OK]
 const RANK_GRADES = [['極上', 95, true], ['特上', 85, false], ['上', 70, false], ['並', 0, false]];
 // 判定の記録 judges: [[拍×4, ずれms|null, 種類 0/1/2, 判定 0 Perfect・1 OK・2 Miss・3 フェイントにつられた, 殿様 0/1], …]（ゲームで起きた順）
@@ -82,13 +88,25 @@ async function rankPut(env, k, entry, ttl) {
   if (!top.includes(entry) && i < 0) return;
   await env.DB.put(k, JSON.stringify(top), ttl ? {expirationTtl: ttl} : undefined);
 }
-async function rankRemove(env, uid) {
-  const now = Date.now();
+// scope: 'all'（全部）・'global'（全体の番付だけ）・合言葉（そのクラス番付だけ）
+async function rankRemove(env, uid, scope = 'all') {
+  const now = Date.now(), groups = await rankRead(env, 'rankg:' + uid);
+  const targets = [];                                                     // [key の頭, 全期間の TTL]
+  if (scope === 'all' || scope === 'global') targets.push(['rank:%c', undefined]);
+  for (const g of scope === 'all' ? groups : groupOf(scope) ? [scope] : []) targets.push(['rank:%c:g:' + g, RANK_GROUP_TTL]);
   for (const course of Object.keys(RANK_COURSES)) {
-    for (const k of ['rank:' + course + ':all', 'rank:' + course + ':w' + rankWeek(now), 'rank:' + course + ':w' + rankWeek(now, 1)]) {
-      const list = await rankRead(env, k), rest = list.filter(e => e.uid !== uid);
-      if (rest.length !== list.length) await env.DB.put(k, JSON.stringify(rest), k.includes(':w') ? {expirationTtl: RANK_WEEK_TTL} : undefined);
+    for (const [head, allTtl] of targets) {
+      const base = head.replace('%c', course);
+      for (const [k, ttl] of [[base + ':all', allTtl], [base + ':w' + rankWeek(now), RANK_WEEK_TTL], [base + ':w' + rankWeek(now, 1), RANK_WEEK_TTL]]) {
+        const list = await rankRead(env, k), rest = list.filter(e => e.uid !== uid);
+        if (rest.length !== list.length) await env.DB.put(k, JSON.stringify(rest), ttl ? {expirationTtl: ttl} : undefined);
+      }
     }
+  }
+  if (scope === 'all') await env.DB.delete('rankg:' + uid);
+  else if (groupOf(scope)) {
+    const rest = groups.filter(g => g !== scope);
+    if (rest.length) await env.DB.put('rankg:' + uid, JSON.stringify(rest)); else await env.DB.delete('rankg:' + uid);
   }
 }
 async function sessionKey(req, env) {
@@ -165,25 +183,41 @@ export default {
       }
       if (path === '/ranking' && req.method === 'GET') {
         const q = new URL(req.url).searchParams, course = q.get('course') || '', period = q.get('period') === 'all' ? 'all' : 'week';
-        if (!RANK_COURSES[course]) return json({ok: false, error: 'notfound'}, 404);
+        const group = q.has('group') ? groupOf(q.get('group')) : '';
+        if (!RANK_COURSES[course] || (q.has('group') && !group)) return json({ok: false, error: 'notfound'}, 404);
         const week = rankWeek(Date.now()), key = await sessionKey(req, env), me = key ? await rankUid(key) : '';
-        const list = await rankRead(env, 'rank:' + course + ':' + (period === 'all' ? 'all' : 'w' + week));
-        return json({ok: true, course, period, week, entries: list.map((e, i) => ({rank: i + 1, name: e.name, score: e.score, grade: e.grade, perfect: e.perfect, combo: e.combo, trick: e.trick, mods: e.mods || null, me: e.uid === me}))});
+        const list = await rankRead(env, 'rank:' + course + (group ? ':g:' + group : '') + ':' + (period === 'all' ? 'all' : 'w' + week));
+        return json({ok: true, course, period, week, group, entries: list.map((e, i) => ({rank: i + 1, name: e.name, score: e.score, grade: e.grade, perfect: e.perfect, combo: e.combo, trick: e.trick, mods: e.mods || null, me: e.uid === me}))});
       }
       if (path === '/ranking' && (req.method === 'POST' || req.method === 'DELETE')) {
         const key = await sessionKey(req, env), rec = key ? await env.DB.get(key, 'json') : null;
         if (!rec) return json({ok: false, error: 'session'});
         const uid = await rankUid(key);
-        if (req.method === 'DELETE') { await rankRemove(env, uid); return json({ok: true}); }
+        if (req.method === 'DELETE') {
+          const q = new URL(req.url).searchParams, scope = q.get('scope') === 'global' ? 'global' : q.has('group') ? groupOf(q.get('group')) : 'all';
+          if (!scope) return json({ok: false, error: 'notfound'}, 404);
+          await rankRemove(env, uid, scope);
+          return json({ok: true});
+        }
         const text = await req.text();
         if (text.length > 32 * 1024) return json({ok: false, error: 'storage'}, 413);
         let body = null;
         try { body = JSON.parse(text); } catch (e) {}
         const r = body && typeof body === 'object' ? rankCheck(body) : null;
         if (!r) return json({ok: false, error: 'rejected'});
+        const pub = body.pub !== false, group = body.group === undefined ? '' : groupOf(body.group);
+        if ((body.group !== undefined && !group) || (!pub && !group)) return json({ok: false, error: 'rejected'});
         const now = Date.now(), entry = {uid, name: rankName(body.name), ...r, at: now};
-        await rankPut(env, 'rank:' + body.course + ':all', {...entry});
-        await rankPut(env, 'rank:' + body.course + ':w' + rankWeek(now), {...entry}, RANK_WEEK_TTL);
+        if (pub) {
+          await rankPut(env, 'rank:' + body.course + ':all', {...entry});
+          await rankPut(env, 'rank:' + body.course + ':w' + rankWeek(now), {...entry}, RANK_WEEK_TTL);
+        }
+        if (group) {                                                          // クラス番付
+          await rankPut(env, 'rank:' + body.course + ':g:' + group + ':all', {...entry}, RANK_GROUP_TTL);
+          await rankPut(env, 'rank:' + body.course + ':g:' + group + ':w' + rankWeek(now), {...entry}, RANK_WEEK_TTL);
+          const gs = (await rankRead(env, 'rankg:' + uid)).filter(g => g !== group).concat([group]).slice(-RANK_GROUPS_MAX);
+          await env.DB.put('rankg:' + uid, JSON.stringify(gs));
+        }
         return json({ok: true});
       }
       if (path === '/account' && req.method === 'DELETE') {

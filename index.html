@@ -878,6 +878,14 @@ body{
 .zan-tools-note{font-size:.68rem;color:var(--ink-soft);}
 .rank-sent{margin:-16px 0 20px;font-size:.8rem;font-weight:700;color:var(--accent-ink);text-align:center;}
 .rank-sent[hidden]{display:none;}
+.rk-group{margin:0 0 12px;padding:12px 14px;}
+.rk-group-h{margin:0 0 4px;font-weight:900;}
+.rk-group-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px;}
+.rk-group-row[hidden]{display:none;}
+.rk-group-in{flex:1 1 120px;min-width:0;max-width:160px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:700 1rem var(--font-body);letter-spacing:.15em;text-transform:uppercase;}
+.rk-group-now{margin:0;flex:1 1 100%;font-size:.9rem;}
+.rk-group-now b{letter-spacing:.12em;}
+#rk-scopes[hidden]{display:none;}
 .zan-fact{display:block;margin-top:6px;font-size:.78rem;font-weight:500;line-height:1.5;color:var(--ink-soft);}
 /* 斬ハイライト (V5) */
 .clip-box{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;border-radius:14px;background:var(--card);box-shadow:var(--card-shadow);}
@@ -1975,8 +1983,27 @@ body{
     <div id="rk-body" hidden>
       <div class="rk-join card">
         <label class="fx-check"><input id="rk-join" type="checkbox"> 番付に参加する</label>
-        <p class="rk-note">参加すると、遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラの有無）がこの端末から送られ、番付でほかの人にも見えます。表示名はマイページで変えられます。参加をやめると、番付からあなたの記録を消します。</p>
+        <p class="rk-note">参加すると、遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラと修行の心得の有無）がこの端末から送られ、番付でほかの人にも見えます。表示名はマイページで変えられます。参加をやめると、番付からあなたの記録を消します。</p>
         <p id="rk-join-msg" class="rk-note rk-msg" role="status"></p>
+      </div>
+      <div class="rk-group card">
+        <p class="rk-group-h">クラス番付（合言葉）</p>
+        <p class="rk-note">同じ合言葉の人だけの番付です。合言葉を知っている人なら誰でも見られます（チャットなどはありません）。全体の番付に参加しなくても使えます。</p>
+        <div id="rk-group-off" class="rk-group-row">
+          <input id="rk-group-in" class="rk-group-in" type="text" inputmode="latin" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="6" placeholder="合言葉（6文字）" aria-label="合言葉">
+          <button id="rk-group-join" class="btn-small btn-primary" type="button">入る</button>
+          <button id="rk-group-new" class="btn-small" type="button">合言葉を作る</button>
+        </div>
+        <div id="rk-group-on" class="rk-group-row" hidden>
+          <p class="rk-group-now">合言葉「<b id="rk-group-code"></b>」に参加中</p>
+          <button id="rk-group-send" class="btn-small btn-primary" type="button">合言葉を送る</button>
+          <button id="rk-group-leave" class="btn-small" type="button">抜ける</button>
+        </div>
+        <p id="rk-group-msg" class="rk-note rk-msg" role="status"></p>
+      </div>
+      <div id="rk-scopes" class="rk-tabs" role="group" aria-label="番付の種類" hidden>
+        <button class="btn-small rk-scope" type="button" data-scope="all" aria-pressed="true">全体</button>
+        <button class="btn-small rk-scope" type="button" data-scope="group" aria-pressed="false">合言葉</button>
       </div>
       <div id="rk-courses" class="rk-tabs" role="group" aria-label="コース"></div>
       <div id="rk-periods" class="rk-tabs" role="group" aria-label="期間">
@@ -3415,7 +3442,7 @@ function withEffectsDefaults(st){
   }
   return out;
 }
-function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}, ghost:false, rankJoin:false, mods:{speed:1, strict:false, blind:false}, clip:false}; }
+function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}, ghost:false, rankJoin:false, mods:{speed:1, strict:false, blind:false}, clip:false, rankGroup:''}; }
 // settings.onboarding (the first-run rules guide) and settings.lastShareDate (the day the 共有ボーナス was last paid).
 // A save without them gets them; a player who has already played is not shown the guide again (it is in 記録と設定).
 // 修行の心得: {speed 1 | 1.2 | 1.5, strict, blind}; anything else falls back to none
@@ -3434,6 +3461,15 @@ function zanModLabels(m){
   if(m && m.blind) out.push('心眼');
   return out;
 }
+// クラス番付 (V5): a 合言葉 is 6 letters and digits, without I・O・0・1 (the server checks the same)
+var RANK_GROUP_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function rankGroupOf(v){ var t = typeof v==='string' ? v.trim().toUpperCase() : ''; return /^[A-HJ-NP-Z2-9]{6}$/.test(t) ? t : ''; }
+function rankGroupNew(){
+  var out = '', b = new Uint8Array(6);
+  try{ crypto.getRandomValues(b); }catch(e){ for(var j=0;j<6;j++) b[j] = Math.floor(Math.random()*256); }
+  for(var i=0;i<6;i++) out += RANK_GROUP_CHARS[b[i] % RANK_GROUP_CHARS.length];
+  return out;
+}
 function isDateStr(v){ return typeof v==='string' && /^\d{4}-\d{2}-\d{2}$/.test(v); }
 function withDailyDefaults(st, played){
   var out = isPlainObj(st) ? st : {};
@@ -3450,6 +3486,7 @@ function withDailyDefaults(st, played){
   out.ghost = out.ghost===true;                      // ゴースト (アリ/ナシ, off unless turned on)
   out.clip = out.clip===true;                        // ハイライト録画 (V5; off unless turned on)
   out.rankJoin = out.rankJoin===true;                // 番付に参加する (this device; off unless chosen)
+  out.rankGroup = rankGroupOf(out.rankGroup);       // クラス番付の合言葉 (V5; this device; '' = none)
   out.mods = sanitizeMods(out.mods);                 // 修行の心得 (速切り・極・判定・心眼)
   return out;
 }
@@ -11022,29 +11059,32 @@ var MockCloudAdapter = {
       if(!isPlainObj(b) || !zanCourse(b.course) || typeof b.score!=='number') return {ok:false, error:'rejected'};
       db.ranking = isPlainObj(db.ranking) ? db.ranking : {};
       var e = {uid:u.name.toLowerCase(), name:cleanProfileName(b.name) || DEFAULT_PLAYER_NAME, score:b.score, grade:b.grade, perfect:b.perfect, combo:b.combo, trick:b.trick===true, mods:sanitizeMods(b.mods), at:Date.now()};
-      ['all', 'w' + rankWeekKey(Date.now())].forEach(function(p){
-        var k = b.course + ':' + p, list = (db.ranking[k] || []).filter(function(x){ return x.uid!==e.uid || x.score>=e.score; });
+      var g = b.group===undefined ? '' : rankGroupOf(b.group), heads = [].concat(b.pub===false ? [] : [b.course], g ? [b.course + ':g:' + g] : []);
+      if(!heads.length) return {ok:false, error:'rejected'};
+      heads.forEach(function(head){ ['all', 'w' + rankWeekKey(Date.now())].forEach(function(p){
+        var k = head + ':' + p, list = (db.ranking[k] || []).filter(function(x){ return x.uid!==e.uid || x.score>=e.score; });
         if(!list.some(function(x){ return x.uid===e.uid; })) list.push(e);
         list.sort(function(x, y){ return y.score - x.score || x.at - y.at; });
         db.ranking[k] = list.slice(0, 50);
-      });
+      }); });
       return writeRawLS(MOCK_CLOUD_KEY, JSON.stringify(db)) ? {ok:true} : {ok:false, error:'storage'};
     });
   },
-  rankGet:function(token, course, period){
+  rankGet:function(token, course, period, group){
     var self = this;
     return this.later(function(){
-      var db = self.read(), u = token ? self.tokenUser(db, token) : null, k = course + ':' + (period==='all' ? 'all' : 'w' + rankWeekKey(Date.now()));
+      var db = self.read(), u = token ? self.tokenUser(db, token) : null, k = course + (group ? ':g:' + group : '') + ':' + (period==='all' ? 'all' : 'w' + rankWeekKey(Date.now()));
       var list = (isPlainObj(db.ranking) && db.ranking[k]) || [];
       return {ok:true, course:course, period:period, week:rankWeekKey(Date.now()), entries:list.map(function(e, i){ return {rank:i + 1, name:e.name, score:e.score, grade:e.grade, perfect:e.perfect, combo:e.combo, trick:e.trick, mods:e.mods || null, me:!!(u && e.uid===u.name.toLowerCase())}; })};
     });
   },
-  rankLeave:function(token){
+  rankLeave:function(token, scope){
     var self = this;
     return this.later(function(){
       var db = self.read(), u = self.tokenUser(db, token);
       if(!u) return {ok:false, error:'session'};
-      if(isPlainObj(db.ranking)) for(var rk in db.ranking) if(Object.prototype.hasOwnProperty.call(db.ranking, rk)) db.ranking[rk] = db.ranking[rk].filter(function(e){ return e.uid!==u.name.toLowerCase(); });
+      var hit = function(rk){ var isG = rk.indexOf(':g:')>=0; return scope==='global' ? !isG : scope ? rk.indexOf(':g:' + scope + ':')>=0 : true; };   // ('global': the whole boards only; a 合言葉: its boards)
+      if(isPlainObj(db.ranking)) for(var rk in db.ranking) if(Object.prototype.hasOwnProperty.call(db.ranking, rk) && hit(rk)) db.ranking[rk] = db.ranking[rk].filter(function(e){ return e.uid!==u.name.toLowerCase(); });
       return writeRawLS(MOCK_CLOUD_KEY, JSON.stringify(db)) ? {ok:true} : {ok:false, error:'storage'};
     });
   }
@@ -11083,8 +11123,8 @@ var RestAdapter = {
   save:function(name, token, data){ return this.call('/save', 'PUT', {data:data}, token); },
   remove:function(name, token, hash){ return this.call('/account', 'DELETE', {hash:hash}, token); },
   rankSubmit:function(token, payload){ return this.call('/ranking', 'POST', payload, token); },
-  rankGet:function(token, course, period){ return this.call('/ranking?course=' + encodeURIComponent(course) + '&period=' + (period==='all' ? 'all' : 'week'), 'GET', null, token); },
-  rankLeave:function(token){ return this.call('/ranking', 'DELETE', null, token); }
+  rankGet:function(token, course, period, group){ return this.call('/ranking?course=' + encodeURIComponent(course) + '&period=' + (period==='all' ? 'all' : 'week') + (group ? '&group=' + encodeURIComponent(group) : ''), 'GET', null, token); },
+  rankLeave:function(token, scope){ return this.call('/ranking' + (scope==='global' ? '?scope=global' : scope ? '?group=' + encodeURIComponent(scope) : ''), 'DELETE', null, token); }
 };
 
 // --- マージ: the better of this device and the cloud ---
@@ -11260,15 +11300,15 @@ var SyncManager = {
     if(!acc || typeof this.adapter.rankSubmit!=='function') return Promise.resolve({ok:false, error:'nologin'});
     return this.adapter.rankSubmit(acc.token, payload).then(function(r){ return r || {ok:false, error:'offline'}; }, function(){ return {ok:false, error:'offline'}; });
   },
-  rankGet:function(course, period){
+  rankGet:function(course, period, group){
     var acc = this.account();
     if(!acc || typeof this.adapter.rankGet!=='function') return Promise.resolve({ok:false, error:'nologin'});
-    return this.adapter.rankGet(acc.token, course, period).then(function(r){ return r || {ok:false, error:'offline'}; }, function(){ return {ok:false, error:'offline'}; });
+    return this.adapter.rankGet(acc.token, course, period, rankGroupOf(group)).then(function(r){ return r || {ok:false, error:'offline'}; }, function(){ return {ok:false, error:'offline'}; });
   },
-  rankLeave:function(){
+  rankLeave:function(scope){                        // (scope: 'global' | a 合言葉 | none = everything)
     var acc = this.account();
     if(!acc || typeof this.adapter.rankLeave!=='function') return Promise.resolve({ok:false, error:'nologin'});
-    return this.adapter.rankLeave(acc.token).then(function(r){ return r || {ok:false, error:'offline'}; }, function(){ return {ok:false, error:'offline'}; });
+    return this.adapter.rankLeave(acc.token, scope==='global' ? 'global' : rankGroupOf(scope) || undefined).then(function(r){ return r || {ok:false, error:'offline'}; }, function(){ return {ok:false, error:'offline'}; });
   },
   // a save was written: send it up a moment later (only while logged in; never for the sync's own write)
   request:function(){
@@ -15154,23 +15194,25 @@ function zanRankPayload(r){
   });
   var name = '';
   try{ name = loadStore().profile.name; }catch(e){}
-  return {course:zan.course.id, chart:zan.song.baseId || zan.song.id, mods:{speed:zan.mods.speed, strict:zan.mods.strict, blind:zan.mods.blind}, score:zan.score, grade:r.grade, perfect:r.perfect, combo:r.combo, trick:!!zan.trick, name:name || DEFAULT_PLAYER_NAME, judges:j};   // (the chart without the 心得; the 心得 apart)
+  var st = {};
+  try{ st = loadStore().settings; }catch(e){}
+  return {pub:st.rankJoin===true, group:rankGroupOf(st.rankGroup) || undefined, course:zan.course.id, chart:zan.song.baseId || zan.song.id, mods:{speed:zan.mods.speed, strict:zan.mods.strict, blind:zan.mods.blind}, score:zan.score, grade:r.grade, perfect:r.perfect, combo:r.combo, trick:!!zan.trick, name:name || DEFAULT_PLAYER_NAME, judges:j};   // (the chart without the 心得; the 心得 apart)
 }
 function zanRankSend(r){
   var el = document.getElementById('rank-sent');
   if(el){ el.hidden = true; el.textContent = ''; }
-  var join = false;
-  try{ join = loadStore().settings.rankJoin===true; }catch(e){}
-  if(!join || zan.practice || !SyncManager.isLoggedIn()) return;
+  var join = false, group = '';
+  try{ var rs = loadStore().settings; join = rs.rankJoin===true; group = rankGroupOf(rs.rankGroup); }catch(e){}
+  if((!join && !group) || zan.practice || !SyncManager.isLoggedIn()) return;   // (番付に参加 and/or a クラス番付's 合言葉)
   var payload = zanRankPayload(r);
   if(el){ el.hidden = false; el.textContent = '番付に送っています…'; }
   SyncManager.rankSubmit(payload).then(function(res){
     if(!el) return;
-    el.textContent = res.ok ? '番付に送りました（参考記録）。' : res.error==='rejected' ? 'この記録は番付に載せられませんでした。' : '番付に送れませんでした（記録はこの端末に残っています）。';
+    el.textContent = res.ok ? (join ? '番付に送りました（参考記録）。' : 'クラス番付に送りました（参考記録）。') : res.error==='rejected' ? 'この記録は番付に載せられませんでした。' : '番付に送れませんでした（記録はこの端末に残っています）。';
   });
 }
 // --- 番付の画面: course × this week / all time, the top 50; your row is marked
-var rankView = {course:'', period:'week', seq:0}, rankOpener = null;
+var rankView = {course:'', period:'week', scope:'all', seq:0}, rankOpener = null;
 function openRanking(opener){
   rankOpener = opener || null;
   if(!rankView.course) rankView.course = zanSelectedCourse();
@@ -15202,15 +15244,25 @@ function renderRanking(){
   for(var i=0;i<ps.length;i++) ps[i].setAttribute('aria-pressed', ps[i].getAttribute('data-period')===rankView.period ? 'true' : 'false');
   var jb = document.getElementById('rk-join');
   jb.checked = join;
+  var group = '';
+  try{ group = rankGroupOf(loadStore().settings.rankGroup); }catch(e){}
+  document.getElementById('rk-group-off').hidden = !!group;
+  document.getElementById('rk-group-on').hidden = !group;
+  document.getElementById('rk-group-code').textContent = group;
+  if(!group) rankView.scope = 'all';
+  document.getElementById('rk-scopes').hidden = !group;
+  var ss = document.querySelectorAll('.rk-scope');
+  for(var si=0;si<ss.length;si++) ss[si].setAttribute('aria-pressed', ss[si].getAttribute('data-scope')===rankView.scope ? 'true' : 'false');
   if(!logged) return;
+  var asGroup = rankView.scope==='group' && group;
   var list = document.getElementById('rk-list'), status = document.getElementById('rk-status'), seq = ++rankView.seq;
   list.textContent = '';
   status.textContent = '読み込み中…';
-  SyncManager.rankGet(rankView.course, rankView.period).then(function(res){
+  SyncManager.rankGet(rankView.course, rankView.period, asGroup ? group : '').then(function(res){
     if(seq!==rankView.seq) return;                   // (another tab was chosen meanwhile)
     if(!res.ok){ status.textContent = '番付を読み込めませんでした。通信できるところで、もう一度開いてください。'; return; }
     var es = Array.isArray(res.entries) ? res.entries : [], c = zanCourse(rankView.course);
-    status.textContent = (c ? c.name : '') + '・' + (rankView.period==='all' ? '全期間' : '今週（' + String(res.week || '').replace(/^\d{4}-0?(\d+)-0?(\d+)$/, '$1月$2日') + 'からの週）') + (es.length ? '　上位' + es.length + '人' : '　まだ誰も載っていません');
+    status.textContent = (asGroup ? '合言葉「' + group + '」・' : '') + (c ? c.name : '') + '・' + (rankView.period==='all' ? '全期間' : '今週（' + String(res.week || '').replace(/^\d{4}-0?(\d+)-0?(\d+)$/, '$1月$2日') + 'からの週）') + (es.length ? '　上位' + es.length + '人' : '　まだ誰も載っていません');
     es.forEach(function(e){
       var li = document.createElement('li');
       if(e.me) li.className = 'is-me';
@@ -15233,6 +15285,66 @@ document.getElementById('rk-courses').addEventListener('click', function(e){
   rankView.course = b.getAttribute('data-course');
   renderRanking();
 });
+document.getElementById('rk-scopes').addEventListener('click', function(e){
+  var b = e.target.closest && e.target.closest('.rk-scope');
+  if(!b) return;
+  rankView.scope = b.getAttribute('data-scope')==='group' ? 'group' : 'all';
+  renderRanking();
+});
+// the 合言葉: join (typed, or from a link), make a new one, send it, leave it
+function rankGroupSet(code, msgText){
+  var msg = document.getElementById('rk-group-msg'), old = '';
+  try{ var store = loadStore(); old = rankGroupOf(store.settings.rankGroup); store.settings.rankGroup = code; saveStoreObj(store); }catch(e){}
+  if(old && old!==code) SyncManager.rankLeave(old);   // (the old class's boards forget you)
+  rankView.scope = code ? 'group' : 'all';
+  msg.textContent = msgText;
+  renderRanking();
+}
+document.getElementById('rk-group-join').addEventListener('click', function(){
+  var inp = document.getElementById('rk-group-in'), code = rankGroupOf(inp.value);
+  if(!code){ document.getElementById('rk-group-msg').textContent = '合言葉は、英字と数字の6文字です（I・O・0・1 は使いません）。'; return; }
+  inp.value = '';
+  rankGroupSet(code, '合言葉「' + code + '」に入りました。これから遊んだ記録が、このクラス番付に送られます。');
+});
+document.getElementById('rk-group-new').addEventListener('click', function(){
+  var code = rankGroupNew();
+  rankGroupSet(code, '合言葉「' + code + '」を作りました。「合言葉を送る」で、クラスの友達に知らせてね。');
+});
+document.getElementById('rk-group-send').addEventListener('click', function(){
+  var code = '', msg = document.getElementById('rk-group-msg');
+  try{ code = rankGroupOf(loadStore().settings.rankGroup); }catch(e){}
+  if(!code) return;
+  var url = SHARE_URL + '#group=' + code, text = '『無限そば道・斬』クラス番付の合言葉は「' + code + '」。リンクから入れるよ', p = null;
+  try{ if(navigator.share) p = navigator.share({title:'無限そば道・斬 クラス番付', text:text, url:url}); }catch(e){ p = null; }
+  var copy = function(){ var c = null; try{ if(navigator.clipboard && navigator.clipboard.writeText) c = navigator.clipboard.writeText(text + '\n' + url); }catch(e){ c = null; }
+    if(c && typeof c.then==='function') c.then(function(){ msg.textContent = '合言葉のリンクをコピーしました。'; }, function(){ msg.textContent = '合言葉は「' + code + '」です。'; });
+    else msg.textContent = '合言葉は「' + code + '」です。'; };
+  if(p && typeof p.then==='function') p.then(function(){ msg.textContent = '合言葉を送りました。'; }, function(err){ if(!(err && err.name==='AbortError')) copy(); });
+  else copy();
+});
+document.getElementById('rk-group-leave').addEventListener('click', function(){
+  var code = '';
+  try{ code = rankGroupOf(loadStore().settings.rankGroup); }catch(e){}
+  try{ var store = loadStore(); store.settings.rankGroup = ''; saveStoreObj(store); }catch(e){}
+  rankView.scope = 'all';
+  var msg = document.getElementById('rk-group-msg');
+  msg.textContent = 'クラス番付から抜けています…';
+  renderRanking();
+  if(code) SyncManager.rankLeave(code).then(function(res){ msg.textContent = res.ok ? '合言葉「' + code + '」から抜けました。そのクラス番付からあなたの記録を消しました。' : '抜けました（クラス番付からの削除は、通信できるときにもう一度お試しください）。'; });
+});
+// a link with #group=…: the ranking screen opens with the 合言葉 filled in (joining is the player's tap)
+function groupFromLocation(){
+  var m = null;
+  try{ m = /^#group=([A-Za-z0-9]{6})$/.exec(location.hash || ''); }catch(e){ return; }
+  if(!m) return;
+  try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+  var code = rankGroupOf(m[1]);
+  if(!code){ showToast('合言葉のリンクが読めませんでした。'); return; }
+  openRanking(null);
+  document.getElementById('rk-group-in').value = code;
+  document.getElementById('rk-group-msg').textContent = SyncManager.isLoggedIn() ? '合言葉「' + code + '」に入るには「入る」を押してください。' : 'マイページでログインしてから、合言葉「' + code + '」で「入る」を押してください。';
+}
+window.addEventListener('hashchange', groupFromLocation);
 document.getElementById('rk-periods').addEventListener('click', function(e){
   var b = e.target.closest && e.target.closest('.rk-period');
   if(!b) return;
@@ -15243,7 +15355,7 @@ document.getElementById('rk-join').addEventListener('change', function(){
   var on = this.checked, msg = document.getElementById('rk-join-msg');
   try{ var store = loadStore(); store.settings.rankJoin = on; saveStoreObj(store); }catch(e){}
   msg.textContent = on ? '参加しました。これから遊んだ記録が番付に送られます。' : '番付から外れています…';
-  if(!on) SyncManager.rankLeave().then(function(res){
+  if(!on) SyncManager.rankLeave('global').then(function(res){
     msg.textContent = res.ok ? '参加をやめました。番付からあなたの記録を消しました。' : '参加をやめました（番付からの削除は、通信できるときにもう一度「参加する」を外してください）。';
     renderRanking();
   });
@@ -16239,7 +16351,7 @@ window.addEventListener('keyup', function(e){ if(e.code==='Space' && state.phase
 window.addEventListener('pagehide', function(){ zanPause(); });
 renderZanHome();
 // 挑戦状 in the address: the invite (after the first-run guide, it waits on the home instead)
-if(document.getElementById('onboard').hidden) duelFromLocation();
+if(document.getElementById('onboard').hidden){ duelFromLocation(); groupFromLocation(); }
 else { try{ var dm = /^#duel=([A-Za-z0-9_.-]+)$/.exec(location.hash || ''); if(dm){ history.replaceState(null, '', location.pathname + location.search); zanDuelHeld = duelDecode(dm[1]); if(zanDuelHeld && duelCheck(zanDuelHeld)) zanDuelHeld = null; renderDuelHome(); } }catch(e){} }
 })();
 </script>
