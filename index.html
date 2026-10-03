@@ -878,6 +878,14 @@ body{
 .zan-tools-note{font-size:.68rem;color:var(--ink-soft);}
 .rank-sent{margin:-16px 0 20px;font-size:.8rem;font-weight:700;color:var(--accent-ink);text-align:center;}
 .rank-sent[hidden]{display:none;}
+/* 斬ハイライト (V5) */
+.clip-box{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;border-radius:14px;background:var(--card);box-shadow:var(--card-shadow);}
+.clip-box[hidden]{display:none;}
+.clip-h{margin:0;font-weight:900;}
+.clip-wait{margin:0;font-size:.85rem;color:var(--ink-soft);}
+.clip-wait[hidden]{display:none;}
+.clip-video{width:100%;max-width:200px;aspect-ratio:9/16;border-radius:10px;background:#1b1712;}
+.clip-video[hidden]{display:none;}
 /* 今日の一杯 (V5) */
 .ippai-grid{margin:8px 0 4px;font-size:1.15rem;line-height:1.3;letter-spacing:1px;white-space:pre-line;word-break:break-all;}
 .ippai-grid[hidden]{display:none;}
@@ -1446,6 +1454,12 @@ body{
         <button class="btn-small trick-opt ghost-opt" type="button" data-ghost="off" aria-pressed="true">ナシ</button>
         <button class="btn-small trick-opt ghost-opt" type="button" data-ghost="on" aria-pressed="false">アリ</button>
         <p id="zan-ghost-note" class="zan-trick-note">アリにすると、そのコースで自己ベストを出したときの包丁が、半透明の青い包丁であなたの包丁と一緒に切ります（見た目だけで、得点や判定は変わりません）。</p>
+      </div>
+      <div class="zan-trick zan-clip" role="group" aria-labelledby="zan-clip-h">
+        <span id="zan-clip-h" class="zan-trick-h">ハイライト録画</span>
+        <button class="btn-small trick-opt clip-opt" type="button" data-clip="off" aria-pressed="true">ナシ</button>
+        <button class="btn-small trick-opt clip-opt" type="button" data-clip="on" aria-pressed="false">アリ</button>
+        <p id="zan-clip-note" class="zan-trick-note">アリにすると、曲の最後の約15秒と結果を、縦長（9:16）の動画にします。リザルトで保存・共有できます（録画中は少し重くなることがあります）。</p>
       </div>
       <div class="zan-mods" role="group" aria-labelledby="zan-mods-h">
         <span id="zan-mods-h" class="zan-trick-h">修行の心得</span>
@@ -2066,6 +2080,13 @@ body{
     <button id="btn-restart" class="btn-main">もう一度挑戦</button>
     <div class="share-box">
       <button id="btn-share-result" class="btn-sub" type="button">友達に共有する（1日1回 +200🪙）</button>
+      <div id="clip-box" class="clip-box" hidden>
+        <p class="clip-h">ハイライト動画</p>
+        <p id="clip-wait" class="clip-wait">動画を仕上げています…</p>
+        <video id="clip-video" class="clip-video" playsinline muted loop controls hidden></video>
+        <div class="card-btns"><button id="btn-clip-save" class="btn-sub" type="button" disabled>動画を保存</button><button id="btn-clip-share" class="btn-sub" type="button" hidden>動画で共有</button></div>
+        <p id="clip-msg" class="share-msg" role="status" aria-live="polite"></p>
+      </div>
       <button id="btn-save-image" class="btn-sub" type="button">カードを画像で保存</button>
       <div class="card-btns">
         <button id="btn-copy-image" class="btn-sub" type="button">クリップボードにコピー</button>
@@ -3393,7 +3414,7 @@ function withEffectsDefaults(st){
   }
   return out;
 }
-function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}, ghost:false, rankJoin:false, mods:{speed:1, strict:false, blind:false}}; }
+function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}, ghost:false, rankJoin:false, mods:{speed:1, strict:false, blind:false}, clip:false}; }
 // settings.onboarding (the first-run rules guide) and settings.lastShareDate (the day the 共有ボーナス was last paid).
 // A save without them gets them; a player who has already played is not shown the guide again (it is in 記録と設定).
 // 修行の心得: {speed 1 | 1.2 | 1.5, strict, blind}; anything else falls back to none
@@ -3426,6 +3447,7 @@ function withDailyDefaults(st, played){
   // settings.haptics.on: 振動 (on unless a save turned it off; anything else there is dropped)
   out.haptics = {on:!(isPlainObj(out.haptics) && out.haptics.on===false)};
   out.ghost = out.ghost===true;                      // ゴースト (アリ/ナシ, off unless turned on)
+  out.clip = out.clip===true;                        // ハイライト録画 (V5; off unless turned on)
   out.rankJoin = out.rankJoin===true;                // 番付に参加する (this device; off unless chosen)
   out.mods = sanitizeMods(out.mods);                 // 修行の心得 (速切り・極・判定・心眼)
   return out;
@@ -6948,7 +6970,7 @@ function sfxOut(ac){
     comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 6; comp.attack.value = 0.002; comp.release.value = 0.12;
     input.connect(comp);
     comp.connect(ac.destination);
-    sfxBus = {ac:ac, input:input};
+    sfxBus = {ac:ac, input:input, out:comp};
     return input;
   }catch(e){ return ac.destination; }
 }
@@ -14660,6 +14682,7 @@ function startZan(courseId, backing, practice){
   document.getElementById('btn-practice-quit').hidden = !practice;
   document.getElementById('btn-zan-pause').hidden = false;
   zanPauseBox(false);
+  zanClipArm();                                     // ハイライト録画 (when it is on)
   showScreen('game');                               // the usual music fades out; the song of 斬 takes over
   resize();
   zanEnsureAudio();
@@ -14674,6 +14697,7 @@ function zanUpdate(dt){
   var now = zanNow();
   if(zan.lastBeat<0 && zanT2B(now)>=0){ try{ var sr = skinPart('sound'); if(sr && sr.round) playSfx(sr.round, 1, 0); }catch(e){} }   // 着せ替えの音: 曲の始まり
   zan.lastBeat = zanT2B(now);
+  zanClipCheck();
   // the master's cuts (お手本), the misses that went by, the hold let go too late
   for(var i=zan.firstOpen;i<zan.notes.length;i++){
     var n = zan.notes[i];
@@ -14717,6 +14741,182 @@ function zanGrade(acc, miss){
   for(var i=0;i<ZAN_GRADES.length;i++){ var g = ZAN_GRADES[i]; if(acc>=g[1] && (!g[2] || miss===0)) return g[0]; }
   return '並';
 }
+// --- 斬ハイライト (V5): the last ~15 seconds of a song and then its result, as a 9:16 video (MediaRecorder on a canvas
+// that copies the board each frame, with the game's sound tapped off its outputs). Opt-in (settings.clip); 🔇 records no
+// sound; a pause pauses it; やり直す・選び直す drop it. Only this device makes and keeps it.
+var CLIP_W = 540, CLIP_H = 960, CLIP_SECS = 15, CLIP_SLATE_MS = 3400, CLIP_FPS = 30;
+var zanClip = null, zanClipLast = null;
+function clipSupported(){
+  try{ return typeof window.MediaRecorder==='function' && typeof HTMLCanvasElement!=='undefined' && typeof HTMLCanvasElement.prototype.captureStream==='function'; }catch(e){ return false; }
+}
+function clipMime(){
+  var list = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4;codecs=avc1', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'];   // (H.264 first; a plain mp4 last: Safari's)
+  for(var i=0;i<list.length;i++){ try{ if(window.MediaRecorder.isTypeSupported(list[i])) return list[i]; }catch(e){} }
+  return '';
+}
+function zanClipArm(){                                // startZan: wait for the last 15 seconds
+  zanClipDrop();
+  var on = false;
+  try{ on = loadStore().settings.clip===true; }catch(e){}
+  if(!on || zan.practice || !clipSupported()) return;
+  zanClip = {state:'wait', from:Math.max(0, zanB2T(zan.song.end) - CLIP_SECS), chunks:[], raf:0};
+}
+function zanClipDrop(){                               // stop and throw away (やり直す・選び直す・a new song)
+  var c = zanClip;
+  zanClip = null;
+  if(!c) return;
+  if(c.raf) cancelAnimationFrame(c.raf);
+  c.dropped = true;
+  try{ if(c.rec && c.rec.state!=='inactive') c.rec.stop(); }catch(e){}
+  zanClipUntap(c);
+}
+function zanClipUntap(c){
+  if(!c.tap) return;
+  try{ if(c.tapFrom) for(var i=0;i<c.tapFrom.length;i++) c.tapFrom[i].disconnect(c.tap); }catch(e){}
+  c.tap = null;
+}
+function zanClipBegin(c){
+  var cv = document.createElement('canvas');
+  cv.width = CLIP_W; cv.height = CLIP_H;
+  c.cv = cv; c.cx = cv.getContext('2d');
+  var stream = cv.captureStream(CLIP_FPS);
+  if(audioEnabled && zan.ac){                         // the game's sound (none while 🔇)
+    try{
+      var tap = zan.ac.createMediaStreamDestination(), from = [];
+      sfxOut(zan.ac);
+      if(sfxBus && sfxBus.ac===zan.ac && sfxBus.out){ sfxBus.out.connect(tap); from.push(sfxBus.out); }
+      if(zan.bus){ zan.bus.connect(tap); from.push(zan.bus); }
+      c.tap = tap; c.tapFrom = from;
+      var at = tap.stream.getAudioTracks();
+      for(var i=0;i<at.length;i++) stream.addTrack(at[i]);
+    }catch(e){ zanClipUntap(c); }
+  }
+  c.mime = clipMime();
+  try{ c.rec = c.mime ? new window.MediaRecorder(stream, {mimeType:c.mime, videoBitsPerSecond:2500000}) : new window.MediaRecorder(stream); }catch(e){ zanClip = null; zanClipUntap(c); return; }
+  c.rec.ondataavailable = function(ev){ if(ev.data && ev.data.size) c.chunks.push(ev.data); };
+  c.rec.onstop = function(){ zanClipUntap(c); if(!c.dropped) zanClipDone(c); };
+  c.rec.start(500);
+  c.state = 'rec';
+  var tick = function(){ c.raf = 0; if(zanClip!==c || c.state==='done') return; zanClipPaint(c); c.raf = requestAnimationFrame(tick); };
+  c.raf = requestAnimationFrame(tick);
+}
+// zanUpdate, every frame: start at its time
+function zanClipCheck(){
+  var c = zanClip;
+  if(c && c.state==='wait' && !zan.paused && zanNow()>=c.from) zanClipBegin(c);
+}
+function zanClipPause(on){
+  var c = zanClip;
+  if(!c || !c.rec) return;
+  try{ if(on && c.rec.state==='recording') c.rec.pause(); else if(!on && c.rec.state==='paused') c.rec.resume(); }catch(e){}
+}
+// finishZan: the result follows as a slate for a few seconds (with the plating's sounds), then the file is made
+function zanClipFinish(info){
+  var c = zanClip;
+  if(!c) return;
+  if(c.state!=='rec'){ zanClipDrop(); return; }
+  c.state = 'slate';
+  c.slate = info;
+  c.slateAt = performance.now();
+  c.plate = null;
+  setTimeout(function(){ try{ c.plate = zanCardPlate(); }catch(e){ c.plate = null; } }, 0);
+  setTimeout(function(){ if(zanClip===c){ c.state = 'stop'; try{ c.rec.stop(); }catch(e){} } }, CLIP_SLATE_MS);
+  zanClipBox('wait');
+}
+function zanClipDone(c){
+  if(c.raf){ cancelAnimationFrame(c.raf); c.raf = 0; }
+  c.state = 'done';
+  if(zanClip===c) zanClip = null;
+  var type = (c.mime || (c.chunks[0] && c.chunks[0].type) || 'video/webm').split(';')[0];
+  var blob = new Blob(c.chunks, {type:type});
+  if(!blob.size){ zanClipBox('fail'); return; }
+  var t = new Date(), two = function(n){ return (n<10 ? '0' : '') + n; };
+  zanClipLast = {blob:blob, filename:'mugen-soba-do.cut_' + t.getFullYear() + two(t.getMonth() + 1) + two(t.getDate()) + '_' + (c.slate ? c.slate.score : 0) + (type==='video/mp4' ? '.mp4' : '.webm'), type:type};
+  zanClipBox('ready');
+}
+// the result's box: waiting → the video and its buttons
+function zanClipBox(st){
+  var box = document.getElementById('clip-box');
+  if(!box) return;
+  var v = document.getElementById('clip-video');
+  if(st==='none'){ box.hidden = true; try{ if(v.src) URL.revokeObjectURL(v.src); }catch(e){} v.removeAttribute('src'); return; }
+  box.hidden = false;
+  document.getElementById('clip-wait').hidden = st!=='wait' && st!=='fail';
+  document.getElementById('clip-wait').textContent = st==='fail' ? 'この端末では動画を作れませんでした。' : '動画を仕上げています…';
+  document.getElementById('btn-clip-save').disabled = st!=='ready';
+  document.getElementById('clip-msg').textContent = '';
+  v.hidden = st!=='ready';
+  var shareBtn = document.getElementById('btn-clip-share');
+  shareBtn.hidden = true;
+  if(st==='ready' && zanClipLast){
+    try{ if(v.src) URL.revokeObjectURL(v.src); v.src = URL.createObjectURL(zanClipLast.blob); }catch(e){}
+    try{ var f = new File([zanClipLast.blob], zanClipLast.filename, {type:zanClipLast.type}); shareBtn.hidden = !(navigator.share && navigator.canShare && navigator.canShare({files:[f]})); }catch(e){ shareBtn.hidden = true; }
+  }
+}
+// one frame: the title, the board as it is, the score, and then the result
+function zanClipPaint(c){
+  var k = c.cx, W2 = CLIP_W, H2 = CLIP_H;
+  var g = k.createLinearGradient(0, 0, 0, H2);
+  g.addColorStop(0, '#f5eedf'); g.addColorStop(1, '#e6d9bd');
+  k.fillStyle = g; k.fillRect(0, 0, W2, H2);
+  k.textAlign = 'center'; k.textBaseline = 'alphabetic';
+  k.fillStyle = '#2a2118'; k.font = '400 46px "Yuji Syuku",' + CARD_SERIF;
+  k.fillText('無限そば道・斬', W2/2, 74);
+  var sub = (zan.course ? zan.course.name + '・' + zan.course.level : '') + (zan.trick ? '・イタズラ' : '') + (zanModsActive(zan.mods) ? '・' + zanModLabels(zan.mods).join('・') : '');
+  k.fillStyle = '#5d4e3b'; fitFont(k, sub, W2 - 60, 24, 14, '700', CARD_SANS); k.fillText(sub, W2/2, 112);
+  var top = 134, bh = H2 - top - 196;
+  try{                                                // the board (a copy of the game canvas, fitted)
+    var gw = canvas.width, gh = canvas.height;
+    if(gw && gh){ var sc = Math.min(W2/gw, bh/gh), dw = gw*sc, dh = gh*sc; k.drawImage(canvas, (W2 - dw)/2, top + (bh - dh)/2, dw, dh); }
+  }catch(e){}
+  k.fillStyle = '#2a2118'; k.font = '900 64px ' + CARD_SANS;
+  k.fillText(fmtPoints(zan.score), W2/2, H2 - 108);
+  k.fillStyle = '#5d4e3b'; k.font = '700 24px ' + CARD_SANS;
+  k.fillText('コンボ ' + zan.combo + '　極・一閃 ' + zan.crit, W2/2, H2 - 70);
+  k.fillStyle = '#7a6a52'; k.font = '700 18px ' + CARD_SANS;
+  k.fillText(SHARE_URL.replace(/^https?:\/\//, '').replace(/\/$/, '') + '　#無限そば道', W2/2, H2 - 30);
+  if(c.state==='slate' || c.state==='stop') zanClipSlate(c, k, Math.min(1, (performance.now() - c.slateAt)/300));
+}
+function zanClipSlate(c, k, a){
+  var s2 = c.slate || {}, W2 = CLIP_W, H2 = CLIP_H;
+  k.save();
+  k.globalAlpha = a;
+  k.fillStyle = '#f3ebda'; k.fillRect(0, 130, W2, H2 - 186);
+  if(c.plate){ var pw = 460, ph = pw*c.plate.height/c.plate.width; k.drawImage(c.plate, 0, 0, c.plate.width, c.plate.height, (W2 - pw)/2, 150, pw, ph); }
+  zanCardSeal(k, W2 - 120, 220, 120, (ZAN_SHOW[s2.grade] || ZAN_SHOW['並']).seal);
+  k.textAlign = 'center';
+  k.fillStyle = '#7a1f14'; k.font = '400 54px "Yuji Syuku",' + CARD_SERIF;
+  k.fillText('完成度 ' + (s2.grade || ''), W2/2, 520);
+  k.fillStyle = '#2a2118'; k.font = '900 76px ' + CARD_SANS;
+  k.fillText(fmtPoints(s2.score || 0) + '点', W2/2, 610);
+  k.fillStyle = '#5d4e3b'; k.font = '700 26px ' + CARD_SANS;
+  k.fillText('極・一閃 ' + (s2.crit || 0) + '　Perfect ' + (s2.perfect || 0), W2/2, 664);
+  k.fillText('OK ' + (s2.ok || 0) + '　Miss ' + (s2.miss || 0) + '　最大コンボ ' + (s2.combo || 0), W2/2, 702);
+  k.fillStyle = '#2e4d38'; k.font = '900 34px ' + CARD_SANS;
+  k.fillText('あなたも斬れる？', W2/2, 786);
+  k.restore();
+}
+document.getElementById('btn-clip-save').addEventListener('click', function(){ if(zanClipLast) deliverFile(zanClipLast.blob, zanClipLast.filename); });
+document.getElementById('btn-clip-share').addEventListener('click', function(){
+  if(!zanClipLast) return;
+  var msg = document.getElementById('clip-msg'), p;
+  try{ p = navigator.share({files:[new File([zanClipLast.blob], zanClipLast.filename, {type:zanClipLast.type})], text:'#無限そば道 ' + SHARE_URL}); }catch(e){ p = Promise.reject(e); }
+  Promise.resolve(p).then(function(){ msg.textContent = '動画を共有しました。'; }, function(err){ msg.textContent = err && err.name==='AbortError' ? '' : '共有できませんでした。「動画を保存」をお使いください。'; });
+});
+document.querySelector('.zan-clip').addEventListener('click', function(e){   // ハイライト録画: アリ / ナシ (settings.clip)
+  var b = e.target.closest('.clip-opt');
+  if(!b || b.disabled) return;
+  try{ var store = loadStore(); store.settings.clip = b.getAttribute('data-clip')==='on'; saveStoreObj(store); }catch(err){}
+  renderZanHome();
+});
+function renderClipToggle(){
+  var on = false, ok = clipSupported();
+  try{ on = loadStore().settings.clip===true; }catch(e){}
+  var opts = document.querySelectorAll('.clip-opt');
+  for(var i=0;i<opts.length;i++){ opts[i].setAttribute('aria-pressed', String((opts[i].getAttribute('data-clip')==='on')===(on && ok))); opts[i].disabled = !ok; }
+  if(!ok) document.getElementById('zan-clip-note').textContent = 'このブラウザでは録画できません。';
+}
+
 // --- 挑戦状 (V5): one play put into a link (#duel=…). Whoever opens it plays the same course, 心得 and イタズラ with the
 // sender's cuts as the ゴースト, then sees who won and can send one back (倍返し). Nothing goes through a server: the link
 // holds the display name, the numbers and the cuts ([beat×4, ずれ ms, kind] as in a ゴースト), and every field is checked.
@@ -15170,6 +15370,8 @@ function finishZan(){
   zanRankSend({perfect:zan.perfect, combo:zan.maxCombo, grade:grade});   // 番付 (参加している人だけ; a failure never touches the records)
   zanDuelResult();                                  // 挑戦状: the verdict, and this song as one to send
   zanIppaiResult(ippaiRes);
+  zanClipBox('none');
+  zanClipFinish({grade:grade, score:zan.score, crit:zan.crit, perfect:zan.perfect, ok:zan.ok, miss:zan.miss, combo:zan.maxCombo});   // ハイライト録画: the result's slate
   showScreen('result');
   zanShowStart({grade:grade, rate:total ? zan.perfect/total : 0, allPerfect:total>0 && zan.perfect===total});
   var rewards = claimRewards();                     // 限定 items whose record this song reached (looks only)
@@ -15187,6 +15389,7 @@ function zanPause(){
   elCaption.textContent = '一時停止中';
   elCaption.classList.add('show');
   state.captionHideAt = null;
+  zanClipPause(true);
   zanPauseBox(true);
 }
 // the pause dialog: 再開 / 最初からやり直す / コースを選び直す
@@ -15200,6 +15403,7 @@ function zanPauseBox(show){
 function zanStopRun(){
   if(!zan || zan.ended) return false;
   zan.ended = true;
+  zanClipDrop();
   if(zan.timer){ clearInterval(zan.timer); zan.timer = 0; }
   zanChargeStop();
   if(zan.ac && zan.ac.state!=='running'){ try{ zan.ac.resume(); }catch(e){} }
@@ -15229,7 +15433,7 @@ function zanQuitToHome(){
 }
 function zanResume(){
   if(!zan || !zan.paused || zan.paused.resuming) return;
-  var p = zan.paused, done = function(){ if(zan && zan.paused===p){ zan.p0 += performance.now() - p.at; zan.paused = null; } };
+  var p = zan.paused, done = function(){ if(zan && zan.paused===p){ zan.p0 += performance.now() - p.at; zan.paused = null; zanClipPause(false); } };
   p.resuming = true;
   elCaption.classList.remove('show');
   zanPauseBox(false);
@@ -15782,6 +15986,7 @@ function renderZanHome(){
   if(typeof ZAN_COURSES==='undefined' || !ZAN_COURSES) return;   // (the home is drawn once before this part of the script has run)
   zanPrepSelected();
   renderDuelHome();
+  renderClipToggle();
   var z = null, sel = zanSelectedCourse();
   try{ z = loadStore().zan; }catch(e){}
   var cards = document.querySelectorAll('.zan-course');
