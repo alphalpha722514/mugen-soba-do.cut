@@ -8,17 +8,20 @@ const TOKEN_TTL = 60 * 60 * 24 * 180;    // ログインの有効期限: 180日
 const USER_RE = /^[A-Za-z0-9_\-ぁ-ゖァ-ヺー一-鿿々]{3,16}$/;
 
 // ---- 番付 ----
-// ゲームの斬と同じ決まり（index.html の ZAN_COURSES・ZAN_POINTS・ZAN_SHIN・コンボ倍率・殿様・イタズラ）。ゲームを変えたらここも直す。
+// ゲームの斬と同じ決まり（index.html の zanWindows・ZAN_POINTS・ZAN_CRIT・コンボ倍率・殿様・イタズラ・修行の心得）。ゲームを変えたらここも直す。
 const RANK_TOP = 50;                         // 1つの番付に載せる人数
 const RANK_WEEK_TTL = 60 * 60 * 24 * 21;     // 週間の番付は3週間で消える
 const RANK_NAME_MAX = 12;                    // 表示名（ゲームの PROFILE_NAME_MAX）
 const RANK_DEFAULT_NAME = 'ななしの職人';
-const RANK_COURSES = {                        // 判定の幅（ms）と、曲ごとの判定の数（同時切りまで・タメ切りは2）
-  nihachi: {perfect: 35, ok: 80, charts: {'nihachi': 76, 'nihachi.shin': 86}},
-  juwari:  {perfect: 30, ok: 70, charts: {'juwari': 104, 'juwari.shin': 103}},
-  arabiki: {perfect: 25, ok: 60, charts: {'arabiki': 128, 'arabiki.shin': 134}},
-  uchihiki:{perfect: 22, ok: 55, charts: {'uchihiki': 112}, alwaysTrick: true}
+const RANK_COURSES = {                        // 曲ごとの判定の数（同時切りまで・タメ切りは2）
+  nihachi: {charts: {'nihachi': 76, 'nihachi.shin': 86}},
+  juwari:  {charts: {'juwari': 104, 'juwari.shin': 103}},
+  arabiki: {charts: {'arabiki': 128, 'arabiki.shin': 134}},
+  uchihiki:{charts: {'uchihiki': 112}, alwaysTrick: true}
 };
+const RANK_WIN = {crit: 10, perfect: 35, ok: 80};          // 判定の幅（ms・全コース共通）。極・一閃は ±10
+const RANK_WIN_STRICT = {crit: 7, perfect: 15, ok: 40};    // 修行の心得「極・判定」
+const RANK_SPEED_MULT = {'1': 1, '1.2': 1.1, '1.5': 1.2};  // 修行の心得「速切り」の倍率（極・判定・心眼は ×1.1）
 const RANK_POINTS = [[100, 50], [50, 25], [300, 150]];   // [通常, タメの頭, タメの斬] の [Perfect, OK]
 const RANK_GRADES = [['極上', 95, true], ['特上', 85, false], ['上', 70, false], ['並', 0, false]];
 // 判定の記録 judges: [[拍×4, ずれms|null, 種類 0/1/2, 判定 0 Perfect・1 OK・2 Miss・3 フェイントにつられた, 殿様 0/1], …]（ゲームで起きた順）
@@ -27,6 +30,12 @@ function rankCheck(b) {
   if (!c || typeof b.chart !== 'string' || !(b.chart in c.charts) || !Array.isArray(b.judges) || b.judges.length > 400) return null;
   const trick = b.trick === true;
   if (c.alwaysTrick && !trick) return null;
+  const m = b.mods === undefined ? {speed: 1, strict: false, blind: false} : b.mods;
+  if (!m || typeof m !== 'object' || !(String(m.speed) in RANK_SPEED_MULT) || typeof m.strict !== 'boolean' || typeof m.blind !== 'boolean') return null;
+  const mods = {speed: [1, 1.2, 1.5].find(v => v === m.speed), strict: m.strict, blind: m.blind};
+  if (mods.speed === undefined) return null;
+  const w = mods.strict ? RANK_WIN_STRICT : RANK_WIN;
+  const modMult = RANK_SPEED_MULT[String(mods.speed)] * (mods.strict ? 1.1 : 1) * (mods.blind ? 1.1 : 1);   // ゲームの zanModMult と同じ順
   let combo = 0, maxCombo = 0, score = 0, perfect = 0, ok = 0, miss = 0, n = 0, tono = 0;
   for (const j of b.judges) {
     if (!Array.isArray(j) || j.length < 5) return null;
@@ -36,20 +45,20 @@ function rankCheck(b) {
     if (rating === 3) { if (!trick) return null; combo = 0; continue; }           // つられた: コンボが切れるだけ
     n++;
     if (rating === 2) { if (err !== null) return null; miss++; combo = 0; continue; }
-    if (typeof err !== 'number' || !Number.isInteger(err) || Math.abs(err) > (rating === 0 ? c.perfect : c.ok)) return null;
+    if (typeof err !== 'number' || !Number.isInteger(err) || Math.abs(err) > (rating === 0 ? w.perfect : w.ok)) return null;
     if (rating === 0) perfect++; else ok++;
     combo++; maxCombo = Math.max(maxCombo, combo);
     if (tn) tono++;
-    const base = RANK_POINTS[kind][rating] * (rating === 0 && Math.abs(err) <= 15 ? 1.5 : 1);
+    const base = RANK_POINTS[kind][rating] * (rating === 0 && Math.abs(err) <= w.crit ? 1.5 : 1);   // 極・一閃 ×1.5
     const mult = 1 + Math.min(1, Math.floor(combo / 10) * 0.1) + (tn ? 0.2 : 0);
-    score += Math.round(base * mult * (trick ? 1.2 : 1));
+    score += Math.round(base * mult * (trick ? 1.2 : 1) * modMult);
   }
   if (n !== c.charts[b.chart]) return null;                                       // どの印もちょうど1回ずつ判定される
   if (tono > (perfect + ok) * 0.4) return null;                                    // 殿様の倍率は、全部Perfectが続いたあとの短いあいだだけ
   if (score !== b.score || maxCombo !== b.combo || perfect !== b.perfect) return null;
   const acc = Math.round((perfect + ok * 0.5) * 100 / n);
   const grade = RANK_GRADES.find(g => acc >= g[1] && (!g[2] || miss === 0))[0];
-  return {score, grade, perfect, combo: maxCombo, trick};
+  return {score, grade, perfect, combo: maxCombo, trick, mods};
 }
 function rankName(v) {
   const s = typeof v === 'string' ? v.replace(/[\u0000-\u001f\u007f<>]/g, '').trim().slice(0, RANK_NAME_MAX) : '';
@@ -159,7 +168,7 @@ export default {
         if (!RANK_COURSES[course]) return json({ok: false, error: 'notfound'}, 404);
         const week = rankWeek(Date.now()), key = await sessionKey(req, env), me = key ? await rankUid(key) : '';
         const list = await rankRead(env, 'rank:' + course + ':' + (period === 'all' ? 'all' : 'w' + week));
-        return json({ok: true, course, period, week, entries: list.map((e, i) => ({rank: i + 1, name: e.name, score: e.score, grade: e.grade, perfect: e.perfect, combo: e.combo, trick: e.trick, me: e.uid === me}))});
+        return json({ok: true, course, period, week, entries: list.map((e, i) => ({rank: i + 1, name: e.name, score: e.score, grade: e.grade, perfect: e.perfect, combo: e.combo, trick: e.trick, mods: e.mods || null, me: e.uid === me}))});
       }
       if (path === '/ranking' && (req.method === 'POST' || req.method === 'DELETE')) {
         const key = await sessionKey(req, env), rec = key ? await env.DB.get(key, 'json') : null;

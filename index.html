@@ -852,6 +852,13 @@ body{
 .zan-trick-note{flex:1 1 100%;margin:0;font-size:.68rem;line-height:1.55;color:var(--ink-soft);}
 .zan-trick-note b{color:var(--accent2-ink);}
 .zan-trick-forced{font-weight:700;color:var(--accent2-ink);}
+.zan-mods{display:grid;gap:6px;}
+.zm-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.zmod-name{font-size:.78rem;font-weight:900;min-width:4.2em;}
+.zan-mod-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:-4px 0 12px;}
+.zan-mod-badges[hidden]{display:none;}
+.zan-mod-badge{font-size:.75rem;font-weight:900;padding:2px 10px;border-radius:999px;background:var(--accent-ink);color:var(--card);}
+.zan-mod-mult{font-size:.75rem;font-weight:700;color:var(--ink-soft);align-self:center;}
 .zan-trick-forced[hidden]{display:none;}
 /* 区間練習 (records nothing) */
 .zan-practice{border-top:1px solid var(--line);padding-top:8px;}
@@ -1405,6 +1412,20 @@ body{
         <button class="btn-small trick-opt ghost-opt" type="button" data-ghost="on" aria-pressed="false">アリ</button>
         <p id="zan-ghost-note" class="zan-trick-note">アリにすると、そのコースで自己ベストを出したときの包丁が、半透明の青い包丁であなたの包丁と一緒に切ります（見た目だけで、得点や判定は変わりません）。</p>
       </div>
+      <div class="zan-mods" role="group" aria-labelledby="zan-mods-h">
+        <span id="zan-mods-h" class="zan-trick-h">修行の心得</span>
+        <div class="zm-row"><span class="zmod-name">速切り</span>
+          <button class="btn-small trick-opt zm-opt" type="button" data-mod="speed" data-v="1" aria-pressed="true">1.0x</button>
+          <button class="btn-small trick-opt zm-opt" type="button" data-mod="speed" data-v="1.2" aria-pressed="false">1.2x</button>
+          <button class="btn-small trick-opt zm-opt" type="button" data-mod="speed" data-v="1.5" aria-pressed="false">1.5x</button></div>
+        <div class="zm-row"><span class="zmod-name">極・判定</span>
+          <button class="btn-small trick-opt zm-opt" type="button" data-mod="strict" data-v="off" aria-pressed="true">ナシ</button>
+          <button class="btn-small trick-opt zm-opt" type="button" data-mod="strict" data-v="on" aria-pressed="false">アリ</button></div>
+        <div class="zm-row"><span class="zmod-name">心眼</span>
+          <button class="btn-small trick-opt zm-opt" type="button" data-mod="blind" data-v="off" aria-pressed="true">ナシ</button>
+          <button class="btn-small trick-opt zm-opt" type="button" data-mod="blind" data-v="on" aria-pressed="false">アリ</button></div>
+        <p id="zan-mods-note" class="zan-trick-note">速切りは曲の速さ（1.2x で得点・コイン×1.1、1.5x で×1.2）。極・判定は判定の幅を 極・一閃±7ms・Perfect±15ms・OK±40ms に（×1.1）。心眼は伴奏を消し、小節の頭の和太鼓と師匠のお手本の音だけで切る（×1.1）。記録はいつもの自己ベスト・番付に入ります。</p>
+      </div>
       <button id="btn-zan" class="btn-start zan-start" type="button">斬 修行開始</button>
       <p class="zan-tools"><button id="btn-calib" class="link-btn" type="button">試し切り（ずれ調整）</button><span id="zan-offset-label">ずれ補正 0ms</span></p>
       <p class="zan-tools"><button id="btn-ranking" class="link-btn" type="button">番付を見る</button><span class="zan-tools-note">ログイン中・参加した人の記録</span></p>
@@ -1939,6 +1960,7 @@ body{
     <p id="result-newbest" class="new-best-badge">🎉 自己ベスト更新!</p>
     <p id="result-dailyclear" class="new-best-badge">📅 本日のチャレンジ達成!</p>
     <p id="result-weeklyclear" class="new-best-badge">🎖 週の段位認定に合格!</p>
+    <p id="zan-mod-badges" class="zan-mod-badges" hidden></p>
     <p id="result-satisfaction-best" class="new-best-badge">😊 満足度ベスト更新!</p>
     <div class="result-stats">
       <p>得点 <span id="result-score">0</span></p>
@@ -3291,9 +3313,25 @@ function withEffectsDefaults(st){
   }
   return out;
 }
-function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}, ghost:false, rankJoin:false}; }
+function defaultSettings(){ return {visual:{detail:DEFAULT_VISUAL_DETAIL}, effects:{level:DEFAULT_EFFECT_LEVEL, particlesOn:true}, onboarding:{done:false, version:ONBOARDING_VERSION}, lastShareDate:'', sound:{bgmOn:true, bgmVolume:DEFAULT_BGM_VOLUME}, haptics:{on:true}, ghost:false, rankJoin:false, mods:{speed:1, strict:false, blind:false}}; }
 // settings.onboarding (the first-run rules guide) and settings.lastShareDate (the day the 共有ボーナス was last paid).
 // A save without them gets them; a player who has already played is not shown the guide again (it is in 記録と設定).
+// 修行の心得: {speed 1 | 1.2 | 1.5, strict, blind}; anything else falls back to none
+var ZAN_MOD_SPEEDS = [1, 1.2, 1.5], ZAN_MOD_SPEED_MULT = {'1':1, '1.2':1.1, '1.5':1.2}, ZAN_MOD_STRICT_MULT = 1.1, ZAN_MOD_BLIND_MULT = 1.1;
+function sanitizeMods(raw){
+  var m = isPlainObj(raw) ? raw : {};
+  return {speed:ZAN_MOD_SPEEDS.indexOf(m.speed)>=0 ? m.speed : 1, strict:m.strict===true, blind:m.blind===true};
+}
+function zanModsActive(m){ return !!(m && (m.speed!==1 || m.strict || m.blind)); }
+// the score and coin multiplier of a set of 心得 (the same order of products as the 番付's server)
+function zanModMult(m){ return m ? ZAN_MOD_SPEED_MULT[String(m.speed)]*(m.strict ? ZAN_MOD_STRICT_MULT : 1)*(m.blind ? ZAN_MOD_BLIND_MULT : 1) : 1; }
+function zanModLabels(m){
+  var out = [];
+  if(m && m.speed!==1) out.push('速切り ' + m.speed.toFixed(1) + 'x');
+  if(m && m.strict) out.push('極・判定');
+  if(m && m.blind) out.push('心眼');
+  return out;
+}
 function isDateStr(v){ return typeof v==='string' && /^\d{4}-\d{2}-\d{2}$/.test(v); }
 function withDailyDefaults(st, played){
   var out = isPlainObj(st) ? st : {};
@@ -3309,6 +3347,7 @@ function withDailyDefaults(st, played){
   out.haptics = {on:!(isPlainObj(out.haptics) && out.haptics.on===false)};
   out.ghost = out.ghost===true;                      // ゴースト (アリ/ナシ, off unless turned on)
   out.rankJoin = out.rankJoin===true;                // 番付に参加する (this device; off unless chosen)
+  out.mods = sanitizeMods(out.mods);                 // 修行の心得 (速切り・極・判定・心眼)
   return out;
 }
 // quiz: today's 3 questions (answered = [{id, choice, ok}] in the order asked), all the right answers ever and the
@@ -3362,10 +3401,13 @@ function sanitizeZan(raw){
     out.courses[ZAN_COURSE_IDS[i]] = sanitizeZanRec(cr);
     out.courses[ZAN_COURSE_IDS[i]].perfect = isPlainObj(cr) && cr.perfect===true;   // 全Perfectメダル (schema 14; older saves: false)
     out.courses[ZAN_COURSE_IDS[i]].ghost = sanitizeGhost(isPlainObj(cr) ? cr.ghost : null);   // ゴースト (schema 14; older saves: null)
+    out.courses[ZAN_COURSE_IDS[i]].bestCrit = clampInt(isPlainObj(cr) ? cr.bestCrit : 0, 0, STAT_MAX);   // 最大CRITICAL数 (one song)
+    out.courses[ZAN_COURSE_IDS[i]].bestMods = isPlainObj(cr) && zanModsActive(sanitizeMods(cr.bestMods)) ? sanitizeMods(cr.bestMods) : null;   // the best's 心得
   }
   out.lastCourse = ZAN_COURSE_IDS.indexOf(z.lastCourse)>=0 ? z.lastCourse : '';
   out.todayDone = typeof z.todayDone==='string' && /^\d{4}-\d{2}-\d{2}$/.test(z.todayDone) ? z.todayDone : '';   // 今日の一曲: the day its bonus was paid
   out.sectionMiss = sanitizeSectionMiss(z.sectionMiss);
+  out.bestCrit = clampInt(z.bestCrit, 0, STAT_MAX);   // 最大CRITICAL数 over all the courses
   return out;
 }
 // --- ゴースト: the best's cuts, replayed by a see-through knife beside yours. Only a look: judging and scores never read it.
@@ -5094,7 +5136,7 @@ function awardCoins(parts){
   if(g.dailyEarned.date!==today) g.dailyEarned = {date:today, amount:0, challenge:false};
   var challengeRepeat = false;
   if(parts.challenge && g.dailyEarned.challenge){ parts.challenge = 0; challengeRepeat = true; }
-  var total = parts.base + parts.scorePart + parts.satPart + parts.challenge + (parts.course || 0) + (parts.trick || 0) + (parts.today || 0);
+  var total = parts.base + parts.scorePart + parts.satPart + parts.challenge + (parts.course || 0) + (parts.trick || 0) + (parts.mods || 0) + (parts.today || 0);
   var granted = Math.max(0, Math.min(total, COIN_MAX - g.currency));   // only the wallet's own ceiling
   g.currency += granted;
   g.dailyEarned.amount = Math.min(COIN_MAX, g.dailyEarned.amount + granted);
@@ -5112,6 +5154,7 @@ function renderCoinResult(r, satLabel){
   ];
   if(p.course) items.push('コース' + (p.courseName ? '（' + p.courseName + '）' : '') + ' ' + p.course);
   if(p.trick) items.push('師匠のイタズラ ' + p.trick);
+  if(p.mods) items.push('修行の心得（' + p.modsLabel + '） ' + p.mods);
   if(p.today) items.push('今日の一曲 ' + p.today);
   if(p.challenge) items.push('本日のチャレンジ達成 ' + p.challenge);
   coinBreakdown.textContent = '（' + items.join(' ＋ ') + '）';
@@ -10544,7 +10587,7 @@ var MockCloudAdapter = {
       if(!u) return {ok:false, error:'session'};
       if(!isPlainObj(b) || !zanCourse(b.course) || typeof b.score!=='number') return {ok:false, error:'rejected'};
       db.ranking = isPlainObj(db.ranking) ? db.ranking : {};
-      var e = {uid:u.name.toLowerCase(), name:cleanProfileName(b.name) || DEFAULT_PLAYER_NAME, score:b.score, grade:b.grade, perfect:b.perfect, combo:b.combo, trick:b.trick===true, at:Date.now()};
+      var e = {uid:u.name.toLowerCase(), name:cleanProfileName(b.name) || DEFAULT_PLAYER_NAME, score:b.score, grade:b.grade, perfect:b.perfect, combo:b.combo, trick:b.trick===true, mods:sanitizeMods(b.mods), at:Date.now()};
       ['all', 'w' + rankWeekKey(Date.now())].forEach(function(p){
         var k = b.course + ':' + p, list = (db.ranking[k] || []).filter(function(x){ return x.uid!==e.uid || x.score>=e.score; });
         if(!list.some(function(x){ return x.uid===e.uid; })) list.push(e);
@@ -10559,7 +10602,7 @@ var MockCloudAdapter = {
     return this.later(function(){
       var db = self.read(), u = token ? self.tokenUser(db, token) : null, k = course + ':' + (period==='all' ? 'all' : 'w' + rankWeekKey(Date.now()));
       var list = (isPlainObj(db.ranking) && db.ranking[k]) || [];
-      return {ok:true, course:course, period:period, week:rankWeekKey(Date.now()), entries:list.map(function(e, i){ return {rank:i + 1, name:e.name, score:e.score, grade:e.grade, perfect:e.perfect, combo:e.combo, trick:e.trick, me:!!(u && e.uid===u.name.toLowerCase())}; })};
+      return {ok:true, course:course, period:period, week:rankWeekKey(Date.now()), entries:list.map(function(e, i){ return {rank:i + 1, name:e.name, score:e.score, grade:e.grade, perfect:e.perfect, combo:e.combo, trick:e.trick, mods:e.mods || null, me:!!(u && e.uid===u.name.toLowerCase())}; })};
     });
   },
   rankLeave:function(token){
@@ -10685,9 +10728,9 @@ function mergeStores(localRaw, cloudRaw){
       o.bestGrade = ZAN_GRADE_NAMES.indexOf(c.bestGrade) > ZAN_GRADE_NAMES.indexOf(l.bestGrade) ? c.bestGrade : l.bestGrade;
     };
     zanMax(out.zan, L.zan, C.zan);
-    ['totalScore', 'maxCombo', 'bestPerfectRate', 'perfectClears'].forEach(function(k){ out.zan[k] = Math.max(L.zan[k], C.zan[k]); });
+    ['totalScore', 'maxCombo', 'bestPerfectRate', 'perfectClears', 'bestCrit'].forEach(function(k){ out.zan[k] = Math.max(L.zan[k], C.zan[k]); });
     out.zan.courses = {};
-    for(var zc=0;zc<ZAN_COURSE_IDS.length;zc++){ var zid = ZAN_COURSE_IDS[zc]; out.zan.courses[zid] = {}; zanMax(out.zan.courses[zid], L.zan.courses[zid], C.zan.courses[zid]); out.zan.courses[zid].perfect = L.zan.courses[zid].perfect || C.zan.courses[zid].perfect; out.zan.courses[zid].ghost = C.zan.courses[zid].best > L.zan.courses[zid].best ? C.zan.courses[zid].ghost : L.zan.courses[zid].ghost; }
+    for(var zc=0;zc<ZAN_COURSE_IDS.length;zc++){ var zid = ZAN_COURSE_IDS[zc]; out.zan.courses[zid] = {}; zanMax(out.zan.courses[zid], L.zan.courses[zid], C.zan.courses[zid]); out.zan.courses[zid].perfect = L.zan.courses[zid].perfect || C.zan.courses[zid].perfect; out.zan.courses[zid].ghost = C.zan.courses[zid].best > L.zan.courses[zid].best ? C.zan.courses[zid].ghost : L.zan.courses[zid].ghost; out.zan.courses[zid].bestMods = C.zan.courses[zid].best > L.zan.courses[zid].best ? C.zan.courses[zid].bestMods : L.zan.courses[zid].bestMods; out.zan.courses[zid].bestCrit = Math.max(L.zan.courses[zid].bestCrit, C.zan.courses[zid].bestCrit); }
     out.zan.lastCourse = L.zan.lastCourse || C.zan.lastCourse;
     out.zan.todayDone = C.zan.todayDone>L.zan.todayDone ? C.zan.todayDone : L.zan.todayDone;
     out.zan.sectionMiss = {};                         // 苦手の記録: the larger count of each part (like the other counters)
@@ -13376,6 +13419,25 @@ function zanSongFor(course){
   }
   return zanShinCache[base.id];
 }
+// the song a course is played to with the 心得: 速切り scales its tempo map, 心眼 keeps only the beat (its music), each
+// with its own id (so its music is made apart, and a ゴースト is only replayed on the same one)
+var zanVariantCache = {};
+function zanPlaySong(course, mods){
+  var base = zanSongFor(course);
+  if(!base || !mods || (mods.speed===1 && !mods.blind)) return base;
+  var id = base.id + '.x' + mods.speed + (mods.blind ? 'b' : '');
+  if(!zanVariantCache[id]){
+    var song = {};
+    for(var k in base) if(Object.prototype.hasOwnProperty.call(base, k)) song[k] = base[k];
+    song.id = id;
+    song.baseId = base.id;
+    song.tempo = base.tempo.map(function(t){ return {b:t.b, bpm:t.bpm*mods.speed}; });
+    song.blind = !!mods.blind;
+    zanVariantCache[id] = song;
+  }
+  return zanVariantCache[id];
+}
+function zanCurrentMods(){ try{ return sanitizeMods(loadStore().settings.mods); }catch(e){ return sanitizeMods(null); } }
 function zanBpmLabel(c){ return c ? String(c.bpmLabel || c.bpm) : ''; }
 function zanPlayable(id){ var c = zanCourse(id); return !!(c && c.song && ZAN_SONGS[c.song]); }
 // --- the tempo map: beats ↔ seconds (song time) ---
@@ -13563,6 +13625,7 @@ function zanBackingStep(ac, out, song, tm, q, t){
     return;
   }
   var q4 = q % 16;
+  if(song.blind){ if(q4===0) bgmTaiko(ac, out, t, 0.09); return; }   // 心眼: only a soft 和太鼓 on the first beat of the bar
   // the ground: 大太鼓 on 1 and 3, 締太鼓 on the off-eighths, the chord at the bar
   if(q4===0) bgmTaiko(ac, out, t, 0.2);
   if(q4===8 && sec.key!=='tame') bgmTaiko(ac, out, t, 0.13);
@@ -13608,7 +13671,8 @@ function zanScheduleStep(ac, q){                    // q: the step in sixteenths
   if(!zan.backingSrc) zanBackingStep(ac, out, song, zan.tempo, q, t);   // (no rendered track: the music is booked live)
   if(sec.key==='ready') return;
   var q4 = q % 16;
-  // コンボで重なる: 10 和太鼓の裏打ち, 20 手拍子, 30 「ハッ！」「ソレ！」
+  // コンボで重なる: 10 和太鼓の裏打ち, 20 手拍子, 30 「ハッ！」「ソレ！」 (心眼: none)
+  if(song.blind) return;
   if(combo>=10 && q % 4===2) bgmTaiko(ac, out, t, 0.07);
   if(combo>=20 && (q4===4 || q4===12)) zanClap(ac, out, t, 0.06);
   if(combo>=30 && q4===0 && bar % 2===0) zanKakegoe(ac, out, t, 'ha', 0.07);
@@ -13832,7 +13896,7 @@ function zanHit(n, part, err){
   var tonoOn = !!(zan.tono && zanT2B(songT) < zan.tono.until);   // 殿様ご来店: +0.2 on top (the formula below is unchanged)
   var mult = 1 + Math.min(1, Math.floor(zan.combo/10)*0.1) + (tonoOn ? ZAN_TONO_BONUS : 0);   // ×1.0 → ×2.0 over 100 in a row
   var base = ZAN_POINTS[kind][rating==='PERFECT' ? 0 : 1]*(crit ? ZAN_CRIT_MULT : 1);   // 極・一閃: ×1.5
-  zan.score += Math.round(base*mult*(zan.trick ? ZAN_TRICK_SCORE : 1));   // (イタズラ ×1.2)
+  zan.score += Math.round(base*mult*(zan.trick ? ZAN_TRICK_SCORE : 1)*zan.modMult);   // (イタズラ ×1.2, 修行の心得 ×modMult)
   if(rating==='PERFECT') zan.perfect++; else zan.ok++;
   if(crit) zan.crit++;
   zan.errs.push(err*1000);
@@ -13989,6 +14053,8 @@ function zanCoinParts(store, acc, dailyJustCleared){
   var p = coinParts(zan.score, 'beginner', acc, dailyJustCleared);
   p.course = zan.course.coinBonus || 0;
   p.trick = zan.trick ? Math.round(ZAN_TRICK_COIN*(p.base + p.scorePart + p.satPart + p.course)) : 0;
+  p.mods = zan.modMult>1 ? Math.round((zan.modMult - 1)*(p.base + p.scorePart + p.satPart + p.course)) : 0;   // 修行の心得
+  p.modsLabel = zanModLabels(zan.mods).join('・');
   p.today = 0;
   if(zan.course.id===zanTodayCourse() && store.zan.todayDone!==todayStr()){ p.today = ZAN_TODAY_BONUS; store.zan.todayDone = todayStr(); }
   p.courseName = zan.course.name;
@@ -14125,7 +14191,8 @@ document.getElementById('zpb-home').addEventListener('click', function(){ zanQui
 var zanLaunching = false;
 function zanLaunch(courseId){
   if(zanLaunching || !zanPlayable(courseId)) return;
-  var song = zanSongFor(zanCourse(courseId));
+  var song = zanPlaySong(zanCourse(courseId), zanCurrentMods());
+  if(song.baseId && !zanRenders[song.id]) for(var vk in zanRenders) if(Object.prototype.hasOwnProperty.call(zanRenders, vk) && vk.indexOf('.x')>=0) delete zanRenders[vk];   // (one 心得 track kept at a time)
   if(!audioEnabled || zanRenders[song.id]){ startZan(courseId, zanRenders[song.id] || null); return; }
   var btn = document.getElementById('btn-zan'), label = btn.textContent;
   zanLaunching = true;
@@ -14139,7 +14206,7 @@ function zanLaunch(courseId){
   });
 }
 function startZan(courseId, backing, practice){
-  var course = zanPlayable(courseId) ? zanCourse(courseId) : ZAN_COURSES[0], song = practice ? practice.song : zanSongFor(course), tm = zanTempoOf(song);
+  var course = zanPlayable(courseId) ? zanCourse(courseId) : ZAN_COURSES[0], mods = practice ? sanitizeMods(null) : zanCurrentMods(), song = practice ? practice.song : zanPlaySong(course, mods), tm = zanTempoOf(song);   // (区間練習: no 心得)
   stopDemoTaps();
   finishResultCount(true);
   state = freshState();
@@ -14161,7 +14228,7 @@ function startZan(courseId, backing, practice){
   var notes = zanChart(song, tm, trick, trickFrom);
   var ghost = null;                                  // ゴースト (looks only): this course's best, on the same chart
   try{ var gs = loadStore(); if(!practice && gs.settings.ghost===true) ghost = zanGhostLoad(gs.zan.courses[course.id].ghost, song, tm); }catch(e){ ghost = null; }
-  zan = {course:course, song:song, tempo:tm, win:zanWindows(course), crit:0, judges:[], tono:null, ghost:ghost, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
+  zan = {course:course, song:song, tempo:tm, win:zanWindows(course, mods.strict), mods:mods, modMult:zanModMult(mods), travel:ZAN_TRAVEL/mods.speed, crit:0, judges:[], tono:null, ghost:ghost, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
          p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
@@ -14173,7 +14240,7 @@ function startZan(courseId, backing, practice){
   applyModeLook('normal');
   modeTag.hidden = false;
   modeTag.textContent = practice ? '練習中（記録されません）・' + course.name + '「' + practice.label + '」' + zanSpeedLabel(practice.speed)
-                                 : '斬・' + course.name + '・♩=' + zanBpmLabel(course) + (season ? '・' + SEASONAL_MODES[season].name + (song.shinsoba ? '譜面' : '') : '');
+                                 : '斬・' + course.name + '・♩=' + zanBpmLabel(course) + (season ? '・' + SEASONAL_MODES[season].name + (song.shinsoba ? '譜面' : '') : '') + (zanModsActive(mods) ? '・' + zanModLabels(mods).join('・') : '');
   document.getElementById('btn-practice-quit').hidden = !practice;
   document.getElementById('btn-zan-pause').hidden = false;
   zanPauseBox(false);
@@ -14243,7 +14310,7 @@ function zanRankPayload(r){
   });
   var name = '';
   try{ name = loadStore().profile.name; }catch(e){}
-  return {course:zan.course.id, chart:zan.song.id, score:zan.score, grade:r.grade, perfect:r.perfect, combo:r.combo, trick:!!zan.trick, name:name || DEFAULT_PLAYER_NAME, judges:j};
+  return {course:zan.course.id, chart:zan.song.baseId || zan.song.id, mods:{speed:zan.mods.speed, strict:zan.mods.strict, blind:zan.mods.blind}, score:zan.score, grade:r.grade, perfect:r.perfect, combo:r.combo, trick:!!zan.trick, name:name || DEFAULT_PLAYER_NAME, judges:j};   // (the chart without the 心得; the 心得 apart)
 }
 function zanRankSend(r){
   var el = document.getElementById('rank-sent');
@@ -14307,7 +14374,7 @@ function renderRanking(){
       var nm = document.createElement('span'); nm.className = 'rk-name'; nm.textContent = cleanProfileName(String(e.name || '')) || DEFAULT_PLAYER_NAME;
       var sc = document.createElement('span'); sc.className = 'rk-score'; sc.textContent = fmtPoints(clampInt(e.score, 0, STAT_MAX)) + '点';
       var sub = document.createElement('span'); sub.className = 'rk-sub';
-      sub.textContent = (ZAN_GRADE_NAMES.indexOf(e.grade)>=0 ? '完成度 ' + e.grade + '・' : '') + 'コンボ ' + clampInt(e.combo, 0, STAT_MAX) + (e.trick ? '・イタズラ' : '') + (e.me ? '・あなた' : '');
+      sub.textContent = (ZAN_GRADE_NAMES.indexOf(e.grade)>=0 ? '完成度 ' + e.grade + '・' : '') + 'コンボ ' + clampInt(e.combo, 0, STAT_MAX) + (e.trick ? '・イタズラ' : '') + zanModLabels(sanitizeMods(e.mods)).map(function(l){ return '・' + l; }).join('') + (e.me ? '・あなた' : '');
       li.appendChild(rk); li.appendChild(nm); li.appendChild(sc); li.appendChild(sub);
       list.appendChild(li);
     });
@@ -14339,6 +14406,16 @@ document.getElementById('rk-join').addEventListener('change', function(){
   else renderRanking();
 });
 
+// 修行の心得: the badges on the result (速切り 1.2x / 極・判定 / 心眼, with the multiplier)
+function zanRenderModBadges(m){
+  var el = document.getElementById('zan-mod-badges');
+  if(!el) return;
+  el.textContent = '';
+  var labels = zanModLabels(m);
+  el.hidden = !labels.length;
+  labels.forEach(function(l){ var b = document.createElement('span'); b.className = 'zan-mod-badge'; b.textContent = l; el.appendChild(b); });
+  if(labels.length){ var x = document.createElement('span'); x.className = 'zan-mod-mult'; x.textContent = '得点・コイン ×' + zanModMult(m).toFixed(2).replace(/0$/, ''); el.appendChild(x); }
+}
 // --- リザルトのふりかえり (only what is shown and the 苦手 counts: the score and the 完成度 are not touched) ---
 // the judgements by part of the song (sections[].from, in beats): how many, the Misses and the mean |ずれ| of the cuts
 function zanReview(song, judges){
@@ -14442,7 +14519,9 @@ function finishZan(){
   var grade = zanGrade(acc, zan.miss);
   var isNewBest = false, store = loadStore(), cid = zan.course.id, rec = store.zan.courses[cid];
   rec.plays = Math.min(STAT_MAX, rec.plays + 1);
-  if(zan.score > rec.best){ rec.best = zan.score; rec.bestTrick = zan.trick; isNewBest = true; rec.ghost = zanGhostOf(zan.song, zan.judges); }   // (+ its ゴースト)
+  if(zan.score > rec.best){ rec.best = zan.score; rec.bestTrick = zan.trick; isNewBest = true; rec.ghost = zanGhostOf(zan.song, zan.judges); rec.bestMods = zanModsActive(zan.mods) ? zan.mods : null; }   // (+ its ゴースト and 心得)
+  rec.bestCrit = Math.max(rec.bestCrit, zan.crit);
+  store.zan.bestCrit = Math.max(store.zan.bestCrit, zan.crit);
   if(zanGradeRank(grade) > zanGradeRank(rec.bestGrade)) rec.bestGrade = grade;
   store.zan.plays = Math.min(STAT_MAX, store.zan.plays + 1);          // (and over all the courses)
   store.zan.best = Math.max(store.zan.best, zan.score);
@@ -14465,6 +14544,7 @@ function finishZan(){
   document.getElementById('zan-stats').hidden = false;
   resultMode.hidden = false;
   resultMode.textContent = 'リズム修行・斬　' + zan.course.name + '（' + zan.course.level + '・♩=' + zanBpmLabel(zan.course) + '）' + (zan.trick ? '・イタズラ' : '');
+  zanRenderModBadges(zan.mods);
   resultRank.textContent = '完成度: ' + grade + (grade==='極上' ? '蕎麦' : '');
   showNewTitles(newTitles);
   resultNewBest.classList.toggle('show', isNewBest);
@@ -14919,9 +14999,9 @@ function drawZan(){
   var nsk = state.mode==='shinsoba' ? null : skinPart('noodle');   // (新そばの季節: the new soba's colour)
   ctx.fillStyle = state.mode==='shinsoba' ? SHINSOBA_DOUGH : (nsk ? nsk.dough : COLORS.dough);
   ctx.fillRect(0, y, W, h);
-  var pxs = (W - jx)/ZAN_TRAVEL;
+  var pxs = (W - jx)/zan.travel;
   // the beat grid moving with the notes (bar lines stronger)
-  for(var gb=Math.ceil(beat), gEnd=zanT2B(songT + ZAN_TRAVEL) + 1; gb<gEnd; gb++){
+  for(var gb=Math.ceil(beat), gEnd=zanT2B(songT + zan.travel) + 1; gb<gEnd; gb++){
     if(gb<0) continue;
     var gx = jx + (zanB2T(gb) - songT)*pxs;
     ctx.fillStyle = gb % 4===0 ? 'rgba(255,248,230,0.28)' : 'rgba(255,248,230,0.12)';
@@ -14944,7 +15024,7 @@ function drawZan(){
   var nextIn = 9;
   for(var i=zan.firstOpen;i<zan.notes.length;i++){
     var n = zan.notes[i];
-    if(n.t - songT > ZAN_TRAVEL + 0.2) break;
+    if(n.t - songT > zan.travel + 0.2) break;
     if(n.judged || n.type==='feint' || n.type==='fake') continue;   // (a フェイント has no mark)
     var nx = jx + (n.t - songT)*pxs, demo = zanIsDemo(n);
     if(n.type==='hold' || n.type==='demohold'){
@@ -15087,7 +15167,7 @@ function zanPrepSelected(){
   clearTimeout(zanPrepTimer);
   zanPrepTimer = setTimeout(function(){
     var c = zanCourse(zanSelectedCourse());
-    if(audioEnabled && c && c.song && screens.title.classList.contains('active')) zanRenderBacking(zanSongFor(c));
+    if(audioEnabled && c && c.song && screens.title.classList.contains('active')) zanRenderBacking(zanPlaySong(c, zanCurrentMods()));
   }, 1500);
 }
 function renderZanHome(){
@@ -15101,7 +15181,7 @@ function renderZanHome(){
     cards[i].disabled = !ok;
     cards[i].setAttribute('aria-pressed', ok && id===sel ? 'true' : 'false');
     var bestEl = cards[i].querySelector('.zan-cbest'), rec = z && z.courses[id];
-    if(bestEl) bestEl.textContent = rec && rec.best>0 ? ('ベスト ' + fmtPoints(rec.best) + (rec.bestTrick ? '（イタズラ）' : '') + (rec.bestGrade ? '・完成度 ' + rec.bestGrade : '')) : 'ベスト —';
+    if(bestEl) bestEl.textContent = rec && rec.best>0 ? ('ベスト ' + fmtPoints(rec.best) + (rec.bestTrick || rec.bestMods ? '（' + [].concat(rec.bestTrick ? ['イタズラ'] : [], zanModLabels(rec.bestMods)).join('・') + '）' : '') + (rec.bestGrade ? '・完成度 ' + rec.bestGrade : '')) : 'ベスト —';
     var todayEl = cards[i].querySelector('.zan-today');
     if(todayEl){
       var isToday = id===zanTodayCourse(), done = !!(z && z.todayDone===todayStr());
@@ -15115,6 +15195,11 @@ function renderZanHome(){
   for(var ti=0;ti<tOpts.length;ti++) tOpts[ti].setAttribute('aria-pressed', (tOpts[ti].getAttribute('data-trick')==='on')===trickOn ? 'true' : 'false');
   var ghostOn = false, selRec = null;
   try{ var hs = loadStore(); ghostOn = hs.settings.ghost===true; selRec = hs.zan.courses[sel]; }catch(e){}
+  var cm = zanCurrentMods(), mOpts = document.querySelectorAll('.zm-opt');
+  for(var mi=0;mi<mOpts.length;mi++){
+    var mk = mOpts[mi].getAttribute('data-mod'), mv = mOpts[mi].getAttribute('data-v');
+    mOpts[mi].setAttribute('aria-pressed', (mk==='speed' ? Number(mv)===cm.speed : (mv==='on')===cm[mk]) ? 'true' : 'false');
+  }
   var gOpts = document.querySelectorAll('.ghost-opt');
   for(var gi=0;gi<gOpts.length;gi++) gOpts[gi].setAttribute('aria-pressed', (gOpts[gi].getAttribute('data-ghost')==='on')===ghostOn ? 'true' : 'false');
   var gNote = document.getElementById('zan-ghost-note'), selCourse = zanCourse(sel);
@@ -15144,6 +15229,17 @@ document.querySelector('.zan-trick:not(.zan-ghost)').addEventListener('click', f
   var b = e.target.closest('.trick-opt');
   if(!b) return;
   try{ var store = loadStore(); store.settings.zanTrick = b.getAttribute('data-trick')==='on'; saveStoreObj(store); }catch(err){}
+  renderZanHome();
+});
+document.querySelector('.zan-mods').addEventListener('click', function(e){   // 修行の心得 (settings.mods)
+  var b = e.target.closest('.zm-opt');
+  if(!b) return;
+  try{
+    var store = loadStore(), m = sanitizeMods(store.settings.mods), k = b.getAttribute('data-mod'), v = b.getAttribute('data-v');
+    if(k==='speed') m.speed = Number(v); else m[k] = v==='on';
+    store.settings.mods = sanitizeMods(m);
+    saveStoreObj(store);
+  }catch(err){}
   renderZanHome();
 });
 document.querySelector('.zan-ghost').addEventListener('click', function(e){   // ゴースト: アリ / ナシ (settings.ghost)
