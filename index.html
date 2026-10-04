@@ -863,6 +863,19 @@ body{
 .zan-mod-badge{font-size:.75rem;font-weight:900;padding:2px 10px;border-radius:999px;background:var(--accent-ink);color:var(--card);}
 .zan-mod-mult{font-size:.75rem;font-weight:700;color:var(--ink-soft);align-self:center;}
 .zan-trick-forced[hidden]{display:none;}
+/* お好みトッピング: 師匠のイタズラ・ゴースト・ハイライト録画・修行の心得 behind one button (closed: what is on now) */
+.zan-toppings{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);}
+.zan-toppings[open]{border-color:var(--accent-ink);}
+.zt-sum{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 12px;box-sizing:border-box;font-weight:900;font-size:.9rem;}
+.zt-sum::-webkit-details-marker{display:none;}
+.zt-sum:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px;border-radius:var(--radius);}
+.zt-name{white-space:nowrap;}
+.zt-now{flex:1 1 auto;min-width:0;text-align:right;font-size:.7rem;font-weight:700;color:var(--ink-soft);line-height:1.4;}
+.zt-now.is-on{color:var(--accent2-ink);}
+.zt-now span{display:inline-block;white-space:nowrap;}
+.zt-chev{flex:none;width:9px;height:9px;border-right:2px solid var(--ink-soft);border-bottom:2px solid var(--ink-soft);transform:rotate(45deg);margin:-4px 2px 0 2px;transition:transform .15s;}
+.zan-toppings[open] .zt-chev{transform:rotate(-135deg);margin-top:4px;}
+.zt-body{display:grid;gap:12px;padding:4px 12px 12px;border-top:1px solid var(--line);padding-top:10px;}
 /* 区間練習 (records nothing) */
 .zan-practice{border-top:1px solid var(--line);padding-top:8px;}
 .zan-practice summary{cursor:pointer;font-weight:900;font-size:.88rem;display:flex;align-items:baseline;gap:8px;}
@@ -1507,6 +1520,9 @@ body{
         </button>
       </div>
       <p id="zan-season" class="zan-season" hidden></p>
+      <details id="zan-toppings" class="zan-toppings">
+        <summary class="zt-sum"><span class="zt-name">お好みトッピング</span><span id="zan-toppings-now" class="zt-now">ナシ</span><span class="zt-chev" aria-hidden="true"></span></summary>
+        <div class="zt-body">
       <div class="zan-trick" role="group" aria-labelledby="zan-trick-h">
         <span id="zan-trick-h" class="zan-trick-h">師匠のイタズラ</span>
         <button class="btn-small trick-opt" type="button" data-trick="off" aria-pressed="true">ナシ</button>
@@ -1540,6 +1556,8 @@ body{
           <button class="btn-small trick-opt zm-opt" type="button" data-mod="blind" data-v="on" aria-pressed="false">アリ</button></div>
         <p id="zan-mods-note" class="zan-trick-note">速切りは曲の速さ（1.2x で得点・コイン×1.1、1.5x で×1.2）。極・判定は判定の幅を 極・一閃±7ms・Perfect±15ms・OK±40ms に（×1.1）。心眼は伴奏を消し、小節の頭の和太鼓と師匠のお手本の音だけで切る（×1.1）。記録はいつもの自己ベスト・番付に入ります。</p>
       </div>
+        </div>
+      </details>
       <button id="btn-zan" class="btn-start zan-start" type="button">斬 修行開始</button>
       <p class="zan-tools"><button id="btn-calib" class="link-btn" type="button">試し切り（ずれ調整）</button><span id="zan-offset-label">ずれ補正 0ms</span></p>
       <p class="zan-tools"><button id="btn-ranking" class="link-btn" type="button">番付を見る</button><span class="zan-tools-note">ログイン中・参加した人の記録</span></p>
@@ -16520,6 +16538,16 @@ function renderZanHome(){
     (ghostOn && !(selRec && selRec.ghost) ? (selCourse ? selCourse.name : '') + 'には、まだゴーストがありません（次に自己ベストを出すと残ります）。' : '');
   var forcedEl = document.getElementById('zan-trick-forced'), selC = zanCourse(sel);
   if(forcedEl) forcedEl.hidden = !(selC && selC.alwaysTrick);
+  var nowEl = document.getElementById('zan-toppings-now');   // お好みトッピング: what is on, shown on the closed button
+  if(nowEl){
+    var clipOn = false;
+    try{ clipOn = loadStore().settings.clip===true && clipSupported(); }catch(e){}
+    var tops = [].concat(trickOn ? ['イタズラ'] : (selC && selC.alwaysTrick ? ['イタズラ（越前打挽き）'] : []), ghostOn ? ['ゴースト'] : [], clipOn ? ['録画'] : [], zanModLabels(cm));
+    nowEl.textContent = '';
+    if(!tops.length) nowEl.textContent = 'ナシ';
+    for(var tp=0; tp<tops.length; tp++){ var tsp = document.createElement('span'); tsp.textContent = tops[tp] + (tp<tops.length - 1 ? '・' : ''); nowEl.appendChild(tsp); }   // (a line breaks only between them)
+    nowEl.classList.toggle('is-on', tops.length>0);
+  }
   var season = zanSeason(), seEl = document.getElementById('zan-season');
   if(seEl){
     seEl.hidden = !season;
