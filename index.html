@@ -879,6 +879,57 @@ body{
 .rank-sent{margin:-16px 0 20px;font-size:.8rem;font-weight:700;color:var(--accent-ink);text-align:center;}
 .rank-sent[hidden]{display:none;}
 .rk-group{margin:0 0 12px;padding:12px 14px;}
+.rk-set-h{margin:18px 0 8px;font-size:1rem;font-weight:900;}
+/* 番付を大きく (V5.1): 横綱・大関・関脇 の表彰台、あなたの順位、ホームとリザルトの番付 */
+.rk-podium{list-style:none;margin:6px 0 10px;padding:0;display:grid;grid-template-columns:1fr 1.18fr 1fr;align-items:end;gap:6px;}
+.rk-podium:empty{display:none;}
+.rk-pod{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;padding:10px 6px 8px;border-radius:16px 16px 6px 6px;border:2px solid;text-align:center;color:#2c2216;}
+.rk-pod.p1{order:2;min-height:156px;border-color:#c99a2e;background:linear-gradient(#fff6d6,#f1d47e);box-shadow:0 6px 18px rgba(201,154,46,.35);}
+.rk-pod.p2{order:1;min-height:128px;border-color:#9aa6b0;background:linear-gradient(#f7f9fa,#d3dade);}
+.rk-pod.p3{order:3;min-height:112px;border-color:#b5774a;background:linear-gradient(#fbeee2,#e0b18c);}
+.rk-pod.is-me{box-shadow:0 0 0 3px var(--accent2-ink);}
+.rk-pod.empty{opacity:.5;}
+.rk-pod-title{font-family:var(--font-display);font-size:1.1rem;line-height:1.1;color:#7a1f14;}
+.rk-pod.p1 .rk-pod-title{font-size:1.6rem;}
+.rk-pod-rank{font-size:.7rem;font-weight:900;color:#5d4e3b;}
+.rk-pod-name{max-width:100%;font-size:.86rem;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rk-pod-score{font-size:1rem;font-weight:900;font-variant-numeric:tabular-nums;}
+.rk-pod.p1 .rk-pod-score{font-size:1.25rem;}
+.rk-pod-sub{font-size:.66rem;font-weight:700;color:#5d4e3b;}
+.rk-me{margin:0 0 10px;padding:12px 14px;border-radius:14px;border:2px solid var(--accent2-ink);background:color-mix(in srgb,var(--accent2-ink) 10%,var(--card));}
+.rk-me[hidden]{display:none;}
+.rk-me-main{margin:0;display:flex;align-items:baseline;gap:10px;}
+.rk-me-rank{font-family:var(--font-display);font-size:1.9rem;line-height:1.1;color:var(--accent2-ink);}
+.rk-me-text{margin:4px 0 8px;font-size:.92rem;font-weight:700;line-height:1.55;}
+.rk-me-text b{color:var(--accent2-ink);font-size:1.1em;}
+.rk-move{font-size:.95rem;font-weight:900;}
+.rk-move.up{color:#2e8b3e;}
+.rk-move.down{color:#c0392b;}
+.rk-move.new{color:var(--accent-ink);}
+.rank-result{width:100%;max-width:340px;margin:-8px 0 22px;padding:14px 16px;border-radius:16px;text-align:center;border:2px solid #c99a2e;background:linear-gradient(#fff8e2,#f6e4ad);color:#2c2216;box-shadow:var(--card-shadow);}
+.rank-result[hidden]{display:none;}
+.rank-result-h{margin:0;font-size:.85rem;font-weight:900;color:#7a5a16;}
+.rank-result-big{margin:2px 0;display:flex;justify-content:center;align-items:baseline;gap:10px;}
+.rank-result-big b{font-family:var(--font-display);font-size:2.6rem;line-height:1.1;color:#7a1f14;}
+.rank-result-gap{margin:0 0 10px;font-size:.92rem;font-weight:700;line-height:1.5;}
+.rank-result-gap b{color:#7a1f14;}
+.home-rank{margin:0 0 14px;padding:14px 16px;}
+.home-rank-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
+.home-rank-h{margin:0;font-family:var(--font-display);font-size:1.3rem;}
+.home-rank-course{font-size:.8rem;font-weight:900;color:var(--ink-soft);}
+.home-rank-top3{list-style:none;margin:8px 0 6px;padding:0;display:flex;flex-direction:column;gap:4px;}
+.home-rank-top3:empty{display:none;}
+.home-rank-top3 li{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;color:#2c2216;}
+.home-rank-top3 li.p1{background:linear-gradient(90deg,#f8e3a0,#fff6d6);}
+.home-rank-top3 li.p2{background:linear-gradient(90deg,#dbe1e5,#f7f9fa);}
+.home-rank-top3 li.p3{background:linear-gradient(90deg,#ecc8aa,#fbeee2);}
+.home-rank-top3 li.is-me{box-shadow:inset 0 0 0 2px var(--accent2-ink);}
+.home-rank-top3 .t{font-family:var(--font-display);font-size:1rem;color:#7a1f14;}
+.home-rank-top3 .n{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.home-rank-top3 .s{font-weight:900;font-variant-numeric:tabular-nums;}
+.home-rank-me{margin:4px 0 10px;font-size:.9rem;font-weight:700;line-height:1.5;}
+.home-rank-me b{color:var(--accent2-ink);}
+.home-rank-btn{width:100%;}
 .rk-group-h{margin:0 0 4px;font-weight:900;}
 .rk-group-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px;}
 .rk-group-row[hidden]{display:none;}
@@ -938,7 +989,6 @@ body{
 .rk-list li{display:grid;grid-template-columns:2.2em minmax(0,1fr) auto;align-items:baseline;gap:2px 10px;padding:7px 12px;border-radius:var(--radius);background:var(--card);border:1px solid var(--line);}
 .rk-list li.is-me{border-color:var(--accent2-ink);box-shadow:inset 0 0 0 1px var(--accent2-ink);}
 .rk-rank{font-weight:900;font-variant-numeric:tabular-nums;color:var(--ink-soft);}
-.rk-list li:nth-child(-n+3) .rk-rank{color:#b8892a;}
 .rk-name{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .rk-score{font-weight:900;font-variant-numeric:tabular-nums;}
 .rk-sub{grid-column:2 / -1;font-size:.7rem;color:var(--ink-soft);font-weight:700;}
@@ -1505,6 +1555,13 @@ body{
       </details>
     </section>
 
+    <section id="home-rank" class="home-rank card" aria-labelledby="home-rank-h">
+      <div class="home-rank-top"><h2 id="home-rank-h" class="home-rank-h">今週の番付</h2><span id="home-rank-course" class="home-rank-course"></span></div>
+      <ol id="home-rank-top3" class="home-rank-top3" aria-label="上位3人"></ol>
+      <p id="home-rank-me" class="home-rank-me"></p>
+      <button id="btn-home-rank" class="btn-small btn-primary home-rank-btn" type="button">番付を見る</button>
+    </section>
+
     <section class="challenge ippai" aria-labelledby="ippai-label">
       <div class="challenge-top">
         <h2 id="ippai-label" class="challenge-label">今日の一杯 <span id="ippai-no"></span></h2>
@@ -1659,7 +1716,7 @@ body{
         <li><b>一時停止・やり直し</b>画面右上の「⏸」（パソコンは Esc か P キー）で一時停止し、「再開」「最初からやり直す」「コースを選び直す」を選べます。R キーですぐに最初からやり直せます。再開とやり直しは「3・2・1」の合図のあとに始まります。ほかのアプリに切り替えたときも一時停止します。やめた曲は記録されません。</li>
         <li><b>修行の心得</b>ホームで曲に縛りをかけられます。「速切り」1.2x・1.5x（曲と印が速くなる。得点・コイン×1.1・×1.2）、「極・判定」（極・一閃±7ms・Perfect±15ms・OK±40ms。×1.1）、「心眼」（伴奏が消え、小節の頭の和太鼓と師匠のお手本の音だけ。×1.1）。重ねると倍率もかけ合わせます。記録はいつもの自己ベスト・番付に入り、リザルトとベストに心得の印がつきます（区間練習では使いません）。</li>
         <li><b>ひょっこり客</b>あなたの番の1小節が終わるたびに、画面の下からお客さんが顔を出して、その小節の出来（全部Perfect・OKまじり・Missあり）に反応します。全部Perfectの小節が2回続くと蕎麦奉行、4回でお姫様、6回で殿様が来店します。殿様が来店すると「殿様ご来店！ 倍率UP」と出て、そこからあなたの番2小節ぶん（16拍）、コンボ倍率が+0.2されます。蕎麦奉行・お姫様とふつうのお客さんは見た目だけで、得点は変わりません。</li>
-        <li><b>番付</b>ホームの「番付を見る」で、コースごとの「今週」と「全期間」の上位50人が見られます（ログインが必要）。「番付に参加する」を選ぶと、それから遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラと修行の心得の有無）が番付に送られます。サーバーで判定の記録から得点を計算し直して載せる参考記録です。送れなくても、この端末の記録はそのまま残ります。参加をやめると番付から消えます。<br>番付の画面の「クラス番付（合言葉）」に、みんなで決めた合言葉（4〜16文字。ひらがな・カタカナ・漢字・英字・数字・ー）を入れると、同じ合言葉を入れた人どうしの番付ができます（全体の番付に参加しなくても使えます）。本名や学校名など、だれかわかる言葉は使わないでください。「合言葉を送る」でリンクを送れます。抜けると、そのクラス番付からあなたの記録が消えます。</li>
+        <li><b>番付</b>ホームの「番付を見る」で、コースごとの「今週」と「全期間」の上位50人が見られます（ログインが必要）。「番付に参加する」を選ぶと、それから遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラと修行の心得の有無）が番付に送られます。サーバーで判定の記録から得点を計算し直して載せる参考記録です。送れなくても、この端末の記録はそのまま残ります。参加をやめると番付から消えます。上位3人は「横綱・大関・関脇」の表彰台に並び、あなたの順位と「1つ上を抜くまであと何点」が、番付の画面・ホームの「今週の番付」・1曲ごとのリザルトに出ます（前に見たときから上がったか下がったかも）。<br>番付の画面の「クラス番付（合言葉）」に、みんなで決めた合言葉（4〜16文字。ひらがな・カタカナ・漢字・英字・数字・ー）を入れると、同じ合言葉を入れた人どうしの番付ができます（全体の番付に参加しなくても使えます）。本名や学校名など、だれかわかる言葉は使わないでください。「合言葉を送る」でリンクを送れます。抜けると、そのクラス番付からあなたの記録が消えます。</li>
         <li><b>ゴースト</b>ホームで「ゴースト」をアリにすると、そのコースで自己ベストを出したときの包丁が、半透明の青い包丁であなたの包丁と一緒に切ります。自分のベストより早いか遅いかが見えます（見た目だけで、得点や判定は変わりません）。ゴーストは自己ベストを更新したときに残ります。</li>
         <li><b>区間練習</b>ホームの「区間練習」で、選んだコースの1区間（お手本・刻み・タメ切り など）だけを3回くり返して練習できます。速さは0.8倍・0.9倍・1.0倍。得点・ベスト・コイン・称号・チャレンジには入りません（師匠のイタズラはなし）。途中でやめるときは画面下の「練習をやめる」。終わるとホームに、その練習のPerfect・OK・Missが出ます。</li>
         <li><b>ふりかえり</b>リザルトに、極上まであと何回OKをPerfectにすればよいか（Missがあるときは「Miss 0」が条件であること）と、曲の区間ごとのMissの数とずれの帯が出ます。いちばんMissの多かった区間を「苦手」として示し、コースごとに区間のMissの累計を記録します。</li>
@@ -1985,6 +2042,24 @@ body{
       <button id="rk-open-mypage" class="btn-small" type="button">マイページでログイン</button>
     </div>
     <div id="rk-body" hidden>
+      <div id="rk-scopes" class="rk-tabs" role="group" aria-label="番付の種類" hidden>
+        <button class="btn-small rk-scope" type="button" data-scope="all" aria-pressed="true">全体</button>
+        <button class="btn-small rk-scope" type="button" data-scope="group" aria-pressed="false">合言葉</button>
+      </div>
+      <div id="rk-courses" class="rk-tabs" role="group" aria-label="コース"></div>
+      <div id="rk-periods" class="rk-tabs" role="group" aria-label="期間">
+        <button class="btn-small rk-period" type="button" data-period="week" aria-pressed="true">今週</button>
+        <button class="btn-small rk-period" type="button" data-period="all" aria-pressed="false">全期間</button>
+      </div>
+      <p id="rk-status" class="rk-status" role="status"></p>
+      <ol id="rk-podium" class="rk-podium" aria-label="上位3人"></ol>
+      <div id="rk-me" class="rk-me" hidden>
+        <p class="rk-me-main"><span id="rk-me-rank" class="rk-me-rank"></span><span id="rk-me-move" class="rk-move"></span></p>
+        <p id="rk-me-text" class="rk-me-text"></p>
+        <button id="rk-me-go" class="btn-small btn-primary" type="button">抜きに行く</button>
+      </div>
+      <ol id="rk-list" class="rk-list" start="4"></ol>
+      <h3 id="rk-set-h" class="rk-set-h">参加の設定</h3>
       <div class="rk-join card">
         <label class="fx-check"><input id="rk-join" type="checkbox"> 番付に参加する</label>
         <p class="rk-note">参加すると、遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラと修行の心得の有無）がこの端末から送られ、番付でほかの人にも見えます。表示名はマイページで変えられます。参加をやめると、番付からあなたの記録を消します。</p>
@@ -2005,17 +2080,6 @@ body{
         </div>
         <p id="rk-group-msg" class="rk-note rk-msg" role="status"></p>
       </div>
-      <div id="rk-scopes" class="rk-tabs" role="group" aria-label="番付の種類" hidden>
-        <button class="btn-small rk-scope" type="button" data-scope="all" aria-pressed="true">全体</button>
-        <button class="btn-small rk-scope" type="button" data-scope="group" aria-pressed="false">合言葉</button>
-      </div>
-      <div id="rk-courses" class="rk-tabs" role="group" aria-label="コース"></div>
-      <div id="rk-periods" class="rk-tabs" role="group" aria-label="期間">
-        <button class="btn-small rk-period" type="button" data-period="week" aria-pressed="true">今週</button>
-        <button class="btn-small rk-period" type="button" data-period="all" aria-pressed="false">全期間</button>
-      </div>
-      <p id="rk-status" class="rk-status" role="status"></p>
-      <ol id="rk-list" class="rk-list"></ol>
     </div>
   </section>
 
@@ -2095,6 +2159,12 @@ body{
       <p id="coin-status" class="coin-status"></p>
     </section>
     <p id="rank-sent" class="rank-sent" role="status" hidden></p>
+    <section id="rank-result" class="rank-result" aria-labelledby="rank-result-h" hidden>
+      <p id="rank-result-h" class="rank-result-h">今週の番付</p>
+      <p class="rank-result-big"><b id="rank-result-rank"></b><span id="rank-result-move" class="rk-move"></span></p>
+      <p id="rank-result-gap" class="rank-result-gap"></p>
+      <button id="btn-rank-result" class="btn-sub" type="button">番付を見る</button>
+    </section>
     <section id="ippai-box" class="duel-box ippai-box" aria-labelledby="ippai-box-h" hidden>
       <h3 id="ippai-box-h" class="duel-box-h">今日の一杯</h3>
       <p id="ippai-r-grid" class="ippai-grid ippai-r-grid" aria-label="小節ごとの結果"></p>
@@ -15206,6 +15276,8 @@ function zanRankPayload(r){
 function zanRankSend(r){
   var el = document.getElementById('rank-sent');
   if(el){ el.hidden = true; el.textContent = ''; }
+  var rr = document.getElementById('rank-result');
+  if(rr) rr.hidden = true;
   var join = false, group = '';
   try{ var rs = loadStore().settings; join = rs.rankJoin===true; group = rankGroupOf(rs.rankGroup); }catch(e){}
   if((!join && !group) || zan.practice || !SyncManager.isLoggedIn()) return;   // (番付に参加 and/or a クラス番付's 合言葉)
@@ -15213,9 +15285,166 @@ function zanRankSend(r){
   if(el){ el.hidden = false; el.textContent = '番付に送っています…'; }
   SyncManager.rankSubmit(payload).then(function(res){
     if(!el) return;
+    if(res.ok) zanRankResult(payload.course);        // 今週の順位を大きく
     el.textContent = res.ok ? (join ? '番付に送りました（参考記録）。' : 'クラス番付に送りました（参考記録）。') : res.error==='rejected' ? 'この記録は番付に載せられませんでした。' : '番付に送れませんでした（記録はこの端末に残っています）。';
   });
 }
+// --- 番付を大きく (V5.1): 横綱・大関・関脇 の表彰台、あなたの順位と「抜くまであと何点」、前に見たときからの上下 (↑↓)。
+// The board is read through rankFetch (kept a minute, so the home does not ask again on every return). The last rank you saw
+// on each board is kept on this device only (STORE_KEY + '.rankSeen'), just for the arrows.
+var RANK_TITLES = ['横綱', '大関', '関脇'];
+var RANK_SEEN_KEY = STORE_KEY + '.rankSeen';
+var rankCache = {};
+function rankFetch(course, period, group, maxAgeMs){
+  var k = course + '|' + period + '|' + (group || ''), c = rankCache[k];
+  if(c && Date.now() - c.at < (maxAgeMs===undefined ? 60000 : maxAgeMs)) return Promise.resolve(c.res);
+  return SyncManager.rankGet(course, period, group || '').then(function(res){ if(res && res.ok) rankCache[k] = {at:Date.now(), res:res}; return res; });
+}
+function rankSeenKey(course, period, group, res){ return course + '|' + period + '|' + (group || '') + '|' + (period==='week' ? String(res.week || '') : ''); }
+function rankSeenGet(k){ try{ var o = JSON.parse(readRawLS(RANK_SEEN_KEY) || '{}'); return isPlainObj(o) && Number.isInteger(o[k]) ? o[k] : 0; }catch(e){ return 0; } }
+function rankSeenSet(k, v){
+  try{ var o = JSON.parse(readRawLS(RANK_SEEN_KEY) || '{}'); if(!isPlainObj(o)) o = {}; delete o[k]; o[k] = v; var ks = Object.keys(o); while(ks.length>40) delete o[ks.shift()]; writeRawLS(RANK_SEEN_KEY, JSON.stringify(o)); }catch(e){}
+}
+function rankName(e){ return cleanProfileName(String(e && e.name || '')) || DEFAULT_PLAYER_NAME; }
+function rankScore(e){ return clampInt(e && e.score, 0, STAT_MAX); }
+function rankTitle(r){ return r>=1 && r<=3 ? RANK_TITLES[r - 1] : ''; }
+// where you stand on a board: on it (your rank, the one just above and how far), or not yet
+function rankStanding(es){
+  var i = -1;
+  for(var k=0;k<es.length;k++) if(es[k].me){ i = k; break; }
+  if(i<0) return {on:false, total:es.length, last:es.length ? es[es.length - 1] : null, full:es.length>=RANK_SHOWN};
+  var me = es[i], up = i>0 ? es[i - 1] : null, down = es[i + 1] || null;
+  return {on:true, rank:clampInt(me.rank, 1, 999), score:rankScore(me), up:up, gapUp:up ? rankScore(up) - rankScore(me) + 1 : 0, down:down, gapDown:down ? rankScore(me) - rankScore(down) : 0, total:es.length};
+}
+var RANK_SHOWN = 50;
+// the line under your rank (with <b> for the numbers; every name goes in as text)
+function rankStandingNodes(el, st){
+  el.textContent = '';
+  var t = function(x){ el.appendChild(document.createTextNode(x)); }, b = function(x){ var e = document.createElement('b'); e.textContent = x; el.appendChild(e); };
+  if(st.on && st.rank===1){ t('あなたが横綱！'); if(st.down){ t(' 2位の「' + rankName(st.down) + '」とは '); b(fmtPoints(st.gapDown) + '点差'); t('。追いつかれるな！'); } else t(' まだだれも追ってきていません。'); return; }
+  if(st.on){ t((st.rank - 1) + '位の「' + rankName(st.up) + '」まで あと '); b(fmtPoints(st.gapUp) + '点'); t(st.rank - 1<=3 ? '。抜けば' + rankTitle(st.rank - 1) + '！' : '！'); return; }
+  if(st.full && st.last){ t('まだ番付の外です。' + RANK_SHOWN + '位は '); b(fmtPoints(rankScore(st.last)) + '点'); t('。これを超えれば番付入り！'); return; }
+  t('まだ載っていません。今なら1曲遊べば '); b((st.total + 1) + '位以内'); t(' に入れます！');
+}
+function rankMoveNode(el, prev, rank){
+  el.className = 'rk-move';
+  el.textContent = '';
+  if(!rank) return;
+  if(!prev){ el.classList.add('new'); el.textContent = '初登場'; return; }
+  if(prev>rank){ el.classList.add('up'); el.textContent = '↑' + (prev - rank); }
+  else if(prev<rank){ el.classList.add('down'); el.textContent = '↓' + (rank - prev); }
+  else el.textContent = '→';
+}
+function rankEntrySub(e){
+  return (ZAN_GRADE_NAMES.indexOf(e.grade)>=0 ? '完成度 ' + e.grade + '・' : '') + 'コンボ ' + clampInt(e.combo, 0, STAT_MAX) + (e.trick ? '・イタズラ' : '') + zanModLabels(sanitizeMods(e.mods)).map(function(l){ return '・' + l; }).join('') + (e.me ? '・あなた' : '');
+}
+// the podium: 1st in the middle (and tallest), 2nd left, 3rd right; an empty seat stays 空席
+function rankPodium(ol, es){
+  ol.textContent = '';
+  if(!es.length) return;
+  for(var i=0;i<3;i++){
+    var e = es[i], li = document.createElement('li');
+    li.className = 'rk-pod p' + (i + 1) + (e && e.me ? ' is-me' : '') + (e ? '' : ' empty');
+    var tt = document.createElement('span'); tt.className = 'rk-pod-title'; tt.textContent = RANK_TITLES[i];
+    var rk = document.createElement('span'); rk.className = 'rk-pod-rank'; rk.textContent = (i + 1) + '位';
+    var nm = document.createElement('span'); nm.className = 'rk-pod-name'; nm.textContent = e ? rankName(e) : '空席';
+    li.appendChild(tt); li.appendChild(rk); li.appendChild(nm);
+    if(e){
+      var sc = document.createElement('span'); sc.className = 'rk-pod-score'; sc.textContent = fmtPoints(rankScore(e)) + '点';
+      var sb = document.createElement('span'); sb.className = 'rk-pod-sub'; sb.textContent = (ZAN_GRADE_NAMES.indexOf(e.grade)>=0 ? e.grade : '') + (e.me ? '・あなた' : '');
+      li.appendChild(sc); li.appendChild(sb);
+    }
+    ol.appendChild(li);
+  }
+}
+// which board a player is on: the whole one when 参加, else the class one (合言葉)
+function rankMyBoard(){
+  var st = {};
+  try{ st = loadStore().settings; }catch(e){}
+  var group = rankGroupOf(st.rankGroup);
+  return {join:st.rankJoin===true, group:group, use:st.rankJoin===true ? '' : group};
+}
+// the result: after a song is sent, this week's place on that board (and how far to the next)
+function zanRankResult(course){
+  var box = document.getElementById('rank-result');
+  if(!box) return;
+  var my = rankMyBoard();
+  rankCache = {};                                     // (the board has just changed)
+  rankFetch(course, 'week', my.use, 0).then(function(res){
+    if(!res || !res.ok || !screens.result.classList.contains('active')) return;
+    var es = Array.isArray(res.entries) ? res.entries : [], st = rankStanding(es), c = zanCourse(course);
+    if(!st.on) return;
+    var k = rankSeenKey(course, 'week', my.use, res), prev = rankSeenGet(k);
+    document.getElementById('rank-result-h').textContent = '今週の' + (my.use ? '合言葉「' + my.use + '」の' : '') + '番付・' + (c ? c.name : '');
+    document.getElementById('rank-result-rank').textContent = (rankTitle(st.rank) ? rankTitle(st.rank) + '　' : '') + st.rank + '位';
+    rankMoveNode(document.getElementById('rank-result-move'), prev, st.rank);
+    rankStandingNodes(document.getElementById('rank-result-gap'), st);
+    rankSeenSet(k, st.rank);
+    box.hidden = false;
+  });
+}
+document.getElementById('btn-rank-result').addEventListener('click', function(){
+  try{ bestFlashEl.hidden = true; bestFlashEl.textContent = ''; }catch(e){}   // (自己ベストの紙吹雪は、リザルトに置いていく)
+  rankView.course = zan && zan.course ? zan.course.id : rankView.course;
+  rankView.period = 'week';
+  var my = rankMyBoard();
+  rankView.scope = my.use ? 'group' : 'all';
+  openRanking(this);
+});
+// the home: this week's board of the chosen course (the top 3 and your place), or an invitation to log in
+var homeRankSeq = 0;
+function renderHomeRank(){
+  var box = document.getElementById('home-rank');
+  if(!box || typeof ZAN_COURSES==='undefined' || !ZAN_COURSES || typeof RANK_TITLES==='undefined' || !RANK_TITLES || !rankCache) return;   // (the home is drawn once before this part has run)
+  var course = zanSelectedCourse(), c = zanCourse(course), my = rankMyBoard(), top = document.getElementById('home-rank-top3'), me = document.getElementById('home-rank-me'), btn = document.getElementById('btn-home-rank');
+  document.getElementById('home-rank-h').textContent = my.use ? 'クラス番付（今週）' : '今週の番付';
+  document.getElementById('home-rank-course').textContent = c ? c.name : '';
+  if(!SyncManager.isLoggedIn()){
+    top.textContent = '';
+    me.textContent = 'ログインすると、コースごとの番付で全国の職人と得点を競えます。横綱をめざせ！';
+    btn.textContent = 'ログインして番付に挑む';
+    btn.setAttribute('data-act', 'login');
+    return;
+  }
+  btn.textContent = '番付を見る';
+  btn.setAttribute('data-act', 'open');
+  var seq = ++homeRankSeq;
+  rankFetch(course, 'week', my.use).then(function(res){
+    if(seq!==homeRankSeq) return;
+    if(!res || !res.ok){ top.textContent = ''; me.textContent = '番付を読み込めませんでした。'; return; }
+    var es = Array.isArray(res.entries) ? res.entries : [], st = rankStanding(es);
+    top.textContent = '';
+    for(var i=0;i<Math.min(3, es.length);i++){
+      var e = es[i], li = document.createElement('li');
+      li.className = 'p' + (i + 1) + (e.me ? ' is-me' : '');
+      var t = document.createElement('span'); t.className = 't'; t.textContent = RANK_TITLES[i];
+      var n = document.createElement('span'); n.className = 'n'; n.textContent = rankName(e) + (e.me ? '（あなた）' : '');
+      var sc = document.createElement('span'); sc.className = 's'; sc.textContent = fmtPoints(rankScore(e)) + '点';
+      li.appendChild(t); li.appendChild(n); li.appendChild(sc);
+      top.appendChild(li);
+    }
+    if(!my.join && !my.use){ me.textContent = es.length ? '番付に参加すると、ここにあなたの順位が出ます。' : 'まだだれも載っていません。一番乗りで横綱になろう！'; return; }
+    if(!es.length){ me.textContent = 'まだだれも載っていません。1曲遊べば、あなたが横綱！'; return; }
+    rankStandingNodes(me, st);
+    if(st.on){ var lead = document.createElement('b'); lead.textContent = 'あなたは ' + st.rank + '位。'; me.insertBefore(lead, me.firstChild); }
+  });
+}
+document.getElementById('btn-home-rank').addEventListener('click', function(){
+  if(this.getAttribute('data-act')==='login'){ openMypage(this); return; }
+  rankView.course = zanSelectedCourse();
+  rankView.period = 'week';
+  rankView.scope = rankMyBoard().use ? 'group' : 'all';
+  openRanking(this);
+});
+document.getElementById('rk-me-go').addEventListener('click', function(){   // 抜きに行く: that course, from the home
+  if(this.getAttribute('data-act')==='settings'){ var sh = document.getElementById('rk-set-h'); try{ sh.scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){ sh.scrollIntoView(); } return; }
+  var cid = rankView.course;
+  closeRanking();
+  zanHomeCourse = cid;
+  zanArmed = null;
+  wakeAudio();
+  zanLaunch(cid);
+});
 // --- 番付の画面: course × this week / all time, the top 50; your row is marked
 var rankView = {course:'', period:'week', scope:'all', seq:0}, rankOpener = null;
 function openRanking(opener){
@@ -15261,21 +15490,45 @@ function renderRanking(){
   if(!logged) return;
   var asGroup = rankView.scope==='group' && group;
   var list = document.getElementById('rk-list'), status = document.getElementById('rk-status'), seq = ++rankView.seq;
+  var podium = document.getElementById('rk-podium'), meBox = document.getElementById('rk-me');
   list.textContent = '';
+  podium.textContent = '';
+  meBox.hidden = true;
   status.textContent = '読み込み中…';
-  SyncManager.rankGet(rankView.course, rankView.period, asGroup ? group : '').then(function(res){
+  rankFetch(rankView.course, rankView.period, asGroup ? group : '', 0).then(function(res){   // (always fresh here; the home keeps it a minute)
     if(seq!==rankView.seq) return;                   // (another tab was chosen meanwhile)
     if(!res.ok){ status.textContent = '番付を読み込めませんでした。通信できるところで、もう一度開いてください。'; return; }
     var es = Array.isArray(res.entries) ? res.entries : [], c = zanCourse(rankView.course);
     status.textContent = (asGroup ? '合言葉「' + group + '」・' : '') + (c ? c.name : '') + '・' + (rankView.period==='all' ? '全期間' : '今週（' + String(res.week || '').replace(/^\d{4}-0?(\d+)-0?(\d+)$/, '$1月$2日') + 'からの週）') + (es.length ? '　上位' + es.length + '人' : '　まだ誰も載っていません');
-    es.forEach(function(e){
+    rankPodium(podium, es);                          // 横綱・大関・関脇
+    var st = rankStanding(es), sendsHere = asGroup || join, goBtn = document.getElementById('rk-me-go');
+    if(!sendsHere){                                  // not on this board yet: the way in
+      document.getElementById('rk-me-rank').textContent = 'あなたの順位は？';
+      rankMoveNode(document.getElementById('rk-me-move'), 0, 0);
+      document.getElementById('rk-me-text').textContent = '番付に参加すると、ここにあなたの順位と「抜くまであと何点」が出ます。';
+      goBtn.textContent = '参加の設定へ';
+      goBtn.setAttribute('data-act', 'settings');
+      meBox.hidden = false;
+    }
+    if(sendsHere){                                   // where you stand (and how far to the next)
+      goBtn.setAttribute('data-act', 'play');
+      var sk = rankSeenKey(rankView.course, rankView.period, asGroup ? group : '', res);
+      document.getElementById('rk-me-rank').textContent = st.on ? 'あなたは ' + (rankTitle(st.rank) ? rankTitle(st.rank) + '・' : '') + st.rank + '位' : 'あなたは 番付外';
+      rankMoveNode(document.getElementById('rk-me-move'), st.on ? rankSeenGet(sk) : 0, st.on ? st.rank : 0);
+      rankStandingNodes(document.getElementById('rk-me-text'), st);
+      document.getElementById('rk-me-go').textContent = st.on && st.rank===1 ? '横綱を守りに行く' : st.on ? '抜きに行く' : '番付入りに挑む';
+      if(st.on) rankSeenSet(sk, st.rank);
+      meBox.hidden = false;
+    }
+    es.forEach(function(e, idx){
+      if(idx<3) return;                              // (the top 3 are on the podium)
       var li = document.createElement('li');
       if(e.me) li.className = 'is-me';
       var rk = document.createElement('span'); rk.className = 'rk-rank'; rk.textContent = String(e.rank);
       var nm = document.createElement('span'); nm.className = 'rk-name'; nm.textContent = cleanProfileName(String(e.name || '')) || DEFAULT_PLAYER_NAME;
       var sc = document.createElement('span'); sc.className = 'rk-score'; sc.textContent = fmtPoints(clampInt(e.score, 0, STAT_MAX)) + '点';
       var sub = document.createElement('span'); sub.className = 'rk-sub';
-      sub.textContent = (ZAN_GRADE_NAMES.indexOf(e.grade)>=0 ? '完成度 ' + e.grade + '・' : '') + 'コンボ ' + clampInt(e.combo, 0, STAT_MAX) + (e.trick ? '・イタズラ' : '') + zanModLabels(sanitizeMods(e.mods)).map(function(l){ return '・' + l; }).join('') + (e.me ? '・あなた' : '');
+      sub.textContent = rankEntrySub(e);
       li.appendChild(rk); li.appendChild(nm); li.appendChild(sc); li.appendChild(sub);
       list.appendChild(li);
     });
@@ -15344,6 +15597,7 @@ function groupFromLocation(){
   if(!code){ showToast('合言葉のリンクが読めませんでした。'); return; }
   openRanking(null);
   document.getElementById('rk-group-in').value = code;
+  try{ document.querySelector('.rk-group').scrollIntoView({block:'center'}); }catch(e){}
   document.getElementById('rk-group-msg').textContent = SyncManager.isLoggedIn() ? '合言葉「' + code + '」に入るには「この合言葉で入る」を押してください。' : 'マイページでログインしてから、合言葉「' + code + '」で「この合言葉で入る」を押してください。';
 }
 window.addEventListener('hashchange', groupFromLocation);
@@ -16182,6 +16436,7 @@ function renderZanHome(){
   zanPrepSelected();
   renderDuelHome();
   renderClipToggle();
+  renderHomeRank();
   var z = null, sel = zanSelectedCourse();
   try{ z = loadStore().zan; }catch(e){}
   var cards = document.querySelectorAll('.zan-course');
