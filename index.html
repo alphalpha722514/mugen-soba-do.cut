@@ -1113,6 +1113,9 @@ body{
 .ob-pic svg{display:block;width:100%;height:auto;}
 .ob-h:focus{outline:none;}
 .ob-text{margin:0;font-size:.86rem;line-height:1.75;text-align:left;min-height:6.2em;}
+.ob-sound{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;padding:8px 10px;box-sizing:border-box;border-radius:10px;background:var(--muted-fill);border:1px solid var(--line);}
+.ob-sound[hidden]{display:none;}
+.ob-sound-state{margin:0;font-size:.8rem;font-weight:700;line-height:1.6;text-align:center;}
 .ob-dots{display:flex;gap:6px;}
 .ob-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);}
 .ob-dots i.is-on{background:var(--accent-ink);}
@@ -2211,11 +2214,15 @@ body{
   <div id="onboard" class="zmodal onboard" hidden>
     <div class="zmodal-backdrop"></div>
     <div class="zmodal-card ob-card" role="dialog" aria-modal="true" aria-labelledby="ob-h" aria-describedby="ob-text">
-      <p class="ob-top"><span class="ob-eyebrow">はじめての修行</span><span id="ob-step" class="ob-step">1 / 4</span></p>
+      <p class="ob-top"><span class="ob-eyebrow">はじめての修行</span><span id="ob-step" class="ob-step">1 / 5</span></p>
       <div id="ob-pic" class="ob-pic" aria-hidden="true"></div>
       <h3 id="ob-h" class="zm-name ob-h" tabindex="-1"></h3>
       <p id="ob-text" class="ob-text"></p>
-      <div id="ob-dots" class="ob-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div id="ob-sound" class="ob-sound" hidden>
+        <p id="ob-sound-state" class="ob-sound-state" role="status" aria-live="polite"></p>
+        <button id="ob-sound-test" class="btn-small btn-primary" type="button">音を鳴らしてみる</button>
+      </div>
+      <div id="ob-dots" class="ob-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
       <div class="ob-nav">
         <button id="ob-prev" class="btn-small" type="button">戻る</button>
         <button id="ob-next" class="btn-small btn-primary" type="button">次へ</button>
@@ -2606,7 +2613,7 @@ var SCHEMA_VERSION = 14;   // 10 → 11: 段位 becomes 称号 (stats, profile, 
                            // Older saves are carried over
                            // by coerceStore (each kept first as echizenSoba.v1.backup-s<its schema>)
 var LEGACY_KEYS = ['soba-dojo-bests','bestScores','soba-best','sobaBests'];
-var ONBOARDING_VERSION = 2;   // settings.onboarding.version: the rules guide a player has seen (2: リズム修行・斬; a player who saw 1 sees it once more)
+var ONBOARDING_VERSION = 3;   // settings.onboarding.version: the rules guide a player has seen (2: リズム修行・斬, 3: the page 「まず音をオンに」 first; a player who saw an older one sees it once more)
 var QUIZ_PER_DAY = 3;         // the daily quiz: three questions a day, the same three for everyone on that date
 var DEFAULT_BGM_VOLUME = 0.4; // settings.sound.bgmVolume when a save has none
 // settings.visual.detail: how finely the bowl is drawn. Looks only; the schema stays 10 and saves without it get 'standard'.
@@ -13255,29 +13262,35 @@ document.getElementById('btn-feedback').addEventListener('click', function(){
                 : ('フォームが開かないときは、こちらのURLから送れます：' + FEEDBACK_URL));
 });
 
-// --- はじめてのルール説明 (4 slides) ---
+// --- はじめてのルール説明 (5 slides: the sound first, then the rules of 斬) ---
 var OB_SLIDES = [
-  {h:'① 師匠のお手本を見て聴く', t:'まず師匠が1小節、お手本を切って見せます。流れてくる金色の印と「トン・トン」の音で、切るリズムを覚えましょう。',
+  {h:'① まず音をオンに！', t:'音に合わせて切るゲームなので、音が聞こえないと遊べません。スマホの消音モード（マナーモード）を解除して、音量を上げてから遊んでください。iPhoneは本体横のスイッチ（アクションボタンの機種はコントロールセンター）で解除できます。イヤホンがおすすめです。', sound:true,
+   svg:'<svg class="ob-svg" viewBox="0 0 240 110"><path class="soft" d="M14 46 h10 l12 -10 v38 l-12 -10 h-10z"/><path class="st" d="M44 44 l14 22 M58 44 l-14 22" style="stroke:var(--accent2-ink);stroke-width:3"/>' +
+       '<text class="soft" x="78" y="62" font-size="18" text-anchor="middle">→</text><rect class="sk" x="94" y="6" width="58" height="98" rx="9"/><rect class="ac" x="89" y="24" width="5" height="14" rx="1.5"/>' +
+       '<path class="ink" d="M106 46 h9 l11 -9 v36 l-11 -9 h-9z"/><path class="st" d="M131 46 q6 9 0 18 M136 40 q11 15 0 30 M141 34 q16 21 0 42" style="stroke:var(--accent2-ink);stroke-width:2.4"/>' +
+       '<circle class="ink" cx="186" cy="42" r="8"/><circle class="ink" cx="216" cy="42" r="8"/><path class="st" d="M186 50 q2 24 15 30 q13 -6 15 -30 M201 80 v14" style="stroke-width:2.2"/>' +
+       '<text class="soft" x="201" y="24" font-size="12" text-anchor="middle">イヤホン推奨</text></svg>'},
+  {h:'② 師匠のお手本を見て聴く', t:'まず師匠が1小節、お手本を切って見せます。流れてくる金色の印と「トン・トン」の音で、切るリズムを覚えましょう。',
    svg:'<svg class="ob-svg" viewBox="0 0 240 110"><rect class="bd2" x="8" y="58" width="224" height="34" rx="4"/><rect class="bd" x="8" y="62" width="224" height="26" rx="3"/><rect class="dg" x="8" y="66" width="60" height="18" rx="2"/>' +
        '<rect class="gd" x="78" y="60" width="6" height="30" rx="1"/><rect class="gd" x="118" y="60" width="6" height="30" rx="1"/><rect class="gd" x="158" y="60" width="6" height="30" rx="1"/><rect class="gd" x="198" y="60" width="6" height="30" rx="1"/>' +
        '<path d="M16 56 q18 -24 36 0 z" style="fill:#3d5a63"/><circle cx="34" cy="30" r="12" style="fill:#e8c39e"/><rect class="ac" x="22" y="24" width="24" height="5" rx="1"/><path class="stl" d="M50 22 h26 v30 h-26z"/><rect class="ink" x="52" y="22" width="22" height="7" rx="1"/>' +
        '<text class="soft" x="160" y="36" font-size="17" text-anchor="middle">トン　トン♪</text></svg>'},
-  {h:'② あなたの番：同じリズムで切る', t:'次の小節は「あなたの番」。お手本と同じリズムで画面をタップ（パソコンはスペースキー）。赤い印が包丁に重なった瞬間なら「Perfect」。包丁がまな板まで切り下ろされます。',
+  {h:'③ あなたの番：同じリズムで切る', t:'次の小節は「あなたの番」。お手本と同じリズムで画面をタップ（パソコンはスペースキー）。赤い印が包丁に重なった瞬間なら「Perfect」。包丁がまな板まで切り下ろされます。',
    svg:'<svg class="ob-svg" viewBox="0 0 240 110"><rect class="bd2" x="8" y="58" width="224" height="34" rx="4"/><rect class="bd" x="8" y="62" width="224" height="26" rx="3"/><rect class="dg" x="8" y="66" width="70" height="18" rx="2"/>' +
        '<line class="ln" x1="80" y1="40" x2="80" y2="100"/><rect class="ac" x="77" y="60" width="6" height="30" rx="1"/><rect class="ac" x="137" y="60" width="6" height="30" rx="1"/><rect class="ac" x="193" y="60" width="6" height="30" rx="1"/>' +
        '<path class="stl" d="M50 40 h30 v34 h-30z"/><rect class="ink" x="52" y="40" width="26" height="8" rx="2"/><text class="ac" x="104" y="36" font-size="22">Perfect</text></svg>'},
-  {h:'③ 長押しでタメ切り', t:'「斬」の帯が来たら、押したまま溜めて、「斬」の拍で離すと一刀両断。タメ切りも、師匠が先にお手本を見せてくれます。',
+  {h:'④ 長押しでタメ切り', t:'「斬」の帯が来たら、押したまま溜めて、「斬」の拍で離すと一刀両断。タメ切りも、師匠が先にお手本を見せてくれます。',
    svg:'<svg class="ob-svg" viewBox="0 0 240 110"><rect class="bd2" x="8" y="58" width="224" height="34" rx="4"/><rect class="bd" x="8" y="62" width="224" height="26" rx="3"/><rect class="dg" x="8" y="66" width="70" height="18" rx="2"/>' +
        '<rect class="ac" x="80" y="68" width="110" height="14" rx="2" opacity=".45"/><rect class="ac" x="77" y="60" width="6" height="30" rx="1"/><rect class="ink" x="186" y="56" width="14" height="38" rx="2"/>' +
        '<text x="193" y="80" font-size="12" text-anchor="middle" style="fill:#fff4dc">斬</text><path class="stl" d="M50 14 h30 v34 h-30z"/><rect class="ink" x="52" y="14" width="26" height="8" rx="2"/>' +
        '<text class="soft" x="150" y="36" font-size="16" text-anchor="middle">ぐーっと溜めて…</text></svg>'},
-  {h:'④ 目指せ極上', t:'コースを選んで1曲（約80〜90秒）。完成度「極上」を目指しましょう。そば猪口コインでガチャや着せ替え、称号・本日のチャレンジ・クイズも楽しめます。音とずれると感じたら「試し切り」で合わせられます。',
+  {h:'⑤ 目指せ極上', t:'コースを選んで1曲（約80〜90秒）。完成度「極上」を目指しましょう。そば猪口コインでガチャや着せ替え、称号・本日のチャレンジ・クイズも楽しめます。音とずれると感じたら「試し切り」で合わせられます。',
    svg:'<svg class="ob-svg" viewBox="0 0 240 110"><circle class="gd" cx="120" cy="56" r="40" opacity=".22"/><circle class="gd" cx="120" cy="56" r="28" opacity=".35"/>' +
        '<text class="ink" x="120" y="66" font-size="28" text-anchor="middle">極上</text>' +
        '<path class="gd" d="M44 30 l4 9 10 1 -8 6 3 10 -9 -6 -9 6 3 -10 -8 -6 10 -1z"/><path class="gd" d="M196 64 l3 7 8 1 -6 5 2 8 -7 -5 -7 5 2 -8 -6 -5 8 -1z"/><path class="gd" d="M184 16 l2 5 6 .5 -4.5 3.5 1.5 6 -5 -3.5 -5 3.5 1.5 -6 -4.5 -3.5 6 -.5z"/></svg>'}
 ];
 var obEls = {};
-['onboard','ob-step','ob-pic','ob-h','ob-text','ob-dots','ob-prev','ob-next','ob-hide','ob-start'].forEach(function(id){ obEls[id] = document.getElementById(id); });
+['onboard','ob-step','ob-pic','ob-h','ob-text','ob-sound','ob-sound-state','ob-sound-test','ob-dots','ob-prev','ob-next','ob-hide','ob-start'].forEach(function(id){ obEls[id] = document.getElementById(id); });
 var obIndex = 0, obOpener = null, obPendingRewards = null;   // 限定 items unlocked at start wait until the guide is closed
 function renderOnboarding(){
   var sl = OB_SLIDES[obIndex];
@@ -13289,7 +13302,23 @@ function renderOnboarding(){
   for(var i=0;i<dots.length;i++) dots[i].classList.toggle('is-on', i===obIndex);
   obEls['ob-prev'].disabled = obIndex===0;
   obEls['ob-next'].hidden = obIndex>=OB_SLIDES.length - 1;
+  obEls['ob-sound'].hidden = !sl.sound;
+  if(sl.sound) renderObSound(false);
 }
+// 「まず音をオンに」: the game's own sound setting (🔊／🔇), and a button that tries the sound. While 🔇 the button
+// turns the sound on first (the player's own choice, the same as pressing 🔇); nothing sounds without it.
+function renderObSound(tried){
+  obEls['ob-sound-state'].textContent = !audioEnabled ? 'いまのゲームの音：🔇 オフ（このままでは音が出ません）'
+    : tried ? '🔊「チーン♪」が聞こえたら準備OK！ 聞こえないときは、消音モードと音量を確かめてください。'
+    : 'いまのゲームの音：🔊 オン';
+  obEls['ob-sound-test'].textContent = audioEnabled ? '音を鳴らしてみる' : '音をオンにして鳴らしてみる';
+}
+obEls['ob-sound-test'].addEventListener('click', function(){
+  if(!audioEnabled){ audioEnabled = true; saveSoundPref(true); syncSoundButtons(); }
+  wakeAudio();
+  zanCritChime();
+  renderObSound(true);
+});
 function openOnboarding(opener){
   obOpener = opener || null;
   obIndex = 0;
