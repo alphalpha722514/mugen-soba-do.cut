@@ -23,11 +23,16 @@ const RANK_COURSES = {                        // 曲ごとの判定の数（同�
 const RANK_WIN = {crit: 10, perfect: 35, ok: 80};          // 判定の幅（ms・全コース共通）。極・一閃は ±10
 const RANK_WIN_STRICT = {crit: 7, perfect: 15, ok: 40};    // 修行の心得「極・判定」
 const RANK_SPEED_MULT = {'1': 1, '1.2': 1.1, '1.5': 1.2};  // 修行の心得「速切り」の倍率（極・判定・心眼は ×1.1）
-// クラス番付（合言葉）: 同じ合言葉の人だけの番付。合言葉は6文字（I・O・0・1 は使わない）。誰が入ったかは本人の記録を消すためにだけ覚える
-const GROUP_RE = /^[A-HJ-NP-Z2-9]{6}$/;
+// クラス番付（合言葉）: 同じ合言葉の人だけの番付。合言葉はプレイヤーが決める4〜16文字（ひらがな・カタカナ・漢字・英字・数字・ー）。
+// 全角／半角・大文字／小文字は同じに扱う（NFKC のあと大文字。ゲームの rankGroupOf と同じ）。誰が入ったかは本人の記録を消すためにだけ覚える
+const GROUP_RE = /^[0-9A-Zぁ-ゖァ-ヺー一-鿿々]{4,16}$/;
 const RANK_GROUP_TTL = 60 * 60 * 24 * 180;   // 合言葉の全期間の番付は、最後の記録から180日で消える
 const RANK_GROUPS_MAX = 5;                    // 1人が覚えておく合言葉の数（古いものから忘れる。その番付は期限で消える）
-function groupOf(v) { return typeof v === 'string' && GROUP_RE.test(v) ? v : ''; }
+function groupOf(v) {
+  if (typeof v !== 'string' || v.length > 64) return '';
+  const t = v.trim().normalize('NFKC').toUpperCase();
+  return GROUP_RE.test(t) ? t : '';
+}
 const RANK_POINTS = [[100, 50], [50, 25], [300, 150]];   // [通常, タメの頭, タメの斬] の [Perfect, OK]
 const RANK_GRADES = [['極上', 95, true], ['特上', 85, false], ['上', 70, false], ['並', 0, false]];
 // 判定の記録 judges: [[拍×4, ずれms|null, 種類 0/1/2, 判定 0 Perfect・1 OK・2 Miss・3 フェイントにつられた, 殿様 0/1], …]（ゲームで起きた順）
