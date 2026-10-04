@@ -913,6 +913,9 @@ body{
 .rank-result-big b{font-family:var(--font-display);font-size:2.6rem;line-height:1.1;color:#7a1f14;}
 .rank-result-gap{margin:0 0 10px;font-size:.92rem;font-weight:700;line-height:1.5;}
 .rank-result-gap b{color:#7a1f14;}
+.rank-result-class{margin:-4px 0 10px;padding-top:8px;border-top:1px dashed rgba(122,90,22,.45);font-size:.88rem;font-weight:700;line-height:1.5;}
+.rank-result-class[hidden]{display:none;}
+.rank-result-class b{color:#7a1f14;}
 .home-rank{margin:0 0 14px;padding:14px 16px;}
 .home-rank-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
 .home-rank-h{margin:0;font-family:var(--font-display);font-size:1.3rem;}
@@ -1716,7 +1719,7 @@ body{
         <li><b>一時停止・やり直し</b>画面右上の「⏸」（パソコンは Esc か P キー）で一時停止し、「再開」「最初からやり直す」「コースを選び直す」を選べます。R キーですぐに最初からやり直せます。再開とやり直しは「3・2・1」の合図のあとに始まります。ほかのアプリに切り替えたときも一時停止します。やめた曲は記録されません。</li>
         <li><b>修行の心得</b>ホームで曲に縛りをかけられます。「速切り」1.2x・1.5x（曲と印が速くなる。得点・コイン×1.1・×1.2）、「極・判定」（極・一閃±7ms・Perfect±15ms・OK±40ms。×1.1）、「心眼」（伴奏が消え、小節の頭の和太鼓と師匠のお手本の音だけ。×1.1）。重ねると倍率もかけ合わせます。記録はいつもの自己ベスト・番付に入り、リザルトとベストに心得の印がつきます（区間練習では使いません）。</li>
         <li><b>ひょっこり客</b>あなたの番の1小節が終わるたびに、画面の下からお客さんが顔を出して、その小節の出来（全部Perfect・OKまじり・Missあり）に反応します。全部Perfectの小節が2回続くと蕎麦奉行、4回でお姫様、6回で殿様が来店します。殿様が来店すると「殿様ご来店！ 倍率UP」と出て、そこからあなたの番2小節ぶん（16拍）、コンボ倍率が+0.2されます。蕎麦奉行・お姫様とふつうのお客さんは見た目だけで、得点は変わりません。</li>
-        <li><b>番付</b>ホームの「番付を見る」で、コースごとの「今週」と「全期間」の上位50人が見られます（ログインが必要）。「番付に参加する」を選ぶと、それから遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラと修行の心得の有無）が番付に送られます。サーバーで判定の記録から得点を計算し直して載せる参考記録です。送れなくても、この端末の記録はそのまま残ります。参加をやめると番付から消えます。上位3人は「横綱・大関・関脇」の表彰台に並び、あなたの順位と「1つ上を抜くまであと何点」が、番付の画面・ホームの「今週の番付」・1曲ごとのリザルトに出ます（前に見たときから上がったか下がったかも）。<br>番付の画面の「クラス番付（合言葉）」に、みんなで決めた合言葉（4〜16文字。ひらがな・カタカナ・漢字・英字・数字・ー）を入れると、同じ合言葉を入れた人どうしの番付ができます（全体の番付に参加しなくても使えます）。本名や学校名など、だれかわかる言葉は使わないでください。「合言葉を送る」でリンクを送れます。抜けると、そのクラス番付からあなたの記録が消えます。</li>
+        <li><b>番付</b>ホームの「番付を見る」で、コースごとの「今週」と「全期間」の上位50人が見られます（ログインが必要）。「番付に参加する」を選ぶと、それから遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラと修行の心得の有無）が番付に送られます。サーバーで判定の記録から得点を計算し直して載せる参考記録です。送れなくても、この端末の記録はそのまま残ります。参加をやめると番付から消えます。上位3人は「横綱・大関・関脇」の表彰台に並び、あなたの順位と「1つ上を抜くまであと何点」が、番付の画面・ホームの「今週の番付」・1曲ごとのリザルトに出ます（前に見たときから上がったか下がったかも）。<br>番付の画面の「クラス番付（合言葉）」に、みんなで決めた合言葉（4〜16文字。ひらがな・カタカナ・漢字・英字・数字・ー）を入れると、同じ合言葉を入れた人どうしの番付ができます（合言葉に入ると全体の番付にも参加し、記録は全体とクラスの両方に載ります）。本名や学校名など、だれかわかる言葉は使わないでください。「合言葉を送る」でリンクを送れます。抜けると、そのクラス番付からあなたの記録が消えます。</li>
         <li><b>ゴースト</b>ホームで「ゴースト」をアリにすると、そのコースで自己ベストを出したときの包丁が、半透明の青い包丁であなたの包丁と一緒に切ります。自分のベストより早いか遅いかが見えます（見た目だけで、得点や判定は変わりません）。ゴーストは自己ベストを更新したときに残ります。</li>
         <li><b>区間練習</b>ホームの「区間練習」で、選んだコースの1区間（お手本・刻み・タメ切り など）だけを3回くり返して練習できます。速さは0.8倍・0.9倍・1.0倍。得点・ベスト・コイン・称号・チャレンジには入りません（師匠のイタズラはなし）。途中でやめるときは画面下の「練習をやめる」。終わるとホームに、その練習のPerfect・OK・Missが出ます。</li>
         <li><b>ふりかえり</b>リザルトに、極上まであと何回OKをPerfectにすればよいか（Missがあるときは「Miss 0」が条件であること）と、曲の区間ごとのMissの数とずれの帯が出ます。いちばんMissの多かった区間を「苦手」として示し、コースごとに区間のMissの累計を記録します。</li>
@@ -2067,7 +2070,7 @@ body{
       </div>
       <div class="rk-group card">
         <p class="rk-group-h">クラス番付（合言葉）</p>
-        <p class="rk-note">みんなで決めた合言葉を入れた人どうしで作る番付です。合言葉を知っている人なら誰でも見られます（チャットなどはありません）。全体の番付に参加しなくても使えます。</p>
+        <p class="rk-note">みんなで決めた合言葉を入れた人どうしで作る番付です。合言葉を知っている人なら誰でも見られます（チャットなどはありません）。合言葉に入ると全体の番付にも参加し、記録は全体とクラスの両方に載ります。</p>
         <p class="rk-note">合言葉は4〜16文字（ひらがな・カタカナ・漢字・英字・数字・ー）。ほかの人とかぶらない言葉にしてください。<b>本名や学校名など、だれかわかる言葉は使わないでください。</b></p>
         <div id="rk-group-off" class="rk-group-row">
           <input id="rk-group-in" class="rk-group-in" type="text" autocomplete="off" spellcheck="false" maxlength="16" placeholder="4〜16文字" aria-label="合言葉（4〜16文字）">
@@ -2163,6 +2166,7 @@ body{
       <p id="rank-result-h" class="rank-result-h">今週の番付</p>
       <p class="rank-result-big"><b id="rank-result-rank"></b><span id="rank-result-move" class="rk-move"></span></p>
       <p id="rank-result-gap" class="rank-result-gap"></p>
+      <p id="rank-result-class" class="rank-result-class" hidden></p>
       <button id="btn-rank-result" class="btn-sub" type="button">番付を見る</button>
     </section>
     <section id="ippai-box" class="duel-box ippai-box" aria-labelledby="ippai-box-h" hidden>
@@ -3562,6 +3566,7 @@ function withDailyDefaults(st, played){
   out.clip = out.clip===true;                        // ハイライト録画 (V5; off unless turned on)
   out.rankJoin = out.rankJoin===true;                // 番付に参加する (this device; off unless chosen)
   out.rankGroup = rankGroupOf(out.rankGroup);       // クラス番付の合言葉 (V5; this device; '' = none)
+  if(out.rankGroup) out.rankJoin = true;             // (a class member's records go to the whole board too)
   out.mods = sanitizeMods(out.mods);                 // 修行の心得 (速切り・極・判定・心眼)
   return out;
 }
@@ -15271,7 +15276,7 @@ function zanRankPayload(r){
   try{ name = loadStore().profile.name; }catch(e){}
   var st = {};
   try{ st = loadStore().settings; }catch(e){}
-  return {pub:st.rankJoin===true, group:rankGroupOf(st.rankGroup) || undefined, course:zan.course.id, chart:zan.song.baseId || zan.song.id, mods:{speed:zan.mods.speed, strict:zan.mods.strict, blind:zan.mods.blind}, score:zan.score, grade:r.grade, perfect:r.perfect, combo:r.combo, trick:!!zan.trick, name:name || DEFAULT_PLAYER_NAME, judges:j};   // (the chart without the 心得; the 心得 apart)
+  return {pub:st.rankJoin===true || !!rankGroupOf(st.rankGroup), group:rankGroupOf(st.rankGroup) || undefined, course:zan.course.id, chart:zan.song.baseId || zan.song.id, mods:{speed:zan.mods.speed, strict:zan.mods.strict, blind:zan.mods.blind}, score:zan.score, grade:r.grade, perfect:r.perfect, combo:r.combo, trick:!!zan.trick, name:name || DEFAULT_PLAYER_NAME, judges:j};   // (the chart without the 心得; the 心得 apart)
 }
 function zanRankSend(r){
   var el = document.getElementById('rank-sent');
@@ -15286,7 +15291,7 @@ function zanRankSend(r){
   SyncManager.rankSubmit(payload).then(function(res){
     if(!el) return;
     if(res.ok) zanRankResult(payload.course);        // 今週の順位を大きく
-    el.textContent = res.ok ? (join ? '番付に送りました（参考記録）。' : 'クラス番付に送りました（参考記録）。') : res.error==='rejected' ? 'この記録は番付に載せられませんでした。' : '番付に送れませんでした（記録はこの端末に残っています）。';
+    el.textContent = res.ok ? (group ? '番付とクラス番付に送りました（参考記録）。' : '番付に送りました（参考記録）。') : res.error==='rejected' ? 'この記録は番付に載せられませんでした。' : '番付に送れませんでした（記録はこの端末に残っています）。';
   });
 }
 // --- 番付を大きく (V5.1): 横綱・大関・関脇 の表彰台、あなたの順位と「抜くまであと何点」、前に見たときからの上下 (↑↓)。
@@ -15362,7 +15367,7 @@ function rankMyBoard(){
   var st = {};
   try{ st = loadStore().settings; }catch(e){}
   var group = rankGroupOf(st.rankGroup);
-  return {join:st.rankJoin===true, group:group, use:st.rankJoin===true ? '' : group};
+  return {join:st.rankJoin===true || !!group, group:group, use:''};   // (全体の番付。クラスの順位はリザルトに並べる)
 }
 // the result: after a song is sent, this week's place on that board (and how far to the next)
 function zanRankResult(course){
@@ -15381,6 +15386,20 @@ function zanRankResult(course){
     rankStandingNodes(document.getElementById('rank-result-gap'), st);
     rankSeenSet(k, st.rank);
     box.hidden = false;
+  });
+  var cl = document.getElementById('rank-result-class');   // クラス番付にも載るので、その順位も並べる
+  cl.hidden = true;
+  if(my.group) rankFetch(course, 'week', my.group, 0).then(function(res){
+    if(!res || !res.ok || !screens.result.classList.contains('active')) return;
+    var st2 = rankStanding(Array.isArray(res.entries) ? res.entries : []);
+    if(!st2.on) return;
+    var k2 = rankSeenKey(course, 'week', my.group, res), prev2 = rankSeenGet(k2);
+    cl.textContent = '合言葉「' + my.group + '」のクラス番付では ';
+    var b = document.createElement('b'); b.textContent = (rankTitle(st2.rank) ? rankTitle(st2.rank) + '・' : '') + st2.rank + '位'; cl.appendChild(b);
+    var mv = document.createElement('span'); rankMoveNode(mv, prev2, st2.rank); mv.style.marginLeft = '6px'; cl.appendChild(mv);
+    if(st2.rank>1 && st2.up) cl.appendChild(document.createTextNode('（' + (st2.rank - 1) + '位まで あと ' + fmtPoints(st2.gapUp) + '点）'));
+    rankSeenSet(k2, st2.rank);
+    cl.hidden = false;
   });
 }
 document.getElementById('btn-rank-result').addEventListener('click', function(){
@@ -15552,7 +15571,7 @@ document.getElementById('rk-scopes').addEventListener('click', function(e){
 // the 合言葉: join (typed by the player, or from a link), send it, leave it
 function rankGroupSet(code, msgText){
   var msg = document.getElementById('rk-group-msg'), old = '';
-  try{ var store = loadStore(); old = rankGroupOf(store.settings.rankGroup); store.settings.rankGroup = code; saveStoreObj(store); }catch(e){}
+  try{ var store = loadStore(); old = rankGroupOf(store.settings.rankGroup); store.settings.rankGroup = code; if(code) store.settings.rankJoin = true; saveStoreObj(store); }catch(e){}   // (クラスに入ると、全体の番付にも参加)
   if(old && old!==code) SyncManager.rankLeave(old);   // (the old class's boards forget you)
   rankView.scope = code ? 'group' : 'all';
   msg.textContent = msgText;
@@ -15562,7 +15581,7 @@ document.getElementById('rk-group-join').addEventListener('click', function(){
   var inp = document.getElementById('rk-group-in'), code = rankGroupOf(inp.value);
   if(!code){ document.getElementById('rk-group-msg').textContent = '合言葉は4〜16文字の、ひらがな・カタカナ・漢字・英字・数字・ー で入れてください（空白や記号は使えません）。'; return; }
   inp.value = '';
-  rankGroupSet(code, '合言葉「' + code + '」に入りました。同じ合言葉を入れた人と同じ番付になります。「合言葉を送る」で友達に知らせてね。');
+  rankGroupSet(code, '合言葉「' + code + '」に入りました。これから遊んだ記録は、全体の番付とこのクラス番付の両方に載ります。「合言葉を送る」で友達に知らせてね。');
 });
 document.getElementById('rk-group-send').addEventListener('click', function(){
   var code = '', msg = document.getElementById('rk-group-msg');
@@ -15609,10 +15628,11 @@ document.getElementById('rk-periods').addEventListener('click', function(e){
 });
 document.getElementById('rk-join').addEventListener('change', function(){
   var on = this.checked, msg = document.getElementById('rk-join-msg');
-  try{ var store = loadStore(); store.settings.rankJoin = on; saveStoreObj(store); }catch(e){}
+  var hadGroup = '';
+  try{ var store = loadStore(); hadGroup = on ? '' : rankGroupOf(store.settings.rankGroup); store.settings.rankJoin = on; if(!on) store.settings.rankGroup = ''; saveStoreObj(store); }catch(e){}   // (やめるとクラス番付からも抜ける)
   msg.textContent = on ? '参加しました。これから遊んだ記録が番付に送られます。' : '番付から外れています…';
-  if(!on) SyncManager.rankLeave('global').then(function(res){
-    msg.textContent = res.ok ? '参加をやめました。番付からあなたの記録を消しました。' : '参加をやめました（番付からの削除は、通信できるときにもう一度「参加する」を外してください）。';
+  if(!on) SyncManager.rankLeave(hadGroup ? undefined : 'global').then(function(res){
+    msg.textContent = res.ok ? '参加をやめました。' + (hadGroup ? '全体とクラスの番付' : '番付') + 'からあなたの記録を消しました。' : '参加をやめました（番付からの削除は、通信できるときにもう一度「参加する」を外してください）。';
     renderRanking();
   });
   else renderRanking();
