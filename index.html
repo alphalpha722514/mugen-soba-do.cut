@@ -1073,7 +1073,43 @@ body{
 /* the home over the equipped background: the background fills the screen, the home sits on washi paper */
 .home-bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 #app{z-index:1;}
-.home.has-bg{background:var(--washi);margin-inline:-8px;padding:8px;border-radius:16px;box-shadow:0 2px 14px rgba(20,14,8,0.18);}
+.home.has-bg{gap:12px;}
+/* over the background: no sheet of paper behind the whole home. Each card is its own pane of washi, a little see-through
+   and blurring what is behind it, so the scene shows between the cards and softly through them (where color-mix or
+   backdrop-filter is missing, the card simply stays solid) */
+.home.has-bg>.card,.home.has-bg>.howto-row,.home.has-bg>.settings{
+  background:color-mix(in srgb,var(--card) 80%,transparent);
+  -webkit-backdrop-filter:blur(10px) saturate(1.15);backdrop-filter:blur(10px) saturate(1.15);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--card-shadow);
+}
+.home.has-bg .game-title,.home.has-bg .subtitle{text-shadow:0 0 2px var(--card),0 0 6px var(--card),0 0 12px var(--card),0 0 18px var(--card);}
+.home.has-bg .subtitle{color:var(--ink);}
+.home.has-bg>.howto-row{padding:8px 12px;}
+.home.has-bg>.settings{padding:4px 12px;}
+.home.has-bg .opt{background:color-mix(in srgb,var(--card) 72%,transparent);}
+.home.has-bg .opt[aria-pressed="true"]{background:color-mix(in srgb,var(--card) 72%,transparent);background-image:linear-gradient(var(--sel),var(--sel));}
+.home.has-bg .zan-toppings{background:color-mix(in srgb,var(--card) 72%,transparent);}
+/* the window onto the scene at the top of the home: the background's name and 「背景を眺める」 */
+.home-window{height:clamp(140px,26vh,240px);display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:0 2px 2px;}
+.home-window[hidden]{display:none;}
+.hw-name,.hw-view{
+  background:color-mix(in srgb,var(--card) 82%,transparent);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:999px;box-shadow:var(--card-shadow);
+}
+.hw-name{margin:0;min-width:0;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:.74rem;font-weight:700;line-height:1.4;}
+.hw-label{flex:none;font-size:.62rem;letter-spacing:.08em;color:var(--ink-soft);}
+.hw-name #hw-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hw-view{flex:none;min-height:44px;padding:0 14px;font:inherit;font-size:.78rem;font-weight:900;color:var(--accent-ink);cursor:pointer;touch-action:manipulation;}
+/* 背景を眺める: the home fades away and only the scene is left; one tap (or Esc) brings it back */
+#app{transition:opacity .25s;}
+body.bg-view #app{opacity:0;pointer-events:none;}
+.bg-view-exit{position:fixed;inset:0;z-index:5;display:flex;align-items:flex-end;justify-content:center;padding:0 16px max(24px,env(safe-area-inset-bottom));border:0;margin:0;background:none;font:inherit;color:var(--ink);cursor:pointer;}
+.bg-view-exit[hidden]{display:none;}
+.bg-view-exit>span{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:8px 18px;border-radius:999px;font-size:.78rem;font-weight:700;line-height:1.4;text-align:center;
+  background:color-mix(in srgb,var(--card) 82%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:var(--card-shadow);}
+.bg-view-exit small{font-size:.66rem;color:var(--ink-soft);}
+@media (prefers-reduced-motion:reduce){ #app{transition:none;} }
 /* 限定 group in the 図鑑 */
 .zgroup-note{margin:0;font-size:.7rem;line-height:1.5;color:var(--ink-soft);}
 .zcard-hint{color:var(--r-gen);font-weight:700;}
@@ -1475,6 +1511,7 @@ body{
 </head>
 <body>
 <canvas id="home-bg" class="home-bg" aria-hidden="true" hidden></canvas>
+<button id="bg-view-exit" class="bg-view-exit" type="button" hidden><span><span id="bg-view-name"></span><small>タップでホームにもどる</small></span></button>
 <div id="app">
 
   <section id="screen-title" class="screen active home" aria-labelledby="home-title">
@@ -1489,6 +1526,10 @@ body{
         <svg class="caret caret-right" viewBox="0 0 10 6" aria-hidden="true" focusable="false"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </header>
+    <div id="home-window" class="home-window" hidden>
+      <p class="hw-name"><span class="hw-label">背景</span><span id="hw-name"></span></p>
+      <button id="btn-bg-view" class="hw-view" type="button">背景を眺める</button>
+    </div>
 
     <section id="zan-hero" class="zan-hero card" aria-labelledby="zan-hero-h">
       <h2 id="zan-hero-h" class="zan-h"><span class="zan-seal" aria-hidden="true">斬</span>リズム修行・斬</h2>
@@ -13374,6 +13415,20 @@ document.addEventListener('keydown', function(e){
 
 // --- the equipped background behind the home (the same scene as in play), under washi paper for the text ---
 var homeBgCanvas = document.getElementById('home-bg'), homeBgKey = '';
+var homeWindow = document.getElementById('home-window'), bgViewBtn = document.getElementById('btn-bg-view'), bgViewExit = document.getElementById('bg-view-exit');
+// 背景を眺める (looks only): the home is hidden (and out of reach of taps, keys and screen readers) until one tap brings it back
+function setBgView(on){
+  var was = document.body.classList.contains('bg-view');
+  if(on===was) return;
+  document.body.classList.toggle('bg-view', on);
+  bgViewExit.hidden = !on;
+  var app = document.getElementById('app');
+  if(on){ app.setAttribute('inert', ''); app.setAttribute('aria-hidden', 'true'); document.getElementById('bg-view-name').textContent = document.getElementById('hw-name').textContent; focusEl(bgViewExit); }
+  else { app.removeAttribute('inert'); app.removeAttribute('aria-hidden'); if(screens.title.classList.contains('active')) focusEl(bgViewBtn); }
+}
+bgViewBtn.addEventListener('click', function(){ setBgView(true); });
+bgViewExit.addEventListener('click', function(){ setBgView(false); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && document.body.classList.contains('bg-view')){ e.preventDefault(); setBgView(false); } });
 function homeBgLook(){
   try{
     var g = loadStore().gacha, id = g.equipped.bg;
@@ -13386,7 +13441,9 @@ function renderHomeBg(){
   if(!homeBgCanvas) return;
   var b = homeBgLook(), homeScr = screens.title;
   homeScr.classList.toggle('has-bg', !!b);
-  if(!b){ homeBgCanvas.hidden = true; homeBgKey = ''; return; }
+  homeWindow.hidden = !b;
+  if(b){ var bgIt = gachaItem(b.id); document.getElementById('hw-name').textContent = bgIt ? bgIt.name : '着せ替えの背景'; }
+  if(!b){ setBgView(false); homeBgCanvas.hidden = true; homeBgKey = ''; return; }
   homeBgCanvas.hidden = !homeScr.classList.contains('active');
   var w = Math.max(1, window.innerWidth || 360), h = Math.max(1, window.innerHeight || 640), dpr = Math.min(window.devicePixelRatio || 1, 2);
   var useImg = bgImageReady(b.id);
@@ -13410,7 +13467,7 @@ function renderHomeBg(){
 }
 function syncHomeBg(onHome){
   if(!homeBgCanvas) return;
-  if(!onHome){ homeBgCanvas.hidden = true; return; }
+  if(!onHome){ setBgView(false); homeBgCanvas.hidden = true; return; }
   renderHomeBg();
 }
 var homeBgResizeTimer = 0;
