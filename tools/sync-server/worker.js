@@ -4,6 +4,7 @@
 // 番付（参加した人だけ）: POST /ranking（Bearer・判定の記録つき。サーバーで得点を計算し直す。pub:false なら全体には載せず、group:合言葉 の
 // クラス番付だけに載せる） ／ GET /ranking?course=&period=week|all[&group=合言葉]（Bearer があれば自分の行に me:true）
 // ／ DELETE /ranking[?scope=global | ?group=合言葉]（Bearer。番付から自分を消す。指定なしは全部。アカウント削除でも全部消える）
+// ／ GET /ranking/prize（Bearer。先週と先々週の、コースごとの全体の週間番付で一位だったか → {wins:[{week, course}]}。番付一位の引換券。クラス番付は対象外）
 const MAX_CHARS = 512 * 1024;            // 1人分のセーブの上限
 const TOKEN_TTL = 60 * 60 * 24 * 180;    // ログインの有効期限: 180日
 const USER_RE = /^[A-Za-z0-9_\-ぁ-ゖァ-ヺー一-鿿々]{3,16}$/;
@@ -241,6 +242,28 @@ export default {
         rec.updatedAt = Date.now();
         await env.DB.put(key, JSON.stringify(rec));
         return json({ok: true, updatedAt: rec.updatedAt});
+      }
+      if (path === '/ranking/prize' && req.method === 'GET') {
+        // 番付一位の引換券：終わった週（先週・先々週）の、全体の週間番付の一位。同点は先に出した人（番付の並びと同じ）
+        const key = await sessionKey(req, env), rec = key ? await env.DB.get(key, 'json') : null;
+        if (!rec) return json({ok: false, error: 'session'});
+        const uid = await rankUid(key), now = Date.now(), db = await rankDb(env), wins = [];
+        for (const back of [1, 2]) {
+          const week = rankWeek(now, back);
+          for (const course of Object.keys(RANK_COURSES)) {
+            const board = course + ':w' + week;
+            let top = null;
+            if (db) {
+              await rankImport(db, env, board);
+              top = await db.prepare('SELECT uid FROM rank WHERE board = ? ORDER BY score DESC, at ASC LIMIT 1').bind(board).first('uid');
+            } else {
+              const list = await rankRead(env, 'rank:' + board);
+              top = list[0] ? list[0].uid : null;
+            }
+            if (top === uid) wins.push({week, course});
+          }
+        }
+        return json({ok: true, wins});
       }
       if (path === '/ranking' && req.method === 'GET') {
         const q = new URL(req.url).searchParams, course = q.get('course') || '', period = q.get('period') === 'all' ? 'all' : 'week';
