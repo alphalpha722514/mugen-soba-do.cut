@@ -729,6 +729,9 @@ body{
 .result-rank{font-size:1.15rem;font-weight:700;margin-bottom:20px;color:var(--accent2-ink);}
 .result-stats{background:var(--card);border-radius:16px;padding:18px 28px;box-shadow:0 4px 12px var(--shadow);margin-bottom:28px;line-height:2.1;border:1px solid var(--line);min-width:240px;}
 .result-stats p{margin:0;display:flex;justify-content:space-between;gap:24px;}
+.result-stats p.zan-r-top{margin-top:-4px;font-size:.84em;color:var(--accent2-ink);font-weight:700;}
+.result-stats p.zan-r-top[hidden]{display:none;}
+.zan-r-top small{display:block;font-size:.82em;font-weight:400;color:var(--ink-soft);}
 .result-stats span{font-weight:700;color:var(--ink);}
 /* ---------- Result: save the result as a picture ---------- */
 .share-box{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:340px;margin:22px 0 28px;}
@@ -873,6 +876,7 @@ body{
 .zt-now{flex:1 1 auto;min-width:0;text-align:right;font-size:.7rem;font-weight:700;color:var(--ink-soft);line-height:1.4;}
 .zt-now.is-on{color:var(--accent2-ink);}
 .zt-now span{display:inline-block;white-space:nowrap;}
+.zt-now .zt-mult{display:block;white-space:nowrap;color:var(--accent-ink);font-weight:900;}
 .zt-chev{flex:none;width:9px;height:9px;border-right:2px solid var(--ink-soft);border-bottom:2px solid var(--ink-soft);transform:rotate(45deg);margin:-4px 2px 0 2px;transition:transform .15s;}
 .zan-toppings[open] .zt-chev{transform:rotate(-135deg);margin-top:4px;}
 .zt-body{display:grid;gap:12px;padding:4px 12px 12px;border-top:1px solid var(--line);padding-top:10px;}
@@ -2245,6 +2249,7 @@ body.bg-view #app{opacity:0;pointer-events:none;}
     </div>
     <div id="zan-stats" class="result-stats zan-stats" hidden>
       <p>得点 <span id="zan-r-score">0</span></p>
+      <p id="zan-r-top-row" class="zan-r-top" hidden><span>うちトッピング分<small id="zan-r-top-what"></small></span><span id="zan-r-top">+0</span></p>
       <p>自己ベスト <span id="zan-r-best">0</span></p>
       <p>極・一閃（CRITICAL） <span id="zan-r-crit">0</span></p>
       <p>Perfect <span id="zan-r-perfect">0</span></p>
@@ -13541,9 +13546,10 @@ window.addEventListener('resize', function(){
 // has not seen the newest one gets the telop on the home; 「内容を見る」 lists what changed. Which one was seen is
 // kept on this device only (STORE_KEY + '.updateSeen', not synced). A first visit marks them seen without a telop.
 var UPDATE_NOTES = [
-  {v:'2026.10.06', date:'2026-10-06', title:'ふりかえりの「詳しく」と、更新のお知らせ', items:[
+  {v:'2026.10.06', date:'2026-10-06', title:'ふりかえりの「詳しく」・更新のお知らせ・トッピングの得点', items:[
     'リザルトの「ふりかえり」に「詳しく」ボタン。区間ごとに 極・一閃／Perfect／OK／Miss（つられた）の数を表で見られます。',
-    'ゲームが新しくなったら、ホームにこのお知らせが流れるようになりました。設定の「更新のお知らせ」からいつでも見返せます。'
+    'ゲームが新しくなったら、ホームにこのお知らせが流れるようになりました。設定の「更新のお知らせ」からいつでも見返せます。',
+    'トッピングで増えた得点が見えるように。リザルトに「うちトッピング分 +○」、お好みトッピングのボタンに「得点×1.2」などの倍率を出します。'
   ]},
   {v:'2026.10.05', date:'2026-10-05', title:'ホームの背景と、お好みトッピング', items:[
     'ホームで、着せ替えで選んだ背景がカード越しに見えるように。「背景を眺める」で背景だけを眺められます。',
@@ -14726,6 +14732,7 @@ function zanHit(n, part, err){
   var mult = 1 + Math.min(1, Math.floor(zan.combo/10)*0.1) + (tonoOn ? ZAN_TONO_BONUS : 0);   // ×1.0 → ×2.0 over 100 in a row
   var base = ZAN_POINTS[kind][rating==='PERFECT' ? 0 : 1]*(crit ? ZAN_CRIT_MULT : 1);   // 極・一閃: ×1.5
   zan.score += Math.round(base*mult*(zan.trick ? ZAN_TRICK_SCORE : 1)*zan.modMult);   // (イタズラ ×1.2, 修行の心得 ×modMult)
+  zan.scorePlain += Math.round(base*mult);           // (the same cut without the toppings: the result shows the difference)
   if(rating==='PERFECT') zan.perfect++; else zan.ok++;
   if(crit) zan.crit++;
   zan.errs.push(err*1000);
@@ -15065,7 +15072,7 @@ function startZan(courseId, backing, practice){
   try{ var gs = loadStore(); if(duel) ghost = zanGhostLoad(duel.ghost, song, tm); else if(!practice && gs.settings.ghost===true) ghost = zanGhostLoad(gs.zan.courses[course.id].ghost, song, tm); }catch(e){ ghost = null; }   // (挑戦状: the sender's knife)
   zan = {course:course, song:song, tempo:tm, win:zanWindows(course, mods.strict), mods:mods, modMult:zanModMult(mods), travel:ZAN_TRAVEL/mods.speed, crit:0, judges:[], tono:null, ghost:ghost, duel:duel, ippai:ippai, practice:practice || null, trick:trick, buzz:buzz, fooled:0, trickFrom:trickFrom, backing:backing || null, backingSrc:null, offset:loadZanOffset(), paused:null,
          notes:notes, mEvents:zanMasterEvents(notes), mDrawIdx:0, pKnife:zanKnife(), mKnife:zanKnife(), cuts:[], firstOpen:0, demoIdx:0, schedBeat:zanT2B(-ZAN_LEAD, tm), ac:null, aligned:false, t0:0,
-         p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, perfect:0, ok:0, miss:0, errs:[],
+         p0:performance.now() + ZAN_LEAD*1000, bus:null, combo:0, maxCombo:0, score:0, scorePlain:0, perfect:0, ok:0, miss:0, errs:[],
          holding:null, charge:null, hitstopUntil:0, frozenT:0, texts:[], flashes:[], parts:[], slump:0, whiff:0, wordIdx:0,
          lastBeat:-1, ended:false, timer:0, captionKey:'', peeks:[], peekTurn:-1, greatRun:0};
   zan.schedBeat = Math.ceil(zan.schedBeat*4)/4;
@@ -16061,6 +16068,11 @@ function finishZan(){
   resultDailyClear.classList.remove('show');
   resultSatisfactionBest.classList.remove('show');
   var set = function(id, v){ document.getElementById(id).textContent = v; };
+  // トッピングで増えた得点（得点の計算は同じ。イタズラ×1.2・修行の心得の倍率を掛けた分を見えるように）
+  var topWhat = [].concat(zan.trick ? ['イタズラ×' + ZAN_TRICK_SCORE] : [], zan.modMult>1 ? [zanModLabels(zan.mods).join('・') + ' ×' + (Math.round(zan.modMult*100)/100)] : []);
+  document.getElementById('zan-r-top-row').hidden = !topWhat.length;
+  set('zan-r-top', '+' + Math.max(0, zan.score - zan.scorePlain));
+  set('zan-r-top-what', topWhat.join('・'));
   set('zan-r-score', String(zan.score)); set('zan-r-best', String(rec.best)); set('zan-r-crit', String(zan.crit)); set('zan-r-perfect', String(zan.perfect));
   set('zan-r-ok', String(zan.ok)); set('zan-r-miss', String(zan.miss)); set('zan-r-combo', String(zan.maxCombo));
   set('zan-r-acc', acc + '%'); set('zan-r-err', '±' + avgErr + 'ms');
@@ -16777,6 +16789,8 @@ function renderZanHome(){
     if(!tops.length) nowEl.textContent = 'ナシ';
     for(var tp=0; tp<tops.length; tp++){ var tsp = document.createElement('span'); tsp.textContent = tops[tp] + (tp<tops.length - 1 ? '・' : ''); nowEl.appendChild(tsp); }   // (a line breaks only between them)
     nowEl.classList.toggle('is-on', tops.length>0);
+    var topMult = (trickOn || (selC && selC.alwaysTrick) ? ZAN_TRICK_SCORE : 1)*zanModMult(cm);
+    if(topMult>1){ var tm = document.createElement('b'); tm.className = 'zt-mult'; tm.textContent = '得点×' + (Math.round(topMult*100)/100).toFixed(2).replace(/0$/, ''); nowEl.appendChild(tm); }
   }
   var season = zanSeason(), seEl = document.getElementById('zan-season');
   if(seEl){
