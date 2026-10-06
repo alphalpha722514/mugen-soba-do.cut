@@ -1,4 +1,4 @@
-// 無限そば道・斬 同期サーバー（Cloudflare Workers + KV。KV のバインド名は DB）
+// 無限そば道・斬 同期サーバー（Cloudflare Workers + KV。KV のバインド名は DB。番付は D1 のバインド名 RANKDB があればそちら）
 // 公開中: https://soba-sync.yfhmbvzk72.workers.dev （Cloudflare の Worker「soba-sync」の「コードを編集」に、この中身を貼って「デプロイ」）
 // POST /register・/login {user, hash} → {ok, user, token} ／ GET・PUT /save（Bearer トークン） ／ DELETE /account {hash}
 // 番付（参加した人だけ）: POST /ranking（Bearer・判定の記録つき。サーバーで得点を計算し直す。pub:false なら全体には載せず、group:合言葉 の
@@ -114,6 +114,62 @@ async function rankRemove(env, uid, scope = 'all') {
     if (rest.length) await env.DB.put('rankg:' + uid, JSON.stringify(rest)); else await env.DB.delete('rankg:' + uid);
   }
 }
+// ---- 番付の置き場（D1） ----
+// D1（バインド名 RANKDB）があると、番付を「1人1行」で持つ。行ごとに書き足すので、同じ時に何人が送っても、ほかの人の行は消えない。
+// KV の番付は1つのリストを「読む→自分を足す→書き戻す」ので、ほぼ同時に送られると後の書き戻しが先の人を消してしまう
+// （クラスで一斉に遊ぶと起きる。KV は読んだ値が最大60秒古いこともある）。RANKDB がない間は、これまでどおり KV のリストを使う。
+// KV にある記録は、その番付を D1 で初めて開いたときに一度だけ写す（imp:<番付>）。番付の名前は <コース>:all・<コース>:w<週>・
+// <コース>:g:<合言葉>:all・<コース>:g:<合言葉>:w<週>（KV のキーは 'rank:' + 番付）。
+const RANK_DDL = [
+  'CREATE TABLE IF NOT EXISTS rank (board TEXT NOT NULL, uid TEXT NOT NULL, name TEXT NOT NULL, score INTEGER NOT NULL, grade TEXT, perfect INTEGER, combo INTEGER, trick INTEGER, mods TEXT, at INTEGER NOT NULL, exp INTEGER, PRIMARY KEY (board, uid))',
+  'CREATE INDEX IF NOT EXISTS rank_top ON rank (board, score DESC, at)',
+  'CREATE TABLE IF NOT EXISTS rank_meta (k TEXT PRIMARY KEY, v TEXT)'
+];
+let rankDdl = null;
+const rankImported = new Set();
+async function rankDb(env) {
+  if (!env.RANKDB) return null;
+  if (!rankDdl) rankDdl = env.RANKDB.batch(RANK_DDL.map(q => env.RANKDB.prepare(q))).catch(e => { rankDdl = null; throw e; });
+  await rankDdl;
+  return env.RANKDB;
+}
+// 週の番付は3週間、合言葉の全期間は最後の記録から180日、全体の全期間は消えない（秒）
+function rankBoardTtl(board) { return /:w[0-9-]+$/.test(board) ? RANK_WEEK_TTL : board.includes(':g:') ? RANK_GROUP_TTL : 0; }
+async function rankImport(db, env, board) {
+  if (rankImported.has(board)) return;
+  if (!(await db.prepare('SELECT v FROM rank_meta WHERE k = ?').bind('imp:' + board).first('v'))) {
+    const ttl = rankBoardTtl(board), list = (await rankRead(env, 'rank:' + board)).filter(e => e && typeof e.uid === 'string' && Number.isFinite(e.score));
+    const st = list.map(e => db.prepare('INSERT OR IGNORE INTO rank (board, uid, name, score, grade, perfect, combo, trick, mods, at, exp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(board, e.uid, rankName(e.name), Math.floor(e.score), String(e.grade || ''), e.perfect | 0, e.combo | 0, e.trick ? 1 : 0, e.mods ? JSON.stringify(e.mods) : null, e.at || 0, ttl ? (e.at || Date.now()) + ttl * 1000 : null));
+    st.push(db.prepare('INSERT OR IGNORE INTO rank_meta (k, v) VALUES (?, ?)').bind('imp:' + board, String(Date.now())));
+    await db.batch(st);
+  }
+  rankImported.add(board);
+}
+// その人の行を、よいほうの記録で残す（名前と期限はいつも新しく）
+async function rankPutDb(db, env, board, entry) {
+  await rankImport(db, env, board);
+  const ttl = rankBoardTtl(board), exp = ttl ? entry.at + ttl * 1000 : null;
+  await db.batch([
+    db.prepare('INSERT INTO rank (board, uid, name, score, grade, perfect, combo, trick, mods, at, exp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ' +
+      'ON CONFLICT (board, uid) DO UPDATE SET score = excluded.score, grade = excluded.grade, perfect = excluded.perfect, combo = excluded.combo, ' +
+      'trick = excluded.trick, mods = excluded.mods, at = excluded.at WHERE excluded.score > rank.score')
+      .bind(board, entry.uid, entry.name, entry.score, entry.grade, entry.perfect, entry.combo, entry.trick ? 1 : 0, entry.mods ? JSON.stringify(entry.mods) : null, entry.at, exp),
+    db.prepare('UPDATE rank SET name = ?, exp = ? WHERE board = ? AND uid = ?').bind(entry.name, exp, board, entry.uid)
+  ]);
+}
+async function rankTopDb(db, env, board) {
+  await rankImport(db, env, board);
+  const r = await db.prepare('SELECT uid, name, score, grade, perfect, combo, trick, mods FROM rank WHERE board = ? AND (exp IS NULL OR exp > ?) ORDER BY score DESC, at ASC LIMIT ?')
+    .bind(board, Date.now(), RANK_TOP).all();
+  return (r.results || []).map(e => { let mods = null; try { mods = e.mods ? JSON.parse(e.mods) : null; } catch (x) {} return {...e, trick: !!e.trick, mods}; });
+}
+// scope: 'all'（全部）・'global'（全体の番付だけ）・合言葉（そのクラス番付だけ）
+async function rankRemoveDb(db, uid, scope) {
+  if (scope === 'all') await db.prepare('DELETE FROM rank WHERE uid = ?').bind(uid).run();
+  else if (scope === 'global') await db.prepare("DELETE FROM rank WHERE uid = ? AND board NOT LIKE '%:g:%'").bind(uid).run();
+  else await db.prepare('DELETE FROM rank WHERE uid = ? AND board LIKE ?').bind(uid, '%:g:' + scope + ':%').run();
+}
 async function sessionKey(req, env) {
   const m = /^Bearer ([0-9a-f]{64})$/.exec(req.headers.get('Authorization') || '');
   return m ? await env.DB.get('tok:' + m[1]) : null;
@@ -191,7 +247,8 @@ export default {
         const group = q.has('group') ? groupOf(q.get('group')) : '';
         if (!RANK_COURSES[course] || (q.has('group') && !group)) return json({ok: false, error: 'notfound'}, 404);
         const week = rankWeek(Date.now()), key = await sessionKey(req, env), me = key ? await rankUid(key) : '';
-        const list = await rankRead(env, 'rank:' + course + (group ? ':g:' + group : '') + ':' + (period === 'all' ? 'all' : 'w' + week));
+        const board = course + (group ? ':g:' + group : '') + ':' + (period === 'all' ? 'all' : 'w' + week), db = await rankDb(env);
+        const list = db ? await rankTopDb(db, env, board) : await rankRead(env, 'rank:' + board);
         return json({ok: true, course, period, week, group, entries: list.map((e, i) => ({rank: i + 1, name: e.name, score: e.score, grade: e.grade, perfect: e.perfect, combo: e.combo, trick: e.trick, mods: e.mods || null, me: e.uid === me}))});
       }
       if (path === '/ranking' && (req.method === 'POST' || req.method === 'DELETE')) {
@@ -201,7 +258,9 @@ export default {
         if (req.method === 'DELETE') {
           const q = new URL(req.url).searchParams, scope = q.get('scope') === 'global' ? 'global' : q.has('group') ? groupOf(q.get('group')) : 'all';
           if (!scope) return json({ok: false, error: 'notfound'}, 404);
-          await rankRemove(env, uid, scope);
+          const db = await rankDb(env);
+          if (db) await rankRemoveDb(db, uid, scope);
+          await rankRemove(env, uid, scope);                                  // (KV にまだ残っている古い番付からも)
           return json({ok: true});
         }
         const text = await req.text();
@@ -212,7 +271,14 @@ export default {
         if (!r) return json({ok: false, error: 'rejected'});
         const pub = body.pub !== false, group = body.group === undefined ? '' : groupOf(body.group);
         if ((body.group !== undefined && !group) || (!pub && !group)) return json({ok: false, error: 'rejected'});
-        const now = Date.now(), entry = {uid, name: rankName(body.name), ...r, at: now};
+        const now = Date.now(), entry = {uid, name: rankName(body.name), ...r, at: now}, db = await rankDb(env);
+        if (db) {                                                             // 1人1行（重なっても、ほかの人は消えない）
+          const boards = [].concat(pub ? [body.course + ':all', body.course + ':w' + rankWeek(now)] : [],
+            group ? [body.course + ':g:' + group + ':all', body.course + ':g:' + group + ':w' + rankWeek(now)] : []);
+          for (const b of boards) await rankPutDb(db, env, b, {...entry});
+          await db.prepare('DELETE FROM rank WHERE exp IS NOT NULL AND exp < ?').bind(now).run();   // (期限の切れた行を片づける)
+          return json({ok: true});
+        }
         if (pub) {
           await rankPut(env, 'rank:' + body.course + ':all', {...entry});
           await rankPut(env, 'rank:' + body.course + ':w' + rankWeek(now), {...entry}, RANK_WEEK_TTL);
@@ -234,7 +300,9 @@ export default {
         const body = await req.json().catch(() => null);
         const hash = body && typeof body.hash === 'string' ? body.hash : '';
         if (!/^[0-9a-f]{64}$/.test(hash) || !same(await slowHash(hash, rec.salt), rec.hash)) return json({ok: false, error: 'auth'});
-        await rankRemove(env, await rankUid(key));      // 番付からも消す
+        const rdb = await rankDb(env), ruid = await rankUid(key);
+        if (rdb) await rankRemoveDb(rdb, ruid, 'all');  // 番付からも消す
+        await rankRemove(env, ruid);
         await env.DB.delete(key);
         await env.DB.delete('tok:' + m[1]);
         return json({ok: true});
