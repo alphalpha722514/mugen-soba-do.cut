@@ -1511,6 +1511,16 @@ body.bg-view #app{opacity:0;pointer-events:none;}
   border:1px solid var(--btn-bg);background:var(--btn-bg);color:var(--btn-ink);cursor:pointer;touch-action:manipulation;
 }
 .ex-btn:disabled{background:var(--muted-fill);color:var(--ink-soft);border:1px dashed var(--line);cursor:not-allowed;}
+/* 番付一位の引換券 */
+.prize-ic{
+  display:inline-grid;place-items:center;min-width:1.4em;height:1.4em;margin-right:4px;padding:0 2px;vertical-align:-.15em;
+  font-size:.62rem;font-weight:900;line-height:1;color:#fff;background:#c4161c;border:1px solid #8c0b11;border-radius:3px;
+}
+.ex-btn.ex-prize{background:#c4161c;border-color:#8c0b11;color:#fff;}
+.prize-card{--rc:#c4161c;}
+.prize-ticket{display:grid;place-items:center;width:64px;height:44px;border-radius:8px;background:#c4161c;color:#fff;font-weight:900;font-size:1.4rem;
+  border:2px dashed rgba(255,255,255,0.7);box-shadow:0 4px 10px var(--shadow);}
+.prize-list{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-weight:700;font-size:.86rem;}
 .xm-head{margin:0;font-size:.84rem;font-weight:900;color:var(--ok);}
 .xm-head:empty{display:none;}
 .xm-text{text-align:center;}
@@ -1831,7 +1841,7 @@ body.bg-view #app{opacity:0;pointer-events:none;}
         <li><b>一時停止・やり直し</b>画面右上の「⏸」（パソコンは Esc か P キー）で一時停止し、「再開」「最初からやり直す」「コースを選び直す」を選べます。R キーですぐに最初からやり直せます。再開とやり直しは「3・2・1」の合図のあとに始まります。ほかのアプリに切り替えたときも一時停止します。やめた曲は記録されません。</li>
         <li><b>修行の心得</b>ホームで曲に縛りをかけられます。「速切り」1.2x・1.5x（曲と印が速くなる。得点・コイン×1.1・×1.2）、「極・判定」（極・一閃±7ms・Perfect±15ms・OK±40ms。×1.1）、「心眼」（伴奏が消え、小節の頭の和太鼓と師匠のお手本の音だけ。×1.1）。重ねると倍率もかけ合わせます。記録はいつもの自己ベスト・番付に入り、リザルトとベストに心得の印がつきます（区間練習では使いません）。</li>
         <li><b>ひょっこり客</b>あなたの番の1小節が終わるたびに、画面の下からお客さんが顔を出して、その小節の出来（全部Perfect・OKまじり・Missあり）に反応します。全部Perfectの小節が2回続くと蕎麦奉行、4回でお姫様、6回で殿様が来店します。殿様が来店すると「殿様ご来店！ 倍率UP」と出て、そこからあなたの番2小節ぶん（16拍）、コンボ倍率が+0.2されます。蕎麦奉行・お姫様とふつうのお客さんは見た目だけで、得点は変わりません。</li>
-        <li><b>番付</b>ホームの「番付を見る」で、コースごとの「今週」と「全期間」の上位50人が見られます（ログインが必要）。「番付に参加する」を選ぶと、それから遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラと修行の心得の有無）が番付に送られます。サーバーで判定の記録から得点を計算し直して載せる参考記録です。送れなくても、この端末の記録はそのまま残ります。参加をやめると番付から消えます。上位3人は「横綱・大関・関脇」の表彰台に並び、あなたの順位と「1つ上を抜くまであと何点」が、番付の画面・ホームの「今週の番付」・1曲ごとのリザルトに出ます（前に見たときから上がったか下がったかも）。<br>番付の画面の「クラス番付（合言葉）」に、みんなで決めた合言葉（4〜16文字。ひらがな・カタカナ・漢字・英字・数字・ー）を入れると、同じ合言葉を入れた人どうしの番付ができます（合言葉に入ると全体の番付にも参加し、記録は全体とクラスの両方に載ります）。本名や学校名など、だれかわかる言葉は使わないでください。「合言葉を送る」でリンクを送れます。抜けると、そのクラス番付からあなたの記録が消えます。</li>
+        <li><b>番付</b>ホームの「番付を見る」で、コースごとの「今週」と「全期間」の上位50人が見られます（ログインが必要）。「番付に参加する」を選ぶと、それから遊んだ記録（表示名・得点・完成度・最大コンボ・Perfectの数・イタズラと修行の心得の有無）が番付に送られます。サーバーで判定の記録から得点を計算し直して載せる参考記録です。送れなくても、この端末の記録はそのまま残ります。参加をやめると番付から消えます。上位3人は「横綱・大関・関脇」の表彰台に並び、あなたの順位と「1つ上を抜くまであと何点」が、番付の画面・ホームの「今週の番付」・1曲ごとのリザルトに出ます（前に見たときから上がったか下がったかも）。<br>番付の画面の「クラス番付（合言葉）」に、みんなで決めた合言葉（4〜16文字。ひらがな・カタカナ・漢字・英字・数字・ー）を入れると、同じ合言葉を入れた人どうしの番付ができます（合言葉に入ると全体の番付にも参加し、記録は全体とクラスの両方に載ります）。本名や学校名など、だれかわかる言葉は使わないでください。「合言葉を送る」でリンクを送れます。抜けると、そのクラス番付からあなたの記録が消えます。<br><b>番付一位の引換券</b>：コースごとの全体の番付（今週）で、週の終わり（月曜0時・日本時間）に一位だった人は、次にログインして遊ぶときに「引換券」を1枚もらえます（クラス番付は対象外）。交換所で、まだ持っていないガチャアイテムを、レア度にかかわらず1枚で1つ選んで手に入れられます。</li>
         <li><b>ゴースト</b>ホームで「ゴースト」をアリにすると、そのコースで自己ベストを出したときの包丁が、半透明の青い包丁であなたの包丁と一緒に切ります。自分のベストより早いか遅いかが見えます（見た目だけで、得点や判定は変わりません）。ゴーストは自己ベストを更新したときに残ります。</li>
         <li><b>区間練習</b>ホームの「区間練習」で、選んだコースの1区間（お手本・刻み・タメ切り など）だけを3回くり返して練習できます。速さは0.8倍・0.9倍・1.0倍。得点・ベスト・コイン・称号・チャレンジには入りません（師匠のイタズラはなし）。途中でやめるときは画面下の「練習をやめる」。終わるとホームに、その練習のPerfect・OK・Missが出ます。</li>
         <li><b>ふりかえり</b>リザルトに、極上まであと何回OKをPerfectにすればよいか（Missがあるときは「Miss 0」が条件であること）と、曲の区間ごとのMissの数とずれの帯が出ます。いちばんMissの多かった区間を「苦手」として示し、コースごとに区間のMissの累計を記録します。</li>
@@ -1982,6 +1992,7 @@ body.bg-view #app{opacity:0;pointer-events:none;}
     </div>
     <div class="gacha-wallet card">
       <p class="gw-row"><span class="gw-label"><span class="fuda-ic" aria-hidden="true">札</span>そば札</span><span id="exchange-tickets" class="gw-coins">0枚</span></p>
+      <p class="gw-row"><span class="gw-label"><span class="prize-ic" aria-hidden="true">券</span>番付一位の引換券</span><span id="exchange-prize" class="gw-coins">0枚</span></p>
       <p id="exchange-lead" class="gw-total"></p>
     </div>
     <div class="table-scroll">
@@ -2151,7 +2162,7 @@ body.bg-view #app{opacity:0;pointer-events:none;}
       <h2 id="ranking-title" class="guide-title" tabindex="-1">番付</h2>
       <button id="btn-ranking-back" class="btn-small" type="button">ホームへ戻る</button>
     </div>
-    <p class="rk-lead">リズム修行・斬のコースごとの番付（上位50人）。サーバーで判定の記録から得点を計算し直して載せる参考記録です。</p>
+    <p class="rk-lead">リズム修行・斬のコースごとの番付（上位50人）。サーバーで判定の記録から得点を計算し直して載せる参考記録です。全体の「今週」で一位になると、翌週に<b>引換券</b>（好きなガチャアイテム1つと交換）がもらえます。</p>
     <div id="rk-login" class="rk-login card">
       <p>番付は、マイページでログインすると見られます。</p>
       <button id="rk-open-mypage" class="btn-small" type="button">マイページでログイン</button>
@@ -2378,6 +2389,18 @@ body.bg-view #app{opacity:0;pointer-events:none;}
       <h3 id="upd-h" class="zm-name" tabindex="-1">アップデートのお知らせ</h3>
       <ol id="upd-list" class="upd-list"></ol>
       <div class="zm-actions"><button id="upd-close" class="btn-small btn-primary" type="button">閉じる</button></div>
+    </div>
+  </div>
+
+  <div id="prizemodal" class="zmodal" hidden>
+    <div class="zmodal-backdrop" data-prizeclose="1"></div>
+    <div class="zmodal-card prize-card" role="dialog" aria-modal="true" aria-labelledby="prize-h" aria-describedby="prize-text">
+      <p class="rw-eyebrow">全体番付・週間一位</p>
+      <span class="prize-ticket" aria-hidden="true">券</span>
+      <h3 id="prize-h" class="zm-name" tabindex="-1">引換券をもらいました！</h3>
+      <ul id="prize-list" class="prize-list"></ul>
+      <p id="prize-text" class="zm-desc">交換所で、好きなガチャアイテム1つと交換できます（1枚につき1つ・まだ持っていないアイテムから）。</p>
+      <div class="zm-actions"><button id="prize-later" class="btn-small" type="button">あとで</button><button id="prize-go" class="btn-small btn-primary" type="button">交換所へ</button></div>
     </div>
   </div>
 
@@ -3495,7 +3518,8 @@ function defaultGacha(){
     history:[],
     titles:[],     // every 称号 earned (TITLES_DATA, and soba_hitosuji for a full 図鑑); never taken away
     equippedTitle:null,  // the 称号 being worn (schema 11; equipped.title is kept as a copy of it)
-    ledger:{coins:emptyLedger(0), tickets:emptyLedger(0)}   // the wallet's book, so a sync never undoes spending (below)
+    ledger:{coins:emptyLedger(0), tickets:emptyLedger(0)},   // the wallet's book, so a sync never undoes spending (below)
+    prize:{got:{}, used:{}}   // 番付一位の引換券 (schema 14): got['<週>:<コース>'] = 1, used[同じ key] = 交換したアイテム
   };
 }
 // ---- コインとそば札の帳簿 ----
@@ -3615,7 +3639,34 @@ function sanitizeGacha(raw){
   out.equipped.title = out.equippedTitle;
   var lg = isPlainObj(g.ledger) ? g.ledger : {};
   out.ledger = {coins:sanitizeLedger(lg.coins, out.currency), tickets:sanitizeLedger(lg.tickets, out.tickets)};
+  out.prize = sanitizePrize(g.prize);
   return out;
+}
+// 番付一位の引換券: one for each (week, course) where this player was 1st on the whole board's weekly ranking. The key
+// says which; a used one keeps the item it became. Both only ever grow, so a sync takes them together (mergePrize).
+var PRIZE_KEY_RE = /^\d{4}-\d{2}-\d{2}:[a-z]{1,16}$/, PRIZE_MAX = 500;
+function sanitizePrize(raw){
+  var p = isPlainObj(raw) ? raw : {}, out = {got:{}, used:{}}, n = 0, k;
+  var got = isPlainObj(p.got) ? p.got : {}, used = isPlainObj(p.used) ? p.used : {};
+  for(k in got) if(Object.prototype.hasOwnProperty.call(got, k) && PRIZE_KEY_RE.test(k) && got[k] && n<PRIZE_MAX){ out.got[k] = 1; n++; }
+  for(k in used) if(Object.prototype.hasOwnProperty.call(used, k) && out.got[k] && typeof used[k]==='string' && used[k].length>0 && used[k].length<=64) out.used[k] = used[k];
+  return out;
+}
+function mergePrize(a, b){
+  var out = {got:{}, used:{}}, k;
+  [a, b].forEach(function(p){ for(k in p.got) if(Object.prototype.hasOwnProperty.call(p.got, k)) out.got[k] = 1; });
+  [b, a].forEach(function(p){ for(k in p.used) if(Object.prototype.hasOwnProperty.call(p.used, k)) out.used[k] = p.used[k]; });   // (the same ticket used on two devices: this device's choice is kept)
+  return sanitizePrize(out);
+}
+// the tickets still to use, oldest first
+function prizeUnused(g){
+  var ks = Object.keys(g.prize.got).filter(function(k){ return !g.prize.used[k]; });
+  ks.sort();
+  return ks;
+}
+function prizeKeyText(k){
+  var m = /^(\d{4})-(\d{2})-(\d{2}):([a-z]+)$/.exec(k), c = m ? zanCourse(m[4]) : null;
+  return m ? (c ? c.name : m[4]) + '・' + Number(m[2]) + '/' + Number(m[3]) + 'からの週' : k;
 }
 // profile: the name shown on the マイページ and the result card (no other personal data is kept)
 var PROFILE_NAME_MAX = 12;
@@ -10175,7 +10226,7 @@ var xmNote = document.getElementById('xm-note');
 var xmOk = document.getElementById('xm-ok');
 var xmEquip = document.getElementById('xm-equip');
 var xmCancel = document.getElementById('xm-cancel');
-var xm = {id:null, phase:'', newTitle:null};
+var xm = {id:null, phase:'', newTitle:null, mode:'fuda'};
 
 function exchangeCost(it){ return GACHA_RARITIES[it.rarity].exchange; }
 // the item's kind and, when it says something more, where it is worn: 「器」, 「SE・音」, 「おまけ・演出」
@@ -10205,11 +10256,31 @@ function runExchangeTransaction(id){
   if(!saveStoreObj(store)) return {ok:false, reason:'save'};
   return {ok:true, id:id, cost:cost, tickets:g.tickets, newTitle:newTitle};
 }
+// 番付一位の引換券で交換: the oldest unused ticket becomes this item (any rarity, one ticket)
+function runPrizeExchange(id){
+  if(!gachaTablesOk) return {ok:false, reason:'tables'};
+  var it = gachaItem(id);
+  if(!it || it.source==='reward') return {ok:false, reason:'unknown'};
+  var store = loadStore(), g = store.gacha;
+  if(g.owned.indexOf(id)>=0) return {ok:false, reason:'owned'};
+  if(!gachaItemAvailable(it, localToday())) return {ok:false, reason:'season'};
+  var key = prizeUnused(g)[0];
+  if(!key) return {ok:false, reason:'noprize'};
+  g.prize.used[key] = id;
+  g.owned.push(id);
+  markNewItems(store);
+  var newTitle = gachaGrantCompletion(g);
+  g.history.push({date:todayStr(), kind:'prize', items:[id], prize:key});
+  if(g.history.length>100) g.history = g.history.slice(-100);
+  if(!saveStoreObj(store)) return {ok:false, reason:'save'};
+  return {ok:true, id:id, key:key, left:prizeUnused(g).length, newTitle:newTitle};
+}
 function exchangeFailText(res){
+  if(res.reason==='noprize') return '引換券がありません。';
   if(res.reason==='short') return 'そば札が足りません（あと' + fmtPoints(res.need) + '枚）。';
   if(res.reason==='owned') return 'このアイテムはもう持っています。';
   if(res.reason==='season') return '新そばは' + seasonSpan('shinsoba') + 'の間だけ交換できます。';
-  if(res.reason==='save') return '保存できなかったため、交換を取り消しました（そば札は減っていません）。';
+  if(res.reason==='save') return '保存できなかったため、交換を取り消しました（そば札・引換券は減っていません）。';
   if(res.reason==='tables') return 'ガチャの設定に誤りがあるため、いまは交換できません。';
   return '交換できませんでした（そば札は減っていません）。';
 }
@@ -10221,7 +10292,10 @@ function renderExchange(){
   var g = loadStore().gacha, today = localToday(), have = Object.create(null), missing = 0, i, j;
   for(i=0;i<g.owned.length;i++) have[g.owned[i]] = true;
   exchangeTicketsEl.textContent = fmtPoints(g.tickets) + '枚';
-  exchangeLeadEl.textContent = 'ガチャで持っているアイテムが出ると、そば札に変わります。そば札で、まだ持っていないアイテムを選んで手に入れられます。';
+  var prizeN = prizeUnused(g).length;
+  document.getElementById('exchange-prize').textContent = prizeN + '枚';
+  exchangeLeadEl.textContent = 'ガチャで持っているアイテムが出ると、そば札に変わります。そば札で、まだ持っていないアイテムを選んで手に入れられます。' +
+    '全体の番付（今週）で一位になると、翌週に「引換券」がもらえ、好きなアイテム1つと交換できます（レア度にかかわらず1枚で1つ）。';
   exchangeCostBody.textContent = '';
   for(i=0;i<GACHA_RARITY_ORDER.length;i++){
     var rk = GACHA_RARITY_ORDER[i], rr = GACHA_RARITIES[rk];
@@ -10290,6 +10364,15 @@ function renderExchange(){
         ? ('：いまは交換できません（' + (!avail ? seasonSpan(season) + 'だけ' : b.textContent) + '）')
         : ('をそば札' + fmtPoints(cost) + '枚で交換する')));
       li.appendChild(b);
+      if(prizeN>0 && gachaTablesOk && avail){             // 番付一位の引換券: any item, one ticket
+        var pb = document.createElement('button');
+        pb.type = 'button';
+        pb.className = 'ex-btn ex-prize';
+        pb.setAttribute('data-prize', it.id);
+        pb.textContent = '引換券で交換';
+        pb.setAttribute('aria-label', it.name + '（' + GACHA_RARITIES[rar].label + '）を番付一位の引換券1枚で交換する');
+        li.appendChild(pb);
+      }
       ul.appendChild(li);
     }
     sec.appendChild(ul);
@@ -10305,11 +10388,11 @@ function renderExchange(){
   }
 }
 // the confirmation, then the result (with 装備する), in one small dialog
-function openExchangeConfirm(id){
+function openExchangeConfirm(id, mode){
   var it = gachaItem(id);
   if(!it) return;
   var g = loadStore().gacha, cost = exchangeCost(it);
-  xm = {id:id, phase:'confirm', newTitle:null};
+  xm = {id:id, phase:'confirm', newTitle:null, mode:mode==='prize' ? 'prize' : 'fuda'};
   xmCard.className = 'zmodal-card r-' + it.rarity;
   xmHead.textContent = '';
   xmArt.textContent = '';
@@ -10319,11 +10402,19 @@ function openExchangeConfirm(id){
   xmCat.textContent = itemKindText(it);
   xmName.textContent = it.name;
   xmText.textContent = '';
-  appendText(xmText, 'そば札 ');
-  appendBold(xmText, fmtPoints(cost) + '枚');
-  appendText(xmText, ' と交換しますか？');
   xmNote.hidden = false;
-  xmNote.textContent = 'いま ' + fmtPoints(g.tickets) + '枚 → 交換したあと ' + fmtPoints(Math.max(0, g.tickets - cost)) + '枚';
+  if(xm.mode==='prize'){
+    var pz = prizeUnused(g);
+    appendText(xmText, '番付一位の引換券 ');
+    appendBold(xmText, '1枚');
+    appendText(xmText, ' と交換しますか？');
+    xmNote.textContent = '引換券 いま ' + pz.length + '枚 → 交換したあと ' + Math.max(0, pz.length - 1) + '枚' + (pz[0] ? '（使う券：' + prizeKeyText(pz[0]) + '）' : '');
+  } else {
+    appendText(xmText, 'そば札 ');
+    appendBold(xmText, fmtPoints(cost) + '枚');
+    appendText(xmText, ' と交換しますか？');
+    xmNote.textContent = 'いま ' + fmtPoints(g.tickets) + '枚 → 交換したあと ' + fmtPoints(Math.max(0, g.tickets - cost)) + '枚';
+  }
   xmOk.hidden = false;
   xmEquip.hidden = true;
   xmCancel.textContent = 'やめる';
@@ -10348,7 +10439,7 @@ function doExchange(){
   var it = gachaItem(xm.id);
   if(!it || xm.phase!=='confirm') return;
   var res;
-  try{ res = runExchangeTransaction(it.id); }catch(e){ res = {ok:false, reason:'error'}; }
+  try{ res = xm.mode==='prize' ? runPrizeExchange(it.id) : runExchangeTransaction(it.id); }catch(e){ res = {ok:false, reason:'error'}; }
   renderExchange();
   if(!res.ok){
     xm.phase = 'error';
@@ -10370,7 +10461,7 @@ function doExchange(){
   xmOk.hidden = true;
   xmCancel.textContent = '閉じる';
   renderXmEquip();
-  setExchangeMsg('「' + it.name + '」を手に入れました（そば札 残り' + fmtPoints(res.tickets) + '枚）。');
+  setExchangeMsg('「' + it.name + '」を手に入れました（' + (xm.mode==='prize' ? '引換券 残り' + res.left : 'そば札 残り' + fmtPoints(res.tickets)) + '枚）。');
   focusEl(xmEquip);
 }
 function closeExchangeModal(){
@@ -10380,7 +10471,7 @@ function closeExchangeModal(){
   var el = null;
   try{ if(xm.id) el = exchangeGroups.querySelector('.ex-btn[data-ex="' + xm.id + '"]'); }catch(e){ el = null; }
   focusEl(el || exchangeTitleEl);                       // after an exchange the item has left the list
-  xm = {id:null, phase:'', newTitle:null};
+  xm = {id:null, phase:'', newTitle:null, mode:'fuda'};
 }
 function cycleXmFocus(back){
   var list = [];
@@ -10395,7 +10486,8 @@ exchangeGroups.addEventListener('click', function(e){
   var b = (e.target && e.target.closest) ? e.target.closest('.ex-btn') : null;
   if(!b || b.disabled) return;
   setExchangeMsg('');
-  openExchangeConfirm(b.getAttribute('data-ex'));
+  if(b.hasAttribute('data-prize')) openExchangeConfirm(b.getAttribute('data-prize'), 'prize');
+  else openExchangeConfirm(b.getAttribute('data-ex'));
 });
 xmOk.addEventListener('click', doExchange);
 xmCancel.addEventListener('click', closeExchangeModal);
@@ -11290,6 +11382,18 @@ var MockCloudAdapter = {
       return {ok:true, course:course, period:period, week:rankWeekKey(Date.now()), entries:list.map(function(e, i){ return {rank:i + 1, name:e.name, score:e.score, grade:e.grade, perfect:e.perfect, combo:e.combo, trick:e.trick, mods:e.mods || null, me:!!(u && e.uid===u.name.toLowerCase())}; })};
     });
   },
+  rankPrize:function(token){                         // 番付一位の引換券: 1st on a whole weekly board (last week or the one before)
+    var self = this;
+    return this.later(function(){
+      var db = self.read(), u = self.tokenUser(db, token), wins = [], now = Date.now();
+      if(!u) return {ok:false, error:'session'};
+      [1, 2].forEach(function(back){
+        var wk = rankWeekKey(now - back*7*86400000);
+        ZAN_COURSE_IDS.forEach(function(c){ var l = isPlainObj(db.ranking) && db.ranking[c + ':w' + wk]; if(l && l[0] && l[0].uid===u.name.toLowerCase()) wins.push({week:wk, course:c}); });
+      });
+      return {ok:true, wins:wins};
+    });
+  },
   rankLeave:function(token, scope){
     var self = this;
     return this.later(function(){
@@ -11336,7 +11440,8 @@ var RestAdapter = {
   remove:function(name, token, hash){ return this.call('/account', 'DELETE', {hash:hash}, token); },
   rankSubmit:function(token, payload){ return this.call('/ranking', 'POST', payload, token); },
   rankGet:function(token, course, period, group){ return this.call('/ranking?course=' + encodeURIComponent(course) + '&period=' + (period==='all' ? 'all' : 'week') + (group ? '&group=' + encodeURIComponent(group) : ''), 'GET', null, token); },
-  rankLeave:function(token, scope){ return this.call('/ranking' + (scope==='global' ? '?scope=global' : scope ? '?group=' + encodeURIComponent(scope) : ''), 'DELETE', null, token); }
+  rankLeave:function(token, scope){ return this.call('/ranking' + (scope==='global' ? '?scope=global' : scope ? '?group=' + encodeURIComponent(scope) : ''), 'DELETE', null, token); },
+  rankPrize:function(token){ return this.call('/ranking/prize', 'GET', null, token); }
 };
 
 // --- マージ: the better of this device and the cloud ---
@@ -11392,6 +11497,7 @@ function mergeStores(localRaw, cloudRaw){
   g.currency = Math.max(0, Math.min(COIN_MAX, ledgerBalance(g.ledger.coins)));
   g.tickets = Math.max(0, Math.min(TICKET_MAX, ledgerBalance(g.ledger.tickets)));
   g.owned = unionList(lg.owned, cg.owned);
+  g.prize = mergePrize(lg.prize, cg.prize);           // 番付一位の引換券 (got and used: both sides together)
   g.titles = unionList(lg.titles, cg.titles);
   g.stats.totalPulls = Math.max(lg.stats.totalPulls, cg.stats.totalPulls);
   if(lg.dailyEarned.date===cg.dailyEarned.date){
@@ -11485,6 +11591,7 @@ var SyncManager = {
       return self.syncNow().then(function(r){
         var store = loadStore();                    // no name on this device or in the cloud: the user name becomes it
         if(r.ok && !store.profile.name){ store.profile.name = cleanProfileName(res.user || user); saveStoreObj(store); }
+        if(r.ok) setTimeout(function(){ prizeCheck(true); }, 0);   // (番付一位の引換券)
         return r;
       });
     }, function(){ return {ok:false, error:'offline'}; });
@@ -11516,6 +11623,11 @@ var SyncManager = {
     var acc = this.account();
     if(!acc || typeof this.adapter.rankGet!=='function') return Promise.resolve({ok:false, error:'nologin'});
     return this.adapter.rankGet(acc.token, course, period, rankGroupOf(group)).then(function(r){ return r || {ok:false, error:'offline'}; }, function(){ return {ok:false, error:'offline'}; });
+  },
+  rankPrize:function(){
+    var acc = this.account();
+    if(!acc || typeof this.adapter.rankPrize!=='function') return Promise.resolve({ok:false, error:'nologin'});
+    return this.adapter.rankPrize(acc.token).then(function(r){ return r || {ok:false, error:'offline'}; }, function(){ return {ok:false, error:'offline'}; });
   },
   rankLeave:function(scope){                        // (scope: 'global' | a 合言葉 | none = everything)
     var acc = this.account();
@@ -13546,6 +13658,10 @@ window.addEventListener('resize', function(){
 // has not seen the newest one gets the telop on the home; 「内容を見る」 lists what changed. Which one was seen is
 // kept on this device only (STORE_KEY + '.updateSeen', not synced). A first visit marks them seen without a telop.
 var UPDATE_NOTES = [
+  {v:'2026.10.07', date:'2026-10-07', title:'番付一位の引換券', items:[
+    'コースごとの全体の番付（今週）で一位になると、翌週に「引換券」を1枚もらえるようになりました（クラス番付は対象外）。',
+    '引換券は交換所で、まだ持っていないガチャアイテムを、レア度にかかわらず1枚で1つ選んで交換できます。'
+  ]},
   {v:'2026.10.06-2', date:'2026-10-06', title:'番付・クラス番付から記録が消える不具合を直しました', items:[
     'ほぼ同じ時刻に何人かが番付に記録を送ると、先に送った人の記録が番付から消えてしまうことがありました（クラスで一斉に遊ぶと起きやすい不具合でした）。番付の仕組みを直し、だれの記録も消えないようにしました。',
     '記録を送ったあと、ホームの「今週の番付」もすぐ新しい順位になります。'
@@ -13616,6 +13732,54 @@ document.getElementById('btn-updates').addEventListener('click', function(){ ope
 updEls.modal.addEventListener('click', function(e){ if(e.target && e.target.getAttribute('data-updclose')) closeUpdates(); });
 document.addEventListener('keydown', function(e){ if(e.key==='Escape' && updEls.modal && !updEls.modal.hidden){ e.preventDefault(); closeUpdates(); } });
 
+// --- 番付一位の引換券: the server says whether this player was 1st on a whole weekly board (each course; last week
+// and the one before, so a week away is not missed). Asked once a day on this device while logged in, and right after a
+// login. A new ticket goes into gacha.prize.got (synced) and the dialog tells it; it is spent at the 交換所.
+var PRIZE_CHECK_KEY = STORE_KEY + '.prizeChecked';
+var prizeEls = {modal:document.getElementById('prizemodal'), list:document.getElementById('prize-list'), h:document.getElementById('prize-h')};
+var prizeBusy = false;
+function prizeCheck(force){
+  if(prizeBusy || !SyncManager.isLoggedIn()) return;
+  var today = localToday();
+  if(!force && readRawLS(PRIZE_CHECK_KEY)===today) return;
+  prizeBusy = true;
+  SyncManager.rankPrize().then(function(res){
+    prizeBusy = false;
+    if(!res || !res.ok || !Array.isArray(res.wins)) return;
+    writeRawLS(PRIZE_CHECK_KEY, today);
+    var store = loadStore(), g = store.gacha, fresh = [];
+    for(var i=0;i<res.wins.length && i<20;i++){
+      var w = res.wins[i], k = w ? String(w.week) + ':' + String(w.course) : '';
+      if(PRIZE_KEY_RE.test(k) && zanCourse(w.course) && !g.prize.got[k]){ g.prize.got[k] = 1; fresh.push(k); }
+    }
+    if(!fresh.length) return;
+    g.history.push({date:todayStr(), kind:'prize-get', prize:fresh});
+    if(g.history.length>100) g.history = g.history.slice(-100);
+    if(!saveStoreObj(store)) return;
+    showPrizeWin(fresh);
+  }, function(){ prizeBusy = false; });
+}
+function showPrizeWin(keys){
+  if(!prizeEls.modal) return;
+  prizeEls.list.textContent = '';
+  for(var i=0;i<keys.length;i++){ var li = document.createElement('li'); li.textContent = prizeKeyText(keys[i]) + '　一位'; prizeEls.list.appendChild(li); }
+  prizeEls.h.textContent = '引換券を' + keys.length + '枚もらいました！';
+  prizeEls.modal.hidden = false;
+  document.body.style.overflow = 'hidden';
+  focusEl(prizeEls.h);
+}
+function closePrizeWin(go){
+  if(!prizeEls.modal || prizeEls.modal.hidden) return;
+  prizeEls.modal.hidden = true;
+  document.body.style.overflow = '';
+  if(go) openSub('exchange', 'title', btnExchange);
+  else if(screens.title.classList.contains('active')) focusEl(btnExchange);
+}
+document.getElementById('prize-go').addEventListener('click', function(){ closePrizeWin(true); });
+document.getElementById('prize-later').addEventListener('click', function(){ closePrizeWin(false); });
+prizeEls.modal.addEventListener('click', function(e){ if(e.target && e.target.getAttribute('data-prizeclose')) closePrizeWin(false); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && prizeEls.modal && !prizeEls.modal.hidden){ e.preventDefault(); closePrizeWin(false); } });
+
 // --- at start: the home with its dots and background, 限定 items already reached, and the guide for a first visit ---
 renderHome();
 (function(){
@@ -13628,6 +13792,7 @@ renderHome();
     if(res.items.length || res.titles.length) obPendingRewards = res;
     openOnboarding(null);
   } else showRewards(res, null);
+  prizeCheck(false);                                  // 番付一位の引換券 (once a day; the dialog waits for nothing else)
 })();
 
 // ---------- BGM: Japanese-style music made in Web Audio (no audio files), one piece per scene ----------
@@ -15716,6 +15881,7 @@ document.getElementById('rk-me-go').addEventListener('click', function(){   // �
 var rankView = {course:'', period:'week', scope:'all', seq:0}, rankOpener = null;
 function openRanking(opener){
   rankOpener = opener || null;
+  prizeCheck(false);
   if(!rankView.course) rankView.course = zanSelectedCourse();
   renderRanking();
   showScreen('ranking');
