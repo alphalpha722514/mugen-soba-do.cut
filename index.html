@@ -13546,6 +13546,10 @@ window.addEventListener('resize', function(){
 // has not seen the newest one gets the telop on the home; 「内容を見る」 lists what changed. Which one was seen is
 // kept on this device only (STORE_KEY + '.updateSeen', not synced). A first visit marks them seen without a telop.
 var UPDATE_NOTES = [
+  {v:'2026.10.06-2', date:'2026-10-06', title:'番付・クラス番付から記録が消える不具合を直しました', items:[
+    'ほぼ同じ時刻に何人かが番付に記録を送ると、先に送った人の記録が番付から消えてしまうことがありました（クラスで一斉に遊ぶと起きやすい不具合でした）。番付の仕組みを直し、だれの記録も消えないようにしました。',
+    '記録を送ったあと、ホームの「今週の番付」もすぐ新しい順位になります。'
+  ]},
   {v:'2026.10.06', date:'2026-10-06', title:'ふりかえりの「詳しく」・更新のお知らせ・トッピングの得点', items:[
     'リザルトの「ふりかえり」に「詳しく」ボタン。区間ごとに 極・一閃／Perfect／OK／Miss（つられた）の数を表で見られます。',
     'ゲームが新しくなったら、ホームにこのお知らせが流れるようになりました。設定の「更新のお知らせ」からいつでも見返せます。',
@@ -15534,7 +15538,7 @@ function zanRankSend(r){
   if(el){ el.hidden = false; el.textContent = '番付に送っています…'; }
   SyncManager.rankSubmit(payload).then(function(res){
     if(!el) return;
-    if(res.ok) zanRankResult(payload.course);        // 今週の順位を大きく
+    if(res.ok){ rankCache = {}; zanRankResult(payload.course); }   // 今週の順位を大きく (and the home's board is read afresh)
     el.textContent = res.ok ? (group ? '番付とクラス番付に送りました（参考記録）。' : '番付に送りました（参考記録）。') : res.error==='rejected' ? 'この記録は番付に載せられませんでした。' : '番付に送れませんでした（記録はこの端末に残っています）。';
   });
 }
