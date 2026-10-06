@@ -1055,6 +1055,21 @@ body{
 .zan-heat-list li.is-weak .hl-name,.zan-heat-list li.is-weak .hl-num{color:var(--accent2-ink);}
 .zan-review.is-calm .zan-heat,.zan-review.is-calm .hl-bar{display:none;}
 .zan-review.is-calm .zan-heat-list li{grid-template-columns:5.5em minmax(0,1fr);}
+.zan-detail-btn{justify-self:start;font:inherit;font-size:13px;font-weight:700;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--muted-fill);color:var(--ink);cursor:pointer;}
+.zan-detail-btn::after{content:" ▾";}
+.zan-detail-btn[aria-expanded="true"]::after{content:" ▴";}
+.zan-detail-btn:focus-visible{outline:3px solid var(--accent2-ink);outline-offset:2px;}
+.zan-detail{display:grid;gap:6px;}
+.zan-detail[hidden]{display:none;}
+.zan-detail-scroll{overflow-x:auto;}
+.zan-detail-table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;}
+.zan-detail-table th,.zan-detail-table td{padding:4px 4px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+.zan-detail-table th:first-child,.zan-detail-table td:first-child{text-align:left;font-weight:700;}
+.zan-detail-table thead th{font-size:11.5px;color:var(--ink-soft);font-weight:700;}
+.zan-detail-table tfoot td{font-weight:900;border-bottom:0;border-top:2px solid var(--line);}
+.zan-detail-table .is-zero{color:var(--ink-soft);opacity:.6;}
+.zan-detail-table .c-miss:not(.is-zero){color:var(--accent2-ink);font-weight:700;}
+.zan-detail-note{margin:0;font-size:12px;color:var(--ink-soft);line-height:1.6;}
 .zan-weak{margin:0;line-height:1.6;}
 .zan-weak-total{margin:0;font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
 @keyframes heatGrow{from{transform:scaleX(0);}}
@@ -2213,6 +2228,11 @@ body.bg-view #app{opacity:0;pointer-events:none;}
       <p id="zan-goal" class="zan-goal"></p>
       <div id="zan-heat" class="zan-heat" aria-hidden="true"></div>
       <ul id="zan-heat-list" class="zan-heat-list"></ul>
+      <button type="button" id="zan-detail-btn" class="zan-detail-btn" aria-expanded="false" aria-controls="zan-detail">詳しく</button>
+      <div id="zan-detail" class="zan-detail" hidden>
+        <div class="zan-detail-scroll"><table class="zan-detail-table" aria-label="区間ごとの判定の数"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+        <p id="zan-detail-note" class="zan-detail-note"></p>
+      </div>
       <p id="zan-weak" class="zan-weak"></p>
       <p id="zan-weak-total" class="zan-weak-total"></p>
     </section>
@@ -15758,16 +15778,16 @@ function zanReview(song, judges){
   var secs = [], i;
   for(i=0;i<song.sections.length;i++){
     var sc = song.sections[i], to = i + 1<song.sections.length ? song.sections[i + 1].from : song.end;
-    secs.push({key:sc.key, label:sc.label, from:sc.from, to:to, n:0, miss:0, errSum:0, hits:0});
+    secs.push({key:sc.key, label:sc.label, from:sc.from, to:to, n:0, miss:0, errSum:0, hits:0, crit:0, perfect:0, ok:0, fooled:0});
   }
   for(i=0;i<judges.length;i++){
     var j = judges[i], k = secs.length - 1;
-    if(j.rating==='FOOLED') continue;
     while(k>0 && j.b < secs[k].from - 1e-6) k--;
     var s = secs[k];
+    if(j.rating==='FOOLED'){ s.fooled++; continue; }   // (つられた: not a cut, so not in n)
     s.n++;
     if(j.rating==='MISS') s.miss++;
-    else { s.hits++; s.errSum += Math.abs(j.err); }
+    else { s.hits++; s.errSum += Math.abs(j.err); if(j.rating==='PERFECT') s.perfect++; else s.ok++; if(j.crit) s.crit++; }
   }
   return secs;
 }
@@ -15817,6 +15837,7 @@ function zanRenderReview(secs, r, totals){
     li.appendChild(name); li.appendChild(bar); li.appendChild(num);
     list.appendChild(li);
   }
+  zanRenderDetail(played);
   document.getElementById('zan-weak').textContent = weak ? 'あなたの苦手は『' + weak.label + '』区間（Miss ' + weak.miss + '/' + weak.n + '）。区間ごとの印を見直してみましょう。'
     : wobbly && wobbly.errSum/wobbly.hits >= 10 ? 'Missなし！ ずれがいちばん大きいのは『' + wobbly.label + '』区間（平均±' + Math.round(wobbly.errSum/wobbly.hits) + 'ms）です。'
     : 'Missなし！ どの区間も、ずれは平均±10ms未満です。';
@@ -15825,6 +15846,45 @@ function zanRenderReview(secs, r, totals){
   var lab = '';
   for(i=0;i<secs.length;i++) if(secs[i].key===topKey) lab = secs[i].label;
   document.getElementById('zan-weak-total').textContent = topN && lab ? 'このコースで、これまでMissがいちばん多い区間は『' + lab + '』（累計' + topN + '回）。' : '';
+}
+// 「詳しく」: 区間ごとの 極・一閃／Perfect／OK／Miss（つられたがあればその列も）と合計。開くまでは閉じておく
+function zanRenderDetail(played){
+  var btn = document.getElementById('zan-detail-btn'), box = document.getElementById('zan-detail');
+  if(!btn || !box) return;
+  var fooled = played.some(function(s){ return s.fooled>0; });
+  var cols = [['crit','極・一閃'], ['perfect','Perfect'], ['ok','OK'], ['miss','Miss']];
+  if(fooled) cols.push(['fooled','つられた']);
+  var table = box.querySelector('table'), thead = table.tHead, tbody = table.tBodies[0], tfoot = table.tFoot, i, c;
+  thead.textContent = ''; tbody.textContent = ''; tfoot.textContent = '';
+  function row(parent, cellTag, name, vals, first){
+    var tr = document.createElement('tr'), th = document.createElement(first || cellTag);
+    th.textContent = name; if(first==='th') th.scope = 'row'; tr.appendChild(th);
+    for(var k=0;k<vals.length;k++){
+      var td = document.createElement(cellTag); td.textContent = String(vals[k]);
+      if(cellTag==='td'){ td.className = 'c-' + cols[k][0] + (vals[k] ? '' : ' is-zero'); }
+      else td.scope = 'col';
+      tr.appendChild(td);
+    }
+    parent.appendChild(tr);
+  }
+  row(thead, 'th', '区間', cols.map(function(x){ return x[1]; }));
+  var sum = cols.map(function(){ return 0; });
+  for(i=0;i<played.length;i++){
+    var vals = cols.map(function(x){ return played[i][x[0]]; });
+    for(c=0;c<vals.length;c++) sum[c] += vals[c];
+    row(tbody, 'td', played[i].label, vals, 'th');
+  }
+  row(tfoot, 'td', '合計', sum);
+  document.getElementById('zan-detail-note').textContent = 'Perfect の数には極・一閃（±' + Math.round(zan && zan.win ? zan.win.crit*1000 : 10) + 'ms以内）も入っています。' +
+    (fooled ? '「つられた」は師匠のイタズラの偽の印で切った回数で、Miss には数えません。' : '');
+  box.hidden = true; btn.setAttribute('aria-expanded', 'false'); btn.textContent = '詳しく';
+  if(!btn.dataset.bound){
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', function(){
+      var open = box.hidden;
+      box.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); btn.textContent = open ? '閉じる' : '詳しく';
+    });
+  }
 }
 // adds this song's Misses to zan.sectionMiss[course] (schema 14)
 function zanAddSectionMiss(store, cid, secs){
