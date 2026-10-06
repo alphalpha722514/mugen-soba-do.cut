@@ -1354,6 +1354,29 @@ body.bg-view #app{opacity:0;pointer-events:none;}
 .zm-desc.is-locked{color:var(--ink-soft);}
 .zm-odds{margin:0;font-size:.7rem;line-height:1.5;color:var(--ink-soft);}
 .zmodal button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px;}
+/* 更新のお知らせ: the telop on the home (it runs across once more each loop) and the list of what changed */
+.upd-telop{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;min-width:0;padding:6px 6px 8px 8px;border-radius:var(--radius);background:#2a1a0e;color:#fff4d6;border:2px solid #d9a63c;box-shadow:0 4px 12px var(--shadow);}
+.upd-telop[hidden]{display:none;}
+.upd-badge{flex:0 0 auto;padding:3px 8px;border-radius:999px;background:#c4161c;color:#fff;font-size:.72rem;font-weight:900;letter-spacing:.04em;}
+.upd-run{order:3;flex:1 0 100%;margin:0;min-width:0;overflow:hidden;white-space:nowrap;font-size:.86rem;font-weight:700;line-height:1.6;}
+.upd-lead{flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.76rem;color:#f2c341;font-weight:700;font-variant-numeric:tabular-nums;}
+.upd-run-in{display:inline-block;padding-left:100%;animation:updRun var(--upd-dur,14s) linear infinite;}
+.upd-telop.is-static .upd-run{white-space:normal;}
+.upd-telop.is-static .upd-run-in{padding-left:0;animation:none;}
+@keyframes updRun{to{transform:translateX(-100%);}}
+@media (prefers-reduced-motion:reduce){ .upd-run{white-space:normal;} .upd-run-in{padding-left:0;animation:none;} }
+.upd-open{flex:0 0 auto;font:inherit;font-size:.74rem;font-weight:900;min-height:32px;padding:0 10px;border-radius:999px;border:1px solid #d9a63c;background:#d9a63c;color:#2a1a0e;cursor:pointer;}
+.upd-x{flex:0 0 auto;font:inherit;font-size:1rem;line-height:1;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,244,214,.4);background:transparent;color:#fff4d6;cursor:pointer;}
+.upd-open:focus-visible,.upd-x:focus-visible{outline:2px solid #fff4d6;outline-offset:2px;}
+.upd-card{max-width:380px;align-items:stretch;text-align:left;--rc:#d9a63c;}
+.upd-card .zm-name,.upd-card .rw-eyebrow{text-align:center;}
+.upd-list{list-style:none;margin:0;padding:0;display:grid;gap:12px;}
+.upd-entry{display:grid;gap:4px;padding-bottom:10px;border-bottom:1px solid var(--line);}
+.upd-entry:last-child{border-bottom:0;padding-bottom:0;}
+.upd-date{margin:0;font-size:.72rem;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
+.upd-title{margin:0;font-size:.92rem;font-weight:900;line-height:1.5;}
+.upd-items{margin:0;padding-left:1.2em;font-size:.82rem;line-height:1.7;}
+.upd-card .zm-actions{justify-content:center;}
 /* ---------- マイページ: profile, 2×2 records, account and sync; the 称号 picker ---------- */
 .caret-right{transform:rotate(-90deg);}
 .mypage{gap:10px;}
@@ -1541,6 +1564,13 @@ body.bg-view #app{opacity:0;pointer-events:none;}
         <svg class="caret caret-right" viewBox="0 0 10 6" aria-hidden="true" focusable="false"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </header>
+    <div id="upd-telop" class="upd-telop" hidden>
+      <span class="upd-badge">アップデート</span>
+      <span id="upd-lead" class="upd-lead"></span>
+      <p class="upd-run" aria-live="polite"><span id="upd-run-in" class="upd-run-in"></span></p>
+      <button id="upd-open" class="upd-open" type="button">内容を見る</button>
+      <button id="upd-x" class="upd-x" type="button" aria-label="お知らせを閉じる">×</button>
+    </div>
     <div id="home-window" class="home-window" hidden>
       <p class="hw-name"><span class="hw-label">背景</span><span id="hw-name"></span></p>
       <button id="btn-bg-view" class="hw-view" type="button">背景を眺める</button>
@@ -1743,6 +1773,7 @@ body.bg-view #app{opacity:0;pointer-events:none;}
           <span id="help-row-title" class="backup-title">ルールとご意見</span>
           <div class="vis-opts help-opts">
             <button id="btn-guide-again" class="btn-small" type="button">ルール説明をもう一度見る</button>
+            <button id="btn-updates" class="btn-small" type="button">更新のお知らせ</button>
             <button id="btn-feedback" class="btn-small" type="button">要望・不具合を送る</button>
           </div>
           <p class="save-note">※「要望・不具合を送る」は外部の入力フォームが開きます。個人情報は入力しないでください。</p>
@@ -2332,6 +2363,16 @@ body.bg-view #app{opacity:0;pointer-events:none;}
       <ul id="rw-list" class="rw-list"></ul>
       <p class="zm-odds">ガチャには出ない限定品です。着せ替えで装備でき、図鑑の「限定」に並びます。</p>
       <div class="zm-actions"><button id="rw-close" class="btn-small btn-primary" type="button">閉じる</button></div>
+    </div>
+  </div>
+
+  <div id="updmodal" class="zmodal" hidden>
+    <div class="zmodal-backdrop" data-updclose="1"></div>
+    <div class="zmodal-card upd-card" role="dialog" aria-modal="true" aria-labelledby="upd-h">
+      <p class="rw-eyebrow">無限そば道・斬</p>
+      <h3 id="upd-h" class="zm-name" tabindex="-1">アップデートのお知らせ</h3>
+      <ol id="upd-list" class="upd-list"></ol>
+      <div class="zm-actions"><button id="upd-close" class="btn-small btn-primary" type="button">閉じる</button></div>
     </div>
   </div>
 
@@ -13496,11 +13537,83 @@ window.addEventListener('resize', function(){
   homeBgResizeTimer = setTimeout(function(){ homeBgResizeTimer = 0; if(screens.title.classList.contains('active')) renderHomeBg(); }, 150);
 });
 
+// --- 更新のお知らせ: every update of the game adds one entry at the top of UPDATE_NOTES (newest first). A player who
+// has not seen the newest one gets the telop on the home; 「内容を見る」 lists what changed. Which one was seen is
+// kept on this device only (STORE_KEY + '.updateSeen', not synced). A first visit marks them seen without a telop.
+var UPDATE_NOTES = [
+  {v:'2026.10.06', date:'2026-10-06', title:'ふりかえりの「詳しく」と、更新のお知らせ', items:[
+    'リザルトの「ふりかえり」に「詳しく」ボタン。区間ごとに 極・一閃／Perfect／OK／Miss（つられた）の数を表で見られます。',
+    'ゲームが新しくなったら、ホームにこのお知らせが流れるようになりました。設定の「更新のお知らせ」からいつでも見返せます。'
+  ]},
+  {v:'2026.10.05', date:'2026-10-05', title:'ホームの背景と、お好みトッピング', items:[
+    'ホームで、着せ替えで選んだ背景がカード越しに見えるように。「背景を眺める」で背景だけを眺められます。',
+    '師匠のイタズラ・ゴースト・ハイライト録画・修行の心得を「お好みトッピング」にまとめました。',
+    'ルール説明の最初に「まず音をオンに」のページ。風鈴の音で音が出るか試せます。'
+  ]}
+];
+var UPDATE_SEEN_KEY = STORE_KEY + '.updateSeen';
+var updEls = {telop:document.getElementById('upd-telop'), run:document.getElementById('upd-run-in'), modal:document.getElementById('updmodal'), list:document.getElementById('upd-list'), h:document.getElementById('upd-h')};
+var updOpener = null;
+function updSeen(){ var v = readRawLS(UPDATE_SEEN_KEY); return typeof v==='string' ? v : ''; }
+function updMarkSeen(){ writeRawLS(UPDATE_SEEN_KEY, UPDATE_NOTES[0].v); if(updEls.telop) updEls.telop.hidden = true; }
+// the entries newer than the one last seen (none seen yet: the newest few)
+function updUnseen(){
+  var seen = updSeen(), out = [];
+  for(var i=0;i<UPDATE_NOTES.length;i++){ if(UPDATE_NOTES[i].v===seen) return out; out.push(UPDATE_NOTES[i]); }
+  return out.slice(0, 3);
+}
+function updDateLabel(d){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d); return m ? Number(m[2]) + '/' + Number(m[3]) : d; }
+function renderUpdTelop(){
+  if(!updEls.telop) return;
+  var news = updUnseen();
+  updEls.telop.hidden = !news.length;
+  if(!news.length) return;
+  var t = news[0].title + '　―　' + news[0].items[0] + (news.length>1 ? '　（ほか' + (news.length - 1) + '件のお知らせ）' : '');
+  document.getElementById('upd-lead').textContent = updDateLabel(news[0].date) + ' 更新';
+  updEls.run.textContent = t;
+  updEls.run.style.setProperty('--upd-dur', Math.max(10, Math.round(t.length*0.32)) + 's');
+  updEls.telop.classList.toggle('is-static', motionCalm());
+}
+function openUpdates(all, opener){
+  if(!updEls.modal) return;
+  var list = all ? UPDATE_NOTES.slice(0, 10) : updUnseen();
+  if(!list.length) list = UPDATE_NOTES.slice(0, 1);
+  updEls.list.textContent = '';
+  for(var i=0;i<list.length;i++){
+    var n = list[i], li = document.createElement('li'), d = document.createElement('p'), h = document.createElement('p'), ul = document.createElement('ul');
+    li.className = 'upd-entry';
+    d.className = 'upd-date'; d.textContent = n.date.replace(/-/g, '/');
+    h.className = 'upd-title'; h.textContent = n.title;
+    ul.className = 'upd-items';
+    for(var k=0;k<n.items.length;k++){ var it = document.createElement('li'); it.textContent = n.items[k]; ul.appendChild(it); }
+    li.appendChild(d); li.appendChild(h); li.appendChild(ul); updEls.list.appendChild(li);
+  }
+  updOpener = opener || null;
+  updEls.modal.hidden = false;
+  focusEl(updEls.h);
+}
+function closeUpdates(){
+  if(!updEls.modal || updEls.modal.hidden) return;
+  updEls.modal.hidden = true;
+  updMarkSeen();
+  if(updOpener){ focusEl(updOpener); updOpener = null; }
+  else if(screens.title.classList.contains('active')) focusEl(document.getElementById('btn-zan'));
+}
+document.getElementById('upd-open').addEventListener('click', function(){ openUpdates(false, this); });
+document.getElementById('upd-x').addEventListener('click', function(){ updMarkSeen(); focusEl(document.getElementById('btn-zan')); });
+document.getElementById('upd-close').addEventListener('click', closeUpdates);
+document.getElementById('btn-updates').addEventListener('click', function(){ openUpdates(true, this); });
+updEls.modal.addEventListener('click', function(e){ if(e.target && e.target.getAttribute('data-updclose')) closeUpdates(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && updEls.modal && !updEls.modal.hidden){ e.preventDefault(); closeUpdates(); } });
+
 // --- at start: the home with its dots and background, 限定 items already reached, and the guide for a first visit ---
 renderHome();
 (function(){
   var res = claimRewards();
   var store = loadStore();
+  // 更新のお知らせ: someone who has never played gets no 「アップデート」 telop (it is all new to them)
+  if(!updSeen() && !store.settings.onboarding.done && !(store.zan.plays>0)) updMarkSeen();
+  renderUpdTelop();
   if(!store.settings.onboarding.done || store.settings.onboarding.version<ONBOARDING_VERSION){
     if(res.items.length || res.titles.length) obPendingRewards = res;
     openOnboarding(null);
